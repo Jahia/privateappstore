@@ -1,0 +1,53 @@
+<comnt = 'http://www.jahia.com/jahia/nt/1.0'>
+<commix = 'http://www.jahia.com/jahia/mix/1.0'>
+
+[commix:forgeModules] > jmix:droppableContent, jmix:editorialContent mixin
+
+[comnt:filterTab] > jnt:content, commix:forgeModules, jmix:bindedComponent
+
+[comnt:categorySwitcher] > jnt:content, commix:forgeModules, jmix:bindedComponent
+- categoryList (weakreference, category[autoSelectParent=false]) multiple
+
+[comnt:queryModule] > jnt:content,  jmix:list, commix:forgeModules
+- startNode (weakreference)
+- nbOfModulePerPage (long) = 9
+
+[comnt:moduleForm] > jnt:content, mix:title, commix:forgeModules
+- moduleRepository (weakreference)
+
+[comnt:module] > jnt:content, mix:title, jmix:editorialContent, commix:forgeModules
+- quickDescription (string, richtext) i18n
+- bigDescription (string, richtext) i18n
+- icon (weakreference, picker[type='image'])
+- promoImage (weakreference, picker[type='image'])
+- screenshot1 (weakreference, picker[type='image'])
+- screenshot2 (weakreference, picker[type='image'])
+- screenshot3 (weakreference, picker[type='image'])
+- screenshot4 (weakreference, picker[type='image'])
+- authorName (string)
+- authorURL (string)
+- authorEmail (string)
+- date (date)
+- new (boolean) = true
+- codeRepository (string)
+- license (string, choicelist[resourceBundle]) < LGPL,GPL,Apache,JSEL,Proprietary,Other
+- downloadTracking (long) = 0 hidden onconflict=latest autocreated
+- supportedByJahia (boolean) = false autocreated
+- reviewedByJahia (boolean) = false autocreated
+- deleted (boolean) = false autocreated hidden
++ * (comnt:moduleVersion)
+
+[comnt:moduleVersion]> jnt:content, mix:title, jmix:editorialContent, commix:forgeModules
+- jcr:title (string) m boost=2.0
+- date (date) = now() m
+- moduleBinary(weakreference, picker[type='file'])
+- desc (string, richtext)
+- relatedJahiaVersion (weakreference,category[root='relatedJahiaVersion'])
+- releaseType (string, choicelist[resourceBundle]) = 'hotfix' m < 'hotfix', 'service-pack', 'upgrade'
+- status (string, choicelist[resourceBundle]) = 'release' m < 'release', 'beta'
+- version (string)
+- fileUrl (string)
+- fileMimeType (string)
+- fileLength (long)
+- fileDsaSignature (string)
+- releaseNotesUrl (string)
