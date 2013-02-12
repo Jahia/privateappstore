@@ -62,5 +62,9 @@
   </c:if>
   <p>${currentNode.properties.bigDescription.string}</p>
     <div class="addVersion"><span><a href="<c:url value='${url.base}${currentNode.path}.forge-addversion.html'/>"><fmt:message key="forge.addVersion"/></a></span></div>
-
+    <c:forEach items="${currentNode.nodes}" var="version">
+        <c:if test="${jcr:isNodeType(version,'comnt:moduleVersion')}">
+            <template:module node="${version}" view="default"/>
+        </c:if>
+    </c:forEach>
 </div>

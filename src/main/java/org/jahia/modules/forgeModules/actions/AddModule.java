@@ -33,17 +33,14 @@ public class AddModule extends Action {
         String authorURL = getParameter(parameters, "authorURL");
         String authorEmail = getParameter(parameters, "authorEmail");
         String codeRepository = getParameter(parameters, "codeRepository");
-        String versionNum = getParameter(parameters, "version");
-
+        String jahiAppLicenseUUID = getParameter(parameters, "jahiAppLicense");
         JCRSessionWrapper jcrSessionWrapper = resource.getNode().getSession();
-        JCRNodeWrapper folderNode = jcrSessionWrapper.getNode(renderContext.getSite().getPath() + "/files");
-        if (!folderNode.hasNode("modules")) {
-            folderNode.checkout();
-            folderNode = folderNode.addNode("modules", "jnt:folder");
-        } else {
-            folderNode = folderNode.getNode("modules");
-        }
-        JCRNodeWrapper node = resource.getNode();
+        JCRNodeWrapper targetNode = resource.getNode();
+        String path = targetNode.getPath();
+        JCRNodeWrapper newNode = createNode(req, parameters, jcrSessionWrapper.getNode(path), "comnt:module",moduleTitle, false);
+        JCRNodeWrapper folderNode = newNode.addNode("files", "jnt:folder");
+        JCRNodeWrapper jahiAppLicense = jcrSessionWrapper.getNodeByUUID(jahiAppLicenseUUID);
+
         final FileUpload fu = (FileUpload) req.getAttribute(FileUpload.FILEUPLOAD_ATTRIBUTE);
         DiskFileItem screenshotFile1 = fu.getFileItems().get("screenshot1");
         DiskFileItem screenshotFile2 = fu.getFileItems().get("screenshot2");
@@ -51,11 +48,9 @@ public class AddModule extends Action {
         DiskFileItem screenshotFile4 = fu.getFileItems().get("screenshot4");
         DiskFileItem iconFile = fu.getFileItems().get("iconFile");
         DiskFileItem promoImageFile = fu.getFileItems().get("promoImage");
-        DiskFileItem binaryFile = fu.getFileItems().get("binaryFile");
         logger.info("Adding module !!!!!!!!");
-        String path = node.getPath();
-        JCRNodeWrapper newNode = createNode(req, parameters, jcrSessionWrapper.getNode(path), "comnt:module",moduleTitle, false);
 
+        newNode.setProperty("license",jahiAppLicense);
         newNode.setProperty("quickDescription",quickDescription);
         newNode.setProperty("bigDescription",bigDescription);
         newNode.setProperty("authorName",authorName);
@@ -63,30 +58,28 @@ public class AddModule extends Action {
         newNode.setProperty("authorEmail",authorEmail);
         newNode.setProperty("codeRepository",codeRepository);
 
-        if (!folderNode.hasNode(moduleTitle)) {
+        /*if (!folderNode.hasNode(moduleTitle)) {
             folderNode.checkout();
             folderNode = folderNode.addNode(moduleTitle, "jnt:folder");
         } else {
             folderNode = folderNode.getNode(moduleTitle);
-        }
+        }            */
 
         JCRNodeWrapper screenshotNode1 = uploadModuleFile(folderNode,screenshotFile1);
         JCRNodeWrapper screenshotNode2 = uploadModuleFile(folderNode,screenshotFile2);
         JCRNodeWrapper screenshotNode3 = uploadModuleFile(folderNode,screenshotFile3);
         JCRNodeWrapper screenshotNode4 = uploadModuleFile(folderNode,screenshotFile4);
-        JCRNodeWrapper binaryFileNode = uploadModuleFile(folderNode,binaryFile);
         JCRNodeWrapper iconFileNode = uploadModuleFile(folderNode,iconFile);
         JCRNodeWrapper promoImageFileNode = uploadModuleFile(folderNode,promoImageFile);
 
+        newNode.setProperty("screenshot1",screenshotNode1);
+        newNode.setProperty("screenshot1",screenshotNode1);
         newNode.setProperty("screenshot1",screenshotNode1);
         newNode.setProperty("screenshot2",screenshotNode2);
         newNode.setProperty("screenshot3",screenshotNode3);
         newNode.setProperty("screenshot4",screenshotNode4);
         newNode.setProperty("icon",iconFileNode);
         newNode.setProperty("promoImage",promoImageFileNode);
-        JCRNodeWrapper version = newNode.addNode("version"+versionNum,"comnt:moduleVersion");
-        version.setProperty("version",versionNum);
-        version.setProperty("moduleBinary",binaryFileNode);
         jcrSessionWrapper.save();
 
 

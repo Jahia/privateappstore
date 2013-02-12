@@ -30,11 +30,12 @@
 - date (date)
 - new (boolean) = true
 - codeRepository (string)
-- license (string, choicelist[resourceBundle]) < LGPL,GPL,Apache,JSEL,Proprietary,Other
+- license  (weakreference,category[root='license'])
 - downloadTracking (long) = 0 hidden onconflict=latest autocreated
 - supportedByJahia (boolean) = false autocreated
 - reviewedByJahia (boolean) = false autocreated
 - deleted (boolean) = false autocreated hidden
++ files (jnt:folder) = jnt:folder autocreated hidden
 + * (comnt:moduleVersion)
 
 [comnt:moduleVersion]> jnt:content, mix:title, jmix:editorialContent, commix:forgeModules
@@ -44,7 +45,7 @@
 - desc (string, richtext)
 - relatedJahiaVersion (weakreference,category[root='relatedJahiaVersion'])
 - releaseType (string, choicelist[resourceBundle]) = 'hotfix' m < 'hotfix', 'service-pack', 'upgrade'
-- status (string, choicelist[resourceBundle]) = 'release' m < 'release', 'beta'
+- status (weakreference,category[root='status'])
 - version (string)
 - fileUrl (string)
 - fileMimeType (string)

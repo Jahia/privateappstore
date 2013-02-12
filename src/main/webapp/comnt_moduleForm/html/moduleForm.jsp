@@ -109,30 +109,19 @@
             <div class="control-group">
                 <label class="control-label" for="jahiAppLicense"><fmt:message key="comnt_module.jahiAppLicense"/></label>
                 <div class="controls">
-                    <input type="hidden" id="jahiAppLicense" name="jahiAppLicense" value=""/>
+                    <input type="text" id="jahiAppLicense" name="jahiAppLicense" value=""/>
                     <input type="text" id="categoryFieldDisplay1" name="categoryFieldDisplay1" readonly="readonly" />
                     <uiComponents:treeItemSelector fieldId="jahiAppLicense" displayFieldId="categoryFieldDisplay1" nodeTypes="jnt:category"
                         selectableNodeTypes="jnt:category" root="/sites/systemsite/categories/forge-categories/license"
-                        includeChildren="false" displayIncludeChildren="false"/>
+                        includeChildren="false" displayIncludeChildren="false" valueType="identifier" />
                 </div>
             </div>
 
-            <div class="control-group">
-                <label class="control-label" for="jahiAppStatus"><fmt:message key="comnt_module.jahiAppStatus"/></label>
-                <div class="controls">
-                    <input type="hidden" id="jahiAppStatus" name="jahiAppStatus" value=""/>
-                    <input type="text" id="categoryFieldDisplay2" name="categoryFieldDisplay2" readonly="readonly" />
-                    <uiComponents:treeItemSelector fieldId="jahiAppStatus" displayFieldId="categoryFieldDisplay2" nodeTypes="jnt:category"
-                        selectableNodeTypes="jnt:category" root="/sites/systemsite/categories/forge-categories/status"
-                        includeChildren="false" displayIncludeChildren="false"/>
-                </div>
-            </div>
             <div class="control-group">
                 <div class="controls">
                     <input type="submit" class="btn" value="<fmt:message key="forge.submit" />"/>
                 </div>
             </div>
-
         </fieldset>
 
     </form>

@@ -28,16 +28,18 @@ public class AddModuleRelease extends Action {
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource, JCRSessionWrapper session, Map<String, List<String>> parameters, URLResolver urlResolver) throws Exception {
         String moduleReleaseTitle = getParameter(parameters, "title");
         String desc = getParameter(parameters, "desc");
-        String status = getParameter(parameters, "status");
+        String statusUUID = getParameter(parameters, "jahiAppStatus");
+        String relatedJahiaVersionUUID = getParameter(parameters, "relatedJahiaVersion");
         String versionNum = getParameter(parameters, "version");
+        String releaseType = getParameter(parameters, "releaseType");
 
         JCRSessionWrapper jcrSessionWrapper = resource.getNode().getSession();
         JCRNodeWrapper node = resource.getNode();
-        JCRNodeWrapper folderNode = jcrSessionWrapper.getNode(renderContext.getSite().getPath() + "/files/modules/"+node.getName());
+        String path = node.getPath();
+        JCRNodeWrapper folderNode = node.getNode("files");
         final FileUpload fu = (FileUpload) req.getAttribute(FileUpload.FILEUPLOAD_ATTRIBUTE);
         DiskFileItem binaryFile = fu.getFileItems().get("binaryFile");
         logger.info("Adding module !!!!!!!!");
-        String path = node.getPath();
 
         if (!folderNode.hasNode(moduleReleaseTitle)) {
             folderNode.checkout();
@@ -46,16 +48,19 @@ public class AddModuleRelease extends Action {
             folderNode = folderNode.getNode(moduleReleaseTitle);
         }
         JCRNodeWrapper binaryFileNode = uploadModuleFile(folderNode,binaryFile);
-
+        JCRNodeWrapper relatedJahiaVersion = jcrSessionWrapper.getNodeByUUID(relatedJahiaVersionUUID);
+        JCRNodeWrapper status = jcrSessionWrapper.getNodeByUUID(statusUUID);
         JCRNodeWrapper moduleVersion = node.addNode("version"+versionNum,"comnt:moduleVersion");
-        moduleVersion.setProperty("title",moduleReleaseTitle);
+        moduleVersion.setProperty("jcr:title",moduleReleaseTitle);
         moduleVersion.setProperty("version",versionNum);
+        moduleVersion.setProperty("relatedJahiaVersion",relatedJahiaVersion);
         moduleVersion.setProperty("status",status);
+        moduleVersion.setProperty("releaseType",releaseType);
         moduleVersion.setProperty("desc",desc);
         moduleVersion.setProperty("moduleBinary",binaryFileNode);
+        moduleVersion.setProperty("date", moduleVersion.getProperty("jcr:created").getDate());
+
         jcrSessionWrapper.save();
-
-
 
         return new ActionResult(HttpServletResponse.SC_OK, node.getPath(), Render.serializeNodeToJSON(node));
     }
