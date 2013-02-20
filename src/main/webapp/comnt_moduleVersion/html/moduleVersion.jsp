@@ -14,11 +14,13 @@
 <%--@elvariable id="currentResource" type="org.jahia.services.render.Resource"--%>
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
-
-${currentNode.properties["jcr:title"].string}
-<fmt:formatDate value="${currentNode.properties.date.time}" type="date" dateStyle="long"/>
-${currentNode.properties.moduleBinary.node.url}
-${currentNode.properties.desc.string}
-${currentNode.properties.relatedJahiaVersion.node.name}
-${currentNode.properties.releaseType.string}
-${currentNode.properties.status.node.name}
+<div>
+    <div></div>
+    <div>${currentNode.properties["jcr:title"].string} </div>
+    <div><fmt:formatDate value="${currentNode.properties.date.time}" type="date" dateStyle="long"/> </div>
+    <div><a href="${currentNode.properties.moduleBinary.node.url}">Download</a></div>
+    <div>${currentNode.properties.desc.string}</div>
+    <div>${currentNode.properties.relatedJahiaVersion.node.name}</div>
+    <div>${currentNode.properties.releaseType.string}</div>
+    <div>${currentNode.properties.status.node.name}</div>
+</div>

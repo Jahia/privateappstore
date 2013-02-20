@@ -17,12 +17,7 @@
 
 <div class="module moduleviewdetail">
   <c:url value="${renderContext.request.requestURL}" var="moduleUrl" />
-  <c:url value="${currentNode.properties.moduleFile.node.url}" var="downloadUrl" />
-  <a class="modulebutton" href="${downloadUrl}"><strong>
-  <fmt:message key="forge.download"/>
-  </strong> <em>
-  <fmt:message key="forge.download"/>
-  </em></a> <a class="modulebutton" href="mailto:?subject=[JAHIA Forge] ${currentNode.properties['jcr:title'].string}&body=${moduleUrl}"><strong>
+  <a class="modulebutton" href="mailto:?subject=[JAHIA Forge] ${currentNode.properties['jcr:title'].string}&body=${moduleUrl}"><strong>
   <fmt:message key="forge.sendToFriend"/>
   </strong> <em>
   <fmt:message key="forge.sendToFriend"/>
@@ -32,18 +27,19 @@
   <fmt:message key="forge.backToList"/>
   </a>
   <h1>${currentNode.properties['jcr:title'].string}</h1>
-  <p class="moduleinfo">
+  <p class="authorinfo">
     <fmt:message key="forge.by"/>
     &nbsp;<a href="${currentNode.properties.authorURL.string}">${currentNode.properties.authorName.string}</a> -
     <fmt:formatDate value="${currentNode.properties.date.time}" type="date" dateStyle="long"/>
+    ${currentNode.properties.authorURL.string}
   </p>
   <p class="moduleinfo">
     <c:if test="${not empty currentNode.properties.url.string}">
       <fmt:message key="forge.url"/>
-      :&nbsp;<a href="${currentNode.properties.url.string}" target="_blank">${currentNode.properties.url.string}</a> </c:if>
+      :&nbsp;<a href="${currentNode.properties.url.string}" target="_blank">${currentNode.properties.url.string}</a></c:if>
     <c:if test="${not empty currentNode.properties.codeRepository.string}"> -
       <fmt:message key="forge.codeRepository"/>
-      :&nbsp;<a href="${currentNode.properties.codeRepository.string}" target="_blank">${currentNode.properties.codeRepository.string}</a> </c:if>
+      :&nbsp;<a href="${currentNode.properties.codeRepository.string}" target="_blank">${currentNode.properties.codeRepository.string}</a></c:if>
     <c:if test="${not empty currentNode.properties.jahiAppLicense.node}"> -
       <fmt:message key="forge.license"/>
       :&nbsp;${currentNode.properties.jahiAppLicense.node.properties['jcr:title'].string} </c:if>
@@ -56,15 +52,45 @@
       <fmt:message key="forge.jahiAppStatus"/>
       :&nbsp;${currentNode.properties.jahiAppStatus.node.properties['jcr:title'].string} </c:if>
   </p>
-  <c:if test="${jcr:isNodeType(currentNode,'jmix:rating')}">
-    <c:url value="${url.currentModule}/img/rating_${fn:substringBefore(currentNode.properties['j:sumOfVotes'].long / currentNode.properties['j:nbOfVotes'].long,'.')}.png" var="ratingUrl" />
-    <div class="ratingbox"><img alt="rating" src="${ratingUrl}"><small> ${currentNode.properties['j:nbOfVotes'].string} ratings</small></div>
-  </c:if>
-  <p>${currentNode.properties.bigDescription.string}</p>
-    <div class="addVersion"><span><a href="<c:url value='${url.base}${currentNode.path}.forge-addversion.html'/>"><fmt:message key="forge.addVersion"/></a></span></div>
-    <c:forEach items="${currentNode.nodes}" var="version">
-        <c:if test="${jcr:isNodeType(version,'comnt:moduleVersion')}">
-            <template:module node="${version}" view="default"/>
+    <div class="modulescreenshots">
+        <c:if test="${not empty currentNode.properties.screenshot1.node}">
+            <fmt:message key="comnt_module.screenshot1"/>:
+            <img alt="icon" src="${currentNode.properties.screenshot1.node.url}">
         </c:if>
-    </c:forEach>
+        <c:if test="${not empty currentNode.properties.screenshot2.node}">
+            <fmt:message key="comnt_module.screenshot2"/>:
+            <img alt="icon" src="${currentNode.properties.screenshot2.node.url}">
+        </c:if>
+        <c:if test="${not empty currentNode.properties.screenshot3.node}">
+            <fmt:message key="comnt_module.screenshot3"/>:
+            <img alt="icon" src="${currentNode.properties.screenshot3.node.url}">
+        </c:if>
+        <c:if test="${not empty currentNode.properties.screenshot4.node}">
+            <fmt:message key="comnt_module.screenshot4"/>:
+            <img alt="icon" src="${currentNode.properties.screenshot4.node.url}">
+        </c:if>
+    </div>
+
+    <c:if test="${currentNode.properties.supportedByJahia.boolean}">
+        <div class="supportedByJahia"><fmt:message key="comnt_module.supportedByJahia"/></div>
+    </c:if>
+
+    <c:if test="${currentNode.properties.reviewedByJahia.boolean}">
+        <div class="reviewedByJahia"><fmt:message key="comnt_module.reviewedByJahia"/></div>
+    </c:if>
+
+  <p>${currentNode.properties.bigDescription.string}</p>
+    <div class="addVersion">
+        <span><a href="<c:url value='${url.base}${currentNode.path}.forge-addversion.html'/>"><fmt:message key="forge.addVersion"/></a></span>
+    </div>
+    <div class="module_versions">
+        <c:forEach items="${currentNode.nodes}" var="version">
+            <c:if test="${jcr:isNodeType(version,'comnt:moduleVersion')}">
+                <a href="<c:url value='${url.base}${version.path}.html'/>">${version.name}</a>
+            </c:if>
+        </c:forEach>
+    </div>
+
+    <div class="edit"><a href="<c:url value='${url.base}${currentNode.path}.edit-module.html'/>">edit</a></div>
+
 </div>

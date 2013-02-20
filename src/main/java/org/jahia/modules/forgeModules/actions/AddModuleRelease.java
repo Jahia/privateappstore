@@ -41,35 +41,46 @@ public class AddModuleRelease extends Action {
         DiskFileItem binaryFile = fu.getFileItems().get("binaryFile");
         logger.info("Adding module !!!!!!!!");
 
+
         if (!folderNode.hasNode(moduleReleaseTitle)) {
             folderNode.checkout();
             folderNode = folderNode.addNode(moduleReleaseTitle, "jnt:folder");
         } else {
             folderNode = folderNode.getNode(moduleReleaseTitle);
         }
-        JCRNodeWrapper binaryFileNode = uploadModuleFile(folderNode,binaryFile);
-        JCRNodeWrapper relatedJahiaVersion = jcrSessionWrapper.getNodeByUUID(relatedJahiaVersionUUID);
-        JCRNodeWrapper status = jcrSessionWrapper.getNodeByUUID(statusUUID);
+
         JCRNodeWrapper moduleVersion = node.addNode("version"+versionNum,"comnt:moduleVersion");
+        uploadAndSetModuleFile(moduleVersion,folderNode,binaryFile,"moduleBinary");
+        if (moduleReleaseTitle!=null)
         moduleVersion.setProperty("jcr:title",moduleReleaseTitle);
-        moduleVersion.setProperty("version",versionNum);
-        moduleVersion.setProperty("relatedJahiaVersion",relatedJahiaVersion);
-        moduleVersion.setProperty("status",status);
-        moduleVersion.setProperty("releaseType",releaseType);
-        moduleVersion.setProperty("desc",desc);
-        moduleVersion.setProperty("moduleBinary",binaryFileNode);
+        if (versionNum!=null)
+            moduleVersion.setProperty("version",versionNum);
+        if (releaseType!=null)
+            moduleVersion.setProperty("releaseType",releaseType);
+        if (desc!=null)
+            moduleVersion.setProperty("desc",desc);
         moduleVersion.setProperty("date", moduleVersion.getProperty("jcr:created").getDate());
+
+        if(statusUUID!=null){
+            JCRNodeWrapper status = jcrSessionWrapper.getNodeByUUID(statusUUID);
+            moduleVersion.setProperty("status",status);
+        }
+
+        if(relatedJahiaVersionUUID!=null){
+            JCRNodeWrapper relatedJahiaVersion = jcrSessionWrapper.getNodeByUUID(relatedJahiaVersionUUID);
+            moduleVersion.setProperty("relatedJahiaVersion",relatedJahiaVersion);
+        }
 
         jcrSessionWrapper.save();
 
         return new ActionResult(HttpServletResponse.SC_OK, node.getPath(), Render.serializeNodeToJSON(node));
     }
 
-    private JCRNodeWrapper uploadModuleFile(JCRNodeWrapper targetFolder,DiskFileItem fileToUpload) throws IOException, RepositoryException {
-        if (fileToUpload !=null)
-            return targetFolder.uploadFile(fileToUpload.getName(), fileToUpload.getInputStream(), fileToUpload.getContentType());
-        else
-            return null;
+    private void uploadAndSetModuleFile(JCRNodeWrapper targetNode, JCRNodeWrapper targetFolder,DiskFileItem fileToUpload,  String propertieName) throws IOException, RepositoryException {
+        if (fileToUpload !=null){
+            JCRNodeWrapper fileNode = targetFolder.uploadFile(fileToUpload.getName(), fileToUpload.getInputStream(), fileToUpload.getContentType());
+            targetNode.setProperty(propertieName,fileNode);
+        }
     }
 
 }

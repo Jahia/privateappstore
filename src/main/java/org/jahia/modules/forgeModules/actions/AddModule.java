@@ -36,27 +36,39 @@ public class AddModule extends Action {
         String jahiAppLicenseUUID = getParameter(parameters, "jahiAppLicense");
         JCRSessionWrapper jcrSessionWrapper = resource.getNode().getSession();
         JCRNodeWrapper targetNode = resource.getNode();
-        String path = targetNode.getPath();
-        JCRNodeWrapper newNode = createNode(req, parameters, jcrSessionWrapper.getNode(path), "comnt:module",moduleTitle, false);
-        JCRNodeWrapper folderNode = newNode.addNode("files", "jnt:folder");
-        JCRNodeWrapper jahiAppLicense = jcrSessionWrapper.getNodeByUUID(jahiAppLicenseUUID);
+        JCRNodeWrapper newNode = null;
+        JCRNodeWrapper folderNode = null;
+
+        if(targetNode.isNodeType("comnt:module")){
+            newNode = targetNode;
+            folderNode = newNode.getNode("files");
+        }else{
+            String path = targetNode.getPath();
+            newNode = createNode(req, parameters, jcrSessionWrapper.getNode(path), "comnt:module",moduleTitle, false);
+            folderNode = newNode.addNode("files", "jnt:folder");
+        }
+
+        if (jahiAppLicenseUUID!=null){
+            JCRNodeWrapper jahiAppLicense = jcrSessionWrapper.getNodeByUUID(jahiAppLicenseUUID);
+            newNode.setProperty("license",jahiAppLicense);
+        }
 
         final FileUpload fu = (FileUpload) req.getAttribute(FileUpload.FILEUPLOAD_ATTRIBUTE);
-        DiskFileItem screenshotFile1 = fu.getFileItems().get("screenshot1");
-        DiskFileItem screenshotFile2 = fu.getFileItems().get("screenshot2");
-        DiskFileItem screenshotFile3 = fu.getFileItems().get("screenshot3");
-        DiskFileItem screenshotFile4 = fu.getFileItems().get("screenshot4");
-        DiskFileItem iconFile = fu.getFileItems().get("iconFile");
-        DiskFileItem promoImageFile = fu.getFileItems().get("promoImage");
+
         logger.info("Adding module !!!!!!!!");
 
-        newNode.setProperty("license",jahiAppLicense);
-        newNode.setProperty("quickDescription",quickDescription);
-        newNode.setProperty("bigDescription",bigDescription);
-        newNode.setProperty("authorName",authorName);
-        newNode.setProperty("authorURL",authorURL);
-        newNode.setProperty("authorEmail",authorEmail);
-        newNode.setProperty("codeRepository",codeRepository);
+        if (quickDescription!=null)
+            newNode.setProperty("quickDescription",quickDescription);
+        if (bigDescription!=null)
+            newNode.setProperty("bigDescription",bigDescription);
+        if (authorName!=null)
+            newNode.setProperty("authorName",authorName);
+        if (authorURL!=null)
+            newNode.setProperty("authorURL",authorURL);
+        if (authorEmail!=null)
+            newNode.setProperty("authorEmail",authorEmail);
+        if (codeRepository!=null)
+            newNode.setProperty("codeRepository",codeRepository);
 
         /*if (!folderNode.hasNode(moduleTitle)) {
             folderNode.checkout();
@@ -64,22 +76,19 @@ public class AddModule extends Action {
         } else {
             folderNode = folderNode.getNode(moduleTitle);
         }            */
+        DiskFileItem screenshotFile1 = fu.getFileItems().get("screenshot1");
+        DiskFileItem screenshotFile2 = fu.getFileItems().get("screenshot2");
+        DiskFileItem screenshotFile3 = fu.getFileItems().get("screenshot3");
+        DiskFileItem screenshotFile4 = fu.getFileItems().get("screenshot4");
+        DiskFileItem iconFile = fu.getFileItems().get("iconFile");
+        DiskFileItem promoImageFile = fu.getFileItems().get("promoImage");
 
-        JCRNodeWrapper screenshotNode1 = uploadModuleFile(folderNode,screenshotFile1);
-        JCRNodeWrapper screenshotNode2 = uploadModuleFile(folderNode,screenshotFile2);
-        JCRNodeWrapper screenshotNode3 = uploadModuleFile(folderNode,screenshotFile3);
-        JCRNodeWrapper screenshotNode4 = uploadModuleFile(folderNode,screenshotFile4);
-        JCRNodeWrapper iconFileNode = uploadModuleFile(folderNode,iconFile);
-        JCRNodeWrapper promoImageFileNode = uploadModuleFile(folderNode,promoImageFile);
-
-        newNode.setProperty("screenshot1",screenshotNode1);
-        newNode.setProperty("screenshot1",screenshotNode1);
-        newNode.setProperty("screenshot1",screenshotNode1);
-        newNode.setProperty("screenshot2",screenshotNode2);
-        newNode.setProperty("screenshot3",screenshotNode3);
-        newNode.setProperty("screenshot4",screenshotNode4);
-        newNode.setProperty("icon",iconFileNode);
-        newNode.setProperty("promoImage",promoImageFileNode);
+        uploadAndSetModuleFile(newNode,folderNode,screenshotFile1,"screenshot1");
+        uploadAndSetModuleFile(newNode,folderNode,screenshotFile2,"screenshot2");
+        uploadAndSetModuleFile(newNode,folderNode,screenshotFile3,"screenshot3");
+        uploadAndSetModuleFile(newNode,folderNode,screenshotFile4,"screenshot4");
+        uploadAndSetModuleFile(newNode,folderNode,iconFile,"icon");
+        uploadAndSetModuleFile(newNode,folderNode,promoImageFile,"promoImage");
         jcrSessionWrapper.save();
 
 
@@ -87,11 +96,11 @@ public class AddModule extends Action {
         return new ActionResult(HttpServletResponse.SC_OK, newNode.getPath(), Render.serializeNodeToJSON(newNode));
     }
 
-    private JCRNodeWrapper uploadModuleFile(JCRNodeWrapper targetFolder,DiskFileItem fileToUpload) throws IOException, RepositoryException {
-        if (fileToUpload !=null)
-            return targetFolder.uploadFile(fileToUpload.getName(), fileToUpload.getInputStream(), fileToUpload.getContentType());
-        else
-            return null;
+    private void uploadAndSetModuleFile(JCRNodeWrapper targetNode, JCRNodeWrapper targetFolder,DiskFileItem fileToUpload,  String propertieName) throws IOException, RepositoryException {
+        if (fileToUpload !=null){
+            JCRNodeWrapper fileNode = targetFolder.uploadFile(fileToUpload.getName(), fileToUpload.getInputStream(), fileToUpload.getContentType());
+            targetNode.setProperty(propertieName,fileNode);
+        }
     }
 
 }
