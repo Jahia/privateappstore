@@ -39,9 +39,9 @@
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.jahiaCom.modules</groupId>
-        <artifactId>jahiaCom-modules</artifactId>
-        <version>1.1</version>
+        <artifactId>jahia-modules</artifactId>
+        <groupId>org.jahia.modules</groupId>
+        <version>6.6.1.0</version>
     </parent>
     <groupId>org.jahia.modules</groupId>
     <artifactId>forgeModules</artifactId>
