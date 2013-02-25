@@ -57,7 +57,7 @@
                 <label class="control-label" for="title"><fmt:message key="comnt_module.title"/></label>
                 <div class="controls">
                     <input placeholder="<fmt:message key="comnt_module.title" />" class="span16" type="text"
-                           name="title" id="title" value="${title}"/>
+                           name="title" id="title" value="${title.string}"/>
                 </div>
             </div>
 
@@ -95,11 +95,17 @@
 
             <div class="control-group">
                 <label class="control-label" for="screenshot1"><fmt:message key="comnt_module.screenshot1"/></label>
-                <div class="controls">
+                <c:if test="${not empty screenshot1.node}">
+                    ${screenshot1.node.name}
+                    <img src="${screenshot1.node.thumbnailUrls['thumbnail']}" alt=""/>
+                    <p><a href="#" onclick="$('#screenshot1container').show();">Update</a></p>
+                    <c:set var="screenshot1Display" value="style=\"display: none;\""/>
+                </c:if>
+                <div class="controls" id="screenshot1container" ${screenshot1Display}>
                     <input placeholder="<fmt:message key="comnt_module.screenshot1" />" class="span16" type="file"
                            name="screenshot1" id="screenshot1"/>
                 </div>
-                <img src="${screenshot1.node.thumbnailUrls['thumbnail']}" alt=""/>
+
             </div>
             <div class="control-group">
                 <label class="control-label" for="screenshot2"><fmt:message key="comnt_module.screenshot2"/></label>

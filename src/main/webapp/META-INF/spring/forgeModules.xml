@@ -12,4 +12,9 @@
         <property name="name" value="AddModuleRelease"/>
         <property name="requireAuthenticatedUser" value="true"/>
     </bean>
+
+    <bean class="org.jahia.modules.forgeModules.actions.DeleteModule" >
+        <property name="name" value="DeleteModule"/>
+        <property name="requireAuthenticatedUser" value="true"/>
+    </bean>
 </beans>

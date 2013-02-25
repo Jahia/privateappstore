@@ -44,13 +44,21 @@
       <fmt:message key="forge.license"/>
       :&nbsp;${currentNode.properties.jahiAppLicense.node.properties['jcr:title'].string} </c:if>
       
-	      <c:if test="${not empty currentNode.properties.relatedJahiaVersion.node}"><br />
-      <fmt:message key="forge.relatedJahiaVersion"/>
-      :&nbsp;${currentNode.properties.relatedJahiaVersion.node.properties['jcr:title'].string} </c:if>
+	  <c:if test="${not empty currentNode.properties.relatedJahiaVersion.node}"><br />
+          <fmt:message key="forge.relatedJahiaVersion"/>
+          :&nbsp;${currentNode.properties.relatedJahiaVersion.node.properties['jcr:title'].string}
+      </c:if>
       
-	      <c:if test="${not empty currentNode.properties.jahiAppStatus.node}"> -
-      <fmt:message key="forge.jahiAppStatus"/>
-      :&nbsp;${currentNode.properties.jahiAppStatus.node.properties['jcr:title'].string} </c:if>
+      <c:if test="${not empty currentNode.properties.jahiAppStatus.node}"> -
+          <fmt:message key="forge.jahiAppStatus"/>
+          :&nbsp;${currentNode.properties.jahiAppStatus.node.properties['jcr:title'].string}
+      </c:if>
+
+        <c:if test="${not empty currentNode.properties.bigDescription.string}"> -
+              <fmt:message key="comnt_module.bigDescription"/>
+              :&nbsp;${currentNode.properties.bigDescription.string}
+        </c:if>
+
   </p>
     <div class="modulescreenshots">
         <c:if test="${not empty currentNode.properties.screenshot1.node}">
@@ -79,7 +87,6 @@
         <div class="reviewedByJahia"><fmt:message key="comnt_module.reviewedByJahia"/></div>
     </c:if>
 
-  <p>${currentNode.properties.bigDescription.string}</p>
     <div class="addVersion">
         <span><a href="<c:url value='${url.base}${currentNode.path}.forge-addversion.html'/>"><fmt:message key="forge.addVersion"/></a></span>
     </div>
@@ -92,5 +99,10 @@
     </div>
 
     <div class="edit"><a href="<c:url value='${url.base}${currentNode.path}.edit-module.html'/>">edit</a></div>
+<template:tokenizedForm>
+    <form action="<c:url value='${url.base}${currentNode.path}.DeleteModule.do'/>" method="post" id="deleteModule" enctype="multipart/form-data"  accept="application/json">
+    </form>
+</template:tokenizedForm>
+    <div class="delete"><a onclick="$('#deleteModule').submit()">delete</a></div>
 
 </div>

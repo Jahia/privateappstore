@@ -16,6 +16,7 @@
 - moduleRepository (weakreference)
 
 [comnt:module] > jnt:content, mix:title, jmix:editorialContent, commix:forgeModules
+- jcr:title (string) m
 - quickDescription (string, richtext) i18n
 - bigDescription (string, richtext) i18n
 - icon (weakreference, picker[type='image'])

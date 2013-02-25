@@ -24,10 +24,10 @@
     <c:when test="${criteria eq 'new'}">
         <c:choose>
             <c:when test="${!empty category and category != 'none'}">
-                <c:set var="statement" value="SELECT * FROM [comnt:module] AS module WHERE ISDESCENDANTNODE(module,'${not empty startNode and not empty startNode.node ? startNode.node.path : renderContext.site.path}') AND module.[new]=true AND module.[j:defaultCategory]='${category}' ORDER BY module.[jcr:created] desc "/>
+                <c:set var="statement" value="SELECT * FROM [comnt:module] AS module WHERE ISDESCENDANTNODE(module,'${not empty startNode and not empty startNode.node ? startNode.node.path : renderContext.site.path}') AND module.[deleted]=false AND module.[new]=true AND module.[j:defaultCategory]='${category}' ORDER BY module.[jcr:created] desc "/>
             </c:when>
             <c:otherwise>
-                <c:set var="statement" value="SELECT * FROM [comnt:module] AS module WHERE ISDESCENDANTNODE(module,'${not empty startNode and not empty startNode.node ? startNode.node.path : renderContext.site.path}') AND module.[new]=true ORDER BY module.[jcr:created] desc"/>
+                <c:set var="statement" value="SELECT * FROM [comnt:module] AS module WHERE ISDESCENDANTNODE(module,'${not empty startNode and not empty startNode.node ? startNode.node.path : renderContext.site.path}') AND module.[deleted]=false AND module.[new]=true ORDER BY module.[jcr:created] desc"/>
             </c:otherwise>
         </c:choose>
     </c:when>
@@ -37,10 +37,10 @@
     <c:otherwise>
         <c:choose>
             <c:when test="${!empty category and category != 'none'}">
-                 <c:set var="statement" value="SELECT * FROM [comnt:module] AS module WHERE ISDESCENDANTNODE(module,'${not empty startNode and not empty startNode.node ? startNode.node.path : renderContext.site.path}') AND module.[j:defaultCategory]='${category}' ORDER BY module.[jcr:created] desc"/>
+                 <c:set var="statement" value="SELECT * FROM [comnt:module] AS module WHERE ISDESCENDANTNODE(module,'${not empty startNode and not empty startNode.node ? startNode.node.path : renderContext.site.path}') AND module.[deleted]=false AND module.[j:defaultCategory]='${category}' ORDER BY module.[jcr:created] desc"/>
             </c:when>
             <c:otherwise>
-                 <c:set var="statement" value="SELECT * FROM [comnt:module] AS module WHERE ISDESCENDANTNODE(module,'${not empty startNode and not empty startNode.node ? startNode.node.path : renderContext.site.path}') ORDER BY module.[jcr:created] desc"/>
+                 <c:set var="statement" value="SELECT * FROM [comnt:module] AS module WHERE ISDESCENDANTNODE(module,'${not empty startNode and not empty startNode.node ? startNode.node.path : renderContext.site.path}') AND module.[deleted]=false ORDER BY module.[jcr:created] desc"/>
             </c:otherwise>
         </c:choose>
     </c:otherwise>

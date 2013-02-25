@@ -14,13 +14,19 @@
 <%--@elvariable id="currentResource" type="org.jahia.services.render.Resource"--%>
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
+
 <div>
     <div></div>
-    <div>${currentNode.properties["jcr:title"].string} </div>
-    <div><fmt:formatDate value="${currentNode.properties.date.time}" type="date" dateStyle="long"/> </div>
-    <div><a href="${currentNode.properties.moduleBinary.node.url}">Download</a></div>
-    <div>${currentNode.properties.desc.string}</div>
-    <div>${currentNode.properties.relatedJahiaVersion.node.name}</div>
-    <div>${currentNode.properties.releaseType.string}</div>
-    <div>${currentNode.properties.status.node.name}</div>
+    <div><fmt:message key="comnt_moduleVersion.title"/>:${currentNode.properties["jcr:title"].string}</div>
+    <div><fmt:message key="comnt_moduleVersion.version"/>:${currentNode.properties.version.string}</div>
+    <div><fmt:message key="comnt_moduleVersion.date"/>:<fmt:formatDate value="${currentNode.properties.date.time}" type="date" dateStyle="long"/> </div>
+    <div><fmt:message key="comnt_moduleVersion.moduleBinary"/>:<a href="${currentNode.properties.moduleBinary.node.url}">Download</a></div>
+    <div><fmt:message key="comnt_moduleVersion.desc"/>:${currentNode.properties.desc.string}</div>
+    <div><fmt:message key="comnt_moduleVersion.relatedJahiaVersion"/>:${currentNode.properties.relatedJahiaVersion.node.name}</div>
+    <div><fmt:message key="comnt_moduleVersion.releaseType"/>:${currentNode.properties.releaseType.string}</div>
+    <div><fmt:message key="comnt_moduleVersion.status"/>:${currentNode.properties.status.node.name}</div>
+
+    <div class="edit"><a href="<c:url value='${url.base}${currentNode.path}.forge-updateversion.html'/>"><fmt:message key="comnt_moduleVersion.edit"/></a></div>
+    <div class="back"><a href="<c:url value='${url.base}${currentNode.parent.path}.html'/>"><fmt:message key="comnt_moduleVersion.backToParentModule"/></a></div>
+
 </div>

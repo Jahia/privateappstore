@@ -18,20 +18,41 @@
 <script type="text/javascript">
     $(document).ready(function() {
          var form = $("#newModuleForm");
-        form.attr("enctype", "multipart/form-data");
+        form.attr("enctype", "multipart/form-data")
+        $("#releaseType").val('${releaseType}');
     })
 </script>
 <uiComponents:ckeditor selector="jahia-moduleVersion-desc-${currentNode.UUID}"/>
 
+
+<c:choose>
+    <c:when test="${jcr:isNodeType(renderContext.mainResource.node,'comnt:moduleVersion')}">
+        <c:set var="targetNode" value="${url.base}${renderContext.mainResource.node.path}"/>
+        <c:set var="currentModule" value="${url.base}${renderContext.mainResource.node}"/>
+        <c:set var="edition" value="true"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="jcr:title" var="title"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="moduleBinary" var="moduleBinary"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="desc" var="desc"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="relatedJahiaVersion" var="relatedJahiaVersion"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="releaseType" var="releaseType"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="status" var="status"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="version" var="version"/>
+    </c:when>
+    <c:otherwise>
+        <c:set var="targetNode" value="${url.base}${currentNode.path}"/>
+        <c:set var="edition" value="false"/>
+    </c:otherwise>
+</c:choose>
+
 <template:tokenizedForm>
-    <form action="<c:url value='${url.base}${currentNode.path}.addModuleRelease.do'/>" method="post" id="newModuleForm" enctype="multipart/form-data"  accept="application/json">
+    <form action="<c:url value='${targetNode}.addModuleRelease.do'/>" method="post" id="newModuleForm" enctype="multipart/form-data"  accept="application/json">
         <fieldset>
 
             <div class="control-group">
                 <label class="control-label" for="title"><fmt:message key="comnt_module.title"/></label>
                 <div class="controls">
                     <input placeholder="<fmt:message key="comnt_module.title" />" class="span16" type="text"
-                           name="title" id="title" value="${sessionScope.formDatas['title'][0]}"/>
+                           name="title" id="title" value="${title.string}"/>
                 </div>
             </div>
 
@@ -39,15 +60,21 @@
                 <label class="control-label" for="version"><fmt:message key="comnt_module.version"/></label>
                 <div class="controls">
                     <input placeholder="<fmt:message key="comnt_module.version" />" class="span16" type="text"
-                           name="version" id="version" value="${sessionScope.formDatas['version'][0]}"/>
+                           name="version" id="version" value="${version.string}"/>
                 </div>
             </div>
+
 
             <div class="control-group">
                 <label class="control-label" for="binaryFile"><fmt:message key="comnt_moduleVersion.moduleFile"/></label>
                 <div class="controls">
+
+                    <c:if test="${not empty moduleBinary.node.name}">
+                        <p>${moduleBinary.node.name}&nbsp<a href="#" onclick="$('#binaryFile').show();">Update</a></p>
+                        <c:set var="binaryFieldDisplay" value="style=\"display: none;\""/>
+                    </c:if>
                     <input placeholder="<fmt:message key="comnt_moduleVersion.moduleFile" />" class="span16" type="file"
-                           name="binaryFile" id="binaryFile" value="${sessionScope.formDatas['binaryFile'][0]}"/>
+                           name="binaryFile" id="binaryFile" value="${moduleBinary.node.name}" ${binaryFieldDisplay}/>
                 </div>
             </div>
 
@@ -56,9 +83,9 @@
                 <div class="controls">
                     <textarea rows="7" cols="35" id="jahia-moduleVersion-desc-${currentNode.UUID}"
                               placeholder="<fmt:message key="comnt_moduleVersion.desc" />" class="jahia-ckeditor span16"
-                           name="desc" value="${sessionScope.formDatas['desc'][0]}">
-                        <c:if test="${not empty sessionScope.formDatas['desc']}">
-                            ${fn:escapeXml(sessionScope.formDatas['desc'][0])}
+                           name="desc" value="${desc.string}">
+                        <c:if test="${not empty desc.string}">
+                            ${fn:escapeXml(desc.string)}
                         </c:if>
                     </textarea>
                 </div>

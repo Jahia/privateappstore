@@ -16,7 +16,7 @@
       <files j:originWS="default" jcr:primaryType="jnt:folder"/>
       <contents j:originWS="default" jcr:primaryType="jnt:contentFolder"/>
       <templates j:originWS="default" j:rootTemplatePath="/base" jcr:primaryType="jnt:templatesFolder">
-        <forge-addversion j:applyOn="comnt:module" j:defaultTemplate="true" j:hiddenTemplate="false" j:originWS="default" j:priority="100" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentTemplate">
+        <forge-addversion j:applyOn="comnt:module" j:defaultTemplate="false" j:hiddenTemplate="false" j:originWS="default" j:priority="100" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentTemplate">
           <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
           <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
             <predefined--rows-960gs column="1col16" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:row">
@@ -29,6 +29,19 @@
             </predefined--rows-960gs>
           </pagecontent>
         </forge-addversion>
+          <forge-updateversion j:applyOn="comnt:moduleVersion" j:defaultTemplate="false" j:hiddenTemplate="false" j:originWS="default" j:priority="100" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentTemplate">
+              <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+              <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" jcr:title="forge-updateversion"/>
+              <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
+                  <predefined--rows-960gs column="1col16" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:row">
+                      <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                      <predefined--rows-960gs-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
+                          <module deleted="false" downloadTracking="0" j:originWS="default" j:view="addversion" jcr:mixinTypes="jmix:accessControlled jmix:renderable" jcr:primaryType="comnt:module" new="true" reviewedByJahia="false" supportedByJahia="false">
+                              <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                          </module>
+                      </predefined--rows-960gs-col1>
+                  </predefined--rows-960gs></pagecontent>
+          </forge-updateversion>
         <module-template j:applyOn="comnt:module" j:defaultTemplate="true" j:hiddenTemplate="false" j:originWS="default" j:priority="100" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentTemplate">
           <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
           <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">

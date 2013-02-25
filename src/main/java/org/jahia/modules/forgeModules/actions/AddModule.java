@@ -57,6 +57,8 @@ public class AddModule extends Action {
 
         logger.info("Adding module !!!!!!!!");
 
+        if (moduleTitle!=null)
+            newNode.setProperty("jcr:title",moduleTitle);
         if (quickDescription!=null)
             newNode.setProperty("quickDescription",quickDescription);
         if (bigDescription!=null)

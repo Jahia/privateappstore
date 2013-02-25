@@ -36,11 +36,19 @@ public class AddModuleRelease extends Action {
         JCRSessionWrapper jcrSessionWrapper = resource.getNode().getSession();
         JCRNodeWrapper node = resource.getNode();
         String path = node.getPath();
-        JCRNodeWrapper folderNode = node.getNode("files");
+        JCRNodeWrapper folderNode = null;
+        JCRNodeWrapper moduleVersion =null;
         final FileUpload fu = (FileUpload) req.getAttribute(FileUpload.FILEUPLOAD_ATTRIBUTE);
         DiskFileItem binaryFile = fu.getFileItems().get("binaryFile");
         logger.info("Adding module !!!!!!!!");
 
+        if(node.isNodeType("comnt:moduleVersion")){
+            moduleVersion = node;
+            folderNode = node.getParent().getNode("files");
+        }else{
+            moduleVersion = node.addNode("version"+versionNum,"comnt:moduleVersion");
+            folderNode = node.getNode("files");
+        }
 
         if (!folderNode.hasNode(moduleReleaseTitle)) {
             folderNode.checkout();
@@ -49,7 +57,6 @@ public class AddModuleRelease extends Action {
             folderNode = folderNode.getNode(moduleReleaseTitle);
         }
 
-        JCRNodeWrapper moduleVersion = node.addNode("version"+versionNum,"comnt:moduleVersion");
         uploadAndSetModuleFile(moduleVersion,folderNode,binaryFile,"moduleBinary");
         if (moduleReleaseTitle!=null)
         moduleVersion.setProperty("jcr:title",moduleReleaseTitle);
