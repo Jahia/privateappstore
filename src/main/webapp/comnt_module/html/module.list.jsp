@@ -23,9 +23,9 @@
         <img alt="icon" src="${iconUrl}" class="moduleicon">
     </a>
 
-     <c:if test="${jcr:isNodeType(currentNode,'jmix:rating')}">
-              <c:url value="${url.currentModule}/img/rating_${fn:substringBefore(currentNode.properties['j:sumOfVotes'].long / currentNode.properties['j:nbOfVotes'].long,'.')}.png" var="ratingUrl" />
-            <div class="ratingbox floatright"><img alt="rating" src="${ratingUrl}"><small> ${currentNode.properties['j:nbOfVotes'].string} ratings</small></div>
+    <c:if test="${jcr:isNodeType(currentNode,'jmix:rating')}">
+        <c:url value="${url.currentModule}/img/rating_${fn:substringBefore(currentNode.properties['j:sumOfVotes'].long / currentNode.properties['j:nbOfVotes'].long,'.')}.png" var="ratingUrl" />
+        <div class="ratingbox floatright"><img alt="rating" src="${ratingUrl}"><small> ${currentNode.properties['j:nbOfVotes'].string} ratings</small></div>
     </c:if>
 
     <h2><a href="${moduleUrl}">${currentNode.properties['jcr:title'].string}</a></h2>

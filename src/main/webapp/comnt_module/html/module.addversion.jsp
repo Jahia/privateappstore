@@ -15,13 +15,71 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 <%--@elvariable id="acl" type="java.lang.String"--%>
 <template:addResources type="javascript" resources="jquery.min.js,jquery.validate.js"/>
-<script type="text/javascript">
-    $(document).ready(function() {
-         var form = $("#newModuleForm");
-        form.attr("enctype", "multipart/form-data")
-        $("#releaseType").val('${releaseType}');
-    })
-</script>
+
+
+<template:addResources type="inlinejavascript">
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+
+            jQuery.validator.addMethod("regexp", function(value, element, param) {
+                          return this.optional(element) || param.test(value);
+                        });
+
+                $("#newModuleForm-${currentNode.UUID}").validate({
+                rules: {
+                    'title': {
+                        required: true,
+                        minlength: 2
+                    },
+
+                    'version': {
+                        required: true,
+                        regexp: /^(\d+\\.)?(\d+\\.)?(\\*|\d+)$/i
+                    },
+
+                    'binaryFile': {
+                        required: true,
+                        regexp: /(\S+?)\.(jar|war)$/i
+                    },
+
+                    'desc': {
+                        required: true,
+                        minlength: 50
+                    }
+                },
+                messages: {
+                    'title': {
+                        required: "<fmt:message key='forge.label.askTitle'/>",
+                        minlength: "<fmt:message key='forge.label.titleSizeWarning'/>"
+                    },
+
+                    'version': {
+                        required: "<fmt:message key='forge.label.askVersion'/>",
+                        regexp: "<fmt:message key='forge.label.askValidVersion'/>"
+                    },
+
+                    'binaryFile': {
+                         required: "<fmt:message key='forge.label.askBinaryFile'/>",
+                         regexp:"<fmt:message key='forge.label.askValidBinaryFile'/>"
+                     },
+
+                    'desc': {
+                        required: "<fmt:message key='forge.label.askVersionDescription'/>",
+                        minlength: "<fmt:message key='forge.label.versionDescriptionSizeWarning'/>"
+                    }
+                }
+            });
+
+            var form = $("#newModuleForm");
+            form.attr("enctype", "multipart/form-data")
+            $("#releaseType").val('${releaseType}');
+
+        });
+
+    </script>
+</template:addResources>
+
 <uiComponents:ckeditor selector="jahia-moduleVersion-desc-${currentNode.UUID}"/>
 
 
@@ -104,18 +162,22 @@
                 </div>
             </div>
 
-            <div class="control-group">
-                <label class="control-label" for="relatedJahiaVersion"><fmt:message key="comnt_module.relatedJahiaVersion"/></label>
-                <div class="controls">
-                    <input type="text" id="relatedJahiaVersion" name="relatedJahiaVersion" value=""/>
-                    <input type="text" id="categoryFieldDisplay1" name="categoryFieldDisplay1" readonly="readonly" />
-                    <uiComponents:treeItemSelector fieldId="relatedJahiaVersion" displayFieldId="categoryFieldDisplay1" nodeTypes="jnt:category"
-                        selectableNodeTypes="jnt:category" root="/sites/systemsite/categories/forge-categories/related-jahia-version"
-                        includeChildren="false" displayIncludeChildren="false" valueType="identifier" />
+            <jcr:node var="jahiaVersionCategory" path="/sites/systemsite/categories/forge-categories/related-jahia-version"/>
+            <c:if test="${not empty jahiaVersionCategory.node}">
+                <div class="control-group">
+                    <label class="control-label" for="relatedJahiaVersion"><fmt:message key="comnt_module.relatedJahiaVersion"/></label>
+                    <div class="controls">
+                        <input type="text" id="relatedJahiaVersion" name="relatedJahiaVersion" value=""/>
+                        <input type="text" id="categoryFieldDisplay1" name="categoryFieldDisplay1" readonly="readonly" />
+                        <uiComponents:treeItemSelector fieldId="relatedJahiaVersion" displayFieldId="categoryFieldDisplay1" nodeTypes="jnt:category"
+                            selectableNodeTypes="jnt:category" root="/sites/systemsite/categories/forge-categories/related-jahia-version"
+                            includeChildren="false" displayIncludeChildren="false" valueType="identifier" />
+                    </div>
                 </div>
-            </div>
+            </c:if>
 
-
+            <jcr:node var="jahiaVersionCategory" path="/sites/systemsite/categories/forge-categories/status"/>
+            <c:if test="${not empty jahiaVersionCategory.node}">
             <div class="control-group">
                 <label class="control-label" for="jahiAppStatus"><fmt:message key="comnt_module.jahiAppStatus"/></label>
                 <div class="controls">
@@ -126,6 +188,7 @@
                         includeChildren="false" displayIncludeChildren="false" valueType="identifier" />
                 </div>
             </div>
+            </c:if>
 
 
             <div class="control-group">

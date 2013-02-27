@@ -25,6 +25,7 @@
 - screenshot2 (weakreference, picker[type='image'])
 - screenshot3 (weakreference, picker[type='image'])
 - screenshot4 (weakreference, picker[type='image'])
++ video (jnt:videostreaming) = jnt:videostreaming
 - authorName (string)
 - authorURL (string)
 - authorEmail (string)

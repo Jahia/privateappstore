@@ -1,6 +1,7 @@
 package org.jahia.modules.forgeModules.actions;
 
 import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.jahia.api.Constants;
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
 import org.jahia.bin.Render;
@@ -16,6 +17,8 @@ import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -34,10 +37,16 @@ public class AddModule extends Action {
         String authorEmail = getParameter(parameters, "authorEmail");
         String codeRepository = getParameter(parameters, "codeRepository");
         String jahiAppLicenseUUID = getParameter(parameters, "jahiAppLicense");
+        String videoProvider = getParameter(parameters, "videoProvider");
+        String videoIdentifier = getParameter(parameters, "videoIdentifier");
+        String videoWidth = getParameter(parameters, "videoWidth");
+        String videoHeight = getParameter(parameters, "videoHeight");
+        String videoAllowfullscreen = getParameter(parameters, "videoAllowfullscreen");
         JCRSessionWrapper jcrSessionWrapper = resource.getNode().getSession();
         JCRNodeWrapper targetNode = resource.getNode();
         JCRNodeWrapper newNode = null;
         JCRNodeWrapper folderNode = null;
+        JCRNodeWrapper videoNode = null;
 
         if(targetNode.isNodeType("comnt:module")){
             newNode = targetNode;
@@ -51,6 +60,23 @@ public class AddModule extends Action {
         if (jahiAppLicenseUUID!=null){
             JCRNodeWrapper jahiAppLicense = jcrSessionWrapper.getNodeByUUID(jahiAppLicenseUUID);
             newNode.setProperty("license",jahiAppLicense);
+        }
+        if(videoIdentifier!=null){
+            if (!newNode.hasNode("video")) {
+                newNode.checkout();
+                videoNode = newNode.addNode("video", "jnt:videostreaming");
+            } else {
+                videoNode = newNode.getNode("video");
+            }
+            videoNode.setProperty("identifier",videoIdentifier);
+            if (videoProvider!=null)
+                videoNode.setProperty("provider",videoProvider);
+            if (videoWidth!=null)
+                videoNode.setProperty("width",videoWidth);
+            if (videoHeight!=null)
+                videoNode.setProperty("height",videoHeight);
+            if (videoAllowfullscreen!=null)
+                videoNode.setProperty("allowfullscreen",videoAllowfullscreen);
         }
 
         final FileUpload fu = (FileUpload) req.getAttribute(FileUpload.FILEUPLOAD_ATTRIBUTE);
@@ -72,6 +98,9 @@ public class AddModule extends Action {
         if (codeRepository!=null)
             newNode.setProperty("codeRepository",codeRepository);
 
+
+
+
         /*if (!folderNode.hasNode(moduleTitle)) {
             folderNode.checkout();
             folderNode = folderNode.addNode(moduleTitle, "jnt:folder");
@@ -91,9 +120,13 @@ public class AddModule extends Action {
         uploadAndSetModuleFile(newNode,folderNode,screenshotFile4,"screenshot4");
         uploadAndSetModuleFile(newNode,folderNode,iconFile,"icon");
         uploadAndSetModuleFile(newNode,folderNode,promoImageFile,"promoImage");
+
+        if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
+            List<String> roles = Arrays.asList("owner");
+            newNode.grantRoles("u:" + session.getUser().getUsername(), new HashSet<String>(roles));
+        }
+
         jcrSessionWrapper.save();
-
-
 
         return new ActionResult(HttpServletResponse.SC_OK, newNode.getPath(), Render.serializeNodeToJSON(newNode));
     }

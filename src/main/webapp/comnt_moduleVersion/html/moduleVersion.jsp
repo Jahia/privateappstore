@@ -22,11 +22,16 @@
     <div><fmt:message key="comnt_moduleVersion.date"/>:<fmt:formatDate value="${currentNode.properties.date.time}" type="date" dateStyle="long"/> </div>
     <div><fmt:message key="comnt_moduleVersion.moduleBinary"/>:<a href="${currentNode.properties.moduleBinary.node.url}">Download</a></div>
     <div><fmt:message key="comnt_moduleVersion.desc"/>:${currentNode.properties.desc.string}</div>
-    <div><fmt:message key="comnt_moduleVersion.relatedJahiaVersion"/>:${currentNode.properties.relatedJahiaVersion.node.name}</div>
+    <c:if test="${not empty currentNode.properties.relatedJahiaVersion.node.name}">
+        <div><fmt:message key="comnt_moduleVersion.relatedJahiaVersion"/>:${currentNode.properties.relatedJahiaVersion.node.name}</div>
+    </c:if>
     <div><fmt:message key="comnt_moduleVersion.releaseType"/>:${currentNode.properties.releaseType.string}</div>
-    <div><fmt:message key="comnt_moduleVersion.status"/>:${currentNode.properties.status.node.name}</div>
-
-    <div class="edit"><a href="<c:url value='${url.base}${currentNode.path}.forge-updateversion.html'/>"><fmt:message key="comnt_moduleVersion.edit"/></a></div>
+    <c:if test="${not empty currentNode.properties.status.node.name}">
+        <div><fmt:message key="comnt_moduleVersion.status"/>:${currentNode.properties.status.node.name}</div>
+    </c:if>
+    <c:if test="${jcr:hasPermission(currentNode, 'editVersion')}">
+        <div class="edit"><a href="<c:url value='${url.base}${currentNode.path}.forge-updateversion.html'/>"><fmt:message key="comnt_moduleVersion.edit"/></a></div>
+    </c:if>
     <div class="back"><a href="<c:url value='${url.base}${currentNode.parent.path}.html'/>"><fmt:message key="comnt_moduleVersion.backToParentModule"/></a></div>
 
 </div>

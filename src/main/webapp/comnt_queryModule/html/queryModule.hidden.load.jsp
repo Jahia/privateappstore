@@ -52,6 +52,7 @@
 <c:set target="${moduleMap}" property="editable" value="false" />
 <c:set target="${moduleMap}" property="emptyListMessage" value="No module found" />
 <c:set target="${moduleMap}" property="listQuery" value="${listQuery}" />
+<template:addCacheDependency flushOnPathMatchingRegexp="\Q${startNode.node.path}\E/[^/]*"/>
 
 <c:choose>
     <c:when test="${empty param.pagesize}">

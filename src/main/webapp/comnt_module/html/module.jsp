@@ -17,33 +17,30 @@
 
 
 <div class="module moduleviewlist">
-	<div style="float: left;">
-	    <c:url value="${url.base}${currentNode.path}.html" var="moduleUrl" />
-	    <a href="${moduleUrl}">
-	        <c:url value="${currentNode.properties.icon.node.url}" var="iconUrl" />
-	        <img alt="icon" src="${iconUrl}" class="moduleicon">
-	    </a>
+    <div style="float: left;">
+        <c:url value="${url.base}${currentNode.path}.html" var="moduleUrl" />
+        <h2><a href="${moduleUrl}">${currentNode.properties['jcr:title'].string}</a></h2>
+        <a href="${moduleUrl}">
+            <c:url value="${currentNode.properties.icon.node.url}" var="iconUrl" />
+            <img alt="icon" src="${currentNode.properties.icon.node.thumbnailUrls['thumbnail']}" class="moduleicon">
+        </a>
 
-	     <c:if test="${jcr:isNodeType(currentNode,'jmix:rating')}">
-	              <c:url value="${url.currentModule}/img/rating_${fn:substringBefore(currentNode.properties['j:sumOfVotes'].long / currentNode.properties['j:nbOfVotes'].long,'.')}.png" var="ratingUrl" />
-	            <div class="ratingbox floatright"><img alt="rating" src="${ratingUrl}"><small> ${currentNode.properties['j:nbOfVotes'].string} ratings</small></div>
-	    </c:if>
+        <c:if test="${jcr:isNodeType(currentNode,'jmix:rating')}">
+            <c:url value="${url.currentModule}/img/rating_${fn:substringBefore(currentNode.properties['j:sumOfVotes'].long / currentNode.properties['j:nbOfVotes'].long,'.')}.png" var="ratingUrl" />
+            <div class="ratingbox floatright"><img alt="rating" src="${ratingUrl}"><small> ${currentNode.properties['j:nbOfVotes'].string} ratings</small></div>
+        </c:if>
 
-	    <h2><a href="${moduleUrl}">${currentNode.properties['jcr:title'].string}</a></h2>
         <c:if test="${currentNode.properties.supportedByJahia.boolean}">
             <c:url value="${url.currentModule}/img/jahia_certified.png" var="jahiaCertifiedUrl" />
             <div class="certified"><img alt="Jahia Certified" src="${jahiaCertifiedUrl}"></div>
         </c:if>
         <c:url value="${currentNode.properties.authorURL.string}" var="authorURL" />
-	    <p class="moduleinfo"><fmt:message key="forge.by"/>&nbsp;<a href="${currentNode.properties.authorURL.string}">${currentNode.properties.authorName.string}</a> - <fmt:formatDate value="${currentNode.properties.date.time}" type="date" dateStyle="long"/></p>
-	    <p>${currentNode.properties.quickDescription.string}</p>
+        <p class="moduleinfo"><fmt:message key="forge.by"/>&nbsp;<a href="${currentNode.properties.authorURL.string}">${currentNode.properties.authorName.string}</a> - <fmt:formatDate value="${currentNode.properties.date.time}" type="date" dateStyle="long"/></p>
+        <p><fmt:message key="comnt_module.quickDescription"/>: ${currentNode.properties.quickDescription.string}</p>
     </div>
-   	<div style="float: left;">
-		<c:url value="${currentNode.properties.moduleFile.node.url}" var="downloadUrl" />
-	    <p>
-	    <a class="modulebutton" href="${downloadUrl}"><strong><fmt:message key="forge.download"/></strong> <em><fmt:message key="forge.download"/></em></a>
-	    </p>
+    <div style="float: left;">
         <p><fmt:message key="forge.JahiaVersion"/>: ${currentNode.properties.relatedJahiaVersion.node.properties['jcr:title'].string}</p>
         <p><fmt:message key="forge.status"/>: ${currentNode.properties.jahiAppStatus.node.properties['jcr:title'].string}</p>
-   	</div>
+    </div>
 </div>
+<div class="clear"></div>

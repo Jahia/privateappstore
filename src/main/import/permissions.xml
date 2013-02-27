@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<permissions jcr:primaryType="jnt:permission"
+             xmlns:jcr="http://www.jcp.org/jcr/1.0"
+             xmlns:j="http://www.jahia.org/jahia/1.0"
+             xmlns:jnt="http://www.jahia.org/jahia/nt/1.0">
+    <actions jcr:primaryType="jnt:permission">
+        <forge jcr:primaryType="jnt:permission">
+            <reviewModule jcr:primaryType="jnt:permission"/>
+            <createModule jcr:primaryType="jnt:permission"/>
+            <editModule jcr:primaryType="jnt:permission"/>
+            <createVersion jcr:primaryType="jnt:permission"/>
+            <editVersion jcr:primaryType="jnt:permission"/>
+            <deleteModule jcr:primaryType="jnt:permission"/>
+        </forge>
+    </actions>
+</permissions>

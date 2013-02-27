@@ -1,6 +1,7 @@
 package org.jahia.modules.forgeModules.actions;
 
 import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.jahia.api.Constants;
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
 import org.jahia.bin.Render;
@@ -16,6 +17,8 @@ import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -76,6 +79,12 @@ public class AddModuleRelease extends Action {
         if(relatedJahiaVersionUUID!=null){
             JCRNodeWrapper relatedJahiaVersion = jcrSessionWrapper.getNodeByUUID(relatedJahiaVersionUUID);
             moduleVersion.setProperty("relatedJahiaVersion",relatedJahiaVersion);
+        }
+
+
+        if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
+            List<String> roles = Arrays.asList("owner");
+            moduleVersion.grantRoles("u:" + session.getUser().getUsername(), new HashSet<String>(roles));
         }
 
         jcrSessionWrapper.save();
