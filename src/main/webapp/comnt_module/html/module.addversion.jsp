@@ -15,7 +15,27 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 <%--@elvariable id="acl" type="java.lang.String"--%>
 <template:addResources type="javascript" resources="jquery.min.js,jquery.validate.js"/>
+<uiComponents:ckeditor selector="jahia-moduleVersion-desc-${currentNode.UUID}"/>
 
+
+<c:choose>
+    <c:when test="${jcr:isNodeType(renderContext.mainResource.node,'comnt:moduleVersion')}">
+        <c:set var="targetNode" value="${url.base}${renderContext.mainResource.node.path}"/>
+        <c:set var="currentModule" value="${url.base}${renderContext.mainResource.node}"/>
+        <c:set var="edition" value="true"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="jcr:title" var="title"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="moduleBinary" var="moduleBinary"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="desc" var="desc"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="relatedJahiaVersion" var="relatedJahiaVersion"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="releaseType" var="releaseType"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="status" var="status"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="version" var="version"/>
+    </c:when>
+    <c:otherwise>
+        <c:set var="targetNode" value="${url.base}${currentNode.path}"/>
+        <c:set var="edition" value="false"/>
+    </c:otherwise>
+</c:choose>
 
 <template:addResources type="inlinejavascript">
     <script type="text/javascript">
@@ -26,7 +46,7 @@
                           return this.optional(element) || param.test(value);
                         });
 
-                $("#newModuleForm-${currentNode.UUID}").validate({
+                $("#newVersionForm-${currentNode.UUID}").validate({
                 rules: {
                     'title': {
                         required: true,
@@ -35,11 +55,13 @@
 
                     'version': {
                         required: true,
-                        regexp: /^(\d+\\.)?(\d+\\.)?(\\*|\d+)$/i
+                        regexp: /^(\d+\.){3}(\d+)$/i
                     },
 
                     'binaryFile': {
-                        required: true,
+                        <c:if test="${not edition}">
+                            required: true,
+                        </c:if>
                         regexp: /(\S+?)\.(jar|war)$/i
                     },
 
@@ -80,30 +102,8 @@
     </script>
 </template:addResources>
 
-<uiComponents:ckeditor selector="jahia-moduleVersion-desc-${currentNode.UUID}"/>
-
-
-<c:choose>
-    <c:when test="${jcr:isNodeType(renderContext.mainResource.node,'comnt:moduleVersion')}">
-        <c:set var="targetNode" value="${url.base}${renderContext.mainResource.node.path}"/>
-        <c:set var="currentModule" value="${url.base}${renderContext.mainResource.node}"/>
-        <c:set var="edition" value="true"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="jcr:title" var="title"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="moduleBinary" var="moduleBinary"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="desc" var="desc"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="relatedJahiaVersion" var="relatedJahiaVersion"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="releaseType" var="releaseType"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="status" var="status"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="version" var="version"/>
-    </c:when>
-    <c:otherwise>
-        <c:set var="targetNode" value="${url.base}${currentNode.path}"/>
-        <c:set var="edition" value="false"/>
-    </c:otherwise>
-</c:choose>
-
 <template:tokenizedForm>
-    <form action="<c:url value='${targetNode}.addModuleRelease.do'/>" method="post" id="newModuleForm" enctype="multipart/form-data"  accept="application/json">
+    <form action="<c:url value='${targetNode}.addModuleRelease.do'/>" method="post" id="newVersionForm-${currentNode.UUID}" enctype="multipart/form-data"  accept="application/json">
         <fieldset>
 
             <div class="control-group">
@@ -201,3 +201,6 @@
 
     </form>
 </template:tokenizedForm>
+<c:if test="${edition}">
+    <div class="edit"><a href="<c:url value='${targetNode}.html'/>">Back</a></div>
+</c:if>

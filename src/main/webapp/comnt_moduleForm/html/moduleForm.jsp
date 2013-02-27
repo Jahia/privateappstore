@@ -16,6 +16,37 @@
 <%--@elvariable id="acl" type="java.lang.String"--%>
 <template:addResources type="javascript" resources="jquery.min.js,jquery.validate.js"/>
 
+
+
+<uiComponents:ckeditor selector="jahia-module-bigDescription-${currentNode.UUID}"/>
+<jcr:nodeProperty node="${currentNode}" name='moduleRepository' var="moduleRepository"/>
+
+<c:choose>
+    <c:when test="${jcr:isNodeType(renderContext.mainResource.node,'comnt:module')}">
+        <c:set var="targetNode" value="${url.base}${renderContext.mainResource.node.path}"/>
+        <c:set var="currentModule" value="${url.base}${renderContext.mainResource.node}"/>
+        <c:set var="edition" value="true"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="jcr:title" var="title"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="authorName" var="authorName"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="authorURL" var="authorURL"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="authorEmail" var="authorEmail"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="codeRepository" var="codeRepository"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="iconFile" var="iconFile"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="quickDescription" var="quickDescription"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="bigDescription" var="bigDescription"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="screenshot1" var="screenshot1"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="screenshot2" var="screenshot2"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="screenshot3" var="screenshot3"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="screenshot4" var="screenshot4"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="supportedByJahia" var="supportedByJahia"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="reviewedByJahia" var="reviewedByJahia"/>
+    </c:when>
+    <c:otherwise>
+        <c:set var="targetNode" value="${url.base}${moduleRepository.node.path}"/>
+        <c:set var="edition" value="false"/>
+    </c:otherwise>
+</c:choose>
+
 <template:addResources type="inlinejavascript">
     <script type="text/javascript">
 
@@ -43,7 +74,9 @@
                     },
 
                     'screenshot1': {
+                    <c:if test="${not edition}">
                         required: true,
+                    </c:if>
                         regexp: /(\S+?)\.(jpg|png|gif|jpeg)$/i
                     },
 
@@ -110,33 +143,6 @@
 
     </script>
 </template:addResources>
-
-<uiComponents:ckeditor selector="jahia-module-bigDescription-${currentNode.UUID}"/>
-<jcr:nodeProperty node="${currentNode}" name='moduleRepository' var="moduleRepository"/>
-
-<c:choose>
-    <c:when test="${jcr:isNodeType(renderContext.mainResource.node,'comnt:module')}">
-        <c:set var="targetNode" value="${url.base}${renderContext.mainResource.node.path}"/>
-        <c:set var="currentModule" value="${url.base}${renderContext.mainResource.node}"/>
-        <c:set var="edition" value="true"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="jcr:title" var="title"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="authorName" var="authorName"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="authorURL" var="authorURL"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="authorEmail" var="authorEmail"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="codeRepository" var="codeRepository"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="iconFile" var="iconFile"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="quickDescription" var="quickDescription"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="bigDescription" var="bigDescription"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="screenshot1" var="screenshot1"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="screenshot2" var="screenshot2"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="screenshot3" var="screenshot3"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="screenshot4" var="screenshot4"/>
-    </c:when>
-    <c:otherwise>
-        <c:set var="targetNode" value="${url.base}${moduleRepository.node.path}"/>
-        <c:set var="edition" value="false"/>
-    </c:otherwise>
-</c:choose>
 
 <template:tokenizedForm>
     <form action="<c:url value='${targetNode}.addModule.do'/>" method="post" id="newModuleForm-${currentNode.UUID}" enctype="multipart/form-data"  accept="application/json">
@@ -326,7 +332,7 @@
                 <label class="control-label" for="quickDescription"><fmt:message key="comnt_module.quickDescription"/></label>
                 <div class="controls">
                     <textarea placeholder="<fmt:message key="comnt_module.quickDescription" />" class="span16"
-                              name="quickDescription" id="quickDescription" value="${quickDescription.string}"></textarea>
+                              name="quickDescription" id="quickDescription">${quickDescription.string}</textarea>
                 </div>
             </div>
 
@@ -335,7 +341,7 @@
                 <div class="controls">
                     <textarea rows="7" cols="35" id="jahia-module-bigDescription-${currentNode.UUID}"
                               placeholder="<fmt:message key="comnt_module.bigDescription" />" class="jahia-ckeditor span16"
-                              name="bigDescription" value="${bigDescription.string}">
+                              name="bigDescription" >
                         <c:if test="${not empty bigDescription.string}">
                             ${fn:escapeXml(bigDescription.string)}
                         </c:if>
@@ -362,14 +368,14 @@
                     <label class="control-label" for="supportedByJahia"><fmt:message key="comnt_module.supportedByJahia"/></label>
                     <div class="controls">
                         <input placeholder="<fmt:message key="comnt_module.supportedByJahia" />" class="span16" type="checkbox"
-                               name="supportedByJahia" id="supportedByJahia" checked="${supportedByJahia.boolean}"/>
+                               name="supportedByJahia" id="supportedByJahia" value="true" <c:if test="${supportedByJahia.boolean}">checked="true"</c:if>"/>
                     </div>
                 </div>
                 <div class="control-group">
                     <label class="control-label" for="reviewedByJahia"><fmt:message key="comnt_module.reviewedByJahia"/></label>
                     <div class="controls">
                         <input placeholder="<fmt:message key="comnt_module.reviewedByJahia" />" class="span16" type="checkbox"
-                               name="reviewedByJahia" id="reviewedByJahia" checked="${reviewedByJahia.boolean}"/>
+                               name="reviewedByJahia" id="reviewedByJahia" value="true" <c:if test="${reviewedByJahia.boolean}">checked="true"</c:if>"/>
                     </div>
                 </div>
             </c:if>
@@ -382,3 +388,6 @@
         </fieldset>
     </form>
 </template:tokenizedForm>
+<c:if test="${edition}">
+    <div class="edit"><a href="<c:url value='${targetNode}.html'/>">Back</a></div>
+</c:if>

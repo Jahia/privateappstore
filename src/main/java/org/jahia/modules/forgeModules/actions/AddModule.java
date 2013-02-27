@@ -37,6 +37,8 @@ public class AddModule extends Action {
         String authorEmail = getParameter(parameters, "authorEmail");
         String codeRepository = getParameter(parameters, "codeRepository");
         String jahiAppLicenseUUID = getParameter(parameters, "jahiAppLicense");
+        String reviewedByJahia = getParameter(parameters, "reviewedByJahia");
+        String supportedByJahia = getParameter(parameters, "supportedByJahia");
         String videoProvider = getParameter(parameters, "videoProvider");
         String videoIdentifier = getParameter(parameters, "videoIdentifier");
         String videoWidth = getParameter(parameters, "videoWidth");
@@ -83,6 +85,10 @@ public class AddModule extends Action {
 
         logger.info("Adding module !!!!!!!!");
 
+        if (reviewedByJahia=="true")
+                    newNode.setProperty("reviewedByJahia",true);
+        if (supportedByJahia=="true")
+                    newNode.setProperty("supportedByJahia",true);
         if (moduleTitle!=null)
             newNode.setProperty("jcr:title",moduleTitle);
         if (quickDescription!=null)

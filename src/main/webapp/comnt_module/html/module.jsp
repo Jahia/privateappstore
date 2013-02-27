@@ -34,13 +34,22 @@
             <c:url value="${url.currentModule}/img/jahia_certified.png" var="jahiaCertifiedUrl" />
             <div class="certified"><img alt="Jahia Certified" src="${jahiaCertifiedUrl}"></div>
         </c:if>
+
+        <c:if test="${currentNode.properties.reviewedByJahia.boolean}">
+            <div class="reviewed"><p><fmt:message key="forge.reviewedByJahia"/></p></div>
+        </c:if>
+
         <c:url value="${currentNode.properties.authorURL.string}" var="authorURL" />
         <p class="moduleinfo"><fmt:message key="forge.by"/>&nbsp;<a href="${currentNode.properties.authorURL.string}">${currentNode.properties.authorName.string}</a> - <fmt:formatDate value="${currentNode.properties.date.time}" type="date" dateStyle="long"/></p>
         <p><fmt:message key="comnt_module.quickDescription"/>: ${currentNode.properties.quickDescription.string}</p>
     </div>
     <div style="float: left;">
-        <p><fmt:message key="forge.JahiaVersion"/>: ${currentNode.properties.relatedJahiaVersion.node.properties['jcr:title'].string}</p>
-        <p><fmt:message key="forge.status"/>: ${currentNode.properties.jahiAppStatus.node.properties['jcr:title'].string}</p>
+        <c:if test="${not empty currentNode.properties.relatedJahiaVersion.node}">
+            <p><fmt:message key="forge.JahiaVersion"/>: ${currentNode.properties.relatedJahiaVersion.node.properties['jcr:title'].string}</p>
+        </c:if>
+        <c:if test="${not empty currentNode.properties.jahiAppStatus.node}">
+            <p><fmt:message key="forge.status"/>: ${currentNode.properties.jahiAppStatus.node.properties['jcr:title'].string}</p>
+        </c:if>
     </div>
 </div>
 <div class="clear"></div>
