@@ -19,6 +19,7 @@
 - jcr:title (string) m
 - quickDescription (string, richtext) i18n
 - bigDescription (string, richtext) i18n
+- category (weakreference,category[root='module-categories']) mandatory
 - icon (weakreference, picker[type='image'])
 - promoImage (weakreference, picker[type='image'])
 - screenshot1 (weakreference, picker[type='image'])
@@ -54,3 +55,4 @@
 - fileLength (long)
 - fileDsaSignature (string)
 - releaseNotesUrl (string)
+- lastVersion (boolean) = true autocreated

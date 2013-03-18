@@ -47,6 +47,8 @@
     </c:otherwise>
 </c:choose>
 
+<c:set var="moduleCategoriesPath" value="/sites/systemsite/categories/forge-categories/module-categories"/>
+
 <template:addResources type="inlinejavascript">
     <script type="text/javascript">
 
@@ -99,6 +101,9 @@
                     'bigDescription': {
                         required: true,
                         minlength: 100
+                    },
+                    'moduleCategory': {
+                        required: true
                     }
                 },
                 messages: {
@@ -132,6 +137,9 @@
                     'bigDescription': {
                         required: "<fmt:message key='forge.label.askBigDescription'/>",
                         minlength: "<fmt:message key='forge.label.bigDescriptionSizeWarning'/>"
+                    },
+                    'moduleCategory': {
+                        required: "<fmt:message key='forge.label.askModuleCategory'/>"
                     }
                 }
             });
@@ -197,7 +205,7 @@
 
                 <div class="controls" id="screenshot1container" ${screenshot1Display}>
                     <input placeholder="<fmt:message key="comnt_module.screenshot1" />" class="span16" type="file"
-                           name="screenshot1" id="screenshot1"/>
+                           name="screenshot1" id="screenshot1" />
                 </div>
 
                 <c:if test="${not empty screenshot1.node}">
@@ -361,6 +369,18 @@
                                                        includeChildren="false" displayIncludeChildren="false" valueType="identifier" />
                     </div>
                 </div>
+            </c:if>
+
+            <jcr:node var="moduleCategories" path="${moduleCategoriesPath}"/>
+            <c:if test="${not empty moduleCategories}">
+
+                <select id="moduleCategory" name="moduleCategory">
+                    <option value=""><fmt:message key="comnt_module.category"/></option>
+                    <c:forEach items="${jcr:getChildrenOfType(moduleCategories, 'jnt:category')}" var="category">
+                        <option value="${category.identifier}">${category.displayableName}</option>
+                    </c:forEach>
+                </select>
+
             </c:if>
 
             <c:if test="${jcr:hasPermission(currentNode, 'reviewModule')}">

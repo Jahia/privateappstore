@@ -32,6 +32,7 @@ public class AddModule extends Action {
         String moduleTitle = getParameter(parameters, "title");
         String quickDescription = getParameter(parameters, "quickDescription");
         String bigDescription = getParameter(parameters, "bigDescription");
+        String categoryUUID = getParameter(parameters, "moduleCategory");
         String authorName = getParameter(parameters, "authorName");
         String authorURL = getParameter(parameters, "authorURL");
         String authorEmail = getParameter(parameters, "authorEmail");
@@ -59,6 +60,10 @@ public class AddModule extends Action {
             folderNode = newNode.addNode("files", "jnt:folder");
         }
 
+        if(categoryUUID!=null){
+            JCRNodeWrapper moduleCategory = jcrSessionWrapper.getNodeByUUID(categoryUUID);
+            newNode.setProperty("category",moduleCategory);
+        }
         if (jahiAppLicenseUUID!=null){
             JCRNodeWrapper jahiAppLicense = jcrSessionWrapper.getNodeByUUID(jahiAppLicenseUUID);
             newNode.setProperty("license",jahiAppLicense);
