@@ -383,6 +383,14 @@
 
             </c:if>
 
+            <div class="control-group">
+                <label class="control-label" for="tags"><fmt:message key="comnt_module.tags"/></label>
+                <div class="controls">
+                    <input placeholder="<fmt:message key="comnt_module.tags" />" type="text"
+                           name="j:newTag" id="tags" />
+                </div>
+            </div>
+
             <c:if test="${jcr:hasPermission(currentNode, 'reviewModule')}">
                 <div class="control-group">
                     <label class="control-label" for="supportedByJahia"><fmt:message key="comnt_module.supportedByJahia"/></label>

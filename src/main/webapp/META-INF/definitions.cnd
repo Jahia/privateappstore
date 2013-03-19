@@ -15,7 +15,7 @@
 [comnt:moduleForm] > jnt:content, mix:title, commix:forgeModules
 - moduleRepository (weakreference)
 
-[comnt:module] > jnt:content, mix:title, jmix:editorialContent, commix:forgeModules
+[comnt:module] > jnt:content, mix:title, jmix:editorialContent, jmix:tagged, commix:forgeModules
 - jcr:title (string) m
 - quickDescription (string, richtext) i18n
 - bigDescription (string, richtext) i18n
