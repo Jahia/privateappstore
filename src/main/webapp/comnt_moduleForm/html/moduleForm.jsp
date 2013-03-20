@@ -34,6 +34,7 @@
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="iconFile" var="iconFile"/>
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="quickDescription" var="quickDescription"/>
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="bigDescription" var="bigDescription"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="category" var="categoryNode"/>
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="screenshot1" var="screenshot1"/>
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="screenshot2" var="screenshot2"/>
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="screenshot3" var="screenshot3"/>
@@ -60,7 +61,7 @@
 
                 $("#newModuleForm-${currentNode.UUID}").validate({
                 rules: {
-                    'title': {
+                    'jcr:title': {
                         required: true,
                         minlength: 2
                     },
@@ -107,7 +108,7 @@
                     }
                 },
                 messages: {
-                    'title': {
+                    'jcr:title': {
                         required: "<fmt:message key='forge.label.askTitle'/>",
                         minlength: "<fmt:message key='forge.label.titleSizeWarning'/>"
                     },
@@ -144,8 +145,8 @@
                 }
             });
 
-            var form = $("#newModuleForm");
-            form.attr("enctype", "multipart/form-data");
+            /*var form = $("#newModuleForm");
+            form.attr("enctype", "multipart/form-data");*/
 
         });
 
@@ -153,14 +154,14 @@
 </template:addResources>
 
 <template:tokenizedForm>
-    <form action="<c:url value='${targetNode}.addModule.do'/>" method="post" id="newModuleForm-${currentNode.UUID}" enctype="multipart/form-data"  accept="application/json">
+    <form action="<c:url value='${targetNode}.${edition ? "editModule" : "addModule"}.do'/>" method="post" id="newModuleForm-${currentNode.UUID}" enctype="multipart/form-data"  accept="application/json">
         <fieldset>
 
             <div class="control-group">
-                <label class="control-label" for="title"><fmt:message key="comnt_module.title"/></label>
+                <label class="control-label" for="jcr:title"><fmt:message key="comnt_module.title"/></label>
                 <div class="controls">
                     <input placeholder="<fmt:message key="comnt_module.title" />" class="span16" type="text"
-                           name="title" id="title" value="${title.string}"/>
+                           name="jcr:title" id="jcr:title" value="${title.string}"/>
                 </div>
             </div>
 
@@ -377,7 +378,7 @@
                 <select id="moduleCategory" name="moduleCategory">
                     <option value=""><fmt:message key="comnt_module.category"/></option>
                     <c:forEach items="${jcr:getChildrenOfType(moduleCategories, 'jnt:category')}" var="category">
-                        <option value="${category.identifier}">${category.displayableName}</option>
+                        <option value="${category.identifier}" ${category.identifier == categoryNode.node.identifier ? 'selected' : ''}>${category.displayableName}</option>
                     </c:forEach>
                 </select>
 

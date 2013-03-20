@@ -26,35 +26,96 @@ import java.util.Map;
  * @author faissah
  */
 public class AddModule extends Action {
+
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(AddModule.class);
+
     @Override
-    public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource, JCRSessionWrapper session, Map<String, List<String>> parameters, URLResolver urlResolver) throws Exception {
-        String moduleTitle = getParameter(parameters, "title");
-        String quickDescription = getParameter(parameters, "quickDescription");
-        String bigDescription = getParameter(parameters, "bigDescription");
+    public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource,
+                                  JCRSessionWrapper session, Map<String, List<String>> parameters,
+                                  URLResolver urlResolver) throws Exception {
+
+        String videoIdentifier = getParameter(parameters, "videoIdentifier");
         String categoryUUID = getParameter(parameters, "moduleCategory");
+        String jahiAppLicenseUUID = getParameter(parameters, "jahiAppLicense");
+
+        JCRNodeWrapper repositery = resource.getNode();
+        JCRNodeWrapper module = createNode(req, parameters, repositery, "comnt:module", null, false);
+        JCRNodeWrapper filesFolder = module.addNode("files", "jnt:folder");
+
+        if (videoIdentifier != null) {
+
+            String videoProvider = getParameter(parameters, "videoProvider");
+            String videoWidth = getParameter(parameters, "videoWidth");
+            String videoHeight = getParameter(parameters, "videoHeight");
+            String videoAllowfullscreen = getParameter(parameters, "videoAllowfullscreen");
+
+            JCRNodeWrapper videoNode = module.addNode("video", "jnt:videostreaming");
+
+            videoNode.setProperty("identifier",videoIdentifier);
+            if (videoProvider != null)
+                videoNode.setProperty("provider",videoProvider);
+            if (videoWidth != null)
+                videoNode.setProperty("width",videoWidth);
+            if (videoHeight != null)
+                videoNode.setProperty("height",videoHeight);
+            if (videoAllowfullscreen != null)
+                videoNode.setProperty("allowfullscreen",videoAllowfullscreen);
+        }
+
+        if (categoryUUID != null) {
+            JCRNodeWrapper category = session.getNodeByUUID(categoryUUID);
+            module.setProperty("category", category);
+        }
+
+        if (jahiAppLicenseUUID != null) {
+            JCRNodeWrapper jahiAppLicense = session.getNodeByUUID(jahiAppLicenseUUID);
+            module.setProperty("license", jahiAppLicense);
+        }
+
+        final FileUpload fu = (FileUpload) req.getAttribute(FileUpload.FILEUPLOAD_ATTRIBUTE);
+
+        DiskFileItem screenshotFile1 = fu.getFileItems().get("screenshot1");
+        DiskFileItem screenshotFile2 = fu.getFileItems().get("screenshot2");
+        DiskFileItem screenshotFile3 = fu.getFileItems().get("screenshot3");
+        DiskFileItem screenshotFile4 = fu.getFileItems().get("screenshot4");
+        DiskFileItem iconFile = fu.getFileItems().get("iconFile");
+        DiskFileItem promoImageFile = fu.getFileItems().get("promoImage");
+
+        uploadAndSetModuleFile(module, filesFolder, screenshotFile1, "screenshot1");
+        uploadAndSetModuleFile(module, filesFolder, screenshotFile2, "screenshot2");
+        uploadAndSetModuleFile(module, filesFolder, screenshotFile3, "screenshot3");
+        uploadAndSetModuleFile(module, filesFolder, screenshotFile4, "screenshot4");
+        uploadAndSetModuleFile(module, filesFolder, iconFile, "icon");
+        uploadAndSetModuleFile(module, filesFolder, promoImageFile, "promoImage");
+
+        if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
+            List<String> roles = Arrays.asList("owner");
+            module.grantRoles("u:" + session.getUser().getUsername(), new HashSet<String>(roles));
+        }
+
+        session.save();
+
+        return new ActionResult(HttpServletResponse.SC_OK, module.getPath(), Render.serializeNodeToJSON(module));
+
+        /*String quickDescription = getParameter(parameters, "quickDescription");
+        String bigDescription = getParameter(parameters, "bigDescription");
+
         String authorName = getParameter(parameters, "authorName");
         String authorURL = getParameter(parameters, "authorURL");
         String authorEmail = getParameter(parameters, "authorEmail");
         String codeRepository = getParameter(parameters, "codeRepository");
-        String jahiAppLicenseUUID = getParameter(parameters, "jahiAppLicense");
         String reviewedByJahia = getParameter(parameters, "reviewedByJahia");
         String supportedByJahia = getParameter(parameters, "supportedByJahia");
-        String videoProvider = getParameter(parameters, "videoProvider");
-        String videoIdentifier = getParameter(parameters, "videoIdentifier");
-        String videoWidth = getParameter(parameters, "videoWidth");
-        String videoHeight = getParameter(parameters, "videoHeight");
-        String videoAllowfullscreen = getParameter(parameters, "videoAllowfullscreen");
-        JCRSessionWrapper jcrSessionWrapper = resource.getNode().getSession();
+
         JCRNodeWrapper targetNode = resource.getNode();
         JCRNodeWrapper newNode = null;
         JCRNodeWrapper folderNode = null;
         JCRNodeWrapper videoNode = null;
 
-        if(targetNode.isNodeType("comnt:module")){
+        if (targetNode.isNodeType("comnt:module")) {
             newNode = targetNode;
             folderNode = newNode.getNode("files");
-        }else{
+        } else {
             String path = targetNode.getPath();
             newNode = createNode(req, parameters, jcrSessionWrapper.getNode(path), "comnt:module",moduleTitle, false);
             folderNode = newNode.addNode("files", "jnt:folder");
@@ -86,10 +147,11 @@ public class AddModule extends Action {
                 videoNode.setProperty("allowfullscreen",videoAllowfullscreen);
         }
 
-        final FileUpload fu = (FileUpload) req.getAttribute(FileUpload.FILEUPLOAD_ATTRIBUTE);
+
 
         logger.info("Adding module !!!!!!!!");
 
+        *//*
         if (reviewedByJahia=="true")
                     newNode.setProperty("reviewedByJahia",true);
         if (supportedByJahia=="true")
@@ -110,14 +172,14 @@ public class AddModule extends Action {
             newNode.setProperty("codeRepository",codeRepository);
 
 
+        *//*
 
-
-        /*if (!folderNode.hasNode(moduleTitle)) {
+        *//*if (!folderNode.hasNode(moduleTitle)) {
             folderNode.checkout();
             folderNode = folderNode.addNode(moduleTitle, "jnt:folder");
         } else {
             folderNode = folderNode.getNode(moduleTitle);
-        }            */
+        }            *//*
         DiskFileItem screenshotFile1 = fu.getFileItems().get("screenshot1");
         DiskFileItem screenshotFile2 = fu.getFileItems().get("screenshot2");
         DiskFileItem screenshotFile3 = fu.getFileItems().get("screenshot3");
@@ -139,13 +201,15 @@ public class AddModule extends Action {
 
         jcrSessionWrapper.save();
 
-        return new ActionResult(HttpServletResponse.SC_OK, newNode.getPath(), Render.serializeNodeToJSON(newNode));
+        return new ActionResult(HttpServletResponse.SC_OK, newNode.getPath(), Render.serializeNodeToJSON(newNode));*/
     }
 
-    private void uploadAndSetModuleFile(JCRNodeWrapper targetNode, JCRNodeWrapper targetFolder,DiskFileItem fileToUpload,  String propertieName) throws IOException, RepositoryException {
-        if (fileToUpload !=null){
+    private void uploadAndSetModuleFile(JCRNodeWrapper targetNode, JCRNodeWrapper targetFolder,
+                                        DiskFileItem fileToUpload,  String propertyName) throws IOException, RepositoryException {
+
+        if (fileToUpload !=null) {
             JCRNodeWrapper fileNode = targetFolder.uploadFile(fileToUpload.getName(), fileToUpload.getInputStream(), fileToUpload.getContentType());
-            targetNode.setProperty(propertieName,fileNode);
+            targetNode.setProperty(propertyName,fileNode);
         }
     }
 
