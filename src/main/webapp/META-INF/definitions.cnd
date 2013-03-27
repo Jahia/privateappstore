@@ -14,6 +14,8 @@
 
 [comnt:moduleForm] > jnt:content, mix:title, commix:forgeModules
 - moduleRepository (weakreference)
+- screenshotsMaxNbr (long) = 10 mandatory
+- screenshotInputsDefaultNbr (long) = 3 mandatory
 
 [comnt:module] > jnt:content, mix:title, jmix:editorialContent, jmix:tagged, commix:forgeModules
 - jcr:title (string) m
@@ -22,6 +24,7 @@
 - category (weakreference,category[root='module-categories']) mandatory
 - icon (weakreference, picker[type='image'])
 - promoImage (weakreference, picker[type='image'])
++ screenshots (comnt:moduleScreenshotList) = comnt:moduleScreenshotList
 - screenshot1 (weakreference, picker[type='image'])
 - screenshot2 (weakreference, picker[type='image'])
 - screenshot3 (weakreference, picker[type='image'])
@@ -56,3 +59,9 @@
 - fileDsaSignature (string)
 - releaseNotesUrl (string)
 - lastVersion (boolean) = true autocreated
+
+[comnt:moduleScreenshotList] > jnt:content, jmix:list orderable
++ * (comnt:moduleScreenshot) = comnt:moduleScreenshot
+
+[comnt:moduleScreenshot] > jnt:content
+- screenshot (weakreference, picker[type='image']) mandatory
