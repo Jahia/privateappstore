@@ -54,7 +54,7 @@ public class AddModuleRelease extends Action {
         }
 
         if (!folderNode.hasNode(moduleReleaseTitle)) {
-            folderNode.checkout();
+            session.checkout(folderNode);
             folderNode = folderNode.addNode(moduleReleaseTitle, "jnt:folder");
         } else {
             folderNode = folderNode.getNode(moduleReleaseTitle);
