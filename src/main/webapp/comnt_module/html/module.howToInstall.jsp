@@ -22,12 +22,16 @@
 
 <section id="moduleHowToInstall">
 
-    <c:if test="${not empty howToInstall}">
-        ${howToInstall}
-    </c:if>
-    <c:otherwise>
-        <p>Nothing to show here yet</p>
-    </c:otherwise>
+    <c:choose>
 
+        <c:when test="${not empty howToInstall}">
+            ${howToInstall}
+        </c:when>
+
+        <c:otherwise>
+            <p>Nothing to show here yet</p>
+        </c:otherwise>
+
+    </c:choose>
 
 </section>
