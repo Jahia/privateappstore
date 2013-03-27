@@ -30,6 +30,7 @@
 <c:set var="screenshotInputsDefaultNbr" value="${currentNode.properties.screenshotInputsDefaultNbr.long}"/>
 <uiComponents:ckeditor selector="jahia-module-bigDescription-${id}"/>
 <uiComponents:ckeditor selector="jahia-module-howToInstall-${id}"/>
+<uiComponents:ckeditor selector="jahia-module-FAQ-${id}"/>
 
 <c:choose>
     <c:when test="${jcr:isNodeType(renderContext.mainResource.node,'comnt:module')}">
@@ -46,6 +47,7 @@
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="bigDescription" var="bigDescription"/>
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="category" var="categoryNode"/>
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="howToInstall" var="howToInstall"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="FAQ" var="FAQ"/>
 
         <jcr:node path="${renderContext.mainResource.node.path}/screenshots" var="screenshots"/>
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="screenshot1" var="screenshot1"/>
@@ -532,6 +534,19 @@
                               name="howToInstall" >
                         <c:if test="${not empty howToInstall.string}">
                             ${fn:escapeXml(howToInstall.string)}
+                        </c:if>
+                    </textarea>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="FAQ"><fmt:message key="comnt_module.FAQ"/></label>
+                <div class="controls">
+                    <textarea rows="7" cols="35" id="jahia-module-FAQ-${id}"
+                              placeholder="<fmt:message key="comnt_module.FAQ" />" class="jahia-ckeditor span16"
+                              name="FAQ" >
+                        <c:if test="${not empty FAQ.string}">
+                            ${fn:escapeXml(FAQ.string)}
                         </c:if>
                     </textarea>
                 </div>

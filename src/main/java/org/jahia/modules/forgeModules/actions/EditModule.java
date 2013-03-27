@@ -56,6 +56,7 @@ public class EditModule extends Action {
         String codeRepository = getParameter(parameters, "codeRepository");
         String jahiAppLicenseUUID = getParameter(parameters, "jahiAppLicense");
         String howToInstall = getParameter(parameters, "howToInstall");
+        String FAQ = getParameter(parameters, "FAQ");
         String reviewedByJahia = getParameter(parameters, "reviewedByJahia");
         String supportedByJahia = getParameter(parameters, "supportedByJahia");
 
@@ -82,6 +83,8 @@ public class EditModule extends Action {
             module.setProperty("codeRepository", codeRepository);
         if (howToInstall != null)
             module.setProperty("howToInstall", howToInstall);
+        if (FAQ != null)
+            module.setProperty("FAQ", FAQ);
         if (reviewedByJahia != null)
             module.setProperty("reviewedByJahia", reviewedByJahia);
         else

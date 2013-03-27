@@ -42,6 +42,7 @@
 - reviewedByJahia (boolean) = false autocreated
 - deleted (boolean) = false autocreated hidden
 - howToInstall (string, richtext) i18n
+- FAQ (string, richtext) i18n
 + files (jnt:folder) = jnt:folder autocreated hidden
 + * (comnt:moduleVersion)
 
