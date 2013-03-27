@@ -1,0 +1,74 @@
+#moduleOverview {
+    clear: both;
+    overflow: hidden;
+}
+
+.moduleDescription {
+    float: left;
+    clear: left;
+    width: 80%;
+    padding-right: 5%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box; /* Firefox */
+    -webkit-box-sizing: border-box; /* Safari */
+}
+
+.moduleDescription footer a {
+    margin-right: 1em;
+}
+
+.moduleDescription footer a:before {
+    content: "> ";
+}
+
+.moduleInformation {
+    border-left: 1px solid #DDDDDD;
+    float: right;
+    clear: right;
+    padding-left: 3%;
+    width: 20%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box; /* Firefox */
+    -webkit-box-sizing: border-box; /* Safari */
+}
+
+.moduleMetaData {
+    font-size: 10px;
+    line-height: normal;
+}
+
+.moduleMetaData dt {
+    text-transform: uppercase;
+    margin: 0;
+    color: #999999;
+}
+
+.moduleMetaData dd {
+    margin: 0 0 1em 0;
+}
+
+.moduleForm .control-group.hidden-control-group {
+    display: none;
+}
+
+.moduleForm .control-group.set-control-group .controls {
+    display: none;
+}
+
+ul#moduleScreenshotList {
+    list-style: none;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+ul#moduleScreenshotList li {
+    border: 1px solid #DDDDDD;
+    margin: 3px 3px 3px 0;
+    padding: 3px;
+    height: 250px;
+    width: 180px;
+    float: left;
+    text-align: center;
+    cursor: move;
+}
