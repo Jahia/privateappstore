@@ -16,7 +16,7 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
 <template:addResources type="javascript" resources="jquery.min.js,jquery-ui.min.js"/>
-<template:addResources type="css" resources="jquery-ui.smoothness.css, moduleScreenshotList.css"/>
+<template:addResources type="css" resources="jquery-ui.smoothness.css, modulesForge.css"/>
 
 <c:set var="screenshotsNodes" value="${jcr:getNodes(currentNode, 'comnt:moduleScreenshot')}"/>
 
