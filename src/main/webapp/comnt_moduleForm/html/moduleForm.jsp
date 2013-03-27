@@ -5,6 +5,7 @@
 <%@ taglib prefix="template" uri="http://www.jahia.org/tags/templateLib" %>
 <%@ taglib prefix="uiComponents" uri="http://www.jahia.org/tags/uiComponentsLib" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="functions" uri="http://www.jahia.org/tags/functions" %>
 <%--@elvariable id="currentNode" type="org.jahia.services.content.JCRNodeWrapper"--%>
 <%--@elvariable id="out" type="java.io.PrintWriter"--%>
 <%--@elvariable id="script" type="org.jahia.services.render.scripting.Script"--%>
@@ -14,12 +15,21 @@
 <%--@elvariable id="currentResource" type="org.jahia.services.render.Resource"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 <%--@elvariable id="acl" type="java.lang.String"--%>
+
 <template:addResources type="javascript" resources="jquery.min.js,jquery.validate.js"/>
+<template:addResources type="css" resources="modulesForge.css"/>
+<template:addResources type="css" resources="jquery.autocomplete.css" />
+<template:addResources type="css" resources="thickbox.css" />
+<template:addResources type="javascript" resources="jquery.autocomplete.js" />
+<template:addResources type="javascript" resources="jquery.bgiframe.min.js" />
+<template:addResources type="javascript" resources="thickbox-compressed.js" />
 
-
-
-<uiComponents:ckeditor selector="jahia-module-bigDescription-${currentNode.UUID}"/>
+<c:set var="id" value="${currentNode.identifier}"/>
 <jcr:nodeProperty node="${currentNode}" name='moduleRepository' var="moduleRepository"/>
+<c:set var="screenshotsMaxNbr" value="${currentNode.properties.screenshotsMaxNbr.long}"/>
+<c:set var="screenshotInputsDefaultNbr" value="${currentNode.properties.screenshotInputsDefaultNbr.long}"/>
+<uiComponents:ckeditor selector="jahia-module-bigDescription-${id}"/>
+<uiComponents:ckeditor selector="jahia-module-howToInstall-${id}"/>
 
 <c:choose>
     <c:when test="${jcr:isNodeType(renderContext.mainResource.node,'comnt:module')}">
@@ -31,10 +41,13 @@
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="authorURL" var="authorURL"/>
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="authorEmail" var="authorEmail"/>
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="codeRepository" var="codeRepository"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="iconFile" var="iconFile"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="icon" var="icon"/>
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="quickDescription" var="quickDescription"/>
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="bigDescription" var="bigDescription"/>
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="category" var="categoryNode"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="howToInstall" var="howToInstall"/>
+
+        <jcr:node path="${renderContext.mainResource.node.path}/screenshots" var="screenshots"/>
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="screenshot1" var="screenshot1"/>
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="screenshot2" var="screenshot2"/>
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="screenshot3" var="screenshot3"/>
@@ -49,17 +62,22 @@
 </c:choose>
 
 <c:set var="moduleCategoriesPath" value="/sites/systemsite/categories/forge-categories/module-categories"/>
+<c:set var="separator" value="${functions:default(currentResource.moduleParams.separator, ', ')}"/>
 
 <template:addResources type="inlinejavascript">
     <script type="text/javascript">
 
         $(document).ready(function() {
 
+            // Set JQuery to traditional
+            $.ajaxSetup({traditional: true, cache:false});
+
             jQuery.validator.addMethod("regexp", function(value, element, param) {
                           return this.optional(element) || param.test(value);
                         });
 
-                $("#newModuleForm-${currentNode.UUID}").validate({
+            $("#moduleForm-${id}").validate({
+
                 rules: {
                     'jcr:title': {
                         required: true,
@@ -76,24 +94,15 @@
                         email: true
                     },
 
-                    'screenshot1': {
-                    <c:if test="${not edition}">
-                        required: true,
-                    </c:if>
-                        regexp: /(\S+?)\.(jpg|png|gif|jpeg)$/i
-                    },
+                    <c:forEach var="i" begin="1" end="${screenshotsMaxNbr}">
 
-                    'screenshot2': {
-                        regexp: /(\S+?)\.(jpg|png|gif|jpeg)$/i
-                    },
-
-                    'screenshot3': {
-                        regexp: /(\S+?)\.(jpg|png|gif|jpeg)$/i
-                    },
-
-                    'screenshot4': {
-                        regexp: /(\S+?)\.(jpg|png|gif|jpeg)$/i
-                    },
+                        'screenshot${i}' : {
+                            <c:if test="${i == 1 && not edition}">
+                            required: true,
+                            </c:if>
+                            regexp: /(\S+?)\.(jpg|png|gif|jpeg)$/i
+                        },
+                    </c:forEach>
 
                     'quickDescription': {
                         required: true,
@@ -118,19 +127,16 @@
                     },
                     'authorEmail': "<fmt:message key='forge.label.askValidEmail'/>",
 
-                    'screenshot1': {
-                         required: "<fmt:message key='forge.label.askScreenshot1'/>",
-                         regexp:"<fmt:message key='forge.label.askValidImage'/>"
-                     },
-                    'screenshot2': {
-                        regexp:"<fmt:message key='forge.label.askValidImage'/>"
-                     },
-                    'screenshot3': {
-                        regexp:"<fmt:message key='forge.label.askValidImage'/>"
-                     },
-                    'screenshot4': {
-                        regexp:"<fmt:message key='forge.label.askValidImage'/>"
-                     },
+                    <c:forEach var="i" begin="1" end="${screenshotsMaxNbr}">
+
+                        'screenshot${i}' : {
+                            <c:if test="${i == 1 && not edition}">
+                            required: "<fmt:message key='forge.label.askScreenshot1'/>",
+                            </c:if>
+                            regexp: "<fmt:message key='forge.label.askValidImage'/>"
+                        },
+                    </c:forEach>
+
                     'quickDescription': {
                         required: "<fmt:message key='forge.label.askQuickDescription'/>",
                         minlength: "<fmt:message key='forge.label.quickDescriptionSizeWarning'/>"
@@ -145,16 +151,71 @@
                 }
             });
 
-            /*var form = $("#newModuleForm");
-            form.attr("enctype", "multipart/form-data");*/
+            $(".addScreenshot").click(function() {
+                $(".control-group.hidden-control-group.screenshot").not(".set-control-group").first()
+                        .slideDown(function(){$(this).removeClass("hidden-control-group");});
+            });
+
+            $(".updateScreenshot").click(function() {
+                $(this).parents('.control-group').find('.controls').slideDown();
+            });
+
+            $(".updateScreenshot").parents('.control-group').addClass("set-control-group").removeClass("hidden-control-group");
+
+
+            function getText(node) {
+                return node["nodename"];
+            }
+
+            function format(result) {
+                return getText(result["node"]);
+            }
+
+            $(".newTagInput").autocomplete("<c:url value='${url.find}'/>", {
+                dataType: "json",
+                cacheLength: 1,
+                parse: function parse(data) {
+                    return $.map(data, function(row) {
+                        return {
+                            data: row,
+                            value: getText(row["node"]),
+                            result: getText(row["node"])
+                        }
+                    });
+                },
+                formatItem: function(item) {
+                    return format(item);
+                },
+                extraParams: {
+                    query : "select * from [jnt:tag] as tags where isdescendantnode(tags,'${functions:sqlencode(renderContext.site.path)}/tags') and localname(tags) like '%{$q}%'",
+                    escapeColon : "false",
+                    propertyMatchRegexp : "{$q}.*",
+                    removeDuplicatePropValues : "false"
+                }
+            });
+
+
 
         });
+
+        function deleteTag(name) {
+
+            var deletedTags = $('#deletedTag').val();
+            var separator = "${separator}";
+
+            if (deletedTags)
+                deletedTags += separator + " " + name;
+            else
+                deletedTags = name;
+
+            $('#deletedTag').val(deletedTags);
+        }
 
     </script>
 </template:addResources>
 
 <template:tokenizedForm>
-    <form action="<c:url value='${targetNode}.${edition ? "editModule" : "addModule"}.do'/>" method="post" id="newModuleForm-${currentNode.UUID}" enctype="multipart/form-data"  accept="application/json">
+    <form action="<c:url value='${targetNode}.${edition ? "editModule" : "addModule"}.do'/>" method="post" id="moduleForm-${id}" class="moduleForm" enctype="multipart/form-data"  accept="application/json">
         <fieldset>
 
             <div class="control-group">
@@ -197,7 +258,43 @@
                 </div>
             </div>
 
-            <div class="control-group">
+            <c:forEach var="i" begin="1" end="${screenshotsMaxNbr}">
+
+                <div class="control-group screenshot ${i > screenshotInputsDefaultNbr ? 'hidden-control-group' : '' }">
+                    <label class="control-label" for="screenshot${i}"><fmt:message key="comnt_module.screenshot"/>&nbsp;${i}</label>
+                    <div class="controls">
+                        <input class="span16" type="file"
+                               name="screenshot${i}" id="screenshot${i}" />
+                    </div>
+
+                    <div class="screenshotThumbnail">
+                        <c:set var="screenshotsNodes" value="${not empty screenshots ? jcr:getNodes(screenshots, 'comnt:moduleScreenshot') : ''}"/>
+                        <c:if test="${edition && not empty screenshotsNodes}">
+                            <c:forEach var="moduleScreenshot" items="${screenshotsNodes}">
+
+                                <c:set var="screenshotName" value="screenshot${i}"/>
+                                <jcr:node var="screenshot" path="${moduleScreenshot.properties['screenshot'].node.path}"/>
+                                <c:if test="${moduleScreenshot.displayableName == screenshotName}">
+                                    <template:module node="${moduleScreenshot}"/>
+                                </c:if>
+
+                            </c:forEach>
+                        </c:if>
+                    </div>
+
+                </div>
+
+            </c:forEach>
+
+            <%--<div>
+                <template:module node="${screenshots}"/>
+            </div>--%>
+
+            <div>
+                <a class="addScreenshot">Add another screenshot</a>
+            </div>
+
+            <%--<div class="control-group">
                 <label class="control-label" for="screenshot1"><fmt:message key="comnt_module.screenshot1"/></label>
 
                 <c:if test="${not empty screenshot1.node}">
@@ -283,7 +380,7 @@
                         <a id="screenshot4update" onclick="$('#screenshot4container').show();$('#screenshot4update').hide();">Update</a>
                     </p>
                 </c:if>
-            </div>
+            </div>--%>
 
             <div class="control-group">
                 <label class="control-label" for="videoProvider"><fmt:message key="comnt_module.videoProvider"/></label>
@@ -331,10 +428,10 @@
             </div>
 
             <div class="control-group">
-                <label class="control-label" for="iconFile"><fmt:message key="comnt_module.iconFile"/></label>
+                <label class="control-label" for="icon"><fmt:message key="comnt_module.icon"/></label>
                 <div class="controls">
-                    <input placeholder="<fmt:message key="comnt_module.iconFile" />" class="span16" type="file"
-                           name="iconFile" id="iconFile" value="${iconFile.path}"/>
+                    <input placeholder="<fmt:message key="comnt_module.icon" />" class="span16" type="file"
+                           name="icon" id="icon" />
                 </div>
             </div>
             <div class="control-group">
@@ -348,7 +445,7 @@
             <div class="control-group">
                 <label class="control-label" for="bigDescription"><fmt:message key="comnt_module.bigDescription"/></label>
                 <div class="controls">
-                    <textarea rows="7" cols="35" id="jahia-module-bigDescription-${currentNode.UUID}"
+                    <textarea rows="7" cols="35" id="jahia-module-bigDescription-${id}"
                               placeholder="<fmt:message key="comnt_module.bigDescription" />" class="jahia-ckeditor span16"
                               name="bigDescription" >
                         <c:if test="${not empty bigDescription.string}">
@@ -377,7 +474,7 @@
 
                 <select id="moduleCategory" name="moduleCategory">
                     <option value=""><fmt:message key="comnt_module.category"/></option>
-                    <c:forEach items="${jcr:getChildrenOfType(moduleCategories, 'jnt:category')}" var="category">
+                    <c:forEach items="${jcr:getNodes(moduleCategories, 'jnt:category')}" var="category">
                         <option value="${category.identifier}" ${category.identifier == categoryNode.node.identifier ? 'selected' : ''}>${category.displayableName}</option>
                     </c:forEach>
                 </select>
@@ -385,10 +482,58 @@
             </c:if>
 
             <div class="control-group">
-                <label class="control-label" for="tags"><fmt:message key="comnt_module.tags"/></label>
+                <label class="control-label" for="newTag"><fmt:message key="comnt_module.tags"/></label>
                 <div class="controls">
+                    <input type="hidden" value="" name="deletedTag" id="deletedTag" />
                     <input placeholder="<fmt:message key="comnt_module.tags" />" type="text"
-                           name="j:newTag" id="tags" />
+                           name="j:newTag" id="newTag" class="newTagInput" />
+                </div>
+
+                <c:if test="${jcr:isNodeType(renderContext.mainResource.node, 'jmix:tagged')}">
+
+                    <jcr:nodeProperty node="${renderContext.mainResource.node}" name="j:tags" var="assignedTags"/>
+                    <jsp:useBean id="filteredTags" class="java.util.LinkedHashMap"/>
+
+                    <c:forEach items="${assignedTags}" var="tag">
+                        <c:if test="${not empty tag.node}">
+                            <c:set target="${filteredTags}" property="${tag.node.identifier}" value="${tag.node.name}"/>
+                        </c:if>
+                    </c:forEach>
+
+                    <p>
+                        <c:choose>
+
+                            <c:when test="${not empty filteredTags}">
+                                <c:forEach items="${filteredTags}" var="tag" varStatus="status">
+
+                                    <span class="taggeditem">${fn:escapeXml(tag.value)}</span>
+                                    <a href="#" onclick="deleteTag('${tag.value}')">delete</a>
+                                    ${!status.last ? separator : ''}
+
+                                </c:forEach>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="notaggeditem${boundComponent.identifier}"><fmt:message
+                                    key="label.tags.notag"/></span>
+                            </c:otherwise>
+
+                        </c:choose>
+                    </p>
+
+                </c:if>
+
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="howToInstall"><fmt:message key="comnt_module.howToInstall"/></label>
+                <div class="controls">
+                    <textarea rows="7" cols="35" id="jahia-module-howToInstall-${id}"
+                              placeholder="<fmt:message key="comnt_module.howToInstall" />" class="jahia-ckeditor span16"
+                              name="howToInstall" >
+                        <c:if test="${not empty howToInstall.string}">
+                            ${fn:escapeXml(howToInstall.string)}
+                        </c:if>
+                    </textarea>
                 </div>
             </div>
 
@@ -411,7 +556,7 @@
 
             <div class="control-group">
                 <div class="controls">
-                    <input type="submit" class="btn" onclick="CKEDITOR.instances['jahia-module-bigDescription-${currentNode.UUID}'].updateElement();" value="<fmt:message key="forge.submit" />"/>
+                    <input type="submit" class="btn" onclick="CKEDITOR.instances['jahia-module-bigDescription-${id}'].updateElement();" value="<fmt:message key="forge.submit" />"/>
                 </div>
             </div>
         </fieldset>

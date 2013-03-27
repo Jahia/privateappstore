@@ -1,88 +1,157 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<content xmlns:jcr="http://www.jcp.org/jcr/1.0"
-         xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
-         xmlns:jnt="http://www.jahia.org/jahia/nt/1.0"
-         xmlns:docmix="http://www.jahia.org/jahia/docspace/mix/1.0"
-         xmlns:docnt="http://www.jahia.org/jahia/docspace/nt/1.0"
-         xmlns:sv="http://www.jcp.org/jcr/sv/1.0"
-         xmlns:commix="http://www.jahia.com/jahia/mix/1.0"
-         xmlns:jmix="http://www.jahia.org/jahia/mix/1.0"
-         xmlns:j="http://www.jahia.org/jahia/1.0"
-         xmlns:mix="http://www.jcp.org/jcr/mix/1.0"
-         xmlns:comnt="http://www.jahia.com/jahia/nt/1.0" xmlns:rep="internal">
-  <templateSets jcr:primaryType="jnt:templateSets">
-    <forgeModules j:dependencies="default grid" j:installedModules="forgeModules" j:originWS="default" j:siteType="module" j:title="Forge Modules" j:wcagCompliance="true" jcr:primaryType="jnt:virtualsite">
-      <portlets j:originWS="default" jcr:primaryType="jnt:portletFolder"/>
-      <files j:originWS="default" jcr:primaryType="jnt:folder"/>
-      <contents j:originWS="default" jcr:primaryType="jnt:contentFolder"/>
-      <templates j:originWS="default" j:rootTemplatePath="/base" jcr:primaryType="jnt:templatesFolder">
-        <forge-addversion j:applyOn="comnt:module" j:defaultTemplate="false" j:hiddenTemplate="false" j:originWS="default" j:priority="100" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentTemplate">
-          <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-          <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
-            <predefined--rows-960gs column="1col16" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:row">
-              <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-              <predefined--rows-960gs-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
-                <main-resource-display j:mainResourceView="addversion" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
-                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                </main-resource-display>
-              </predefined--rows-960gs-col1>
-            </predefined--rows-960gs>
-          </pagecontent>
-        </forge-addversion>
-          <forge-updateversion j:applyOn="comnt:moduleVersion" j:defaultTemplate="false" j:hiddenTemplate="false" j:originWS="default" j:priority="100" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentTemplate">
-              <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-              <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" jcr:title="forge-updateversion"/>
-              <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
-                  <predefined--rows-960gs column="1col16" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:row">
-                      <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                      <predefined--rows-960gs-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
-                          <module deleted="false" downloadTracking="0" j:originWS="default" j:view="addversion" jcr:mixinTypes="jmix:accessControlled jmix:renderable" jcr:primaryType="comnt:module" new="true" reviewedByJahia="false" supportedByJahia="false">
-                              <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                          </module>
-                      </predefined--rows-960gs-col1>
-                  </predefined--rows-960gs></pagecontent>
-          </forge-updateversion>
-        <module-template j:applyOn="comnt:module" j:defaultTemplate="true" j:hiddenTemplate="false" j:originWS="default" j:priority="100" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentTemplate">
-          <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-          <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
-            <predefined--rows-960gs column="1col16" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:row">
-              <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-              <predefined--rows-960gs-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
-                <main-resource-display j:mainResourceView="detail" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
-                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                </main-resource-display>
-              </predefined--rows-960gs-col1>
-            </predefined--rows-960gs>
-          </pagecontent>
-        </module-template>
-        <release-template j:applyOn="comnt:moduleVersion" j:defaultTemplate="true" j:hiddenTemplate="false" j:originWS="default" j:priority="100" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentTemplate">
-          <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-          <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
-            <predefined--rows-960gs column="1col16" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:row">
-              <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-              <predefined--rows-960gs-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
-                <main-resource-display j:mainResourceView="default" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
-                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                </main-resource-display>
-              </predefined--rows-960gs-col1>
-            </predefined--rows-960gs>
-          </pagecontent>
-        </release-template>
-        <edit-module j:applyOn="comnt:module" j:defaultTemplate="false" j:hiddenTemplate="false" j:originWS="default" j:priority="99" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentTemplate">
-            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-            <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
-                <predefined--rows-960gs column="1col16" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:row">
+<content xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:jnt="http://www.jahia.org/jahia/nt/1.0" xmlns:docnt="http://www.jahia.org/jahia/docspace/nt/1.0" xmlns:docmix="http://www.jahia.org/jahia/docspace/mix/1.0" xmlns:sv="http://www.jcp.org/jcr/sv/1.0" xmlns:commix="http://www.jahia.com/jahia/mix/1.0" xmlns:jmix="http://www.jahia.org/jahia/mix/1.0" xmlns:j="http://www.jahia.org/jahia/1.0" xmlns:mix="http://www.jcp.org/jcr/mix/1.0" xmlns:comnt="http://www.jahia.com/jahia/nt/1.0" xmlns:rep="internal">
+    <templateSets jcr:primaryType="jnt:templateSets">
+        <forgeModules j:dependencies="default grid tabularList videostreaming" j:installedModules="forgeModules" j:originWS="default" j:siteType="module" j:title="Forge Modules" j:wcagCompliance="true" jcr:primaryType="jnt:virtualsite">
+            <portlets j:originWS="default" jcr:primaryType="jnt:portletFolder" />
+            <files j:originWS="default" jcr:primaryType="jnt:folder" />
+            <contents j:originWS="default" jcr:primaryType="jnt:contentFolder" />
+            <templates j:originWS="default" j:rootTemplatePath="/base" jcr:primaryType="jnt:templatesFolder">
+                <forge-addversion j:applyOn="comnt:module" j:defaultTemplate="false" j:hiddenTemplate="false" j:originWS="default" j:priority="100" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentTemplate">
+                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
+                    <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
+                        <predefined--rows-960gs column="1col16" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:row">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
+                            <predefined--rows-960gs-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
+                                <main-resource-display j:mainResourceView="addversion" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
+                                </main-resource-display>
+                            </predefined--rows-960gs-col1>
+                        </predefined--rows-960gs>
+                    </pagecontent>
+                </forge-addversion>
+                <forge-updateversion j:applyOn="comnt:moduleVersion" j:defaultTemplate="false" j:hiddenTemplate="false" j:originWS="default" j:priority="100" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentTemplate">
+                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
+                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="forge-updateversion" />
+                    <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
+                        <predefined--rows-960gs column="1col16" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:row">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
+                            <predefined--rows-960gs-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
+                                <module deleted="false" downloadTracking="0" j:originWS="default" j:view="addversion" jcr:mixinTypes="jmix:accessControlled jmix:renderable" jcr:primaryType="comnt:module" new="true" reviewedByJahia="false" supportedByJahia="false">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
+                                    <files j:originWS="default" jcr:primaryType="jnt:folder" />
+                                </module>
+                            </predefined--rows-960gs-col1>
+                        </predefined--rows-960gs>
+                    </pagecontent>
+                </forge-updateversion>
+                <module-template j:applyOn="comnt:module" j:defaultTemplate="true" j:hiddenTemplate="false"
+                                 j:originWS="default" j:priority="100" jcr:mixinTypes="jmix:accessControlled"
+                                 jcr:primaryType="jnt:contentTemplate">
                     <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                    <predefined--rows-960gs-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
-                        <moduleform j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="comnt:moduleForm">
+                    <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
+                        <predefined--rows-960gs column="2col412" j:originWS="default"
+                                                jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:row">
                             <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" jcr:title="moduleForm"/>
-                        </moduleform>
-                    </predefined--rows-960gs-col1>
-                </predefined--rows-960gs>
-            </pagecontent>
-        </edit-module>
-      </templates>
-    </forgeModules>
-  </templateSets>
+                            <predefined--rows-960gs-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
+                                <tabular-list j:originWS="default" j:view="ajax"
+                                              jcr:mixinTypes="jmix:accessControlled jmix:renderable"
+                                              jcr:primaryType="jnt:tabularList">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                    <new j:originWS="default" jcr:mixinTypes="jmix:accessControlled"
+                                         jcr:primaryType="jnt:contentList">
+                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title"
+                                                          jcr:primaryType="jnt:translation" jcr:title="Overview"/>
+                                        <main-resource-display j:mainResourceView="overview" j:originWS="default"
+                                                               jcr:mixinTypes="jmix:accessControlled"
+                                                               jcr:primaryType="jnt:mainResourceDisplay">
+                                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        </main-resource-display>
+                                    </new>
+                                    <dos j:originWS="default" jcr:mixinTypes="jmix:accessControlled"
+                                         jcr:primaryType="jnt:contentList">
+                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title"
+                                                          jcr:primaryType="jnt:translation" jcr:title="Screenshots"/>
+                                        <main-resource-display j:mainResourceView="header" j:originWS="default"
+                                                               jcr:mixinTypes="jmix:accessControlled"
+                                                               jcr:primaryType="jnt:mainResourceDisplay">
+                                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        </main-resource-display>
+                                    </dos>
+                                    <installation j:originWS="default" jcr:mixinTypes="jmix:accessControlled"
+                                                  jcr:primaryType="jnt:contentList">
+                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation"
+                                                          jcr:title="Installation"/>
+                                        <main-resource-display j:mainResourceView="howToInstall" j:originWS="default"
+                                                               jcr:mixinTypes="jmix:accessControlled"
+                                                               jcr:primaryType="jnt:mainResourceDisplay">
+                                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        </main-resource-display>
+                                    </installation>
+                                </tabular-list>
+                            </predefined--rows-960gs-col1>
+                            <predefined--rows-960gs-col2 j:originWS="default" jcr:primaryType="jnt:contentList">
+                                <main-resource-display j:mainResourceView="header" j:originWS="default"
+                                                       jcr:mixinTypes="jmix:accessControlled"
+                                                       jcr:primaryType="jnt:mainResourceDisplay">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                </main-resource-display>
+                            </predefined--rows-960gs-col2>
+                        </predefined--rows-960gs>
+                    </pagecontent>
+                </module-template>
+                <release-template j:applyOn="comnt:moduleVersion" j:defaultTemplate="true" j:hiddenTemplate="false"
+                                  j:originWS="default" j:priority="100" jcr:mixinTypes="jmix:accessControlled"
+                                  jcr:primaryType="jnt:contentTemplate">
+                <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
+                    <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
+                        <predefined--rows-960gs column="1col16" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:row">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
+                            <predefined--rows-960gs-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
+                                <main-resource-display j:mainResourceView="default" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
+                                </main-resource-display>
+                            </predefined--rows-960gs-col1>
+                        </predefined--rows-960gs>
+                    </pagecontent>
+                </release-template>
+                <edit-module j:applyOn="comnt:module" j:defaultTemplate="false" j:hiddenTemplate="false" j:originWS="default" j:priority="99" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentTemplate">
+                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
+                    <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
+                        <predefined--rows-960gs column="1col16" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:row">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
+                            <predefined--rows-960gs-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
+                                <moduleform j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="comnt:moduleForm">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
+                                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="moduleForm" />
+                                </moduleform>
+                            </predefined--rows-960gs-col1>
+                        </predefined--rows-960gs>
+                    </pagecontent>
+                </edit-module>
+                <forge-home j:hiddenTemplate="false" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:pageTemplate" />
+                <dev j:applyOn="comnt:module" j:defaultTemplate="false" j:hiddenTemplate="false" j:originWS="default"
+                     jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentTemplate">
+                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation"
+                                      jcr:title="dev"/>
+                    <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
+                        <predefined--rows-960gs column="1col16" j:originWS="default"
+                                                jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:row">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <predefined--rows-960gs-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
+                                <main-resource-display j:mainResourceView="addversion" j:originWS="default"
+                                                       jcr:mixinTypes="jmix:accessControlled"
+                                                       jcr:primaryType="jnt:mainResourceDisplay">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                </main-resource-display>
+                                <moduleform j:originWS="default" jcr:mixinTypes="jmix:accessControlled"
+                                            jcr:primaryType="comnt:moduleForm" screenshotInputsDefaultNbr="3"
+                                            screenshotsMaxNbr="10">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                </moduleform>
+                            </predefined--rows-960gs-col1>
+                        </predefined--rows-960gs>
+                    </pagecontent>
+                </dev>
+            </templates>
+            <forge-home j:originWS="default" j:templateNode="/templateSets/forgeModules/templates/forge-home" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:page">
+                <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
+                <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="forge-home" />
+            </forge-home>
+        </forgeModules>
+    </templateSets>
 </content>
+

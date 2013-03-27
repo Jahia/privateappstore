@@ -41,6 +41,7 @@
 - supportedByJahia (boolean) = false autocreated
 - reviewedByJahia (boolean) = false autocreated
 - deleted (boolean) = false autocreated hidden
+- howToInstall (string, richtext) i18n
 + files (jnt:folder) = jnt:folder autocreated hidden
 + * (comnt:moduleVersion)
 
@@ -58,6 +59,7 @@
 - fileLength (long)
 - fileDsaSignature (string)
 - releaseNotesUrl (string)
+- changeLog (string, richtext)
 - lastVersion (boolean) = true autocreated
 
 [comnt:moduleScreenshotList] > jnt:content, jmix:list orderable
