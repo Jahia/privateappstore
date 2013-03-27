@@ -21,6 +21,8 @@
 <c:set var="title" value="${currentNode.properties['jcr:title'].string}"/>
 <c:set var="icon" value="${currentNode.properties['icon'].node}"/>
 <c:set var="authorName" value="${currentNode.properties['authorName'].string}"/>
+<c:set var="nbOfVotes"
+       value="${not empty currentNode.properties['j:nbOfVotes'] ? currentNode.properties['j:nbOfVotes'].long : null}"/>
 
 <jcr:sql
         var="moduleVersions"
@@ -37,17 +39,19 @@
 
     </header>
 
-    <figure>
+    <img src="${icon.url}" alt="icon"/>
 
-        <img src="${icon.url}" alt="icon"/>
+    <div>
 
         <c:if test="${jcr:isNodeType(currentNode, 'jmix:rating')}">
             <template:include view="hidden.average.readonly" />
+            <span>(${nbOfVotes})</span>
         </c:if>
 
-    </figure>
+    </div>
 
     <div class="downloadLink">
+
         <c:forEach items="${moduleVersions.nodes}" var="lastVersion">
             <jcr:nodeProperty node="${lastVersion}" name="moduleBinary" var="moduleBinary"/>
             <jcr:nodeProperty node="${lastVersion}" name="version" var="version"/>
