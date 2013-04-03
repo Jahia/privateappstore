@@ -13,13 +13,19 @@
         <property name="requireAuthenticatedUser" value="true"/>
     </bean>
 
+    <bean class="org.jahia.modules.forgeModules.actions.DeleteModule" >
+        <property name="name" value="DeleteModule"/>
+        <property name="requireAuthenticatedUser" value="true"/>
+    </bean>
+
     <bean class="org.jahia.modules.forgeModules.actions.AddModuleRelease" >
         <property name="name" value="AddModuleRelease"/>
         <property name="requireAuthenticatedUser" value="true"/>
     </bean>
 
-    <bean class="org.jahia.modules.forgeModules.actions.DeleteModule" >
-        <property name="name" value="DeleteModule"/>
+    <bean class="org.jahia.modules.forgeModules.actions.EditModuleRelease" >
+        <property name="name" value="EditModuleRelease"/>
         <property name="requireAuthenticatedUser" value="true"/>
     </bean>
+
 </beans>

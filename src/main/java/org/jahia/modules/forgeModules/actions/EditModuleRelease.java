@@ -13,65 +13,74 @@ import org.jahia.services.render.URLResolver;
 import org.jahia.tools.files.FileUpload;
 import org.slf4j.Logger;
 
-import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.*;
 
 /**
- * @author faissah
+ * Date: 2013-03-27
+ *
+ * @author Frédéric PIERRE
+ * @version 1.0
  */
-public class    AddModuleRelease extends Action {
+public class EditModuleRelease extends Action {
 
-    private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(AddModuleRelease.class);
+    private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(AddModule.class);
 
     @Override
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource,
                                   JCRSessionWrapper session, Map<String, List<String>> parameters,
                                   URLResolver urlResolver) throws Exception {
 
-        JCRNodeWrapper module = resource.getNode();
+        JCRNodeWrapper module = resource.getNode().getParent();
+        JCRNodeWrapper moduleVersion = resource.getNode();
+        JCRNodeWrapper filesFolder = module.getNode("files");
 
         String moduleTitle = module.getPropertyAsString("jcr:title");
-        String version = getParameter(parameters, "version");
+        String version = moduleVersion.getPropertyAsString("version");
 
-        logger.info("Start adding module release " + version + " of " + moduleTitle);
-
-        JCRNodeWrapper filesFolder = module.getNode("files");
-        JCRNodeWrapper moduleVersion = createNode(req, parameters, module, "comnt:moduleVersion", moduleTitle+"-"+version, false);
+        logger.info("Start updating module release " + version + " of " + moduleTitle);
 
         String statusUUID = getParameter(parameters, "jahiAppStatus");
         String relatedJahiaVersionUUID = getParameter(parameters, "relatedJahiaVersion");
         String releaseType = getParameter(parameters, "releaseType");
+        String changeLog = getParameter(parameters, "changeLog");
         String activeVersion = getParameter(parameters, "activeVersion");
+
+        session.checkout(moduleVersion);
+
+        if (changeLog != null)
+            moduleVersion.setProperty("changeLog", changeLog);
+
+        if (releaseType != null)
+            moduleVersion.setProperty("releaseType", releaseType);
 
         if (statusUUID != null) {
             JCRNodeWrapper status = session.getNodeByUUID(statusUUID);
             moduleVersion.setProperty("status",status);
         }
 
+        if (activeVersion.equals("true"))
+            moduleVersion.setProperty("activeVersion", true);
+        else
+            moduleVersion.setProperty("activeVersion", false);
+
         if (relatedJahiaVersionUUID != null) {
             JCRNodeWrapper relatedJahiaVersion = session.getNodeByUUID(relatedJahiaVersionUUID);
             moduleVersion.setProperty("relatedJahiaVersion",relatedJahiaVersion);
-        }
-
-        if (activeVersion.equals("true"))
-            moduleVersion.setProperty("activeVersion", true);
-
-        if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
-            List<String> roles = Arrays.asList("owner");
-            moduleVersion.grantRoles("u:" + session.getUser().getUsername(), new HashSet<String>(roles));
         }
 
         final FileUpload fu = (FileUpload) req.getAttribute(FileUpload.FILEUPLOAD_ATTRIBUTE);
 
         DiskFileItem moduleBinary = fu.getFileItems().get("moduleBinary");
 
-        JCRNodeWrapper fileNode = filesFolder.uploadFile(moduleBinary.getName(), moduleBinary.getInputStream(),
-                moduleBinary.getContentType());
+        if (moduleBinary != null) {
 
-        moduleVersion.setProperty("moduleBinary", fileNode);
+            JCRNodeWrapper fileNode = filesFolder.uploadFile(moduleBinary.getName(), moduleBinary.getInputStream(),
+                    moduleBinary.getContentType());
+
+            moduleVersion.setProperty("moduleBinary", fileNode);
+        }
 
         /*
         for (Map.Entry<String, DiskFileItem> entry : fu.getFileItems().entrySet()) {
@@ -87,11 +96,11 @@ public class    AddModuleRelease extends Action {
 
                 targetNode.setProperty(propertyName, fileNode);
             }
-        }  */
+        }   */
 
         session.save();
 
-        logger.info("Module release " + version + " of " + moduleTitle + " successfully added");
+        logger.info("Module release " + version + " of " + moduleTitle + " successfully updated");
 
         // TODO
         return new ActionResult(HttpServletResponse.SC_OK, moduleVersion.getPath(), Render.serializeNodeToJSON(moduleVersion));

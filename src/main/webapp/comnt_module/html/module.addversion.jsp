@@ -14,18 +14,19 @@
 <%--@elvariable id="currentResource" type="org.jahia.services.render.Resource"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 <%--@elvariable id="acl" type="java.lang.String"--%>
-<template:addResources type="javascript" resources="jquery.min.js,jquery.validate.js"/>
-<uiComponents:ckeditor selector="jahia-moduleVersion-desc-${currentNode.UUID}"/>
 
+<template:addResources type="javascript" resources="jquery.min.js,jquery.validate.js"/>
+
+<c:set var="id" value="${currentNode.identifier}"/>
+<uiComponents:ckeditor selector="jahia-moduleVersion-changeLog-${id}"/>
 
 <c:choose>
     <c:when test="${jcr:isNodeType(renderContext.mainResource.node,'comnt:moduleVersion')}">
         <c:set var="targetNode" value="${url.base}${renderContext.mainResource.node.path}"/>
         <c:set var="currentModule" value="${url.base}${renderContext.mainResource.node}"/>
         <c:set var="edition" value="true"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="jcr:title" var="title"/>
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="moduleBinary" var="moduleBinary"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="desc" var="desc"/>
+        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="changeLog" var="changeLog"/>
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="relatedJahiaVersion" var="relatedJahiaVersion"/>
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="releaseType" var="releaseType"/>
         <jcr:nodeProperty node="${renderContext.mainResource.node}" name="status" var="status"/>
@@ -46,55 +47,47 @@
                           return this.optional(element) || param.test(value);
                         });
 
-                $("#newVersionForm-${currentNode.UUID}").validate({
+                $("#moduleVersionForm-${id}").validate({
                 rules: {
-                    'title': {
-                        required: true,
-                        minlength: 2
-                    },
 
                     'version': {
                         required: true,
                         regexp: /^(\d+\.){3}(\d+)$/i
                     },
 
-                    'binaryFile': {
+                    'moduleBinary': {
                         <c:if test="${not edition}">
                             required: true,
                         </c:if>
                         regexp: /(\S+?)\.(jar|war)$/i
                     },
 
-                    'desc': {
+                    'changeLog': {
                         required: true,
                         minlength: 50
                     }
                 },
                 messages: {
-                    'title': {
-                        required: "<fmt:message key='forge.label.askTitle'/>",
-                        minlength: "<fmt:message key='forge.label.titleSizeWarning'/>"
-                    },
 
                     'version': {
                         required: "<fmt:message key='forge.label.askVersion'/>",
                         regexp: "<fmt:message key='forge.label.askValidVersion'/>"
                     },
 
-                    'binaryFile': {
-                         required: "<fmt:message key='forge.label.askBinaryFile'/>",
-                         regexp:"<fmt:message key='forge.label.askValidBinaryFile'/>"
+                    'moduleBinary': {
+                         required: "<fmt:message key='forge.label.askModuleBinary'/>",
+                         regexp:"<fmt:message key='forge.label.askValidModuleBinary'/>"
                      },
 
-                    'desc': {
-                        required: "<fmt:message key='forge.label.askVersionDescription'/>",
-                        minlength: "<fmt:message key='forge.label.versionDescriptionSizeWarning'/>"
+                    'changeLog': {
+                        required: "<fmt:message key='forge.label.askChangeLog'/>",
+                        minlength: "<fmt:message key='forge.label.changeLogSizeWarning'/>"
                     }
                 }
             });
 
-            var form = $("#newModuleForm");
-            form.attr("enctype", "multipart/form-data")
+            /*var form = $("#newModuleForm");
+            form.attr("enctype", "multipart/form-data")*/
             $("#releaseType").val('${releaseType}');
 
         });
@@ -103,16 +96,8 @@
 </template:addResources>
 
 <template:tokenizedForm>
-    <form action="<c:url value='${targetNode}.addModuleRelease.do'/>" method="post" id="newVersionForm-${currentNode.UUID}" enctype="multipart/form-data"  accept="application/json">
+    <form action="<c:url value='${targetNode}.${edition ? "editModuleRelease" : "addModuleRelease"}.do'/>" method="post" id="moduleVersionForm-${id}" enctype="multipart/form-data"  accept="application/json">
         <fieldset>
-
-            <div class="control-group">
-                <label class="control-label" for="title"><fmt:message key="comnt_module.title"/></label>
-                <div class="controls">
-                    <input placeholder="<fmt:message key="comnt_module.title" />" class="span16" type="text"
-                           name="title" id="title" value="${title.string}"/>
-                </div>
-            </div>
 
             <div class="control-group">
                 <label class="control-label" for="version"><fmt:message key="comnt_module.version"/></label>
@@ -124,26 +109,26 @@
 
 
             <div class="control-group">
-                <label class="control-label" for="binaryFile"><fmt:message key="comnt_moduleVersion.moduleFile"/></label>
+                <label class="control-label" for="moduleBinary"><fmt:message key="comnt_moduleVersion.moduleFile"/></label>
                 <div class="controls">
 
                     <c:if test="${not empty moduleBinary.node.name}">
-                        <p>${moduleBinary.node.name}&nbsp<a href="#" onclick="$('#binaryFile').show();">Update</a></p>
+                        <p>${moduleBinary.node.name}&nbsp<a href="#" onclick="$('#moduleBinary').show();">Update</a></p>
                         <c:set var="binaryFieldDisplay" value="style=\"display: none;\""/>
                     </c:if>
                     <input placeholder="<fmt:message key="comnt_moduleVersion.moduleFile" />" class="span16" type="file"
-                           name="binaryFile" id="binaryFile" value="${moduleBinary.node.name}" ${binaryFieldDisplay}/>
+                           name="moduleBinary" id="moduleBinary" value="${moduleBinary.node.name}" ${binaryFieldDisplay}/>
                 </div>
             </div>
 
             <div class="control-group">
-                <label class="control-label" for="jahia-moduleVersion-desc-${currentNode.UUID}"><fmt:message key="comnt_moduleVersion.desc"/></label>
+                <label class="control-label" for="jahia-moduleVersion-changeLog-${id}"><fmt:message key="comnt_moduleVersion.changeLog"/></label>
                 <div class="controls">
-                    <textarea rows="7" cols="35" id="jahia-moduleVersion-desc-${currentNode.UUID}"
-                              placeholder="<fmt:message key="comnt_moduleVersion.desc" />" class="jahia-ckeditor span16"
-                           name="desc" value="${desc.string}">
-                        <c:if test="${not empty desc.string}">
-                            ${fn:escapeXml(desc.string)}
+                    <textarea rows="7" cols="35" id="jahia-moduleVersion-changeLog-${id}"
+                              placeholder="<fmt:message key="comnt_moduleVersion.changeLog" />" class="jahia-ckeditor span16"
+                           name="changeLog" value="${changeLog.string}">
+                        <c:if test="${not empty changeLog.string}">
+                            ${fn:escapeXml(changeLog.string)}
                         </c:if>
                     </textarea>
                 </div>
@@ -189,6 +174,13 @@
                 </div>
             </div>
             </c:if>
+
+            <div class="control-group">
+                <label class="control-label" for="activeVersion"><fmt:message key="comnt_moduleVersion.activeVersion"/></label>
+                <div class="controls">
+                    <input type="checkbox" id="activeVersion" name="activeVersion" checked="true"/>
+                </div>
+            </div>
 
 
             <div class="control-group">

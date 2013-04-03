@@ -21,7 +21,7 @@
     <div><fmt:message key="comnt_moduleVersion.version"/>:${currentNode.properties.version.string}</div>
     <div><fmt:message key="comnt_moduleVersion.date"/>:<fmt:formatDate value="${currentNode.properties.date.time}" type="date" dateStyle="long"/> </div>
     <div><fmt:message key="comnt_moduleVersion.moduleBinary"/>:<a href="${currentNode.properties.moduleBinary.node.url}">Download</a></div>
-    <div><fmt:message key="comnt_moduleVersion.desc"/>:${currentNode.properties.desc.string}</div>
+    <div><fmt:message key="comnt_moduleVersion.changeLog"/>:${currentNode.properties.changeLog.string}</div>
     <c:if test="${not empty currentNode.properties.relatedJahiaVersion.node.name}">
         <div><fmt:message key="comnt_moduleVersion.relatedJahiaVersion"/>:${currentNode.properties.relatedJahiaVersion.node.name}</div>
     </c:if>
