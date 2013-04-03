@@ -46,6 +46,7 @@
 + * (comnt:moduleVersion)
 
 [comnt:moduleVersion]> jnt:content, jmix:editorialContent, commix:forgeModules
++ * (jnt:file)
 - relatedJahiaVersion (weakreference,category[root='relatedJahiaVersion'])
 - releaseType (string, choicelist[resourceBundle]) = 'hotfix' m < 'hotfix', 'service-pack', 'upgrade'
 - status (weakreference,category[root='status'])

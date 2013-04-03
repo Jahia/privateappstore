@@ -28,6 +28,7 @@
     <template:param name="getActiveVersion" value="true"/>
 </template:include>
 <c:set value="${moduleMap.activeVersion}" var="activeVersion"/>
+<c:set value="${moduleMap.activeVersionBinary}" var="activeVersionBinary"/>
 
 <section id="moduleHeader">
 
@@ -51,14 +52,9 @@
 
     <div class="downloadLink">
 
-        <jcr:nodeProperty node="${activeVersion}" name="moduleBinary" var="moduleBinary"/>
         <jcr:nodeProperty node="${activeVersion}" name="version" var="version"/>
-        <a href="${moduleBinary.node.url}">Download version ${version.string}</a>
+        <a href="${activeVersionBinary.url}">Download version ${version.string}</a>
 
     </div>
-
-
-
-
 
 </section>

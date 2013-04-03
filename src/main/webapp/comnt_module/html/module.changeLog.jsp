@@ -61,12 +61,20 @@
 
                 <jcr:nodeProperty node="${previousVersion}" name="changeLog" var="changeLog"/>
                 <jcr:nodeProperty node="${previousVersion}" name="version" var="version"/>
-                <jcr:nodeProperty node="${previousVersion}" name="moduleBinary" var="moduleBinary"/>
                 <jcr:nodeProperty node="${previousVersion}" name="relatedJahiaVersion" var="relatedJahiaVersion"/>
+
+                <jcr:sql
+                    var="moduleBinaries"
+                    sql="SELECT * FROM [jnt:file] WHERE ischildnode(['${previousVersion.path}'])
+                      ORDER BY ['jcr:lastModified'] DESC" limit ='1'/>
+
+                <c:forEach items="${moduleBinaries.nodes}" var="moduleBinaryNode">
+                    <c:set value="${moduleBinaryNode}" var="moduleBinary"/>
+                </c:forEach>
 
                 <header>
                     <h3>${version.string}</h3>
-                    <a href="${moduleBinary.node.url}">Download version ${version.string}</a>
+                    <a href="${moduleBinary.url}">Download version ${version.string}</a>
                 </header>
 
                 ${changeLog.string}
@@ -76,7 +84,7 @@
                         <dt>Requires Jahia:</dt>
                             <dd>${relatedJahiaVersion.node.displayableName}</dd>
                         <dt>Updated:</dt>
-                            <dd><fmt:formatDate value="${moduleBinary.node.contentLastModifiedAsDate}" pattern="yyyy-MM-dd" /></dd>
+                            <dd><fmt:formatDate value="${moduleBinary.contentLastModifiedAsDate}" pattern="yyyy-MM-dd" /></dd>
                     </dl>
                 </footer>
 

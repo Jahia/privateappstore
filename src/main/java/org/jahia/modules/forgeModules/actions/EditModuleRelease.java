@@ -34,7 +34,6 @@ public class EditModuleRelease extends Action {
 
         JCRNodeWrapper module = resource.getNode().getParent();
         JCRNodeWrapper moduleVersion = resource.getNode();
-        JCRNodeWrapper filesFolder = module.getNode("files");
 
         String moduleTitle = module.getPropertyAsString("jcr:title");
         String version = moduleVersion.getPropertyAsString("version");
@@ -60,7 +59,7 @@ public class EditModuleRelease extends Action {
             moduleVersion.setProperty("status",status);
         }
 
-        if (activeVersion.equals("true"))
+        if (activeVersion != null && activeVersion.equals("on"))
             moduleVersion.setProperty("activeVersion", true);
         else
             moduleVersion.setProperty("activeVersion", false);
@@ -74,29 +73,8 @@ public class EditModuleRelease extends Action {
 
         DiskFileItem moduleBinary = fu.getFileItems().get("moduleBinary");
 
-        if (moduleBinary != null) {
-
-            JCRNodeWrapper fileNode = filesFolder.uploadFile(moduleBinary.getName(), moduleBinary.getInputStream(),
-                    moduleBinary.getContentType());
-
-            moduleVersion.setProperty("moduleBinary", fileNode);
-        }
-
-        /*
-        for (Map.Entry<String, DiskFileItem> entry : fu.getFileItems().entrySet()) {
-
-            DiskFileItem fileItem = entry.getValue();
-            String propertyName = entry.getKey();
-
-            if (fileItem != null) {
-
-                JCRNodeWrapper targetNode = moduleVersion;
-                JCRNodeWrapper fileNode = filesFolder.uploadFile(fileItem.getName(), fileItem.getInputStream(),
-                        fileItem.getContentType());
-
-                targetNode.setProperty(propertyName, fileNode);
-            }
-        }   */
+        if (moduleBinary != null)
+            moduleVersion.uploadFile(moduleBinary.getName(), moduleBinary.getInputStream(), moduleBinary.getContentType());
 
         session.save();
 

@@ -18,25 +18,33 @@
 <c:if test="${getActiveVersion}">
 
     <jcr:sql
-            var="activeVersions"
-            sql="SELECT * FROM [comnt:moduleVersion] WHERE isdescendantnode(['${currentNode.path}'])
-              AND activeVersion = true"
-            limit= '1' />
+        var="query"
+        sql="SELECT * FROM [comnt:moduleVersion] AS moduleVersion
+            INNER JOIN [jnt:file] AS moduleBinary ON ischildnode(moduleBinary,moduleVersion)
+            WHERE isdescendantnode(moduleVersion,['${currentNode.path}']) AND moduleVersion.activeVersion = true
+            ORDER BY moduleBinary.['jcr:lastModified'] DESC"
+        limit= '1' />
 
-    <c:forEach items="${activeVersions.nodes}" var="activeVersionNode">
-        <c:set value="${activeVersionNode}" var="activeVersion"/>
+    <c:forEach items="${query.rows}" var="row">
+        <c:set target="${moduleMap}" property="activeVersion" value="${row.nodes['moduleVersion']}" />
+        <c:set target="${moduleMap}" property="activeVersionBinary" value="${row.nodes['moduleBinary']}"/>
     </c:forEach>
-
-    <c:set target="${moduleMap}" property="activeVersion" value="${activeVersion}"/>
 
 </c:if>
 
 <c:if test="${getPreviousVersions}">
 
+    <%--<jcr:sql
+        var="previousVersions"
+        sql="SELECT * FROM [comnt:moduleVersion] AS moduleVersion
+            INNER JOIN [jnt:file] AS moduleBinary ON ischildnode(moduleBinary,moduleVersion)
+            WHERE isdescendantnode(moduleVersion,['${currentNode.path}']) AND moduleVersion.activeVersion = false
+            ORDER BY moduleBinary.['jcr:lastModified'] DESC" />--%>
+
     <jcr:sql
             var="previousVersions"
             sql="SELECT * FROM [comnt:moduleVersion] WHERE isdescendantnode(['${currentNode.path}'])
-              AND activeVersion = false ORDER BY [jcr:created] DESC" />
+              AND activeVersion = false ORDER BY [jcr:lastModified] DESC" />
 
     <c:set target="${moduleMap}" property="previousVersions" value="${previousVersions}"/>
 

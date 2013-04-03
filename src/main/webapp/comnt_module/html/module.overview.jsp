@@ -37,12 +37,12 @@
     <template:param name="getActiveVersion" value="true"/>
 </template:include>
 <c:set value="${moduleMap.activeVersion}" var="activeVersion"/>
+<c:set value="${moduleMap.activeVersionBinary}" var="activeVersionBinary"/>
 
 <section id="moduleOverview" itemtype="http://schema.org/SoftwareApplication">
 
     <jcr:nodeProperty node="${activeVersion}" name="version" var="version"/>
     <jcr:nodeProperty node="${activeVersion}" name="relatedJahiaVersion" var="relatedJahiaVersion"/>
-    <jcr:nodeProperty node="${activeVersion}" name="moduleBinary" var="moduleBinary"/>
 
     <article class="moduleDescription">
 
@@ -76,8 +76,8 @@
 
                 <span content="${title}" itemprop="name"></span>
                 <span content="${icon.url}" itemprop="image"></span>
-                <span content="${moduleBinary.node.fileContent.contentType}" itemprop="fileFormat"></span>
-                <span content="${moduleBinary.node.url}" itemprop="downloadUrl"></span>
+                <span content="${activeVersionBinary.fileContent.contentType}" itemprop="fileFormat"></span>
+                <span content="${activeVersionBinary.url}" itemprop="downloadUrl"></span>
                 <c:forEach items="${assignedTags}" var="tag" varStatus="status">
                     <span content="${tag.node.name}" itemprop="keywords"></span>
                 </c:forEach>
@@ -85,7 +85,7 @@
                 <dt>Updated:</dt>
                     <dd>
                         <time itemprop="datePublished">
-                            <fmt:formatDate value="${moduleBinary.node.contentLastModifiedAsDate}" pattern="yyyy-MM-dd" />
+                            <fmt:formatDate value="${activeVersionBinary.contentLastModifiedAsDate}" pattern="yyyy-MM-dd" />
                         </time>
                     </dd>
 
@@ -96,7 +96,7 @@
                     <dd>${relatedJahiaVersion.node.displayableName}</dd>
 
                 <dt>Size:</dt>
-                    <dd itemprop="fileSize">${jcr:humanReadableFileLength(moduleBinary.node)}</dd>
+                    <dd itemprop="fileSize">${jcr:humanReadableFileLength(activeVersionBinary)}</dd>
 
                 <div itemtype="http://schema.org/Organization" itemscope="" itemprop="author">
 
