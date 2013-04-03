@@ -126,7 +126,7 @@
                 <div class="controls">
                     <textarea rows="7" cols="35" id="jahia-moduleVersion-changeLog-${id}"
                               placeholder="<fmt:message key="comnt_moduleVersion.changeLog" />" class="jahia-ckeditor span16"
-                           name="changeLog" value="${changeLog.string}">
+                           name="changeLog">
                         <c:if test="${not empty changeLog.string}">
                             ${fn:escapeXml(changeLog.string)}
                         </c:if>
