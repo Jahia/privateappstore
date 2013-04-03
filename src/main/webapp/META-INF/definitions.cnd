@@ -33,7 +33,6 @@
 - authorName (string)
 - authorURL (string)
 - authorEmail (string)
-- date (date)
 - new (boolean) = true
 - codeRepository (string)
 - license  (weakreference,category[root='license'])
@@ -46,22 +45,14 @@
 + files (jnt:folder) = jnt:folder autocreated hidden
 + * (comnt:moduleVersion)
 
-[comnt:moduleVersion]> jnt:content, mix:title, jmix:editorialContent, commix:forgeModules
-- jcr:title (string) m boost=2.0
-- date (date) = now() m
-- moduleBinary(weakreference, picker[type='file'])
-- desc (string, richtext)
+[comnt:moduleVersion]> jnt:content, jmix:editorialContent, commix:forgeModules
 - relatedJahiaVersion (weakreference,category[root='relatedJahiaVersion'])
 - releaseType (string, choicelist[resourceBundle]) = 'hotfix' m < 'hotfix', 'service-pack', 'upgrade'
 - status (weakreference,category[root='status'])
 - version (string)
-- fileUrl (string)
-- fileMimeType (string)
-- fileLength (long)
 - fileDsaSignature (string)
-- releaseNotesUrl (string)
 - changeLog (string, richtext)
-- lastVersion (boolean) = true autocreated
+- activeVersion (boolean) = false autocreated
 
 [comnt:moduleScreenshotList] > jnt:content, jmix:list orderable
 + * (comnt:moduleScreenshot) = comnt:moduleScreenshot
