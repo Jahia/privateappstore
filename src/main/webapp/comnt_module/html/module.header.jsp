@@ -24,11 +24,10 @@
 <c:set var="nbOfVotes"
        value="${not empty currentNode.properties['j:nbOfVotes'] ? currentNode.properties['j:nbOfVotes'].long : null}"/>
 
-<jcr:sql
-        var="moduleVersions"
-        sql="SELECT * FROM [comnt:moduleVersion] WHERE isdescendantnode(['${currentNode.path}'])
-              AND lastVersion = true"
-        limit= '1' />
+<template:include view="sql">
+    <template:param name="getActiveVersion" value="true"/>
+</template:include>
+<c:set value="${moduleMap.activeVersion}" var="activeVersion"/>
 
 <section id="moduleHeader">
 
@@ -52,11 +51,9 @@
 
     <div class="downloadLink">
 
-        <c:forEach items="${moduleVersions.nodes}" var="lastVersion">
-            <jcr:nodeProperty node="${lastVersion}" name="moduleBinary" var="moduleBinary"/>
-            <jcr:nodeProperty node="${lastVersion}" name="version" var="version"/>
-            <a href="${moduleBinary.node.url}">Download version ${version.string}</a>
-        </c:forEach>
+        <jcr:nodeProperty node="${activeVersion}" name="moduleBinary" var="moduleBinary"/>
+        <jcr:nodeProperty node="${activeVersion}" name="version" var="version"/>
+        <a href="${moduleBinary.node.url}">Download version ${version.string}</a>
 
     </div>
 
