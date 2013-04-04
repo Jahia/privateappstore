@@ -16,7 +16,7 @@
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
-<template:addResources type="javascript" resources="html5shiv.js"/>
+<template:addResources type="javascript" resources="html5shiv.js, modulesForge.js"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
 
@@ -74,7 +74,7 @@
 
                 <header>
                     <h3>${version.string}</h3>
-                    <a href="${moduleBinary.url}">Download version ${version.string}</a>
+                    <a href="${moduleBinary.url}" onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')">Download version ${version.string}</a>
                 </header>
 
                 ${changeLog.string}

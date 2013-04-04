@@ -28,4 +28,9 @@
         <property name="requireAuthenticatedUser" value="true"/>
     </bean>
 
+    <bean class="org.jahia.modules.forgeModules.actions.DownloadCount" >
+        <property name="name" value="DownloadCount"/>
+        <property name="requireAuthenticatedUser" value="false"/>
+    </bean>
+
 </beans>
