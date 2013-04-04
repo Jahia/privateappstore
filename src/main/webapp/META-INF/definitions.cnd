@@ -25,15 +25,10 @@
 - icon (weakreference, picker[type='image'])
 - promoImage (weakreference, picker[type='image'])
 + screenshots (comnt:moduleScreenshotList) = comnt:moduleScreenshotList
-- screenshot1 (weakreference, picker[type='image'])
-- screenshot2 (weakreference, picker[type='image'])
-- screenshot3 (weakreference, picker[type='image'])
-- screenshot4 (weakreference, picker[type='image'])
 + video (jnt:videostreaming) = jnt:videostreaming
 - authorName (string)
 - authorURL (string)
 - authorEmail (string)
-- new (boolean) = true
 - codeRepository (string)
 - license  (weakreference,category[root='license'])
 - downloadTracking (long) = 0 hidden onconflict=latest autocreated

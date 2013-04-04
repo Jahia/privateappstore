@@ -158,21 +158,6 @@ public class EditModule extends Action {
             }
         }
 
-        /*DiskFileItem screenshotFile1 = fu.getFileItems().get("screenshot1");
-        DiskFileItem screenshotFile2 = fu.getFileItems().get("screenshot2");
-        DiskFileItem screenshotFile3 = fu.getFileItems().get("screenshot3");
-        DiskFileItem screenshotFile4 = fu.getFileItems().get("screenshot4");
-        DiskFileItem iconFile = fu.getFileItems().get("iconFile");
-        DiskFileItem promoImageFile = fu.getFileItems().get("promoImage");
-
-        uploadAndSetModuleFile(module, filesFolder, screenshotFile1, "screenshot1");
-        uploadAndSetModuleFile(module, filesFolder, screenshotFile2, "screenshot2");
-        uploadAndSetModuleFile(module, filesFolder, screenshotFile3, "screenshot3");
-        uploadAndSetModuleFile(module, filesFolder, screenshotFile4, "screenshot4");
-        uploadAndSetModuleFile(module, filesFolder, iconFile, "icon");
-        uploadAndSetModuleFile(module, filesFolder, promoImageFile, "promoImage");
-        */
-
         if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
             List<String> roles = Arrays.asList("owner");
             module.grantRoles("u:" + session.getUser().getUsername(), new HashSet<String>(roles));
@@ -186,12 +171,4 @@ public class EditModule extends Action {
 
     }
 
-    /*private void uploadAndSetModuleFile(JCRNodeWrapper targetNode, JCRNodeWrapper targetFolder,
-                                        DiskFileItem fileToUpload,  String propertyName) throws IOException, RepositoryException {
-
-        if (fileToUpload !=null) {
-            JCRNodeWrapper fileNode = targetFolder.uploadFile(fileToUpload.getName(), fileToUpload.getInputStream(), fileToUpload.getContentType());
-            targetNode.setProperty(propertyName,fileNode);
-        }
-    }*/
 }

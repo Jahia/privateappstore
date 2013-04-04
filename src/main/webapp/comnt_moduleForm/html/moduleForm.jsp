@@ -288,102 +288,6 @@
 
             </c:forEach>
 
-            <%--<div>
-                <template:module node="${screenshots}"/>
-            </div>--%>
-
-            <div>
-                <a class="addScreenshot">Add another screenshot</a>
-            </div>
-
-            <%--<div class="control-group">
-                <label class="control-label" for="screenshot1"><fmt:message key="comnt_module.screenshot1"/></label>
-
-                <c:if test="${not empty screenshot1.node}">
-                    <c:set var="screenshot1Display" value="style=\"display: none;\""/>
-                </c:if>
-
-                <div class="controls" id="screenshot1container" ${screenshot1Display}>
-                    <input placeholder="<fmt:message key="comnt_module.screenshot1" />" class="span16" type="file"
-                           name="screenshot1" id="screenshot1" />
-                </div>
-
-                <c:if test="${not empty screenshot1.node}">
-                    <div>
-                        <img src="${screenshot1.node.thumbnailUrls['thumbnail']}" alt="${screenshot1.node.name}"/>
-                    </div>
-                    <p>
-                        <a id="screenshot1update" onclick="$('#screenshot1container').show();$('#screenshot1update').hide();">Update</a>
-                    </p>
-                </c:if>
-            </div>
-            
-            <div class="control-group">
-                <label class="control-label" for="screenshot2"><fmt:message key="comnt_module.screenshot2"/></label>
-
-                <c:if test="${not empty screenshot2.node}">
-                    <c:set var="screenshot2Display" value="style=\"display: none;\""/>
-                </c:if>
-
-                <div class="controls" id="screenshot2container" ${screenshot2Display}>
-                    <input placeholder="<fmt:message key="comnt_module.screenshot2" />" class="span16" type="file"
-                           name="screenshot2" id="screenshot2"/>
-                </div>
-
-                <c:if test="${not empty screenshot2.node}">
-                    <div>
-                        <img src="${screenshot2.node.thumbnailUrls['thumbnail']}" alt="${screenshot2.node.name}"/>
-                    </div>
-                    <p>
-                        <a id="screenshot2update" onclick="$('#screenshot2container').show();$('#screenshot2update').hide();">Update</a>
-                    </p>
-                </c:if>
-            </div>
-            
-            <div class="control-group">
-                <label class="control-label" for="screenshot3"><fmt:message key="comnt_module.screenshot3"/></label>
-
-                <c:if test="${not empty screenshot3.node}">
-                    <c:set var="screenshot3Display" value="style=\"display: none;\""/>
-                </c:if>
-
-                <div class="controls" id="screenshot3container" ${screenshot3Display}>
-                    <input placeholder="<fmt:message key="comnt_module.screenshot3" />" class="span16" type="file"
-                           name="screenshot3" id="screenshot3"/>
-                </div>
-
-                <c:if test="${not empty screenshot3.node}">
-                    <div>
-                        <img src="${screenshot3.node.thumbnailUrls['thumbnail']}" alt="${screenshot3.node.name}"/>
-                    </div>
-                    <p>
-                        <a id="screenshot3update" onclick="$('#screenshot3container').show();$('#screenshot3update').hide();">Update</a>
-                    </p>
-                </c:if>
-            </div>
-            
-            <div class="control-group">
-                <label class="control-label" for="screenshot4"><fmt:message key="comnt_module.screenshot4"/></label>
-
-                <c:if test="${not empty screenshot4.node}">
-                    <c:set var="screenshot4Display" value="style=\"display: none;\""/>
-                </c:if>
-
-                <div class="controls" id="screenshot4container" ${screenshot4Display}>
-                    <input placeholder="<fmt:message key="comnt_module.screenshot4" />" class="span16" type="file"
-                           name="screenshot4" id="screenshot4"/>
-                </div>
-
-                <c:if test="${not empty screenshot4.node}">
-                    <div>
-                        <img src="${screenshot4.node.thumbnailUrls['thumbnail']}" alt="${screenshot4.node.name}"/>
-                    </div>
-                    <p>
-                        <a id="screenshot4update" onclick="$('#screenshot4container').show();$('#screenshot4update').hide();">Update</a>
-                    </p>
-                </c:if>
-            </div>--%>
-
             <div class="control-group">
                 <label class="control-label" for="videoProvider"><fmt:message key="comnt_module.videoProvider"/></label>
                 <div class="controls">
@@ -527,7 +431,7 @@
             </div>
 
             <div class="control-group">
-                <label class="control-label" for="howToInstall"><fmt:message key="comnt_module.howToInstall"/></label>
+                <label class="control-label" for="jahia-module-howToInstall-${id}"><fmt:message key="comnt_module.howToInstall"/></label>
                 <div class="controls">
                     <textarea rows="7" cols="35" id="jahia-module-howToInstall-${id}"
                               placeholder="<fmt:message key="comnt_module.howToInstall" />" class="jahia-ckeditor span16"
@@ -540,7 +444,7 @@
             </div>
 
             <div class="control-group">
-                <label class="control-label" for="FAQ"><fmt:message key="comnt_module.FAQ"/></label>
+                <label class="control-label" for="jahia-module-FAQ-${id}"><fmt:message key="comnt_module.FAQ"/></label>
                 <div class="controls">
                     <textarea rows="7" cols="35" id="jahia-module-FAQ-${id}"
                               placeholder="<fmt:message key="comnt_module.FAQ" />" class="jahia-ckeditor span16"
