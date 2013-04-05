@@ -17,6 +17,8 @@
 
 <template:addResources type="javascript" resources="html5shiv.js"/>
 <template:addResources type="css" resources="modulesForge.css"/>
+<template:addResources type="css" resources="commentable.css,ui.stars.css"/>
+<template:addResources type="javascript" resources="jquery.min.js,jquery.validate.js,jquery-ui.min.js,ui.stars.js"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="title" value="${currentNode.properties['jcr:title'].string}"/>

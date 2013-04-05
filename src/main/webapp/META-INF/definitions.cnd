@@ -17,7 +17,7 @@
 - screenshotsMaxNbr (long) = 10 mandatory
 - screenshotInputsDefaultNbr (long) = 3 mandatory
 
-[comnt:module] > jnt:content, mix:title, jmix:editorialContent, jmix:tagged, commix:forgeModules
+[comnt:module] > jnt:content, mix:title, jmix:editorialContent, jmix:tagged, commix:forgeModules, jmix:reviews, jmix:rating
 - jcr:title (string) m
 - quickDescription (string, richtext) i18n
 - bigDescription (string, richtext) i18n
@@ -56,4 +56,17 @@
 [comnt:moduleScreenshot] > jnt:content
 - screenshot (weakreference, picker[type='image']) mandatory
 
-[jnt:]
+[jnt:review] > jnt:post
+- rating (long) mandatory
+
+[jnt:addReview] > jnt:content, jmix:bindedComponent, commix:forgeModules
+- commentMandatory (boolean) = false mandatory
+- commentMinLength (long) = 50
+
+[jnt:reviewList] > jnt:content, jmix:bindedComponent, commix:forgeModules
+
+[jnt:reviews] > jnt:content, jmix:list orderable
++ * (jnt:review) = jnt:review
+
+[jmix:reviews] mixin
++ reviews (jnt:reviews) = jnt:reviews autocreated hidden
