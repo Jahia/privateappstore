@@ -16,7 +16,7 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
 <template:addResources type="javascript" resources="html5shiv.js"/>
-<template:addResources type="css" resources="modulesForge.css"/>
+<template:addResources type="css" resources="modulesForge.css,review.css"/>
 <template:addResources type="css" resources="commentable.css,ui.stars.css"/>
 <template:addResources type="javascript" resources="jquery.min.js,jquery.validate.js,jquery-ui.min.js,ui.stars.js"/>
 
@@ -34,6 +34,7 @@
        value="${not empty nbOfVotes && not empty currentNode.properties['j:sumOfVotes'] ?
        currentNode.properties['j:sumOfVotes'].long / nbOfVotes : null}"/>
 <jcr:nodeProperty node="${currentNode}" name="j:tags" var="assignedTags"/>
+<jcr:node var="videoNode" path="${currentNode.path}/video"/>
 
 <template:include view="sql">
     <template:param name="getActiveVersion" value="true"/>
@@ -41,93 +42,117 @@
 <c:set value="${moduleMap.activeVersion}" var="activeVersion"/>
 <c:set value="${moduleMap.activeVersionBinary}" var="activeVersionBinary"/>
 
-<section id="moduleOverview" itemtype="http://schema.org/SoftwareApplication">
+<article id="moduleOverview" itemtype="http://schema.org/SoftwareApplication">
 
     <jcr:nodeProperty node="${activeVersion}" name="version" var="version"/>
     <jcr:nodeProperty node="${activeVersion}" name="relatedJahiaVersion" var="relatedJahiaVersion"/>
 
-    <article class="moduleDescription">
+    <div class="mainContentWrapper">
 
-        <h2>Description</h2>
+        <section class="moduleDescription">
 
-        ${bigDescription}
+            <h2><fmt:message key="comnt_module.label.description"/></h2>
 
-        <footer>
+            ${bigDescription}
 
-            <a href="${authorURL}">Visit developer's website</a>
-            <a href="mailto:${authorEmail}?Subject=${title}%20-%20Version:%20${version.string}">Email developer</a>
+            <footer>
 
-            <h4>Tags</h4>
-            <ul class="modulesTags">
-                <c:forEach items="${assignedTags}" var="tag" varStatus="status">
-                    <li>${tag.node.name}</li>
-                </c:forEach>
-            </ul>
+                <a href="${authorURL}"><fmt:message key="comnt_module.label.authorURL"/></a>
+                <a href="mailto:${authorEmail}?Subject=${title}%20-%20Version:%20${version.string}"><fmt:message key="comnt_module.label.authorEmail"/></a>
 
-            <template:module node="${currentNode}" />
+                <c:if test="${not empty assignedTags}">
 
-        </footer>
+                    <section class="moduleTags">
 
-    </article>
+                        <header><fmt:message key="comnt_module.label.tags"/></header>
+                        <ul>
+                            <c:forEach items="${assignedTags}" var="tag" varStatus="status">
+                                <li>${tag.node.name}</li>
+                            </c:forEach>
+                        </ul>
+
+                    </section>
+
+                </c:if>
+
+            </footer>
+
+        </section>
+
+        <c:if test="${not empty videoNode}">
+
+            <section class="moduleVideo">
+
+                <h2><fmt:message key="comnt_module.label.video"/></h2>
+
+                <%-- TODO --%>
+                <template:module node="${videoNode}"/>
+                <template:module path="${videoNode.path}"/>
+
+            </section>
+
+        </c:if>
+
+    </div>
 
     <aside class="moduleInformation">
 
-            <dl class="moduleMetaData">
+        <dl class="moduleMetaData">
 
-                <h4>Information</h4>
+            <h4><fmt:message key="comnt_module.label.information"/></h4>
 
-                <span content="${title}" itemprop="name"></span>
-                <span content="${icon.url}" itemprop="image"></span>
-                <span content="${activeVersionBinary.fileContent.contentType}" itemprop="fileFormat"></span>
-                <span content="${activeVersionBinary.url}" itemprop="downloadUrl"></span>
-                <c:forEach items="${assignedTags}" var="tag" varStatus="status">
-                    <span content="${tag.node.name}" itemprop="keywords"></span>
-                </c:forEach>
+            <span content="${title}" itemprop="name"></span>
+            <span content="${icon.url}" itemprop="image"></span>
+            <span content="${activeVersionBinary.fileContent.contentType}" itemprop="fileFormat"></span>
+            <span content="${activeVersionBinary.url}" itemprop="downloadUrl"></span>
+            <c:forEach items="${assignedTags}" var="tag" varStatus="status">
+                <span content="${tag.node.name}" itemprop="keywords"></span>
+            </c:forEach>
 
-                <dt>Updated:</dt>
-                    <dd>
-                        <time itemprop="datePublished">
-                            <fmt:formatDate value="${activeVersionBinary.contentLastModifiedAsDate}" pattern="yyyy-MM-dd" />
-                        </time>
-                    </dd>
+            <dt><fmt:message key="comnt_module.label.updated"/></dt>
+                <dd>
+                    <time itemprop="datePublished">
+                        <fmt:formatDate value="${activeVersionBinary.contentLastModifiedAsDate}" pattern="yyyy-MM-dd" />
+                    </time>
+                </dd>
 
-                <dt>Current version:</dt>
-                    <dd itemprop="softwareVersion">${version.string}</dd>
+            <dt><fmt:message key="comnt_module.label.version"/></dt>
+                <dd itemprop="softwareVersion">${version.string}</dd>
 
-                <dt>Requires Jahia:</dt>
-                    <dd>${relatedJahiaVersion.node.displayableName}</dd>
+            <dt><fmt:message key="comnt_module.label.relatedJahiaVersion"/></dt>
+                <dd>${relatedJahiaVersion.node.displayableName}</dd>
 
-                <dt>Size:</dt>
-                    <dd itemprop="fileSize">${jcr:humanReadableFileLength(activeVersionBinary)}</dd>
+            <dt><fmt:message key="comnt_module.label.fileSize"/></dt>
+                <dd itemprop="fileSize">${jcr:humanReadableFileLength(activeVersionBinary)}</dd>
 
-                <div itemtype="http://schema.org/Organization" itemscope="" itemprop="author">
+            <div itemtype="http://schema.org/Organization" itemscope="" itemprop="author">
 
-                    <dt>Author:</dt>
-                        <dd itemprop="name">${authorName}</dd>
+                <dt><fmt:message key="comnt_module.label.authorName"/></dt>
+                    <dd itemprop="name">${authorName}</dd>
 
-                    <span content="${authorURL}" itemprop="url"></span>
-                    <span content="${authorEmail}" itemprop="email"></span>
+                <span content="${authorURL}" itemprop="url"></span>
+                <span content="${authorEmail}" itemprop="email"></span>
 
-                </div>
+            </div>
 
-                <dt><h4>Category</h4></dt>
-                    <dd itemprop="applicationCategory">${category.node.displayableName}</dd>
+            <c:if test="${jcr:isNodeType(currentNode, 'jmix:rating')}">
+                <dt><fmt:message key="comnt_module.label.rating"/></dt>
+                <dd itemtype="http://schema.org/AggregateRating" itemscope="" itemprop="aggregateRating">
+                    <span itemprop="worstRating" content="1"></span>
+                    <span itemprop="bestRating" content="5"></span>
+                    <div itemprop="ratingValue" content="${avgRating}">
+                        <template:include view="hidden.average.readonly" />
+                    </div>
+                    <span itemprop="ratingCount" content="${nbOfVotes}">(${nbOfVotes})</span>
 
-                <c:if test="${jcr:isNodeType(currentNode, 'jmix:rating')}">
-                <dt><h4>Rating:</h4></dt>
-                    <dd itemtype="http://schema.org/AggregateRating" itemscope="" itemprop="aggregateRating">
-                        <div itemprop="ratingValue" content="${avgRating}">
-                            <template:include view="hidden.average.readonly" />
-                        </div>
-                        <span itemprop="ratingCount" content="${nbOfVotes}">(${nbOfVotes})</span>
+                </dd>
+            </c:if>
 
-                    </dd>
-                </c:if>
+            <dt><h4><fmt:message key="comnt_module.label.category"/></h4></dt>
+                <dd itemprop="applicationCategory">${category.node.displayableName}</dd>
 
-            </dl>
-
-
+        </dl>
 
     </aside>
 
-</section>
+</article>

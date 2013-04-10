@@ -3,11 +3,22 @@
     overflow: hidden;
 }
 
-.moduleDescription {
+#moduleOverview .mainContentWrapper {
     float: left;
     clear: left;
     width: 80%;
     padding-right: 5%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box; /* Firefox */
+    -webkit-box-sizing: border-box; /* Safari */
+}
+
+#moduleOverview aside {
+    border-left: 1px solid #DDDDDD;
+    float: right;
+    clear: right;
+    padding-left: 3%;
+    width: 20%;
     box-sizing: border-box;
     -moz-box-sizing: border-box; /* Firefox */
     -webkit-box-sizing: border-box; /* Safari */
@@ -21,15 +32,30 @@
     content: "> ";
 }
 
-.moduleInformation {
-    border-left: 1px solid #DDDDDD;
-    float: right;
-    clear: right;
-    padding-left: 3%;
-    width: 20%;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box; /* Firefox */
-    -webkit-box-sizing: border-box; /* Safari */
+.moduleDescription .moduleTags {
+    margin: 1em 0;
+}
+
+.moduleDescription .moduleTags header {
+    font-weight: bold;
+}
+
+.moduleDescription .moduleTags ul {
+    list-style: none;
+    display: inline;
+    padding: 0;
+    margin: 0;
+}
+
+.moduleDescription .moduleTags ul > li {
+    list-style: none;
+    display: inline;
+    padding: 0 0.5em 0 0;
+    color: #999999;
+}
+
+.moduleDescription .moduleTags ul > li:before {
+    content: "#";
 }
 
 .moduleMetaData {

@@ -343,7 +343,7 @@
             <div class="control-group">
                 <label class="control-label" for="quickDescription"><fmt:message key="comnt_module.quickDescription"/></label>
                 <div class="controls">
-                    <textarea placeholder="<fmt:message key="comnt_module.quickDescription" />" class="span16"
+                    <textarea class="span16"
                               name="quickDescription" id="quickDescription">${quickDescription.string}</textarea>
                 </div>
             </div>
@@ -433,8 +433,7 @@
             <div class="control-group">
                 <label class="control-label" for="jahia-module-howToInstall-${id}"><fmt:message key="comnt_module.howToInstall"/></label>
                 <div class="controls">
-                    <textarea rows="7" cols="35" id="jahia-module-howToInstall-${id}"
-                              placeholder="<fmt:message key="comnt_module.howToInstall" />" class="jahia-ckeditor span16"
+                    <textarea rows="7" cols="35" id="jahia-module-howToInstall-${id}" class="jahia-ckeditor span16"
                               name="howToInstall" >
                         <c:if test="${not empty howToInstall.string}">
                             ${fn:escapeXml(howToInstall.string)}
@@ -446,8 +445,7 @@
             <div class="control-group">
                 <label class="control-label" for="jahia-module-FAQ-${id}"><fmt:message key="comnt_module.FAQ"/></label>
                 <div class="controls">
-                    <textarea rows="7" cols="35" id="jahia-module-FAQ-${id}"
-                              placeholder="<fmt:message key="comnt_module.FAQ" />" class="jahia-ckeditor span16"
+                    <textarea rows="7" cols="35" id="jahia-module-FAQ-${id}" class="jahia-ckeditor span16"
                               name="FAQ" >
                         <c:if test="${not empty FAQ.string}">
                             ${fn:escapeXml(FAQ.string)}
