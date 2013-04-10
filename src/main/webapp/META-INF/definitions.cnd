@@ -63,7 +63,7 @@
 - commentMandatory (boolean) = false mandatory
 - commentMinLength (long) = 50
 
-[jnt:reviewList] > jnt:content, jmix:bindedComponent, commix:forgeModules
+[jnt:reviewsList] > jnt:content, jmix:bindedComponent, commix:forgeModules
 
 [jnt:reviews] > jnt:content, jmix:list orderable
 + * (jnt:review) = jnt:review

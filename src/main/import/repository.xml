@@ -80,14 +80,20 @@
                                         <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                                         <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title"
                                                           jcr:primaryType="jnt:translation" jcr:title="Reviews"/>
-                                        <addreview commentMandatory="false" commentMinLength="50" j:originWS="default" jcr:mixinTypes="jmix:accessControlled"
+                                        <ratings-split j:originWS="default" j:view="ratingsSplit"
+                                                       jcr:mixinTypes="jmix:accessControlled jmix:renderable"
+                                                       jcr:primaryType="jnt:reviewsList">
+                                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        </ratings-split>
+                                        <addreview commentMandatory="false" commentMinLength="50" j:originWS="default"
+                                                   jcr:mixinTypes="jmix:accessControlled"
                                                    jcr:primaryType="jnt:addReview">
                                             <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                                         </addreview>
-                                        <reviewlist j:originWS="default" jcr:mixinTypes="jmix:accessControlled"
-                                                    jcr:primaryType="jnt:reviewList">
+                                        <reviews-list j:originWS="default" jcr:mixinTypes="jmix:accessControlled"
+                                                      jcr:primaryType="jnt:reviewsList">
                                             <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                        </reviewlist>
+                                        </reviews-list>
                                     </reviews>
                                     <installation j:originWS="default" jcr:mixinTypes="jmix:accessControlled"
                                                   jcr:primaryType="jnt:contentList">
