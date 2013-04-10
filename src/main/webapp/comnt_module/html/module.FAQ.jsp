@@ -22,6 +22,8 @@
 
 <section id="moduleFAQ">
 
+    <h2><fmt:message key="comnt_module.label.FAQ"/></h2>
+
     <c:choose>
 
         <c:when test="${not empty FAQ}">
