@@ -22,6 +22,8 @@
 
 <section id="moduleHowToInstall">
 
+    <h2><fmt:message key="comnt_module.label.howToInstall"/></h2>
+
     <c:choose>
 
         <c:when test="${not empty howToInstall}">
