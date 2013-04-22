@@ -27,9 +27,9 @@
 <c:set value="${moduleMap.activeVersion}" var="activeVersion"/>
 <c:set value="${moduleMap.previousVersions}" var="previousVersions"/>
 
-<section id="moduleChangeLog">
+<article id="moduleChangeLog">
 
-    <article class="whatsNew">
+    <section class="whatsNew">
 
         <jcr:nodeProperty node="${activeVersion}" name="changeLog" var="changeLog"/>
         <jcr:nodeProperty node="${activeVersion}" name="version" var="version"/>
@@ -41,7 +41,7 @@
         ${changeLog.string}
 
         <footer>
-            <dl>
+            <dl class="inline">
                 <dt>Requires Jahia:</dt>
                 <dd>${relatedJahiaVersion.node.displayableName}</dd>
                 <dt>Updated:</dt>
@@ -49,49 +49,57 @@
             </dl>
         </footer>
 
-    </article>
+    </section>
 
     <c:if test="${functions:length(previousVersions.nodes) > 0}">
 
-        <article class="previousVersions">
+        <section class="previousVersions">
 
             <h2>Previous versions</h2>
 
             <c:forEach items="${previousVersions.nodes}" var="previousVersion">
 
-                <jcr:nodeProperty node="${previousVersion}" name="changeLog" var="changeLog"/>
-                <jcr:nodeProperty node="${previousVersion}" name="version" var="version"/>
-                <jcr:nodeProperty node="${previousVersion}" name="relatedJahiaVersion" var="relatedJahiaVersion"/>
+                <article class="previousVersion">
 
-                <jcr:sql
-                    var="moduleBinaries"
-                    sql="SELECT * FROM [jnt:file] WHERE ischildnode(['${previousVersion.path}'])
-                      ORDER BY ['jcr:lastModified'] DESC" limit ='1'/>
+                    <jcr:nodeProperty node="${previousVersion}" name="changeLog" var="changeLog"/>
+                    <jcr:nodeProperty node="${previousVersion}" name="version" var="version"/>
+                    <jcr:nodeProperty node="${previousVersion}" name="relatedJahiaVersion" var="relatedJahiaVersion"/>
 
-                <c:forEach items="${moduleBinaries.nodes}" var="moduleBinaryNode">
-                    <c:set value="${moduleBinaryNode}" var="moduleBinary"/>
-                </c:forEach>
+                    <jcr:sql
+                        var="moduleBinaries"
+                        sql="SELECT * FROM [jnt:file] WHERE ischildnode(['${previousVersion.path}'])
+                          ORDER BY ['jcr:lastModified'] DESC" limit ='1'/>
 
-                <header>
-                    <h3>${version.string}</h3>
-                    <a href="${moduleBinary.url}" onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')">Download version ${version.string}</a>
-                </header>
+                    <c:forEach items="${moduleBinaries.nodes}" var="moduleBinaryNode">
+                        <c:set value="${moduleBinaryNode}" var="moduleBinary"/>
+                    </c:forEach>
 
-                ${changeLog.string}
+                    <header>
+                        <h3>${version.string}</h3>
+                        <a class="btn btn-small pull-right" href="${moduleBinary.url}" onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')">Download version ${version.string}</a>
+                    </header>
 
-                <footer>
-                    <dl>
-                        <dt>Requires Jahia:</dt>
-                            <dd>${relatedJahiaVersion.node.displayableName}</dd>
-                        <dt>Updated:</dt>
-                            <dd><fmt:formatDate value="${moduleBinary.contentLastModifiedAsDate}" pattern="yyyy-MM-dd" /></dd>
-                    </dl>
-                </footer>
+                    <div class="clearfix">
+
+                        ${changeLog.string}
+
+                    </div>
+
+                    <footer>
+                        <dl class="inline">
+                            <dt>Requires Jahia:</dt>
+                                <dd>${relatedJahiaVersion.node.displayableName}</dd>
+                            <dt>Updated:</dt>
+                                <dd><fmt:formatDate value="${moduleBinary.contentLastModifiedAsDate}" pattern="yyyy-MM-dd" /></dd>
+                        </dl>
+                    </footer>
+
+                </article>
 
             </c:forEach>
 
-        </article>
+        </section>
 
     </c:if>
 
-</section>
+</article>
