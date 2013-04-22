@@ -56,83 +56,91 @@
 
 </script>
 
-<article class="review" itemscope itemtype="http://schema.org/Review">
+<article class="review media" itemscope itemtype="http://schema.org/Review">
 
-    <header>
+    <div class="authorImage pull-left">
 
-        <div itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <c:if test="${not empty picture}">
+            <img
+                class="media-object"
+                src="${picture.node.thumbnailUrls['avatar_60']}"
+                <c:choose>
+                    <c:when test="${not empty firstName || not empty lastName}">
+                        alt="${fn:escapeXml(firstName)}<c:if test="${not empty firstName}">&nbsp;</c:if>${fn:escapeXml(lastName)}"
+                    </c:when>
+                    <c:otherwise>
+                        alt="${createdBy}"
+                    </c:otherwise>
+                </c:choose>
+                width="60"
+                height="60"
+                itemprop="image"/>
+        </c:if>
+        <c:if test="${empty picture}"><img alt="" src="<c:url value='/modules/default/images/userbig.png'/>"/></c:if>
+    </div>
 
-            <div class="authorImage">
+    <div class="media-body">
 
-                <c:if test="${not empty picture}">
-                    <img
-                        src="${picture.node.thumbnailUrls['avatar_60']}"
-                        <c:choose>
-                            <c:when test="${not empty firstName || not empty lastName}">
-                                alt="${fn:escapeXml(firstName)}<c:if test="${not empty firstName}">&nbsp;</c:if>${fn:escapeXml(lastName)}"
-                            </c:when>
-                            <c:otherwise>
-                                alt="${createdBy}"
-                            </c:otherwise>
-                        </c:choose>
-                        width="60"
-                        height="60"
-                        itemprop="image"/>
-                </c:if>
-                <c:if test="${empty picture}"><img alt="" src="<c:url value='/modules/default/images/userbig.png'/>"/></c:if>
+        <header>
+
+            <div class="media-heading">
+
+                <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+                    <c:choose>
+                        <c:when test="${not empty user}">
+                            <a class="authorName" href="<c:url value='${url.base}${user.path}.html'/>" itemprop="name">
+                                <c:choose>
+                                    <c:when test="${not empty firstName || not empty lastName}">
+                                        ${fn:escapeXml(firstName)}<c:if test="${not empty firstName}">&nbsp;</c:if>${fn:escapeXml(lastName)}
+                                    </c:when>
+                                    <c:otherwise>
+                                        ${createdBy}
+                                    </c:otherwise>
+                                </c:choose>
+                            </a>
+                        </c:when>
+                        <c:otherwise>
+                            <span class="authorName" itemprop="name">${fn:escapeXml(currentNode.properties.pseudo.string)}</span>
+                        </c:otherwise>
+                    </c:choose>
+                </span>
+
+                <time itemprop="datePublished" datetime="<fmt:formatDate value="${created}" pattern="yyyy-MM-dd" />">
+                    <fmt:formatDate value="${created}" dateStyle="long" />
+                </time>
+
+                <div itemprop="reviewRating" itemscope itemtype="http://schema.org/Rating">
+
+                    <span itemprop="worstRating" content="1"></span>
+                    <span itemprop="bestRating" content="5"></span>
+                    <span itemprop="ratingValue" content="${rating}"></span>
+
+                    <form id="reviewRating-${id}" class="reviewRating" style="width: 200px" action="">
+                        <input type="radio" name="rate_avg" value="1" title="<fmt:message key="jnt_review.label.rating.poor"/>"
+                               disabled="disabled" ${rating >= 1.0 ? 'checked="checked"' : ''}/>
+                        <input type="radio" name="rate_avg" value="2" title="<fmt:message key="jnt_review.label.rating.fair"/>"
+                               disabled="disabled" ${rating >= 2.0 ? 'checked="checked"' : ''}/>
+                        <input type="radio" name="rate_avg" value="3" title="<fmt:message key="jnt_review.label.rating.average"/>"
+                               disabled="disabled" ${rating >= 3.0 ? 'checked="checked"' : ''}/>
+                        <input type="radio" name="rate_avg" value="4" title="<fmt:message key="jnt_review.label.rating.good"/>"
+                               disabled="disabled" ${rating >= 4.0 ? 'checked="checked"' : ''}/>
+                        <input type="radio" name="rate_avg" value="5" title="<fmt:message key="jnt_review.label.rating.excellent"/>"
+                               disabled="disabled" ${rating >= 5.0 ? 'checked="checked"' : ''}/>
+                    </form>
+
+                </div>
+
+                <h4 itemprop="headline">${fn:escapeXml(title)}</h4>
+
             </div>
 
-            <c:choose>
-                <c:when test="${not empty user}">
-                    <a class="authorName" href="<c:url value='${url.base}${user.path}.html'/>" itemprop="name">
-                        <c:choose>
-                            <c:when test="${not empty firstName || not empty lastName}">
-                                ${fn:escapeXml(firstName)}<c:if test="${not empty firstName}">&nbsp;</c:if>${fn:escapeXml(lastName)}
-                            </c:when>
-                            <c:otherwise>
-                                ${createdBy}
-                            </c:otherwise>
-                        </c:choose>
-                    </a>
-                </c:when>
-                <c:otherwise>
-                    <span class="authorName" itemprop="name">${fn:escapeXml(currentNode.properties.pseudo.string)}</span>
-                </c:otherwise>
-            </c:choose>
+        </header>
 
+        <div itemprop="reviewBody">
+            ${fn:escapeXml(content)}
         </div>
 
-        <time itemprop="datePublished" datetime="<fmt:formatDate value="${created}" pattern="yyyy-MM-dd" />">
-            <fmt:formatDate value="${created}" dateStyle="long" />
-        </time>
 
-        <div itemprop="reviewRating" itemscope itemtype="http://schema.org/Rating">
-
-            <span itemprop="worstRating" content="1"></span>
-            <span itemprop="bestRating" content="5"></span>
-            <span itemprop="ratingValue" content="${rating}"></span>
-
-            <form id="reviewRating-${id}" style="width: 200px" action="">
-                <input type="radio" name="rate_avg" value="1" title="<fmt:message key="jnt_review.label.rating.poor"/>"
-                       disabled="disabled" ${rating >= 1.0 ? 'checked="checked"' : ''}/>
-                <input type="radio" name="rate_avg" value="2" title="<fmt:message key="jnt_review.label.rating.fair"/>"
-                       disabled="disabled" ${rating >= 2.0 ? 'checked="checked"' : ''}/>
-                <input type="radio" name="rate_avg" value="3" title="<fmt:message key="jnt_review.label.rating.average"/>"
-                       disabled="disabled" ${rating >= 3.0 ? 'checked="checked"' : ''}/>
-                <input type="radio" name="rate_avg" value="4" title="<fmt:message key="jnt_review.label.rating.good"/>"
-                       disabled="disabled" ${rating >= 4.0 ? 'checked="checked"' : ''}/>
-                <input type="radio" name="rate_avg" value="5" title="<fmt:message key="jnt_review.label.rating.excellent"/>"
-                       disabled="disabled" ${rating >= 5.0 ? 'checked="checked"' : ''}/>
-            </form>
-
-        </div>
-
-        <h4 itemprop="headline">${fn:escapeXml(title)}</h4>
-
-    </header>
-
-    <div itemprop="reviewBody">
-        ${fn:escapeXml(content)}
     </div>
 
 </article>

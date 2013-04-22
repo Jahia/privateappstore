@@ -35,13 +35,19 @@
 
                 <jcr:sql
                         var="reviews"
-                        sql="SELECT * FROM [jnt:review] WHERE isdescendantnode(['${reviewsNode.path}']) ORDER BY [jcr:lastModified] DESC" />
+                        sql="SELECT * FROM [jnt:review] WHERE isdescendantnode(['${reviewsNode.path}']) AND content IS NOT null ORDER BY [jcr:lastModified] DESC" />
+
 
                 <c:forEach items="${reviews.nodes}" var="review">
 
                     <c:set var="content" value="${review.properties['content'].string}" />
 
                     <c:if test="${fn:length(fn:trim(content)) gt 0}">
+
+                        <c:if test="${empty reviewsListHeader}">
+                            <h2><fmt:message key="jnt_reviewsList.label.reviewsList"/></h2>
+                            <c:set var="reviewsListHeader" value="true"/>
+                        </c:if>
 
                         <div class="reviewListItem">
                             <template:module node="${review}"/>
@@ -50,6 +56,7 @@
                     </c:if>
 
                 </c:forEach>
+
             </c:when>
             <c:otherwise>
                 <template:addCacheDependency node="${boundComponent}"/>

@@ -98,3 +98,102 @@ ul#moduleScreenshotList li {
     text-align: center;
     cursor: move;
 }
+
+
+/*
+ * Module Header
+ */
+
+#moduleHeader {
+    border: 1px solid #C6C6C6;
+    padding: 1em 1em 1.5em;
+    color: #555;
+    margin-bottom: 0.875em;
+}
+
+#moduleHeader header {
+    color: inherit;
+}
+
+#moduleHeader header > h1 {
+    font-weight: normal;
+    line-height: normal;
+    font-size: 2em;
+    margin: 0;
+    padding: 0;
+}
+
+#moduleHeader header > a {
+    color: inherit;
+}
+
+#moduleHeader .moduleIcon {
+    width: 125px;
+    margin: 0.6em 0;
+    display: block;
+}
+
+#moduleHeader .moduleRating {
+    margin-top: 1em;
+}
+
+#moduleHeader .moduleDownloadLink {
+    background-color: #F9F9F9;
+    border: 1px solid #C6C6C6;
+    color: #282828;
+    display: block;
+    margin-top: 1em;
+    padding: 0.7em 0.8em 0.5em;
+    text-align: center;
+}
+
+/*
+ * Tabular list
+ */
+
+#tabstabular-list {
+    border: 1px solid #C6C6C6;
+    background-color: #FFFFFF;
+}
+
+#tabstabular-list .idTabs {
+    margin: 0;
+}
+
+#tabstabular-list .tabContainer {
+    padding: 1em 1.6em 3em;
+}
+
+
+
+/*
+ * Change log tab
+ */
+
+#moduleChangeLog .previousVersion header {
+    background-color: #F9F9F9;
+    border: 1px solid #C6C6C6;
+    margin-bottom: 1em;
+    margin-top: 2em;
+    overflow: hidden;
+    padding: 0.7em 1em 0.5em;
+}
+
+#moduleChangeLog .previousVersion header > h3 {
+    float: left;
+    clear: left;
+    margin: 0;
+}
+
+#moduleChangeLog .previousVersion header > a {
+    float: right;
+    clear: right;
+    color: inherit;
+}
+
+/* TODO */
+
+#moduleOverview h2, #moduleChangeLog h2, #moduleFAQ h2, #moduleHowToInstall h2 {
+    background: none;
+    margin-bottom: 0;
+}

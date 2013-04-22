@@ -22,54 +22,70 @@
 <c:set var="barWidth" value="200"/>
 <c:set var="bindedComponent" value="${currentNode.parent}"/>
 
-<c:forEach var="i" begin="${worstRating}" end="${bestRating}" step="1">
+<div class ="row-fluid">
 
-    <c:set var="j" value="${bestRating - i + worstRating}"/>
+    <dl class="dl-horizontal span5">
 
-    <jcr:sql var="queryResult" sql="SELECT count AS [rep:count(skipChecks=1)] FROM [jnt:review] WHERE isdescendantnode(['${currentNode.path}'])
-              AND rating = ${j}" />
+        <c:forEach var="i" begin="${worstRating}" end="${bestRating}" step="1">
 
-    <c:forEach var="ratings" items="${queryResult.rows}">
-        <c:set var="ratingCount" value="${ratings.values[0].long}"/>
-    </c:forEach>
+            <c:set var="j" value="${bestRating - i + worstRating}"/>
 
-    <div class="ratingsSplitItem">
+            <jcr:sql var="queryResult" sql="SELECT count AS [rep:count(skipChecks=1)] FROM [jnt:review] WHERE isdescendantnode(['${currentNode.path}'])
+                      AND rating = ${j}" />
 
-        <span class="ratingValue">${j}&nbsp;
-            <c:choose>
-                <c:when test="${j eq 0}">
-                    <fmt:message key="jnt_reviewsList.label.ratingsSplit.star"/>
-                </c:when>
-                <c:otherwise>
-                    <fmt:message key="jnt_reviewsList.label.ratingsSplit.stars"/>
-                </c:otherwise>
-            </c:choose>
-        </span>
-        <span class="ratingPercentage ratingPercentage-${j}" style="width: ${barWidth * ratingCount/ratingNbr}px;">&nbsp;</span>
-        <span class="ratingCount">${ratingCount}</span><br/>
+            <c:forEach var="ratings" items="${queryResult.rows}">
+                <c:set var="ratingCount" value="${ratings.values[0].long}"/>
+            </c:forEach>
 
-    </div>
+            <dt class="ratingValue">${j}&nbsp;
+                <c:choose>
+                    <c:when test="${j eq 1}">
+                        <fmt:message key="jnt_reviewsList.label.ratingsSplit.star"/>
+                    </c:when>
+                    <c:otherwise>
+                        <fmt:message key="jnt_reviewsList.label.ratingsSplit.stars"/>
+                    </c:otherwise>
+                </c:choose>
+            </dt>
 
-</c:forEach>
+            <dd>
+                <div class="progress">
+                    <c:set var="barWidth" value="${ratingCount/ratingNbr*100}"/>
+                    <div class="bar ratingPercentage bar-${j}stars" style="width: ${barWidth}%;">
+                        <c:if test="${barWidth gt 90}">
+                            <span class="ratingCount">${ratingCount}</span>
+                        </c:if>
+                    </div>
+                    <c:if test="${barWidth lt 90 && ratingCount gt 0}">
+                        <span class="ratingCount muted">${ratingCount}</span>
+                    </c:if>
+                </div>
+            </dd>
 
-<c:if test="${jcr:isNodeType(bindedComponent, 'jmix:rating')}">
+        </c:forEach>
 
-    <c:set var="averageRating" value="${bindedComponent.properties['j:sumOfVotes'].long/bindedComponent.properties['j:nbOfVotes'].long}"/>
+    </dl>
 
-    <div class="averageRating">
+    <c:if test="${jcr:isNodeType(bindedComponent, 'jmix:rating')}">
 
-        <h4><fmt:message key="jnt_reviewsList.label.ratingsSplit.average"/></h4>
-        <span class="averageRatingValue"><fmt:formatNumber value="${averageRating}" maxFractionDigits="1"/></span>
-        <%-- TODO
+        <c:set var="averageRating" value="${bindedComponent.properties['j:sumOfVotes'].long/bindedComponent.properties['j:nbOfVotes'].long}"/>
 
-                <template:module node="${bindedComponent}" view="hidden.average.readonly" />
+        <div class="averageRating span4 offset1 box box-rounded box-tinted text-center">
 
-        --%>
+            <h4><fmt:message key="jnt_reviewsList.label.ratingsSplit.average"/></h4>
+            <span class="averageRatingValue lead"><fmt:formatNumber value="${averageRating}" maxFractionDigits="1"/></span>
+            <%-- TODO
 
-        <template:module path="${bindedComponent.path}" view="hidden.average.readonly" />
+                    <template:module node="${bindedComponent}" view="hidden.average.readonly" />
 
-    </div>
+            --%>
 
-    <div class="clear"></div>
+            <template:module path="${bindedComponent.path}" view="hidden.average.readonly" />
 
-</c:if>
+        </div>
+
+        <div class="clear"></div>
+
+    </c:if>
+
+</div>

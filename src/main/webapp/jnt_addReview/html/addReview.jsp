@@ -16,7 +16,8 @@
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
-<template:addResources type="css" resources="review.css,ui.stars.css"/>
+<%--<template:addResources type="css" resources="review.css,ui.stars.css"/>--%>
+<template:addResources type="css" resources="ui.stars.css"/>
 <template:addResources type="javascript" resources="jquery.min.js,jquery.validate.js,ui.stars.js"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
@@ -27,121 +28,152 @@
 
 <c:if test="${not empty boundComponent}">
 
-    <script type="text/javascript">
+    <template:addResources type="inlinejavascript">
 
-        $(document).ready(function(){
+        <script type="text/javascript">
 
-            $("#writeReviewForm").validate({
-                rules: {
-                    'j:lastVote': {
-                        required: true,
-                        min: 1,
-                        max: 5
-                    },
-                    'jcr:title': {
-                        required: "#reviewComment-${boundComponent.identifier}:filled"
-                    },
-                    <c:if test="${commentMandatory}">
-                    'content': {
-                        required: true
-                        <c:if test="${not empty commentMinLength}">
-                        ,minlength: ${commentMinLength}
+            $(document).ready(function(){
+
+                $("#writeReviewForm").validate({
+                    errorClass:'help-block',
+                    rules: {
+                        'j:lastVote': {
+                            required: true,
+                            min: 1,
+                            max: 5
+                        },
+                        'jcr:title': {
+                            required: "#reviewComment-${boundComponent.identifier}:filled"
+                        },
+                        <c:if test="${commentMandatory}">
+                        'content': {
+                            required: true
+                            <c:if test="${not empty commentMinLength}">
+                            ,minlength: ${commentMinLength}
+                            </c:if>
+                        },
+                        </c:if>
+                        <c:if test="${not renderContext.loggedIn}">
+                        pseudo: "required",
+                        jcrCaptcha: "required"
                         </c:if>
                     },
-                    </c:if>
-                    <c:if test="${not renderContext.loggedIn}">
-                    pseudo: "required",
-                    captcha: "required"
-                    </c:if>
-                },
-                submitHandler: function(form) {
-                    $('#reviewRating-${boundComponent.identifier}').find('input[name="j:lastVote"]').removeAttr("disabled");
-                    form.submit();
-                }
+                    submitHandler: function(form) {
+                        if ($.trim($('#reviewComment-088857c6-3257-435e-89db-68faf7f57039').val()).length == 0) {
+                            $('#reviewTitle-088857c6-3257-435e-89db-68faf7f57039').val("");
+                            $('#reviewComment-088857c6-3257-435e-89db-68faf7f57039').val("");
+                        }
+                        $('#reviewRating-${boundComponent.identifier}').find('input[name="j:lastVote"]').removeAttr("disabled");
+                        form.submit();
+                    },
+                    highlight: function(element, errorClass, validClass) {
+                        $(element).addClass("error").removeClass(validClass).parents('.control-group').addClass("error");
+                    },
+                    unhighlight: function(element, errorClass, validClass) {
+                        $(element).removeClass("error").addClass(validClass).parents('.control-group').removeClass("error");
+                    }
+                });
+
+                $("#reviewRating-${boundComponent.identifier}").find(".controls").stars({
+                    inputType: "select",
+                    cancelShow: false,
+                    disableValue: false
+                });
+
+                $("#writeReview").hide();
+
+                $("#writeReviewToggle").click(function(){
+                    $("#writeReview").slideToggle();
+                    $(this).toggleClass("btn-inverse");
+                });
+
             });
 
-            $("#reviewRating-${boundComponent.identifier}").stars({
-                inputType: "select",
-                cancelShow: false,
-                disableValue: false
-            });
+        </script>
 
-            $("#writeReviewToggle").click(function(){
-                $("#writeReviewForm").slideToggle();
-                $(this).toggleClass("toggleButtonEnabled");
-            });
+    </template:addResources>
 
-        });
+    <button class="btn btn-small" id="writeReviewToggle"><fmt:message key="jnt_addReview.label.writeReview"/></button>
 
-    </script>
-
-    <section id="writeReview">
-
-        <span id="writeReviewToggle"><fmt:message key="jnt_addReview.label.writeReview"/></span>
+    <section id="writeReview" class="box box-rounded box-tinted box-margin-top">
 
         <template:tokenizedForm>
-            <form action="<c:url value='${url.base}${boundComponent.path}.chain.do'/>" method="post" id="writeReviewForm">
+            <form action="<c:url value='${url.base}${boundComponent.path}.chain.do'/>" method="post" id="writeReviewForm" class="form-horizontal">
                 <input type="hidden" name="jcrNodeType" value="jnt:review"/>
                 <input type="hidden" name="chainOfAction" value="addReview,rate"/>
 
                 <fieldset>
                     <c:if test="${not renderContext.loggedIn}">
-                        <p class="field">
-                            <label for="reviewPseudo-${boundComponent.identifier}"><fmt:message key="jnt_review.label.pseudo"/></label>
-                            <input value="${sessionScope.formDatas['pseudo'][0]}"
-                                   type="text" size="35" name="pseudo" id="reviewPseudo-${boundComponent.identifier}"
-                                   tabindex="1"/>
-                        </p>
+                        <div class="control-group">
+                            <label class="control-label" for="reviewPseudo-${boundComponent.identifier}"><fmt:message key="jnt_review.label.pseudo"/></label>
+                            <div class="controls">
+                                <input value="${sessionScope.formDatas['pseudo'][0]}"
+                                       type="text" size="35" name="pseudo" id="reviewPseudo-${boundComponent.identifier}"
+                                       tabindex="1"/>
+                            </div>
+                        </div>
                     </c:if>
-                    <p class="field" id="reviewRating-${boundComponent.identifier}">
-                        <span><fmt:message key="jnt_review.label.rating"/></span>
-                        <select name="j:lastVote">
-                            <option value="1"><fmt:message key="jnt_review.label.rating.poor"/></option>
-                            <option value="2"><fmt:message key="jnt_review.label.rating.fair"/></option>
-                            <option value="3"><fmt:message key="jnt_review.label.rating.average"/></option>
-                            <option value="4"><fmt:message key="jnt_review.label.rating.good"/></option>
-                            <option value="5"><fmt:message key="jnt_review.label.rating.excellent"/></option>
-                        </select>
-                    </p>
-                    <p class="field">
-                        <label class="left" for="reviewTitle-${boundComponent.identifier}"><fmt:message key="jnt_review.label.title"/></label>
-                        <input class="" value="${sessionScope.formDatas['jcr:title'][0]}"
-                               type="text" size="35" id="reviewTitle-${boundComponent.identifier}" name="jcr:title"
-                               tabindex="1"/>
-                    </p>
+                    <div class="control-group reviewRating" id="reviewRating-${boundComponent.identifier}">
+                        <span class="control-label"><fmt:message key="jnt_review.label.rating"/></span>
+                        <div class="controls">
+                            <select name="j:lastVote">
+                                <option value="1"><fmt:message key="jnt_review.label.rating.poor"/></option>
+                                <option value="2"><fmt:message key="jnt_review.label.rating.fair"/></option>
+                                <option value="3"><fmt:message key="jnt_review.label.rating.average"/></option>
+                                <option value="4"><fmt:message key="jnt_review.label.rating.good"/></option>
+                                <option value="5"><fmt:message key="jnt_review.label.rating.excellent"/></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="reviewTitle-${boundComponent.identifier}"><fmt:message key="jnt_review.label.title"/></label>
+                        <div class="controls">
+                            <input class="" value="${sessionScope.formDatas['jcr:title'][0]}"
+                                   type="text" size="35" id="reviewTitle-${boundComponent.identifier}" name="jcr:title"
+                                   tabindex="1"/>
+                        </div>
+                    </div>
 
-                    <p class="field">
-                        <label class="left" for="reviewComment-${boundComponent.identifier}">
+                    <div class="control-group">
+                        <label class="control-label" for="reviewComment-${boundComponent.identifier}">
                             <fmt:message key="jnt_review.label.body"/>
                             <c:if test="${commentMandatory}">
                                 <fmt:message key="jnt_review.label.body.optional"/>
                             </c:if>
                         </label>
-                        <textarea rows="7" cols="35" id="reviewComment-${boundComponent.identifier}"
-                                  name="content"
-                                  tabindex="2"><c:if test="${not empty sessionScope.formDatas['content']}">
-                                  ${fn:escapeXml(sessionScope.formDatas['content'][0])}
-                        </c:if></textarea>
-                    </p>
+                        <div class="controls">
+                            <textarea rows="7" cols="35" id="reviewComment-${boundComponent.identifier}"
+                                      name="content"
+                                      tabindex="2"><c:if test="${not empty sessionScope.formDatas['content']}">
+                                      ${fn:escapeXml(sessionScope.formDatas['content'][0])}
+                            </c:if></textarea>
+                        </div>
+                    </div>
 
                     <c:if test="${not renderContext.loggedIn}">
-                        <p class="field">
-                            <label class="left" for="captcha"><fmt:message key="jnt_review.label.captcha"/></label>
-                            <template:captcha/>
+                        <div class="control-group">
+                            <label class="control-label" for="captcha"><fmt:message key="jnt_review.label.captcha"/></label>
+                            <div class="controls">
+                                <template:captcha/>
+                            </div>
                             <c:if test="${not empty sessionScope.formError}">
                                 <label class="error">${fn:escapeXml(sessionScope.formError)}</label>
                             </c:if>
-                        </p>
-                        <p class="field">
-                            <label class="left" for="captcha"><fmt:message key="jnt_review.label.captcha.enter"/></label>
-                            <input type="text" id="captcha" name="jcrCaptcha"/>
-                        </p>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="captcha"><fmt:message key="jnt_review.label.captcha.enter"/></label>
+                            <div class="controls">
+                                <input type="text" id="captcha" name="jcrCaptcha"/>
+                            </div>
+                        </div>
                     </c:if>
 
-                    <p>
-                        <input type="submit" value="<fmt:message key='jnt_review.label.submit'/>" class="button"
-                               tabindex="4"  ${disabled} onclick=""/>
-                    </p>
+                    <div class="control-group">
+                        <div class="controls">
+                            <input class="btn btn-primary" type="submit" value="<fmt:message key='jnt_review.label.submit'/>"
+                                   tabindex="4"  ${disabled} onclick=""/>
+                        </div>
+                    </div>
                 </fieldset>
             </form>
 
