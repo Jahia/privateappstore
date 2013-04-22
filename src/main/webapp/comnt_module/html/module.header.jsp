@@ -16,6 +16,7 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
 <template:addResources type="javascript" resources="html5shiv.js, modulesForge.js"/>
+<template:addResources type="css" resources="module.css"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="title" value="${currentNode.properties['jcr:title'].string}"/>
@@ -30,7 +31,7 @@
 <c:set value="${moduleMap.activeVersion}" var="activeVersion"/>
 <c:set value="${moduleMap.activeVersionBinary}" var="activeVersionBinary"/>
 
-<section id="moduleHeader">
+<section id="moduleHeader" class="box box-rounded">
 
     <header>
 
@@ -39,9 +40,9 @@
 
     </header>
 
-    <img src="${icon.url}" alt="icon"/>
+    <img class="moduleIcon" src="${icon.url}" alt="<fmt:message key="comnt_module.label.moduleIcon"><fmt:param value="${title}"/></fmt:message>"/>
 
-    <div>
+    <div class="moduleRating">
 
         <c:if test="${jcr:isNodeType(currentNode, 'jmix:rating')}">
             <template:include view="hidden.average.readonly" />
@@ -50,11 +51,7 @@
 
     </div>
 
-    <div class="downloadLink">
-
-        <jcr:nodeProperty node="${activeVersion}" name="version" var="version"/>
-        <a href="${activeVersionBinary.url}" onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')">Download version ${version.string}</a>
-
-    </div>
+    <jcr:nodeProperty node="${activeVersion}" name="version" var="version"/>
+    <a class="btn btn-block" href="${activeVersionBinary.url}" onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')">Download version ${version.string}</a>
 
 </section>
