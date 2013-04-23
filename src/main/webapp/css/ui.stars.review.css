@@ -1,0 +1,15 @@
+.reviewRating .ui-stars-star {
+    display: inline-block;
+    overflow: hidden;
+    width: 16px;
+    height: 15px;
+    line-height:15px;
+    background: url(ui.stars.gif) no-repeat 0 0;
+    padding-left: 2px;
+}
+.reviewRating .ui-stars-star {
+    background-position: 0 -32px;
+}
+.reviewRating .ui-stars-star-on {
+    background-position: 0 -48px;
+}

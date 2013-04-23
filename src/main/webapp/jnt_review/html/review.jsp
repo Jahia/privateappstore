@@ -18,8 +18,8 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
 <template:addResources type="javascript" resources="html5shiv.js"/>
-<template:addResources type="css" resources="ui.stars.css"/>
-<template:addResources type="javascript" resources="jquery.min.js,ui.stars.js"/>
+<template:addResources type="css" resources="ui.stars.css, ui.stars.review.css"/>
+<template:addResources type="javascript" resources="jquery.min.js"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="createdBy" value="${currentNode.properties['jcr:createdBy'].string}"/>
@@ -54,7 +54,7 @@
 
     $(document).ready(function(){
 
-        $("#reviewRating-${id}").stars();
+        <%--$("#reviewRating-${id}").stars();--%>
 
         <c:if test="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}">
 
@@ -99,58 +99,60 @@
 
             <div class="media-heading">
 
-                <span itemprop="author" itemscope itemtype="http://schema.org/Person">
-                    <c:choose>
-                        <c:when test="${not empty user}">
-                            <a class="authorName" href="<c:url value='${url.base}${user.path}.html'/>" itemprop="name">
-                                <c:choose>
-                                    <c:when test="${not empty firstName || not empty lastName}">
-                                        ${fn:escapeXml(firstName)}<c:if test="${not empty firstName}">&nbsp;</c:if>${fn:escapeXml(lastName)}
-                                    </c:when>
-                                    <c:otherwise>
-                                        ${createdBy}
-                                    </c:otherwise>
-                                </c:choose>
-                            </a>
-                        </c:when>
-                        <c:otherwise>
-                            <span class="authorName" itemprop="name">${fn:escapeXml(currentNode.properties.pseudo.string)}</span>
-                        </c:otherwise>
-                    </c:choose>
-                </span>
+                <div>
 
-                <time itemprop="datePublished" datetime="<fmt:formatDate value="${created}" pattern="yyyy-MM-dd" />">
-                    <fmt:formatDate value="${created}" dateStyle="long" />
-                </time>
+                    <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+                        <c:choose>
+                            <c:when test="${not empty user}">
+                                <a class="authorName" href="<c:url value='${url.base}${user.path}.html'/>" itemprop="name">
+                                    <c:choose>
+                                        <c:when test="${not empty firstName || not empty lastName}">
+                                            ${fn:escapeXml(firstName)}<c:if test="${not empty firstName}">&nbsp;</c:if>${fn:escapeXml(lastName)}
+                                        </c:when>
+                                        <c:otherwise>
+                                            ${createdBy}
+                                        </c:otherwise>
+                                    </c:choose>
+                                </a>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="authorName" itemprop="name">${fn:escapeXml(currentNode.properties.pseudo.string)}</span>
+                            </c:otherwise>
+                        </c:choose>
+                    </span>
 
-                <c:if test="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}">
+                    <time itemprop="datePublished" datetime="<fmt:formatDate value="${created}" pattern="yyyy-MM-dd" />">
+                        <fmt:formatDate value="${created}" dateStyle="long" />
+                    </time>
 
-                    <span class="pull-right"><button id="replyReviewToggle-${id}" class="btn btn-small"><fmt:message key="jnt_review.label.reply"/></button></span>
+                    <c:if test="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}">
 
-                </c:if>
+                        <span class="pull-right"><button id="replyReviewToggle-${id}" class="btn btn-small"><fmt:message key="jnt_review.label.reply"/></button></span>
 
-                <div itemprop="reviewRating" itemscope itemtype="http://schema.org/Rating">
-
-                    <span itemprop="worstRating" content="1"></span>
-                    <span itemprop="bestRating" content="5"></span>
-                    <span itemprop="ratingValue" content="${rating}"></span>
-
-                    <form id="reviewRating-${id}" class="reviewRating" style="width: 200px" action="">
-                        <input type="radio" name="rate_avg" value="1" title="<fmt:message key="jnt_review.label.rating.poor"/>"
-                               disabled="disabled" ${rating >= 1.0 ? 'checked="checked"' : ''}/>
-                        <input type="radio" name="rate_avg" value="2" title="<fmt:message key="jnt_review.label.rating.fair"/>"
-                               disabled="disabled" ${rating >= 2.0 ? 'checked="checked"' : ''}/>
-                        <input type="radio" name="rate_avg" value="3" title="<fmt:message key="jnt_review.label.rating.average"/>"
-                               disabled="disabled" ${rating >= 3.0 ? 'checked="checked"' : ''}/>
-                        <input type="radio" name="rate_avg" value="4" title="<fmt:message key="jnt_review.label.rating.good"/>"
-                               disabled="disabled" ${rating >= 4.0 ? 'checked="checked"' : ''}/>
-                        <input type="radio" name="rate_avg" value="5" title="<fmt:message key="jnt_review.label.rating.excellent"/>"
-                               disabled="disabled" ${rating >= 5.0 ? 'checked="checked"' : ''}/>
-                    </form>
+                    </c:if>
 
                 </div>
 
-                <h4 itemprop="headline">${fn:escapeXml(title)}</h4>
+                <div>
+
+                    <div class="reviewRating" itemprop="reviewRating" itemscope itemtype="http://schema.org/Rating">
+
+                        <c:set var="worstRating" value="1"/>
+                        <c:set var="bestRating" value="5"/>
+
+                        <span itemprop="worstRating" content="${worstRating}"></span>
+                        <span itemprop="bestRating" content="${bestRating}"></span>
+                        <span itemprop="ratingValue" content="${rating}"></span>
+
+                        <c:forEach var="i" begin="${worstRating}" end="${bestRating}">
+                            <div class="ui-stars-star ${rating ge i ? 'ui-stars-star-on' : ''}"></div>
+                        </c:forEach>
+
+                    </div>
+
+                    <h4 class="reviewTitle" itemprop="headline">${fn:escapeXml(title)}</h4>
+
+                </div>
 
             </div>
 
