@@ -16,7 +16,6 @@
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
-<%--<template:addResources type="css" resources="review.css,ui.stars.css"/>--%>
 <template:addResources type="css" resources="ui.stars.css"/>
 <template:addResources type="javascript" resources="jquery.min.js,jquery.validate.js,ui.stars.js"/>
 

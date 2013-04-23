@@ -38,4 +38,9 @@
         <property name="requireAuthenticatedUser" value="false"/>
     </bean>
 
+    <bean class="org.jahia.modules.forgeModules.actions.ReplyReview" >
+        <property name="name" value="ReplyReview"/>
+        <property name="requireAuthenticatedUser" value="true"/>
+    </bean>
+
 </beans>

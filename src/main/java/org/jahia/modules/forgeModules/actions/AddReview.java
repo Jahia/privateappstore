@@ -1,5 +1,6 @@
 package org.jahia.modules.forgeModules.actions;
 
+import org.jahia.api.Constants;
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
 import org.jahia.bin.Render;
@@ -12,9 +13,7 @@ import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Date: 2013-04-04
@@ -46,6 +45,11 @@ public class AddReview extends Action {
         parameters.put("rating", rating);
 
         JCRNodeWrapper review = createNode(req, parameters, session.getNode(path), "jnt:review", null, false);
+
+        if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
+            List<String> roles = Arrays.asList("owner");
+            review.grantRoles("u:" + session.getUser().getUsername(), new HashSet<String>(roles));
+        }
 
         session.save();
 

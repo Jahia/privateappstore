@@ -58,6 +58,7 @@
 
 [jnt:review] > jnt:post
 - rating (long) mandatory
++ * (jnt:post)
 
 [jnt:addReview] > jnt:content, jmix:bindedComponent, commix:forgeModules
 - commentMandatory (boolean) = false mandatory

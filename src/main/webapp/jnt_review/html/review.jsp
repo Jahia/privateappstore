@@ -27,6 +27,10 @@
 <c:set var="title" value="${currentNode.properties['jcr:title'].string}"/>
 <c:set var="content" value="${currentNode.properties['content'].string}"/>
 <c:set var="created" value="${currentNode.properties['jcr:created'].date.time}"/>
+<jcr:sql
+        var="replies"
+        sql="SELECT * FROM [jnt:post] WHERE isdescendantnode(['${currentNode.path}'])
+              ORDER BY [jcr:lastModified] ASC" />
 
 <c:if test="${createdBy ne 'guest'}">
     <jcr:node var="user" path="${user:lookupUser(createdBy).localPath}"/>
@@ -51,6 +55,16 @@
     $(document).ready(function(){
 
         $("#reviewRating-${id}").stars();
+
+        <c:if test="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}">
+
+            $('#replyReviewToggle-${id}').click( function() {
+
+                $(this).toggleClass('btn-inverse');
+                $('#replyReview-${id}').slideToggle();
+            });
+
+        </c:if>
 
     });
 
@@ -109,6 +123,12 @@
                     <fmt:formatDate value="${created}" dateStyle="long" />
                 </time>
 
+                <c:if test="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}">
+
+                    <span class="pull-right"><button id="replyReviewToggle-${id}" class="btn btn-small"><fmt:message key="jnt_review.label.reply"/></button></span>
+
+                </c:if>
+
                 <div itemprop="reviewRating" itemscope itemtype="http://schema.org/Rating">
 
                     <span itemprop="worstRating" content="1"></span>
@@ -140,7 +160,53 @@
             ${fn:escapeXml(content)}
         </div>
 
+        <c:forEach items="${replies.nodes}" var="reply">
+
+            <template:module node="${reply}" view="reply"/>
+
+        </c:forEach>
 
     </div>
+
+    <c:if test="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}">
+
+        <div id="replyReview-${id}" class="replyReview box box-rounded box-tinted box-margin-top">
+
+            <template:tokenizedForm>
+
+                <form id="replyReviewForm-${id}" class="replyReviewForm form-horizontal" action="<c:url value='${url.base}${currentNode.path}.replyReview.do'/>" method="post">
+                    <input type="hidden" name="jcrNodeType" value="jnt:review"/>
+
+                    <fieldset>
+
+                        <div class="control-group">
+                            <label class="control-label" for="reviewReply-${id}">
+                                <fmt:message key="jnt_review.label.reply"/>
+                            </label>
+                            <div class="controls">
+                                <textarea rows="7" id="reviewReply-${id}"
+                                          name="content"
+                                        ><c:if test="${not empty sessionScope.formDatas['content']}">
+                                    ${fn:escapeXml(sessionScope.formDatas['content'][0])}
+                                </c:if></textarea>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <div class="controls">
+                                <input class="btn btn-primary" type="submit" value="<fmt:message key='jnt_review.label.submitReply'/>"/>
+                            </div>
+                        </div>
+
+                    </fieldset>
+
+
+                </form>
+
+            </template:tokenizedForm>
+
+        </div>
+
+    </c:if>
 
 </article>
