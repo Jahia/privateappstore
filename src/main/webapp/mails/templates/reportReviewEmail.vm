@@ -1,0 +1,11 @@
+#* @vtlvariable name="bundle" type="java.util.ResourceBundle" *#
+#* @vtlvariable name="reportedNodePath" type="java.lang.String" *#
+#* @vtlvariable name="isReview" type="java.lang.Boolean" *#
+#* @vtlvariable name="username" type="java.lang.String" *#
+
+<html>
+<body>
+<h1>New#if( ${isReview} ) review#else review reply#end reported as spam by ${username}</h1>
+<p>#if( ${isReview} )review #else review reply#end path: ${reportedNodePath}</p>
+</body>
+</html>

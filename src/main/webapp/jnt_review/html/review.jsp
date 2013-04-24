@@ -19,7 +19,7 @@
 
 <template:addResources type="javascript" resources="html5shiv.js"/>
 <template:addResources type="css" resources="ui.stars.css, ui.stars.review.css"/>
-<template:addResources type="javascript" resources="jquery.min.js"/>
+<template:addResources type="javascript" resources="jquery.min.js, bootstrap-modal.js, modulesForge.js"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="createdBy" value="${currentNode.properties['jcr:createdBy'].string}"/>
@@ -53,8 +53,6 @@
 <script type="text/javascript">
 
     $(document).ready(function(){
-
-        <%--$("#reviewRating-${id}").stars();--%>
 
         <c:if test="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}">
 
@@ -127,7 +125,16 @@
 
                     <c:if test="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}">
 
-                        <span class="pull-right"><button id="replyReviewToggle-${id}" class="btn btn-small"><fmt:message key="jnt_review.label.reply"/></button></span>
+                        <div class="pull-right">
+
+                            <button id="replyReviewToggle-${id}" class="btn btn-small btn-primary"><fmt:message key="jnt_review.label.reply"/></button>
+
+                            <%--- check if curent user is the owner of the module ---%>
+                            <c:if test="${jcr:hasPermission(currentNode.parent.parent, 'jcr:all_live')}">
+                                <%@include file="../../commons/reportButton.jspf"%>
+                            </c:if>
+
+                        </div>
 
                     </c:if>
 

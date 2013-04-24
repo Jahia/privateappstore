@@ -43,4 +43,11 @@
         <property name="requireAuthenticatedUser" value="true"/>
     </bean>
 
+    <bean class="org.jahia.modules.forgeModules.actions.ReportReview" >
+        <property name="name" value="ReportReview"/>
+        <property name="requireAuthenticatedUser" value="true"/>
+        <property name="templatePath" value="/mails/templates/reportReviewEmail.vm"/>
+        <property name="mailService" ref="MailService"/>
+    </bean>
+
 </beans>

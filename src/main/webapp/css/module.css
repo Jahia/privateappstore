@@ -1246,6 +1246,9 @@
 #comnt_module .reviewsHeader {
   display: inline-block;
 }
+#comnt_module .reviewRating .ui-stars-star {
+  cursor: default;
+}
 #comnt_module .reviewRating,
 #comnt_module .reviewTitle {
   display: inline-block;

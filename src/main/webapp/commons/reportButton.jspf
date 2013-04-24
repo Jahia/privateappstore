@@ -1,0 +1,40 @@
+<c:choose>
+    <c:when test="${not jcr:isNodeType(currentNode, 'jmix:reportedReview')}">
+
+        <%--<button id="reportReview-${id}" class="btn btn-small" onclick="reportReview('<c:url value='${url.base}${currentNode.path}'/>');"><fmt:message key="jnt_review.label.report"/></button>--%>
+        <button class="btn btn-small" data-toggle="modal" data-target="#reportModal-${id}"><fmt:message key="jnt_review.label.report"/></button>
+
+        <div id="reportModal-${id}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3><fmt:message key="jnt_review.label.modal.report.header"/></h3>
+            </div>
+            <div class="modal-body">
+                <p><fmt:message key="jnt_review.label.modal.report.body"/></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" aria-hidden="true"><fmt:message key="jnt_review.label.modal.report.cancel"/></button>
+                <button class="btn btn-primary" onclick="reportReview('<c:url value='${url.base}${currentNode.path}'/>', '#reportModal-${id}');"><fmt:message key="jnt_review.label.modal.report.submit"/></button>
+            </div>
+        </div>
+
+    </c:when>
+    <c:otherwise>
+
+        <button class="btn btn-small btn-danger" data-toggle="modal" data-target="#reportedModal-${id}"><fmt:message key="jnt_review.label.reported"/></button>
+
+        <div id="reportedModal-${id}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3><fmt:message key="jnt_review.label.modal.reported.header"/></h3>
+            </div>
+            <div class="modal-body">
+                <p><fmt:message key="jnt_review.label.modal.reported.body"/></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" aria-hidden="true"><fmt:message key="jnt_review.label.modal.reported.close"/></button>
+            </div>
+        </div>
+
+    </c:otherwise>
+</c:choose>

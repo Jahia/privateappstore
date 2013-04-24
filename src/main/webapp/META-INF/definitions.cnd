@@ -71,3 +71,6 @@
 
 [jmix:reviews] mixin
 + reviews (jnt:reviews) = jnt:reviews autocreated hidden
+
+[jmix:reportedReview] mixin
+- reported (boolean) = true

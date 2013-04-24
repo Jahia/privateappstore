@@ -18,6 +18,7 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
 <template:addResources type="javascript" resources="html5shiv.js"/>
+<template:addResources type="javascript" resources="jquery.min.js, bootstrap-modal.js, modulesForge.js"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="createdBy" value="${currentNode.properties['jcr:createdBy'].string}"/>
@@ -94,6 +95,15 @@
                 <time itemprop="datePublished" datetime="<fmt:formatDate value="${created}" pattern="yyyy-MM-dd" />">
                     <fmt:formatDate value="${created}" dateStyle="long" />
                 </time>
+
+                <%--- check if curent user is the owner of the module ---%>
+                <c:if test="${renderContext.loggedIn && jcr:hasPermission(currentNode.parent.parent.parent, 'jcr:all_live')}">
+
+                    <div class="pull-right">
+                        <%@include file="../../commons/reportButton.jspf"%>
+                    </div>
+
+                </c:if>
 
             </div>
 
