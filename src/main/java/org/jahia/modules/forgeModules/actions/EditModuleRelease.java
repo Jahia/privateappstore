@@ -25,7 +25,7 @@ import java.util.*;
  */
 public class EditModuleRelease extends Action {
 
-    private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(AddModule.class);
+    private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(EditModuleRelease.class);
 
     @Override
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource,

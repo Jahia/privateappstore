@@ -27,10 +27,11 @@
 <c:set var="title" value="${currentNode.properties['jcr:title'].string}"/>
 <c:set var="content" value="${currentNode.properties['content'].string}"/>
 <c:set var="created" value="${currentNode.properties['jcr:created'].date.time}"/>
+
 <jcr:sql
         var="replies"
         sql="SELECT * FROM [jnt:post] WHERE isdescendantnode(['${currentNode.path}'])
-              ORDER BY [jcr:lastModified] ASC" />
+              ORDER BY [jcr:created] ASC" />
 
 <c:if test="${createdBy ne 'guest'}">
     <jcr:node var="user" path="${user:lookupUser(createdBy).localPath}"/>
@@ -126,12 +127,22 @@
                     <c:if test="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}">
 
                         <div class="pull-right">
+                            isForgeAdmin: ${isForgeAdmin} <br>
+                            isReportedOverall: ${isReportedOverall} <br>
 
-                            <button id="replyReviewToggle-${id}" class="btn btn-small btn-primary"><fmt:message key="jnt_review.label.reply"/></button>
+                            <c:if test="${not isForgeAdmin}">
 
-                            <%--- check if curent user is the owner of the module ---%>
-                            <c:if test="${jcr:hasPermission(currentNode.parent.parent, 'jcr:all_live')}">
-                                <%@include file="../../commons/reportButton.jspf"%>
+                                <button id="replyReviewToggle-${id}" class="btn btn-small btn-primary"><fmt:message key="jnt_review.label.reply"/></button>
+
+                                <%--- check if curent user is the owner of the module ---%>
+                                <c:if test="${jcr:hasPermission(currentNode.parent.parent, 'jcr:all_live')}">
+                                    <%@include file="../../commons/reportButton.jspf"%>
+                                </c:if>
+
+                            </c:if>
+
+                            <c:if test="${isForgeAdmin && jcr:isNodeType(currentNode, 'jmix:reportedReview') && not currentNode.properties['unjustifiedReport'].boolean}">
+                                <%@include file="../../commons/adminButtons.jspf"%>
                             </c:if>
 
                         </div>
@@ -169,53 +180,59 @@
             ${fn:escapeXml(content)}
         </div>
 
+        <c:if test="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}">
+
+            <div id="replyReview-${id}" class="replyReview box box-rounded box-tinted box-margin-top">
+
+                <template:tokenizedForm>
+
+                    <form id="replyReviewForm-${id}" class="replyReviewForm form-horizontal" action="<c:url value='${url.base}${currentNode.path}.replyReview.do'/>" method="post">
+                        <input type="hidden" name="jcrNodeType" value="jnt:review"/>
+
+                        <fieldset>
+
+                            <div class="control-group">
+                                <label class="control-label" for="reviewReply-${id}">
+                                    <fmt:message key="jnt_review.label.reply"/>
+                                </label>
+                                <div class="controls">
+                                    <textarea rows="7" id="reviewReply-${id}"
+                                              name="content"
+                                            ><c:if test="${not empty sessionScope.formDatas['content']}">
+                                        ${fn:escapeXml(sessionScope.formDatas['content'][0])}
+                                    </c:if></textarea>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <div class="controls">
+                                    <input class="btn btn-primary" type="submit" value="<fmt:message key='jnt_review.label.submitReply'/>"/>
+                                </div>
+                            </div>
+
+                        </fieldset>
+
+
+                    </form>
+
+                </template:tokenizedForm>
+
+            </div>
+
+        </c:if>
+
         <c:forEach items="${replies.nodes}" var="reply">
 
-            <template:module node="${reply}" view="reply"/>
+            <template:module node="${reply}" view="reply">
+                <template:param name="module.cache.additional.key" value="${reply.identifier}"/>
+                <template:param name="isForgeAdmin" value="${isForgeAdmin}"/>
+                <template:param name="isReportedOverall" value="${isReportedOverall}"/>
+            </template:module>
 
         </c:forEach>
 
     </div>
 
-    <c:if test="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}">
 
-        <div id="replyReview-${id}" class="replyReview box box-rounded box-tinted box-margin-top">
-
-            <template:tokenizedForm>
-
-                <form id="replyReviewForm-${id}" class="replyReviewForm form-horizontal" action="<c:url value='${url.base}${currentNode.path}.replyReview.do'/>" method="post">
-                    <input type="hidden" name="jcrNodeType" value="jnt:review"/>
-
-                    <fieldset>
-
-                        <div class="control-group">
-                            <label class="control-label" for="reviewReply-${id}">
-                                <fmt:message key="jnt_review.label.reply"/>
-                            </label>
-                            <div class="controls">
-                                <textarea rows="7" id="reviewReply-${id}"
-                                          name="content"
-                                        ><c:if test="${not empty sessionScope.formDatas['content']}">
-                                    ${fn:escapeXml(sessionScope.formDatas['content'][0])}
-                                </c:if></textarea>
-                            </div>
-                        </div>
-
-                        <div class="control-group">
-                            <div class="controls">
-                                <input class="btn btn-primary" type="submit" value="<fmt:message key='jnt_review.label.submitReply'/>"/>
-                            </div>
-                        </div>
-
-                    </fieldset>
-
-
-                </form>
-
-            </template:tokenizedForm>
-
-        </div>
-
-    </c:if>
 
 </article>

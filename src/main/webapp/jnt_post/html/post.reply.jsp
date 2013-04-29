@@ -100,7 +100,18 @@
                 <c:if test="${renderContext.loggedIn && jcr:hasPermission(currentNode.parent.parent.parent, 'jcr:all_live')}">
 
                     <div class="pull-right">
-                        <%@include file="../../commons/reportButton.jspf"%>
+
+                        isForgeAdmin: ${isForgeAdmin} <br>
+                        isReportedOverall: ${isReportedOverall} <br>
+
+
+                        <c:if test="${not isForgeAdmin || ( isForgeAdmin && ( not jcr:isNodeType(currentNode, 'jmix:reportedReview') || currentNode.properties['unjustifiedReport'].boolean ) )}">
+                            <%@include file="../../commons/reportButton.jspf"%>
+                        </c:if>
+                        <c:if test="${isForgeAdmin && jcr:isNodeType(currentNode, 'jmix:reportedReview') && not currentNode.properties['unjustifiedReport'].boolean}">
+                            <%@include file="../../commons/adminButtons.jspf"%>
+                        </c:if>
+
                     </div>
 
                 </c:if>

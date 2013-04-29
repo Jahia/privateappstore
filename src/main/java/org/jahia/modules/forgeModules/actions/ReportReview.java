@@ -9,11 +9,13 @@ import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
 import org.jahia.services.usermanager.JahiaUser;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import javax.jcr.RepositoryException;
 import javax.script.ScriptException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -27,7 +29,7 @@ import java.util.Map;
  */
 public class ReportReview extends Action {
 
-    private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(AddModule.class);
+    private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(ReportReview.class);
     private MailServiceImpl mailService;
     private String templatePath;
 
@@ -46,6 +48,7 @@ public class ReportReview extends Action {
 
         JCRNodeWrapper node = resource.getNode();
         JahiaUser user = session.getUser();
+        JCRNodeWrapper module = node.isNodeType("jnt:review") ? node.getParent().getParent() : node.getParent().getParent().getParent();
 
         session.checkout(node);
 
@@ -61,8 +64,7 @@ public class ReportReview extends Action {
 
         session.save();
 
-        // TODO
-        return null;
+        return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("moduleUrl", module.getUrl()));
     }
 
     private void sendNotificationEmail(JCRNodeWrapper node, JahiaUser user, Locale locale) throws RepositoryException, ScriptException {

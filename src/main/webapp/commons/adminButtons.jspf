@@ -1,0 +1,89 @@
+<%--<button class="btn btn-small btn-success" onclick="reviewDo('unjustifiedReport', '<c:url value='${url.base}${currentNode.path}'/>', '#reportModal-${id}');"><fmt:message key="jnt_review.label.admin.unjustified"/></button>--%>
+<%--<button class="btn btn-small btn-danger" onclick="reviewDo('deleteReview', '<c:url value='${url.base}${currentNode.path}'/>', '#reportModal-${id}');"><fmt:message key="jnt_review.label.admin.delete"/></button>--%>
+
+<%--<c:set var="reportedNodetype" value="${jcr:isNodeType(currentNode, 'jnt:review') ? 'review' : 'review reply'}"/>
+
+<button class="btn btn-small btn-success" data-toggle="modal" data-target="#adminUnjustifiedModal-${id}"><fmt:message key="jnt_review.label.admin.modal.unjustified.toggle"/></button>
+
+<div id="adminUnjustifiedModal-${id}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="adminUnjustifiedModalLabel-${id}" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 id="adminUnjustifiedModalLabel-${id}"><fmt:message key="jnt_review.label.admin.modal.unjustified.header"/></h3>
+    </div>
+    <div class="modal-body">
+        <p><fmt:message key="jnt_review.label.admin.modal.unjustified.body"><fmt:param value="${jcr:isNodeType(currentNode, 'jnt:review') ? 'review' : 'review reply'}"/></fmt:message></p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><fmt:message key="jnt_review.label.admin.modal.unjustified.cancel"/></button>
+        <button class="btn btn-primary" onclick="reviewDo('unjustifiedReport', '<c:url value='${url.base}${currentNode.path}'/>', '#adminUnjustifiedModal-${id}');"><fmt:message key="jnt_review.label.admin.modal.unjustified.confirm"/></button>
+    </div>
+</div>
+
+<button class="btn btn-small btn-danger" data-toggle="modal" data-target="#adminDeleteModal-${id}"><fmt:message key="jnt_review.label.admin.modal.delete.toggle"/></button>
+
+<div id="adminDeleteModal-${id}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="adminDeleteModalLabel-${id}" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 id="adminDeleteModalLabel-${id}"><fmt:message key="jnt_review.label.admin.modal.delete.header"/></h3>
+    </div>
+    <div class="modal-body">
+        <p><fmt:message key="jnt_review.label.admin.modal.delete.body"/></p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><fmt:message key="jnt_review.label.admin.modal.delete.cancel"/></button>
+        <button class="btn btn-primary" onclick="reviewDo('deleteReview', '<c:url value='${url.base}${currentNode.path}'/>', '#adminDeleteModal-${id}');"><fmt:message key="jnt_review.label.admin.modal.delete.confirm"/></button>
+    </div>
+</div>--%>
+
+
+<c:forEach begin="1" end="2" varStatus="status">
+
+    <c:choose>
+
+        <c:when test="${status.index eq 1}">
+
+            <c:set var="modalName" value="adminUnjustified"/>
+            <c:set var="messageKey" value="jnt_review.label.admin.modal.unjustified"/>
+            <c:set var="modalToggleCss" value="btn-success"/>
+
+            <c:set var="isConfirm"              value="true"/>
+            <c:set var="modalConfirmCss"        value="btn-primary"/>
+            <c:url var="curentNodePath"         value='${url.base}${currentNode.path}'/>
+            <c:set var="modalConfirmAction"     value="onclick=\"reviewDo('unjustifiedReport', '${curentNodePath}', '#${modalName}-${currentNode.identifier}', $(this).parents('.tab-pane').attr('id'));\""/>
+
+        </c:when>
+
+        <c:when test="${status.index eq 2}">
+
+            <c:set var="modalName"  value="adminDelete"/>
+            <c:set var="messageKey" value="jnt_review.label.admin.modal.delete"/>
+            <c:set var="modalToggleCss" value="btn-danger"/>
+
+            <c:set var="isConfirm"              value="true"/>
+            <c:set var="modalConfirmCss"        value="btn-danger"/>
+            <c:url var="curentNodePath"         value='${url.base}${currentNode.path}'/>
+            <c:set var="modalConfirmAction"     value="onclick=\"reviewDo('deleteReview', '${curentNodePath}', '#${modalName}-${currentNode.identifier}', $(this).parents('.tab-pane').attr('id'));\""/>
+
+        </c:when>
+
+    </c:choose>
+
+    <button class="btn btn-small ${modalToggleCss}" data-toggle="modal" data-target="#${modalName}-${currentNode.identifier}"><fmt:message key="${messageKey}.toggle"/></button>
+
+    <div id="${modalName}-${currentNode.identifier}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="${modalName}-${currentNode.identifier}" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3 id="${modalName}Label-${currentNode.identifier}"><fmt:message key="${messageKey}.header"/></h3>
+        </div>
+        <div class="modal-body">
+            <p><fmt:message key="${messageKey}.body"/></p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true"><fmt:message key="${messageKey}.cancel"/></button>
+            <c:if test="${isConfirm}">
+                <button class="btn ${modalConfirmCss}" ${modalConfirmAction}><fmt:message key="${messageKey}.confirm"/></button>
+            </c:if>
+        </div>
+    </div>
+
+</c:forEach>

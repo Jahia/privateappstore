@@ -2,10 +2,13 @@ function countDownload(modulePath) {
     $.post(modulePath+".downloadCount.do");
 }
 
-function reportReview(reviewPath, modalIdentifier) {
+function reviewDo(action,reviewPath, modalIdentifier, bootstrapTab) {
 
-    $.post(reviewPath+".reportReview.do", null, function() {
+    $.post(reviewPath+"." + action + ".do", function(result) {
 
+        window.location = result['moduleUrl'] + "?bootstrapTab=" + bootstrapTab;
         $(modalIdentifier).modal('hide');
-    });
+
+    }, "json");
+
 }

@@ -50,4 +50,14 @@
         <property name="mailService" ref="MailService"/>
     </bean>
 
+    <bean class="org.jahia.modules.forgeModules.actions.UnjustifiedReport" >
+        <property name="name" value="UnjustifiedReport"/>
+        <property name="requireAuthenticatedUser" value="true"/>
+    </bean>
+
+    <bean class="org.jahia.modules.forgeModules.actions.DeleteReview" >
+        <property name="name" value="DeleteReview"/>
+        <property name="requireAuthenticatedUser" value="true"/>
+    </bean>
+
 </beans>

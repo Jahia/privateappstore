@@ -1,40 +1,101 @@
 <c:choose>
-    <c:when test="${not jcr:isNodeType(currentNode, 'jmix:reportedReview')}">
+    <c:when test="${jcr:isNodeType(currentNode, 'jmix:reportedReview')}">
 
-        <%--<button id="reportReview-${id}" class="btn btn-small" onclick="reportReview('<c:url value='${url.base}${currentNode.path}'/>');"><fmt:message key="jnt_review.label.report"/></button>--%>
-        <button class="btn btn-small" data-toggle="modal" data-target="#reportModal-${id}"><fmt:message key="jnt_review.label.report"/></button>
+        <c:choose>
+            <c:when test="${currentNode.properties['unjustifiedReport'].boolean}">
 
-        <div id="reportModal-${id}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <c:set var="modalName" value="unjustifiedModal"/>
+                <c:set var="messageKey" value="jnt_review.label.modal.unjustified"/>
+                <c:set var="modalToggleCss" value="btn-warning"/>
+
+                <%--<button class="btn btn-small btn-warning" data-toggle="modal" data-target="#unjustifiedModal-${id}"><fmt:message key="jnt_review.label.modal.unjustified.toggle"/></button>
+
+                <div id="unjustifiedModal-${id}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="unjustifiedModalLabel-${id}" aria-hidden="true">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h3 id="unjustifiedModalLabel-${id}"><fmt:message key="jnt_review.label.modal.unjustified.header"/></h3>
+                    </div>
+                    <div class="modal-body">
+                        <p><fmt:message key="jnt_review.label.modal.unjustified.body"/></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn" data-dismiss="modal" aria-hidden="true"><fmt:message key="jnt_review.label.modal.unjustified.cancel"/></button>
+                    </div>
+                </div>--%>
+
+            </c:when>
+            <c:otherwise>
+
+                <c:set var="modalName" value="reportedModal"/>
+                <c:set var="messageKey" value="jnt_review.label.modal.reported"/>
+                <c:set var="modalToggleCss" value="btn-danger"/>
+
+                <%--<button class="btn btn-small btn-danger" data-toggle="modal" data-target="#reportedModal-${id}"><fmt:message key="jnt_review.label.modal.reported.toggle"/></button>
+
+                <div id="reportedModal-${id}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="reportedModalLabel-${id}" aria-hidden="true">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h3 id="reportedModalLabel-${id}"><fmt:message key="jnt_review.label.modal.reported.header"/></h3>
+                    </div>
+                    <div class="modal-body">
+                        <p><fmt:message key="jnt_review.label.modal.reported.body"/></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn" data-dismiss="modal" aria-hidden="true"><fmt:message key="jnt_review.label.modal.reported.cancel"/></button>
+                    </div>
+                </div>--%>
+
+            </c:otherwise>
+        </c:choose>
+
+    </c:when>
+    <c:otherwise>
+
+        <%--<button class="btn btn-small" data-toggle="modal" data-target="#reportModal-${id}"><fmt:message key="jnt_review.label.modal.report.toggle"/></button>
+
+        <div id="reportModal-${id}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel-${id}" aria-hidden="true">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h3><fmt:message key="jnt_review.label.modal.report.header"/></h3>
+                <h3 id="reportModalLabel-${id}"><fmt:message key="jnt_review.label.modal.report.header"/></h3>
             </div>
             <div class="modal-body">
                 <p><fmt:message key="jnt_review.label.modal.report.body"/></p>
             </div>
             <div class="modal-footer">
                 <button class="btn" data-dismiss="modal" aria-hidden="true"><fmt:message key="jnt_review.label.modal.report.cancel"/></button>
-                <button class="btn btn-primary" onclick="reportReview('<c:url value='${url.base}${currentNode.path}'/>', '#reportModal-${id}');"><fmt:message key="jnt_review.label.modal.report.submit"/></button>
+                <button class="btn btn-primary" onclick="reviewDo('reportReview', '<c:url value='${url.base}${currentNode.path}'/>', '#reportModal-${id}');"><fmt:message key="jnt_review.label.modal.report.confirm"/></button>
             </div>
-        </div>
+        </div>--%>
 
-    </c:when>
-    <c:otherwise>
+        <c:set var="modalName" value="reportModal"/>
+        <c:set var="messageKey" value="jnt_review.label.modal.report"/>
+        <c:set var="modalToggleCss" value=""/>
 
-        <button class="btn btn-small btn-danger" data-toggle="modal" data-target="#reportedModal-${id}"><fmt:message key="jnt_review.label.reported"/></button>
+        <c:set var="isConfirm"              value="true"/>
+        <c:set var="modalConfirmCss"        value="btn-primary"/>
+        <c:url var="curentNodePath"         value='${url.base}${currentNode.path}'/>
+        <c:set var="modalConfirmAction"     value="onclick=\"reviewDo('reportReview', '${curentNodePath}', '#${modalName}-${currentNode.identifier}', $(this).parents('.tab-pane').attr('id'));\""/>
 
-        <div id="reportedModal-${id}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h3><fmt:message key="jnt_review.label.modal.reported.header"/></h3>
-            </div>
-            <div class="modal-body">
-                <p><fmt:message key="jnt_review.label.modal.reported.body"/></p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn" data-dismiss="modal" aria-hidden="true"><fmt:message key="jnt_review.label.modal.reported.close"/></button>
-            </div>
-        </div>
 
     </c:otherwise>
 </c:choose>
+
+<button class="btn btn-small ${modalToggleCss}" data-toggle="modal" data-target="#${modalName}-${currentNode.identifier}"><fmt:message key="${messageKey}.toggle"/></button>
+
+<div id="${modalName}-${currentNode.identifier}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="${modalName}-${currentNode.identifier}" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 id="${modalName}Label-${currentNode.identifier}"><fmt:message key="${messageKey}.header"/></h3>
+    </div>
+    <div class="modal-body">
+        <p><fmt:message key="${messageKey}.body"/></p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><fmt:message key="${messageKey}.cancel"/></button>
+        <c:if test="${isConfirm}">
+            <button class="btn ${modalConfirmCss}" ${modalConfirmAction}><fmt:message key="${messageKey}.confirm"/></button>
+        </c:if>
+    </div>
+</div>
+
+

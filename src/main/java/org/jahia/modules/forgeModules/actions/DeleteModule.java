@@ -28,7 +28,7 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public class DeleteModule extends Action {
-    private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(AddModule.class);
+    private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(DeleteModule.class);
     @Override
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource, JCRSessionWrapper session, Map<String, List<String>> parameters, URLResolver urlResolver) throws Exception {
         JCRNodeWrapper node = resource.getNode();

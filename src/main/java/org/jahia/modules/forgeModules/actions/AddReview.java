@@ -23,7 +23,7 @@ import java.util.*;
  */
 public class AddReview extends Action {
 
-    private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(AddModule.class);
+    private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(AddReview.class);
 
     @Override
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource,
