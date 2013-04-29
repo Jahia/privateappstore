@@ -63,7 +63,8 @@
                             $('#reviewComment-088857c6-3257-435e-89db-68faf7f57039').val("");
                         }
                         $('#reviewRating-${boundComponent.identifier}').find('input[name="j:lastVote"]').removeAttr("disabled");
-                        form.submit();
+                        //form.submit();
+                        moduleDoAddReview("<c:url value='${url.base}${boundComponent.path}'/>", $(form), $(form).parents('.tab-pane').attr('id'));
                     },
                     highlight: function(element, errorClass, validClass) {
                         $(element).addClass("error").removeClass(validClass).parents('.control-group').addClass("error");
@@ -99,7 +100,7 @@
         <template:tokenizedForm>
             <form action="<c:url value='${url.base}${boundComponent.path}.chain.do'/>" method="post" id="writeReviewForm" class="form-horizontal">
                 <input type="hidden" name="jcrNodeType" value="jnt:review"/>
-                <input type="hidden" name="chainOfAction" value="addReview,rate"/>
+                <input type="hidden" name="chainOfAction" value="rate,addReview"/>
 
                 <fieldset>
                     <c:if test="${not renderContext.loggedIn}">

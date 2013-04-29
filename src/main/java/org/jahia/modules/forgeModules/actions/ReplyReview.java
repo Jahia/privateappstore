@@ -8,6 +8,7 @@ import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +40,6 @@ public class ReplyReview extends Action {
 
         session.save();
 
-        return new ActionResult(HttpServletResponse.SC_OK, module.getPath(), Render.serializeNodeToJSON(respond));
+        return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("moduleUrl", module.getUrl()));
     }
 }

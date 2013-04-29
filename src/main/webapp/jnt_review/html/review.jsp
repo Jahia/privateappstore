@@ -63,6 +63,24 @@
                 $('#replyReview-${id}').slideToggle();
             });
 
+            $("#replyReviewForm-${id}").validate({
+                errorClass:'help-block',
+                rules: {
+                    'content': {
+                        required: true
+                    }
+                },
+                submitHandler: function(form) {
+                    reviewDoReply("<c:url value='${url.base}${currentNode.path}'/>", $(form), $(form).parents('.tab-pane').attr('id'));
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).addClass("error").removeClass(validClass).parents('.control-group').addClass("error");
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).removeClass("error").addClass(validClass).parents('.control-group').removeClass("error");
+                }
+            });
+
         </c:if>
 
     });
@@ -127,8 +145,8 @@
                     <c:if test="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}">
 
                         <div class="pull-right">
-                            isForgeAdmin: ${isForgeAdmin} <br>
-                            isReportedOverall: ${isReportedOverall} <br>
+
+                            <c:set var="isForgeAdmin" value="${jcr:hasPermission(currentNode.parent.parent.parent, 'jcr:all_live')}"/>
 
                             <c:if test="${not isForgeAdmin}">
 
@@ -224,9 +242,10 @@
         <c:forEach items="${replies.nodes}" var="reply">
 
             <template:module node="${reply}" view="reply">
-                <template:param name="module.cache.additional.key" value="${reply.identifier}"/>
+                <%--<template:param name="module.cache.additional.key" value="${reply.identifier}"/>
+                <template:param name="cache.mainResource.flushParent" value="true"/>
                 <template:param name="isForgeAdmin" value="${isForgeAdmin}"/>
-                <template:param name="isReportedOverall" value="${isReportedOverall}"/>
+                <template:param name="isReportedOverall" value="${isReportedOverall}"/>--%>
             </template:module>
 
         </c:forEach>

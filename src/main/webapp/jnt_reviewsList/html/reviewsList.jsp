@@ -1,3 +1,4 @@
+<%@ page import="java.util.Calendar" %>
 <%@ taglib prefix="jcr" uri="http://www.jahia.org/tags/jcr" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -45,7 +46,7 @@
 
                     <jcr:sql
                             var="replies"
-                            sql="SELECT * FROM [jnt:review] AS review INNER JOIN [jnt:post] AS reply ON ischildnode(reply,review) WHERE isdescendantnode(review,['${reviewsNode.path}']) AND (review.reported IS null OR review.reported = false) AND reply.reported = true ORDER BY review.[jcr:created] DESC" />
+                            sql="SELECT * FROM [jnt:review] AS review INNER JOIN [jnt:post] AS reply ON ischildnode(reply,review) WHERE isdescendantnode(review,['${reviewsNode.path}']) AND (review.reported IS null OR review.reported = false) AND reply.reported = true AND (reply.unjustifiedReport IS null OR reply.unjustifiedReport = false) ORDER BY review.[jcr:created] DESC" />
 
                     <c:set var="reportedOverallNbr" value="${functions:length(reviews.nodes) + functions:length(replies.nodes)}"/>
                     <c:set var="isReportedOverall" value="${reportedOverallNbr gt 0}"/>
@@ -98,9 +99,9 @@
 
                         <div class="reviewListItem">
                             <template:module node="${review}">
-                                <template:param name="module.cache.additional.key" value="${review.identifier}"/>
+                                <%--<template:param name="module.cache.additional.key" value="${review.identifier}"/>
                                 <template:param name="isForgeAdmin" value="${isForgeAdmin}"/>
-                                <template:param name="isReportedOverall" value="${isReportedOverall}"/>
+                                <template:param name="isReportedOverall" value="${isReportedOverall}"/>--%>
                             </template:module>
                         </div>
 
@@ -130,9 +131,10 @@
 
                                 <div class="reviewListItem">
                                     <template:module node="${review}">
-                                        <template:param name="module.cache.additional.key" value="${review.identifier}"/>
+                                       <%-- <template:param name="module.cache.additional.key" value="${review.identifier}"/>
+                                        <template:param name="cache.mainResource.flushParent" value="true"/>
                                         <template:param name="isForgeAdmin" value="${isForgeAdmin}"/>
-                                        <template:param name="isReportedOverall" value="${isReportedOverall}"/>
+                                        <template:param name="isReportedOverall" value="${isReportedOverall}"/>--%>
                                     </template:module>
                                 </div>
 
