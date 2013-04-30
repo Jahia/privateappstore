@@ -278,6 +278,24 @@
                                                        jcr:primaryType="jnt:mainResourceDisplay">
                                     <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                                 </main-resource-display>
+                                <add-version j:invertCondition="false" j:originWS="default" j:requireLoggedUser="false"
+                                             j:requirePrivilegedUser="false"
+                                             j:requiredPermissions="#/permissions/repository-permissions/jcr:all_live"
+                                             jcr:mixinTypes="jmix:accessControlled jmix:requiredPermissions"
+                                             jcr:primaryType="jnt:componentLink" targetTemplate="forge-addversion">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                    <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation"
+                                                      jcr:title="Add Version"/>
+                                </add-version>
+                                <edit-module j:invertCondition="false" j:originWS="default" j:requireLoggedUser="false"
+                                             j:requirePrivilegedUser="false"
+                                             j:requiredPermissions="#/permissions/repository-permissions/jcr:all_live"
+                                             jcr:mixinTypes="jmix:accessControlled jmix:requiredPermissions"
+                                             jcr:primaryType="jnt:componentLink" targetTemplate="edit-module">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                    <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation"
+                                                      jcr:title="Edit Module"/>
+                                </edit-module>
                             </module-aside>
                             <module-main j:originWS="default" jcr:primaryType="jnt:contentList">
                                 <bootstrap-tabular-list fadeIn="true" j:originWS="default"
