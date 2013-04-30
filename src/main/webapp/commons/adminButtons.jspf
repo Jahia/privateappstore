@@ -35,8 +35,22 @@
     </div>
 </div>--%>
 
+<c:choose>
+    <c:when test="${currentNode.properties['reported'].boolean && not currentNode.properties['unjustifiedReport'].boolean}">
+        <c:set var="begin" value="1"/>
+        <c:set var="end" value="2"/>
+    </c:when>
+    <c:when test="${currentNode.properties['reported'].boolean && currentNode.properties['unjustifiedReport'].boolean}">
+        <c:set var="begin" value="4"/>
+        <c:set var="end" value="4"/>
+    </c:when>
+    <c:otherwise>
+        <c:set var="begin" value="3"/>
+        <c:set var="end" value="3"/>
+    </c:otherwise>
+</c:choose>
 
-<c:forEach begin="1" end="2" varStatus="status">
+<c:forEach begin="${begin}" end="${end}" varStatus="status">
 
     <c:choose>
 
@@ -58,6 +72,32 @@
             <c:set var="modalName"  value="adminDelete"/>
             <c:set var="messageKey" value="jnt_review.label.admin.modal.delete"/>
             <c:set var="modalToggleCss" value="btn-danger"/>
+
+            <c:set var="isConfirm"              value="true"/>
+            <c:set var="modalConfirmCss"        value="btn-danger"/>
+            <c:url var="curentNodePath"         value='${url.base}${currentNode.path}'/>
+            <c:set var="modalConfirmAction"     value="onclick=\"reviewDo('deleteReview', '${curentNodePath}', '#${modalName}-${currentNode.identifier}', $(this).parents('.tab-pane').attr('id'));\""/>
+
+        </c:when>
+
+        <c:when test="${status.index eq 3}">
+
+            <c:set var="modalName"  value="adminManage"/>
+            <c:set var="messageKey" value="jnt_review.label.admin.modal.manage"/>
+            <c:set var="modalToggleCss" value=""/>
+
+            <c:set var="isConfirm"              value="true"/>
+            <c:set var="modalConfirmCss"        value="btn-danger"/>
+            <c:url var="curentNodePath"         value='${url.base}${currentNode.path}'/>
+            <c:set var="modalConfirmAction"     value="onclick=\"reviewDo('deleteReview', '${curentNodePath}', '#${modalName}-${currentNode.identifier}', $(this).parents('.tab-pane').attr('id'));\""/>
+
+        </c:when>
+
+        <c:when test="${status.index eq 4}">
+
+            <c:set var="modalName"  value="adminManageUnjustified"/>
+            <c:set var="messageKey" value="jnt_review.label.admin.modal.manageUnjustified"/>
+            <c:set var="modalToggleCss" value="btn-warning"/>
 
             <c:set var="isConfirm"              value="true"/>
             <c:set var="modalConfirmCss"        value="btn-danger"/>

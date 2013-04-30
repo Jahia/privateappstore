@@ -148,20 +148,25 @@
 
                             <c:set var="isForgeAdmin" value="${jcr:hasPermission(currentNode.parent.parent.parent, 'jcr:all_live')}"/>
 
-                            <c:if test="${not isForgeAdmin}">
 
-                                <button id="replyReviewToggle-${id}" class="btn btn-small btn-primary"><fmt:message key="jnt_review.label.reply"/></button>
+                            <c:choose>
 
-                                <%--- check if curent user is the owner of the module ---%>
-                                <c:if test="${jcr:hasPermission(currentNode.parent.parent, 'jcr:all_live')}">
-                                    <%@include file="../../commons/reportButton.jspf"%>
-                                </c:if>
+                                <c:when test="${isForgeAdmin}">
+                                    <%@include file="../../commons/adminButtons.jspf"%>
+                                </c:when>
 
-                            </c:if>
+                                <c:otherwise>
 
-                            <c:if test="${isForgeAdmin && jcr:isNodeType(currentNode, 'jmix:reportedReview') && not currentNode.properties['unjustifiedReport'].boolean}">
-                                <%@include file="../../commons/adminButtons.jspf"%>
-                            </c:if>
+                                    <button id="replyReviewToggle-${id}" class="btn btn-small btn-primary"><fmt:message key="jnt_review.label.reply"/></button>
+
+                                    <%--- check if curent user is the owner of the module ---%>
+                                    <c:if test="${jcr:hasPermission(currentNode.parent.parent, 'jcr:all_live')}">
+                                        <%@include file="../../commons/reportButton.jspf"%>
+                                    </c:if>
+
+                                </c:otherwise>
+
+                            </c:choose>
 
                         </div>
 

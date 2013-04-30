@@ -101,16 +101,22 @@
 
                     <div class="pull-right">
 
-                        isForgeAdmin: ${isForgeAdmin} <br>
-                        isReportedOverall: ${isReportedOverall} <br>
+                        <c:set var="isForgeAdmin" value="${jcr:hasPermission(currentNode.parent.parent.parent.parent, 'jcr:all_live')}"/>
 
+                        <c:choose>
 
-                        <c:if test="${not isForgeAdmin || ( isForgeAdmin && ( not jcr:isNodeType(currentNode, 'jmix:reportedReview') || currentNode.properties['unjustifiedReport'].boolean ) )}">
-                            <%@include file="../../commons/reportButton.jspf"%>
-                        </c:if>
-                        <c:if test="${isForgeAdmin && jcr:isNodeType(currentNode, 'jmix:reportedReview') && not currentNode.properties['unjustifiedReport'].boolean}">
-                            <%@include file="../../commons/adminButtons.jspf"%>
-                        </c:if>
+                            <c:when test="${isForgeAdmin}">
+                                <%@include file="../../commons/adminButtons.jspf"%>
+                            </c:when>
+
+                            <c:otherwise>
+                                <%@include file="../../commons/reportButton.jspf"%>
+                            </c:otherwise>
+
+                        </c:choose>
+
+                        <%--<c:if test="${isForgeAdmin && jcr:isNodeType(currentNode, 'jmix:reportedReview') && not currentNode.properties['unjustifiedReport'].boolean}">
+                        </c:if>--%>
 
                     </div>
 
