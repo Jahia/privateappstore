@@ -31,7 +31,7 @@
  - nbOfModulePerPage (long) = 9
 
 [jnt:forgeModuleCreation] > jnt:content, mix:title, jmix:forge
- - moduleRepository (weakreference)
+ - modulesRepository (weakreference)
 
 [jnt:forgeModule] > jnt:content, mix:title, jmix:editorialContent, jmix:tagged, jmix:forge, jmix:reviews, jmix:rating
  - jcr:title (string) mandatory

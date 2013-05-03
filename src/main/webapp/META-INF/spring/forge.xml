@@ -3,6 +3,11 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
+    <bean class="org.jahia.modules.forge.actions.CreateModule" >
+        <property name="name" value="CreateModule"/>
+        <property name="requireAuthenticatedUser" value="true"/>
+    </bean>
+
     <bean class="org.jahia.modules.forge.actions.AddModule" >
         <property name="name" value="AddModule"/>
         <property name="requireAuthenticatedUser" value="true"/>

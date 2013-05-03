@@ -34,81 +34,81 @@
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-.bodywrapper #jnt_forgeModule {
+.bodywrapper #jnt_forge {
   /* move down carets for tabs */
 
 }
-.bodywrapper #jnt_forgeModule p {
+.bodywrapper #jnt_forge p {
   margin: 0 0 10px;
 }
-.bodywrapper #jnt_forgeModule .lead {
+.bodywrapper #jnt_forge .lead {
   margin-bottom: 20px;
   font-size: 21px;
   font-weight: 200;
   line-height: 30px;
 }
-.bodywrapper #jnt_forgeModule small {
+.bodywrapper #jnt_forge small {
   font-size: 85%;
 }
-.bodywrapper #jnt_forgeModule strong {
+.bodywrapper #jnt_forge strong {
   font-weight: bold;
 }
-.bodywrapper #jnt_forgeModule em {
+.bodywrapper #jnt_forge em {
   font-style: italic;
 }
-.bodywrapper #jnt_forgeModule cite {
+.bodywrapper #jnt_forge cite {
   font-style: normal;
 }
-.bodywrapper #jnt_forgeModule .muted {
+.bodywrapper #jnt_forge .muted {
   color: #999999;
 }
-.bodywrapper #jnt_forgeModule a.muted:hover,
-.bodywrapper #jnt_forgeModule a.muted:focus {
+.bodywrapper #jnt_forge a.muted:hover,
+.bodywrapper #jnt_forge a.muted:focus {
   color: #808080;
 }
-.bodywrapper #jnt_forgeModule .text-warning {
+.bodywrapper #jnt_forge .text-warning {
   color: #c09853;
 }
-.bodywrapper #jnt_forgeModule a.text-warning:hover,
-.bodywrapper #jnt_forgeModule a.text-warning:focus {
+.bodywrapper #jnt_forge a.text-warning:hover,
+.bodywrapper #jnt_forge a.text-warning:focus {
   color: #a47e3c;
 }
-.bodywrapper #jnt_forgeModule .text-error {
+.bodywrapper #jnt_forge .text-error {
   color: #b94a48;
 }
-.bodywrapper #jnt_forgeModule a.text-error:hover,
-.bodywrapper #jnt_forgeModule a.text-error:focus {
+.bodywrapper #jnt_forge a.text-error:hover,
+.bodywrapper #jnt_forge a.text-error:focus {
   color: #953b39;
 }
-.bodywrapper #jnt_forgeModule .text-info {
+.bodywrapper #jnt_forge .text-info {
   color: #3a87ad;
 }
-.bodywrapper #jnt_forgeModule a.text-info:hover,
-.bodywrapper #jnt_forgeModule a.text-info:focus {
+.bodywrapper #jnt_forge a.text-info:hover,
+.bodywrapper #jnt_forge a.text-info:focus {
   color: #2d6987;
 }
-.bodywrapper #jnt_forgeModule .text-success {
+.bodywrapper #jnt_forge .text-success {
   color: #468847;
 }
-.bodywrapper #jnt_forgeModule a.text-success:hover,
-.bodywrapper #jnt_forgeModule a.text-success:focus {
+.bodywrapper #jnt_forge a.text-success:hover,
+.bodywrapper #jnt_forge a.text-success:focus {
   color: #356635;
 }
-.bodywrapper #jnt_forgeModule .text-left {
+.bodywrapper #jnt_forge .text-left {
   text-align: left;
 }
-.bodywrapper #jnt_forgeModule .text-right {
+.bodywrapper #jnt_forge .text-right {
   text-align: right;
 }
-.bodywrapper #jnt_forgeModule .text-center {
+.bodywrapper #jnt_forge .text-center {
   text-align: center;
 }
-.bodywrapper #jnt_forgeModule h1,
-.bodywrapper #jnt_forgeModule h2,
-.bodywrapper #jnt_forgeModule h3,
-.bodywrapper #jnt_forgeModule h4,
-.bodywrapper #jnt_forgeModule h5,
-.bodywrapper #jnt_forgeModule h6 {
+.bodywrapper #jnt_forge h1,
+.bodywrapper #jnt_forge h2,
+.bodywrapper #jnt_forge h3,
+.bodywrapper #jnt_forge h4,
+.bodywrapper #jnt_forge h5,
+.bodywrapper #jnt_forge h6 {
   margin: 10px 0;
   font-family: inherit;
   font-weight: bold;
@@ -116,82 +116,82 @@
   color: inherit;
   text-rendering: optimizelegibility;
 }
-.bodywrapper #jnt_forgeModule h1 small,
-.bodywrapper #jnt_forgeModule h2 small,
-.bodywrapper #jnt_forgeModule h3 small,
-.bodywrapper #jnt_forgeModule h4 small,
-.bodywrapper #jnt_forgeModule h5 small,
-.bodywrapper #jnt_forgeModule h6 small {
+.bodywrapper #jnt_forge h1 small,
+.bodywrapper #jnt_forge h2 small,
+.bodywrapper #jnt_forge h3 small,
+.bodywrapper #jnt_forge h4 small,
+.bodywrapper #jnt_forge h5 small,
+.bodywrapper #jnt_forge h6 small {
   font-weight: normal;
   line-height: 1;
   color: #999999;
 }
-.bodywrapper #jnt_forgeModule h1,
-.bodywrapper #jnt_forgeModule h2,
-.bodywrapper #jnt_forgeModule h3 {
+.bodywrapper #jnt_forge h1,
+.bodywrapper #jnt_forge h2,
+.bodywrapper #jnt_forge h3 {
   line-height: 40px;
 }
-.bodywrapper #jnt_forgeModule h1 {
+.bodywrapper #jnt_forge h1 {
   font-size: 38.5px;
 }
-.bodywrapper #jnt_forgeModule h2 {
+.bodywrapper #jnt_forge h2 {
   font-size: 31.5px;
 }
-.bodywrapper #jnt_forgeModule h3 {
+.bodywrapper #jnt_forge h3 {
   font-size: 24.5px;
 }
-.bodywrapper #jnt_forgeModule h4 {
+.bodywrapper #jnt_forge h4 {
   font-size: 17.5px;
 }
-.bodywrapper #jnt_forgeModule h5 {
+.bodywrapper #jnt_forge h5 {
   font-size: 14px;
 }
-.bodywrapper #jnt_forgeModule h6 {
+.bodywrapper #jnt_forge h6 {
   font-size: 11.9px;
 }
-.bodywrapper #jnt_forgeModule h1 small {
+.bodywrapper #jnt_forge h1 small {
   font-size: 24.5px;
 }
-.bodywrapper #jnt_forgeModule h2 small {
+.bodywrapper #jnt_forge h2 small {
   font-size: 17.5px;
 }
-.bodywrapper #jnt_forgeModule h3 small {
+.bodywrapper #jnt_forge h3 small {
   font-size: 14px;
 }
-.bodywrapper #jnt_forgeModule h4 small {
+.bodywrapper #jnt_forge h4 small {
   font-size: 14px;
 }
-.bodywrapper #jnt_forgeModule .page-header {
+.bodywrapper #jnt_forge .page-header {
   padding-bottom: 9px;
   margin: 20px 0 30px;
   border-bottom: 1px solid #eeeeee;
 }
-.bodywrapper #jnt_forgeModule ul,
-.bodywrapper #jnt_forgeModule ol {
+.bodywrapper #jnt_forge ul,
+.bodywrapper #jnt_forge ol {
   padding: 0;
   margin: 0 0 10px 25px;
 }
-.bodywrapper #jnt_forgeModule ul ul,
-.bodywrapper #jnt_forgeModule ul ol,
-.bodywrapper #jnt_forgeModule ol ol,
-.bodywrapper #jnt_forgeModule ol ul {
+.bodywrapper #jnt_forge ul ul,
+.bodywrapper #jnt_forge ul ol,
+.bodywrapper #jnt_forge ol ol,
+.bodywrapper #jnt_forge ol ul {
   margin-bottom: 0;
 }
-.bodywrapper #jnt_forgeModule li {
+.bodywrapper #jnt_forge li {
   line-height: 20px;
 }
-.bodywrapper #jnt_forgeModule ul.unstyled,
-.bodywrapper #jnt_forgeModule ol.unstyled {
+.bodywrapper #jnt_forge ul.unstyled,
+.bodywrapper #jnt_forge ol.unstyled {
   margin-left: 0;
   list-style: none;
 }
-.bodywrapper #jnt_forgeModule ul.inline,
-.bodywrapper #jnt_forgeModule ol.inline {
+.bodywrapper #jnt_forge ul.inline,
+.bodywrapper #jnt_forge ol.inline {
   margin-left: 0;
   list-style: none;
 }
-.bodywrapper #jnt_forgeModule ul.inline > li,
-.bodywrapper #jnt_forgeModule ol.inline > li {
+.bodywrapper #jnt_forge ul.inline > li,
+.bodywrapper #jnt_forge ol.inline > li {
   display: inline-block;
   *display: inline;
   /* IE7 inline-block hack */
@@ -200,32 +200,32 @@
   padding-left: 5px;
   padding-right: 5px;
 }
-.bodywrapper #jnt_forgeModule dl {
+.bodywrapper #jnt_forge dl {
   margin-bottom: 20px;
 }
-.bodywrapper #jnt_forgeModule dt,
-.bodywrapper #jnt_forgeModule dd {
+.bodywrapper #jnt_forge dt,
+.bodywrapper #jnt_forge dd {
   line-height: 20px;
 }
-.bodywrapper #jnt_forgeModule dt {
+.bodywrapper #jnt_forge dt {
   font-weight: bold;
 }
-.bodywrapper #jnt_forgeModule dd {
+.bodywrapper #jnt_forge dd {
   margin-left: 10px;
 }
-.bodywrapper #jnt_forgeModule .dl-horizontal {
+.bodywrapper #jnt_forge .dl-horizontal {
   *zoom: 1;
 }
-.bodywrapper #jnt_forgeModule .dl-horizontal:before,
-.bodywrapper #jnt_forgeModule .dl-horizontal:after {
+.bodywrapper #jnt_forge .dl-horizontal:before,
+.bodywrapper #jnt_forge .dl-horizontal:after {
   display: table;
   content: "";
   line-height: 0;
 }
-.bodywrapper #jnt_forgeModule .dl-horizontal:after {
+.bodywrapper #jnt_forge .dl-horizontal:after {
   clear: both;
 }
-.bodywrapper #jnt_forgeModule .dl-horizontal dt {
+.bodywrapper #jnt_forge .dl-horizontal dt {
   float: left;
   width: 100px;
   clear: left;
@@ -234,73 +234,73 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.bodywrapper #jnt_forgeModule .dl-horizontal dd {
+.bodywrapper #jnt_forge .dl-horizontal dd {
   margin-left: 120px;
 }
-.bodywrapper #jnt_forgeModule hr {
+.bodywrapper #jnt_forge hr {
   margin: 20px 0;
   border: 0;
   border-top: 1px solid #eeeeee;
   border-bottom: 1px solid #ffffff;
 }
-.bodywrapper #jnt_forgeModule abbr[title],
-.bodywrapper #jnt_forgeModule abbr[data-original-title] {
+.bodywrapper #jnt_forge abbr[title],
+.bodywrapper #jnt_forge abbr[data-original-title] {
   cursor: help;
   border-bottom: 1px dotted #999999;
 }
-.bodywrapper #jnt_forgeModule abbr.initialism {
+.bodywrapper #jnt_forge abbr.initialism {
   font-size: 90%;
   text-transform: uppercase;
 }
-.bodywrapper #jnt_forgeModule blockquote {
+.bodywrapper #jnt_forge blockquote {
   padding: 0 0 0 15px;
   margin: 0 0 20px;
   border-left: 5px solid #eeeeee;
 }
-.bodywrapper #jnt_forgeModule blockquote p {
+.bodywrapper #jnt_forge blockquote p {
   margin-bottom: 0;
   font-size: 17.5px;
   font-weight: 300;
   line-height: 1.25;
 }
-.bodywrapper #jnt_forgeModule blockquote small {
+.bodywrapper #jnt_forge blockquote small {
   display: block;
   line-height: 20px;
   color: #999999;
 }
-.bodywrapper #jnt_forgeModule blockquote small:before {
+.bodywrapper #jnt_forge blockquote small:before {
   content: '\2014 \00A0';
 }
-.bodywrapper #jnt_forgeModule blockquote.pull-right {
+.bodywrapper #jnt_forge blockquote.pull-right {
   float: right;
   padding-right: 15px;
   padding-left: 0;
   border-right: 5px solid #eeeeee;
   border-left: 0;
 }
-.bodywrapper #jnt_forgeModule blockquote.pull-right p,
-.bodywrapper #jnt_forgeModule blockquote.pull-right small {
+.bodywrapper #jnt_forge blockquote.pull-right p,
+.bodywrapper #jnt_forge blockquote.pull-right small {
   text-align: right;
 }
-.bodywrapper #jnt_forgeModule blockquote.pull-right small:before {
+.bodywrapper #jnt_forge blockquote.pull-right small:before {
   content: '';
 }
-.bodywrapper #jnt_forgeModule blockquote.pull-right small:after {
+.bodywrapper #jnt_forge blockquote.pull-right small:after {
   content: '\00A0 \2014';
 }
-.bodywrapper #jnt_forgeModule q:before,
-.bodywrapper #jnt_forgeModule q:after,
-.bodywrapper #jnt_forgeModule blockquote:before,
-.bodywrapper #jnt_forgeModule blockquote:after {
+.bodywrapper #jnt_forge q:before,
+.bodywrapper #jnt_forge q:after,
+.bodywrapper #jnt_forge blockquote:before,
+.bodywrapper #jnt_forge blockquote:after {
   content: "";
 }
-.bodywrapper #jnt_forgeModule address {
+.bodywrapper #jnt_forge address {
   display: block;
   margin-bottom: 20px;
   font-style: normal;
   line-height: 20px;
 }
-.bodywrapper #jnt_forgeModule .close {
+.bodywrapper #jnt_forge .close {
   float: right;
   font-size: 20px;
   font-weight: bold;
@@ -310,22 +310,22 @@
   opacity: 0.2;
   filter: alpha(opacity=20);
 }
-.bodywrapper #jnt_forgeModule .close:hover,
-.bodywrapper #jnt_forgeModule .close:focus {
+.bodywrapper #jnt_forge .close:hover,
+.bodywrapper #jnt_forge .close:focus {
   color: #000000;
   text-decoration: none;
   cursor: pointer;
   opacity: 0.4;
   filter: alpha(opacity=40);
 }
-.bodywrapper #jnt_forgeModule button.close {
+.bodywrapper #jnt_forge button.close {
   padding: 0;
   cursor: pointer;
   background: transparent;
   border: 0;
   -webkit-appearance: none;
 }
-.bodywrapper #jnt_forgeModule .btn {
+.bodywrapper #jnt_forge .btn {
   display: inline-block;
   *display: inline;
   /* IE7 inline-block hack */
@@ -365,25 +365,25 @@
   -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
 }
-.bodywrapper #jnt_forgeModule .btn:hover,
-.bodywrapper #jnt_forgeModule .btn:focus,
-.bodywrapper #jnt_forgeModule .btn:active,
-.bodywrapper #jnt_forgeModule .btn.active,
-.bodywrapper #jnt_forgeModule .btn.disabled,
-.bodywrapper #jnt_forgeModule .btn[disabled] {
+.bodywrapper #jnt_forge .btn:hover,
+.bodywrapper #jnt_forge .btn:focus,
+.bodywrapper #jnt_forge .btn:active,
+.bodywrapper #jnt_forge .btn.active,
+.bodywrapper #jnt_forge .btn.disabled,
+.bodywrapper #jnt_forge .btn[disabled] {
   color: #333333;
   background-color: #e6e6e6;
   *background-color: #d9d9d9;
 }
-.bodywrapper #jnt_forgeModule .btn:active,
-.bodywrapper #jnt_forgeModule .btn.active {
+.bodywrapper #jnt_forge .btn:active,
+.bodywrapper #jnt_forge .btn.active {
   background-color: #cccccc \9;
 }
-.bodywrapper #jnt_forgeModule .btn:first-child {
+.bodywrapper #jnt_forge .btn:first-child {
   *margin-left: 0;
 }
-.bodywrapper #jnt_forgeModule .btn:hover,
-.bodywrapper #jnt_forgeModule .btn:focus {
+.bodywrapper #jnt_forge .btn:hover,
+.bodywrapper #jnt_forge .btn:focus {
   color: #333333;
   text-decoration: none;
   background-position: 0 -15px;
@@ -392,21 +392,21 @@
   -o-transition: background-position 0.1s linear;
   transition: background-position 0.1s linear;
 }
-.bodywrapper #jnt_forgeModule .btn:focus {
+.bodywrapper #jnt_forge .btn:focus {
   outline: thin dotted #333;
   outline: 5px auto -webkit-focus-ring-color;
   outline-offset: -2px;
 }
-.bodywrapper #jnt_forgeModule .btn.active,
-.bodywrapper #jnt_forgeModule .btn:active {
+.bodywrapper #jnt_forge .btn.active,
+.bodywrapper #jnt_forge .btn:active {
   background-image: none;
   outline: 0;
   -webkit-box-shadow: inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05);
   -moz-box-shadow: inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05);
   box-shadow: inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05);
 }
-.bodywrapper #jnt_forgeModule .btn.disabled,
-.bodywrapper #jnt_forgeModule .btn[disabled] {
+.bodywrapper #jnt_forge .btn.disabled,
+.bodywrapper #jnt_forge .btn[disabled] {
   cursor: default;
   background-image: none;
   opacity: 0.65;
@@ -415,40 +415,40 @@
   -moz-box-shadow: none;
   box-shadow: none;
 }
-.bodywrapper #jnt_forgeModule .btn-large {
+.bodywrapper #jnt_forge .btn-large {
   padding: 11px 19px;
   font-size: 17.5px;
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
   border-radius: 6px;
 }
-.bodywrapper #jnt_forgeModule .btn-large [class^="icon-"],
-.bodywrapper #jnt_forgeModule .btn-large [class*=" icon-"] {
+.bodywrapper #jnt_forge .btn-large [class^="icon-"],
+.bodywrapper #jnt_forge .btn-large [class*=" icon-"] {
   margin-top: 4px;
 }
-.bodywrapper #jnt_forgeModule .btn-small {
+.bodywrapper #jnt_forge .btn-small {
   padding: 2px 10px;
   font-size: 11.9px;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
 }
-.bodywrapper #jnt_forgeModule .btn-small [class^="icon-"],
-.bodywrapper #jnt_forgeModule .btn-small [class*=" icon-"] {
+.bodywrapper #jnt_forge .btn-small [class^="icon-"],
+.bodywrapper #jnt_forge .btn-small [class*=" icon-"] {
   margin-top: 0;
 }
-.bodywrapper #jnt_forgeModule .btn-mini [class^="icon-"],
-.bodywrapper #jnt_forgeModule .btn-mini [class*=" icon-"] {
+.bodywrapper #jnt_forge .btn-mini [class^="icon-"],
+.bodywrapper #jnt_forge .btn-mini [class*=" icon-"] {
   margin-top: -1px;
 }
-.bodywrapper #jnt_forgeModule .btn-mini {
+.bodywrapper #jnt_forge .btn-mini {
   padding: 0 6px;
   font-size: 10.5px;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
 }
-.bodywrapper #jnt_forgeModule .btn-block {
+.bodywrapper #jnt_forge .btn-block {
   display: block;
   width: 100%;
   padding-left: 0;
@@ -457,23 +457,23 @@
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-.bodywrapper #jnt_forgeModule .btn-block + .btn-block {
+.bodywrapper #jnt_forge .btn-block + .btn-block {
   margin-top: 5px;
 }
-.bodywrapper #jnt_forgeModule input[type="submit"].btn-block,
-.bodywrapper #jnt_forgeModule input[type="reset"].btn-block,
-.bodywrapper #jnt_forgeModule input[type="button"].btn-block {
+.bodywrapper #jnt_forge input[type="submit"].btn-block,
+.bodywrapper #jnt_forge input[type="reset"].btn-block,
+.bodywrapper #jnt_forge input[type="button"].btn-block {
   width: 100%;
 }
-.bodywrapper #jnt_forgeModule .btn-primary.active,
-.bodywrapper #jnt_forgeModule .btn-warning.active,
-.bodywrapper #jnt_forgeModule .btn-danger.active,
-.bodywrapper #jnt_forgeModule .btn-success.active,
-.bodywrapper #jnt_forgeModule .btn-info.active,
-.bodywrapper #jnt_forgeModule .btn-inverse.active {
+.bodywrapper #jnt_forge .btn-primary.active,
+.bodywrapper #jnt_forge .btn-warning.active,
+.bodywrapper #jnt_forge .btn-danger.active,
+.bodywrapper #jnt_forge .btn-success.active,
+.bodywrapper #jnt_forge .btn-info.active,
+.bodywrapper #jnt_forge .btn-inverse.active {
   color: rgba(255, 255, 255, 0.75);
 }
-.bodywrapper #jnt_forgeModule .btn-primary {
+.bodywrapper #jnt_forge .btn-primary {
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
   background-color: #5bb75b;
@@ -491,21 +491,21 @@
 
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
-.bodywrapper #jnt_forgeModule .btn-primary:hover,
-.bodywrapper #jnt_forgeModule .btn-primary:focus,
-.bodywrapper #jnt_forgeModule .btn-primary:active,
-.bodywrapper #jnt_forgeModule .btn-primary.active,
-.bodywrapper #jnt_forgeModule .btn-primary.disabled,
-.bodywrapper #jnt_forgeModule .btn-primary[disabled] {
+.bodywrapper #jnt_forge .btn-primary:hover,
+.bodywrapper #jnt_forge .btn-primary:focus,
+.bodywrapper #jnt_forge .btn-primary:active,
+.bodywrapper #jnt_forge .btn-primary.active,
+.bodywrapper #jnt_forge .btn-primary.disabled,
+.bodywrapper #jnt_forge .btn-primary[disabled] {
   color: #ffffff;
   background-color: #51a351;
   *background-color: #499249;
 }
-.bodywrapper #jnt_forgeModule .btn-primary:active,
-.bodywrapper #jnt_forgeModule .btn-primary.active {
+.bodywrapper #jnt_forge .btn-primary:active,
+.bodywrapper #jnt_forge .btn-primary.active {
   background-color: #408140 \9;
 }
-.bodywrapper #jnt_forgeModule .btn-warning {
+.bodywrapper #jnt_forge .btn-warning {
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
   background-color: #faa732;
@@ -523,21 +523,21 @@
 
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
-.bodywrapper #jnt_forgeModule .btn-warning:hover,
-.bodywrapper #jnt_forgeModule .btn-warning:focus,
-.bodywrapper #jnt_forgeModule .btn-warning:active,
-.bodywrapper #jnt_forgeModule .btn-warning.active,
-.bodywrapper #jnt_forgeModule .btn-warning.disabled,
-.bodywrapper #jnt_forgeModule .btn-warning[disabled] {
+.bodywrapper #jnt_forge .btn-warning:hover,
+.bodywrapper #jnt_forge .btn-warning:focus,
+.bodywrapper #jnt_forge .btn-warning:active,
+.bodywrapper #jnt_forge .btn-warning.active,
+.bodywrapper #jnt_forge .btn-warning.disabled,
+.bodywrapper #jnt_forge .btn-warning[disabled] {
   color: #ffffff;
   background-color: #f89406;
   *background-color: #df8505;
 }
-.bodywrapper #jnt_forgeModule .btn-warning:active,
-.bodywrapper #jnt_forgeModule .btn-warning.active {
+.bodywrapper #jnt_forge .btn-warning:active,
+.bodywrapper #jnt_forge .btn-warning.active {
   background-color: #c67605 \9;
 }
-.bodywrapper #jnt_forgeModule .btn-danger {
+.bodywrapper #jnt_forge .btn-danger {
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
   background-color: #da4f49;
@@ -555,21 +555,21 @@
 
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
-.bodywrapper #jnt_forgeModule .btn-danger:hover,
-.bodywrapper #jnt_forgeModule .btn-danger:focus,
-.bodywrapper #jnt_forgeModule .btn-danger:active,
-.bodywrapper #jnt_forgeModule .btn-danger.active,
-.bodywrapper #jnt_forgeModule .btn-danger.disabled,
-.bodywrapper #jnt_forgeModule .btn-danger[disabled] {
+.bodywrapper #jnt_forge .btn-danger:hover,
+.bodywrapper #jnt_forge .btn-danger:focus,
+.bodywrapper #jnt_forge .btn-danger:active,
+.bodywrapper #jnt_forge .btn-danger.active,
+.bodywrapper #jnt_forge .btn-danger.disabled,
+.bodywrapper #jnt_forge .btn-danger[disabled] {
   color: #ffffff;
   background-color: #bd362f;
   *background-color: #a9302a;
 }
-.bodywrapper #jnt_forgeModule .btn-danger:active,
-.bodywrapper #jnt_forgeModule .btn-danger.active {
+.bodywrapper #jnt_forge .btn-danger:active,
+.bodywrapper #jnt_forge .btn-danger.active {
   background-color: #942a25 \9;
 }
-.bodywrapper #jnt_forgeModule .btn-success {
+.bodywrapper #jnt_forge .btn-success {
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
   background-color: #5bb75b;
@@ -587,21 +587,21 @@
 
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
-.bodywrapper #jnt_forgeModule .btn-success:hover,
-.bodywrapper #jnt_forgeModule .btn-success:focus,
-.bodywrapper #jnt_forgeModule .btn-success:active,
-.bodywrapper #jnt_forgeModule .btn-success.active,
-.bodywrapper #jnt_forgeModule .btn-success.disabled,
-.bodywrapper #jnt_forgeModule .btn-success[disabled] {
+.bodywrapper #jnt_forge .btn-success:hover,
+.bodywrapper #jnt_forge .btn-success:focus,
+.bodywrapper #jnt_forge .btn-success:active,
+.bodywrapper #jnt_forge .btn-success.active,
+.bodywrapper #jnt_forge .btn-success.disabled,
+.bodywrapper #jnt_forge .btn-success[disabled] {
   color: #ffffff;
   background-color: #51a351;
   *background-color: #499249;
 }
-.bodywrapper #jnt_forgeModule .btn-success:active,
-.bodywrapper #jnt_forgeModule .btn-success.active {
+.bodywrapper #jnt_forge .btn-success:active,
+.bodywrapper #jnt_forge .btn-success.active {
   background-color: #408140 \9;
 }
-.bodywrapper #jnt_forgeModule .btn-info {
+.bodywrapper #jnt_forge .btn-info {
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
   background-color: #49afcd;
@@ -619,21 +619,21 @@
 
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
-.bodywrapper #jnt_forgeModule .btn-info:hover,
-.bodywrapper #jnt_forgeModule .btn-info:focus,
-.bodywrapper #jnt_forgeModule .btn-info:active,
-.bodywrapper #jnt_forgeModule .btn-info.active,
-.bodywrapper #jnt_forgeModule .btn-info.disabled,
-.bodywrapper #jnt_forgeModule .btn-info[disabled] {
+.bodywrapper #jnt_forge .btn-info:hover,
+.bodywrapper #jnt_forge .btn-info:focus,
+.bodywrapper #jnt_forge .btn-info:active,
+.bodywrapper #jnt_forge .btn-info.active,
+.bodywrapper #jnt_forge .btn-info.disabled,
+.bodywrapper #jnt_forge .btn-info[disabled] {
   color: #ffffff;
   background-color: #2f96b4;
   *background-color: #2a85a0;
 }
-.bodywrapper #jnt_forgeModule .btn-info:active,
-.bodywrapper #jnt_forgeModule .btn-info.active {
+.bodywrapper #jnt_forge .btn-info:active,
+.bodywrapper #jnt_forge .btn-info.active {
   background-color: #24748c \9;
 }
-.bodywrapper #jnt_forgeModule .btn-inverse {
+.bodywrapper #jnt_forge .btn-inverse {
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
   background-color: #363636;
@@ -651,55 +651,55 @@
 
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
-.bodywrapper #jnt_forgeModule .btn-inverse:hover,
-.bodywrapper #jnt_forgeModule .btn-inverse:focus,
-.bodywrapper #jnt_forgeModule .btn-inverse:active,
-.bodywrapper #jnt_forgeModule .btn-inverse.active,
-.bodywrapper #jnt_forgeModule .btn-inverse.disabled,
-.bodywrapper #jnt_forgeModule .btn-inverse[disabled] {
+.bodywrapper #jnt_forge .btn-inverse:hover,
+.bodywrapper #jnt_forge .btn-inverse:focus,
+.bodywrapper #jnt_forge .btn-inverse:active,
+.bodywrapper #jnt_forge .btn-inverse.active,
+.bodywrapper #jnt_forge .btn-inverse.disabled,
+.bodywrapper #jnt_forge .btn-inverse[disabled] {
   color: #ffffff;
   background-color: #222222;
   *background-color: #151515;
 }
-.bodywrapper #jnt_forgeModule .btn-inverse:active,
-.bodywrapper #jnt_forgeModule .btn-inverse.active {
+.bodywrapper #jnt_forge .btn-inverse:active,
+.bodywrapper #jnt_forge .btn-inverse.active {
   background-color: #080808 \9;
 }
-.bodywrapper #jnt_forgeModule button.btn,
-.bodywrapper #jnt_forgeModule input[type="submit"].btn {
+.bodywrapper #jnt_forge button.btn,
+.bodywrapper #jnt_forge input[type="submit"].btn {
   *padding-top: 3px;
   *padding-bottom: 3px;
 }
-.bodywrapper #jnt_forgeModule button.btn::-moz-focus-inner,
-.bodywrapper #jnt_forgeModule input[type="submit"].btn::-moz-focus-inner {
+.bodywrapper #jnt_forge button.btn::-moz-focus-inner,
+.bodywrapper #jnt_forge input[type="submit"].btn::-moz-focus-inner {
   padding: 0;
   border: 0;
 }
-.bodywrapper #jnt_forgeModule button.btn.btn-large,
-.bodywrapper #jnt_forgeModule input[type="submit"].btn.btn-large {
+.bodywrapper #jnt_forge button.btn.btn-large,
+.bodywrapper #jnt_forge input[type="submit"].btn.btn-large {
   *padding-top: 7px;
   *padding-bottom: 7px;
 }
-.bodywrapper #jnt_forgeModule button.btn.btn-small,
-.bodywrapper #jnt_forgeModule input[type="submit"].btn.btn-small {
+.bodywrapper #jnt_forge button.btn.btn-small,
+.bodywrapper #jnt_forge input[type="submit"].btn.btn-small {
   *padding-top: 3px;
   *padding-bottom: 3px;
 }
-.bodywrapper #jnt_forgeModule button.btn.btn-mini,
-.bodywrapper #jnt_forgeModule input[type="submit"].btn.btn-mini {
+.bodywrapper #jnt_forge button.btn.btn-mini,
+.bodywrapper #jnt_forge input[type="submit"].btn.btn-mini {
   *padding-top: 1px;
   *padding-bottom: 1px;
 }
-.bodywrapper #jnt_forgeModule .btn-link,
-.bodywrapper #jnt_forgeModule .btn-link:active,
-.bodywrapper #jnt_forgeModule .btn-link[disabled] {
+.bodywrapper #jnt_forge .btn-link,
+.bodywrapper #jnt_forge .btn-link:active,
+.bodywrapper #jnt_forge .btn-link[disabled] {
   background-color: transparent;
   background-image: none;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
 }
-.bodywrapper #jnt_forgeModule .btn-link {
+.bodywrapper #jnt_forge .btn-link {
   border-color: transparent;
   cursor: pointer;
   color: #0088cc;
@@ -707,18 +707,18 @@
   -moz-border-radius: 0;
   border-radius: 0;
 }
-.bodywrapper #jnt_forgeModule .btn-link:hover,
-.bodywrapper #jnt_forgeModule .btn-link:focus {
+.bodywrapper #jnt_forge .btn-link:hover,
+.bodywrapper #jnt_forge .btn-link:focus {
   color: #005580;
   text-decoration: underline;
   background-color: transparent;
 }
-.bodywrapper #jnt_forgeModule .btn-link[disabled]:hover,
-.bodywrapper #jnt_forgeModule .btn-link[disabled]:focus {
+.bodywrapper #jnt_forge .btn-link[disabled]:hover,
+.bodywrapper #jnt_forge .btn-link[disabled]:focus {
   color: #333333;
   text-decoration: none;
 }
-.bodywrapper #jnt_forgeModule .alert {
+.bodywrapper #jnt_forge .alert {
   padding: 8px 35px 8px 14px;
   margin-bottom: 20px;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
@@ -728,76 +728,76 @@
   -moz-border-radius: 4px;
   border-radius: 4px;
 }
-.bodywrapper #jnt_forgeModule .alert,
-.bodywrapper #jnt_forgeModule .alert h4 {
+.bodywrapper #jnt_forge .alert,
+.bodywrapper #jnt_forge .alert h4 {
   color: #c09853;
 }
-.bodywrapper #jnt_forgeModule .alert h4 {
+.bodywrapper #jnt_forge .alert h4 {
   margin: 0;
 }
-.bodywrapper #jnt_forgeModule .alert .close {
+.bodywrapper #jnt_forge .alert .close {
   position: relative;
   top: -2px;
   right: -21px;
   line-height: 20px;
 }
-.bodywrapper #jnt_forgeModule .alert-success {
+.bodywrapper #jnt_forge .alert-success {
   background-color: #dff0d8;
   border-color: #d6e9c6;
   color: #468847;
 }
-.bodywrapper #jnt_forgeModule .alert-success h4 {
+.bodywrapper #jnt_forge .alert-success h4 {
   color: #468847;
 }
-.bodywrapper #jnt_forgeModule .alert-danger,
-.bodywrapper #jnt_forgeModule .alert-error {
+.bodywrapper #jnt_forge .alert-danger,
+.bodywrapper #jnt_forge .alert-error {
   background-color: #f2dede;
   border-color: #eed3d7;
   color: #b94a48;
 }
-.bodywrapper #jnt_forgeModule .alert-danger h4,
-.bodywrapper #jnt_forgeModule .alert-error h4 {
+.bodywrapper #jnt_forge .alert-danger h4,
+.bodywrapper #jnt_forge .alert-error h4 {
   color: #b94a48;
 }
-.bodywrapper #jnt_forgeModule .alert-info {
+.bodywrapper #jnt_forge .alert-info {
   background-color: #d9edf7;
   border-color: #bce8f1;
   color: #3a87ad;
 }
-.bodywrapper #jnt_forgeModule .alert-info h4 {
+.bodywrapper #jnt_forge .alert-info h4 {
   color: #3a87ad;
 }
-.bodywrapper #jnt_forgeModule .alert-block {
+.bodywrapper #jnt_forge .alert-block {
   padding-top: 14px;
   padding-bottom: 14px;
 }
-.bodywrapper #jnt_forgeModule .alert-block > p,
-.bodywrapper #jnt_forgeModule .alert-block > ul {
+.bodywrapper #jnt_forge .alert-block > p,
+.bodywrapper #jnt_forge .alert-block > ul {
   margin-bottom: 0;
 }
-.bodywrapper #jnt_forgeModule .alert-block p + p {
+.bodywrapper #jnt_forge .alert-block p + p {
   margin-top: 5px;
 }
-.bodywrapper #jnt_forgeModule .nav {
+.bodywrapper #jnt_forge .nav {
   margin-left: 0;
   margin-bottom: 20px;
   list-style: none;
 }
-.bodywrapper #jnt_forgeModule .nav > li > a {
+.bodywrapper #jnt_forge .nav > li > a {
   display: block;
 }
-.bodywrapper #jnt_forgeModule .nav > li > a:hover,
-.bodywrapper #jnt_forgeModule .nav > li > a:focus {
+.bodywrapper #jnt_forge .nav > li > a:hover,
+.bodywrapper #jnt_forge .nav > li > a:focus {
   text-decoration: none;
   background-color: #eeeeee;
 }
-.bodywrapper #jnt_forgeModule .nav > li > a > img {
+.bodywrapper #jnt_forge .nav > li > a > img {
   max-width: none;
 }
-.bodywrapper #jnt_forgeModule .nav > .pull-right {
+.bodywrapper #jnt_forge .nav > .pull-right {
   float: right;
 }
-.bodywrapper #jnt_forgeModule .nav-header {
+.bodywrapper #jnt_forge .nav-header {
   display: block;
   padding: 3px 15px;
   font-size: 11px;
@@ -807,35 +807,35 @@
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
   text-transform: uppercase;
 }
-.bodywrapper #jnt_forgeModule .nav li + .nav-header {
+.bodywrapper #jnt_forge .nav li + .nav-header {
   margin-top: 9px;
 }
-.bodywrapper #jnt_forgeModule .nav-list {
+.bodywrapper #jnt_forge .nav-list {
   padding-left: 15px;
   padding-right: 15px;
   margin-bottom: 0;
 }
-.bodywrapper #jnt_forgeModule .nav-list > li > a,
-.bodywrapper #jnt_forgeModule .nav-list .nav-header {
+.bodywrapper #jnt_forge .nav-list > li > a,
+.bodywrapper #jnt_forge .nav-list .nav-header {
   margin-left: -15px;
   margin-right: -15px;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
-.bodywrapper #jnt_forgeModule .nav-list > li > a {
+.bodywrapper #jnt_forge .nav-list > li > a {
   padding: 3px 15px;
 }
-.bodywrapper #jnt_forgeModule .nav-list > .active > a,
-.bodywrapper #jnt_forgeModule .nav-list > .active > a:hover,
-.bodywrapper #jnt_forgeModule .nav-list > .active > a:focus {
+.bodywrapper #jnt_forge .nav-list > .active > a,
+.bodywrapper #jnt_forge .nav-list > .active > a:hover,
+.bodywrapper #jnt_forge .nav-list > .active > a:focus {
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
   background-color: #0088cc;
 }
-.bodywrapper #jnt_forgeModule .nav-list [class^="icon-"],
-.bodywrapper #jnt_forgeModule .nav-list [class*=" icon-"] {
+.bodywrapper #jnt_forge .nav-list [class^="icon-"],
+.bodywrapper #jnt_forge .nav-list [class*=" icon-"] {
   margin-right: 2px;
 }
-.bodywrapper #jnt_forgeModule .nav-list .divider {
+.bodywrapper #jnt_forge .nav-list .divider {
   *width: 100%;
   height: 1px;
   margin: 9px 1px;
@@ -844,40 +844,40 @@
   background-color: #e5e5e5;
   border-bottom: 1px solid #ffffff;
 }
-.bodywrapper #jnt_forgeModule .nav-tabs,
-.bodywrapper #jnt_forgeModule .nav-pills {
+.bodywrapper #jnt_forge .nav-tabs,
+.bodywrapper #jnt_forge .nav-pills {
   *zoom: 1;
 }
-.bodywrapper #jnt_forgeModule .nav-tabs:before,
-.bodywrapper #jnt_forgeModule .nav-pills:before,
-.bodywrapper #jnt_forgeModule .nav-tabs:after,
-.bodywrapper #jnt_forgeModule .nav-pills:after {
+.bodywrapper #jnt_forge .nav-tabs:before,
+.bodywrapper #jnt_forge .nav-pills:before,
+.bodywrapper #jnt_forge .nav-tabs:after,
+.bodywrapper #jnt_forge .nav-pills:after {
   display: table;
   content: "";
   line-height: 0;
 }
-.bodywrapper #jnt_forgeModule .nav-tabs:after,
-.bodywrapper #jnt_forgeModule .nav-pills:after {
+.bodywrapper #jnt_forge .nav-tabs:after,
+.bodywrapper #jnt_forge .nav-pills:after {
   clear: both;
 }
-.bodywrapper #jnt_forgeModule .nav-tabs > li,
-.bodywrapper #jnt_forgeModule .nav-pills > li {
+.bodywrapper #jnt_forge .nav-tabs > li,
+.bodywrapper #jnt_forge .nav-pills > li {
   float: left;
 }
-.bodywrapper #jnt_forgeModule .nav-tabs > li > a,
-.bodywrapper #jnt_forgeModule .nav-pills > li > a {
+.bodywrapper #jnt_forge .nav-tabs > li > a,
+.bodywrapper #jnt_forge .nav-pills > li > a {
   padding-right: 12px;
   padding-left: 12px;
   margin-right: 2px;
   line-height: 14px;
 }
-.bodywrapper #jnt_forgeModule .nav-tabs {
+.bodywrapper #jnt_forge .nav-tabs {
   border-bottom: 1px solid #ddd;
 }
-.bodywrapper #jnt_forgeModule .nav-tabs > li {
+.bodywrapper #jnt_forge .nav-tabs > li {
   margin-bottom: -1px;
 }
-.bodywrapper #jnt_forgeModule .nav-tabs > li > a {
+.bodywrapper #jnt_forge .nav-tabs > li > a {
   padding-top: 8px;
   padding-bottom: 8px;
   line-height: 20px;
@@ -886,20 +886,20 @@
   -moz-border-radius: 4px 4px 0 0;
   border-radius: 4px 4px 0 0;
 }
-.bodywrapper #jnt_forgeModule .nav-tabs > li > a:hover,
-.bodywrapper #jnt_forgeModule .nav-tabs > li > a:focus {
+.bodywrapper #jnt_forge .nav-tabs > li > a:hover,
+.bodywrapper #jnt_forge .nav-tabs > li > a:focus {
   border-color: #eeeeee #eeeeee #dddddd;
 }
-.bodywrapper #jnt_forgeModule .nav-tabs > .active > a,
-.bodywrapper #jnt_forgeModule .nav-tabs > .active > a:hover,
-.bodywrapper #jnt_forgeModule .nav-tabs > .active > a:focus {
+.bodywrapper #jnt_forge .nav-tabs > .active > a,
+.bodywrapper #jnt_forge .nav-tabs > .active > a:hover,
+.bodywrapper #jnt_forge .nav-tabs > .active > a:focus {
   color: #555555;
   background-color: #ffffff;
   border: 1px solid #ddd;
   border-bottom-color: transparent;
   cursor: default;
 }
-.bodywrapper #jnt_forgeModule .nav-pills > li > a {
+.bodywrapper #jnt_forge .nav-pills > li > a {
   padding-top: 8px;
   padding-bottom: 8px;
   margin-top: 2px;
@@ -908,28 +908,28 @@
   -moz-border-radius: 5px;
   border-radius: 5px;
 }
-.bodywrapper #jnt_forgeModule .nav-pills > .active > a,
-.bodywrapper #jnt_forgeModule .nav-pills > .active > a:hover,
-.bodywrapper #jnt_forgeModule .nav-pills > .active > a:focus {
+.bodywrapper #jnt_forge .nav-pills > .active > a,
+.bodywrapper #jnt_forge .nav-pills > .active > a:hover,
+.bodywrapper #jnt_forge .nav-pills > .active > a:focus {
   color: #ffffff;
   background-color: #0088cc;
 }
-.bodywrapper #jnt_forgeModule .nav-stacked > li {
+.bodywrapper #jnt_forge .nav-stacked > li {
   float: none;
 }
-.bodywrapper #jnt_forgeModule .nav-stacked > li > a {
+.bodywrapper #jnt_forge .nav-stacked > li > a {
   margin-right: 0;
 }
-.bodywrapper #jnt_forgeModule .nav-tabs.nav-stacked {
+.bodywrapper #jnt_forge .nav-tabs.nav-stacked {
   border-bottom: 0;
 }
-.bodywrapper #jnt_forgeModule .nav-tabs.nav-stacked > li > a {
+.bodywrapper #jnt_forge .nav-tabs.nav-stacked > li > a {
   border: 1px solid #ddd;
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
   border-radius: 0;
 }
-.bodywrapper #jnt_forgeModule .nav-tabs.nav-stacked > li:first-child > a {
+.bodywrapper #jnt_forge .nav-tabs.nav-stacked > li:first-child > a {
   -webkit-border-top-right-radius: 4px;
   -moz-border-radius-topright: 4px;
   border-top-right-radius: 4px;
@@ -937,7 +937,7 @@
   -moz-border-radius-topleft: 4px;
   border-top-left-radius: 4px;
 }
-.bodywrapper #jnt_forgeModule .nav-tabs.nav-stacked > li:last-child > a {
+.bodywrapper #jnt_forge .nav-tabs.nav-stacked > li:last-child > a {
   -webkit-border-bottom-right-radius: 4px;
   -moz-border-radius-bottomright: 4px;
   border-bottom-right-radius: 4px;
@@ -945,210 +945,210 @@
   -moz-border-radius-bottomleft: 4px;
   border-bottom-left-radius: 4px;
 }
-.bodywrapper #jnt_forgeModule .nav-tabs.nav-stacked > li > a:hover,
-.bodywrapper #jnt_forgeModule .nav-tabs.nav-stacked > li > a:focus {
+.bodywrapper #jnt_forge .nav-tabs.nav-stacked > li > a:hover,
+.bodywrapper #jnt_forge .nav-tabs.nav-stacked > li > a:focus {
   border-color: #ddd;
   z-index: 2;
 }
-.bodywrapper #jnt_forgeModule .nav-pills.nav-stacked > li > a {
+.bodywrapper #jnt_forge .nav-pills.nav-stacked > li > a {
   margin-bottom: 3px;
 }
-.bodywrapper #jnt_forgeModule .nav-pills.nav-stacked > li:last-child > a {
+.bodywrapper #jnt_forge .nav-pills.nav-stacked > li:last-child > a {
   margin-bottom: 1px;
 }
-.bodywrapper #jnt_forgeModule .nav-tabs .dropdown-menu {
+.bodywrapper #jnt_forge .nav-tabs .dropdown-menu {
   -webkit-border-radius: 0 0 6px 6px;
   -moz-border-radius: 0 0 6px 6px;
   border-radius: 0 0 6px 6px;
 }
-.bodywrapper #jnt_forgeModule .nav-pills .dropdown-menu {
+.bodywrapper #jnt_forge .nav-pills .dropdown-menu {
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
   border-radius: 6px;
 }
-.bodywrapper #jnt_forgeModule .nav .dropdown-toggle .caret {
+.bodywrapper #jnt_forge .nav .dropdown-toggle .caret {
   border-top-color: #0088cc;
   border-bottom-color: #0088cc;
   margin-top: 6px;
 }
-.bodywrapper #jnt_forgeModule .nav .dropdown-toggle:hover .caret,
-.bodywrapper #jnt_forgeModule .nav .dropdown-toggle:focus .caret {
+.bodywrapper #jnt_forge .nav .dropdown-toggle:hover .caret,
+.bodywrapper #jnt_forge .nav .dropdown-toggle:focus .caret {
   border-top-color: #005580;
   border-bottom-color: #005580;
 }
-.bodywrapper #jnt_forgeModule .nav-tabs .dropdown-toggle .caret {
+.bodywrapper #jnt_forge .nav-tabs .dropdown-toggle .caret {
   margin-top: 8px;
 }
-.bodywrapper #jnt_forgeModule .nav .active .dropdown-toggle .caret {
+.bodywrapper #jnt_forge .nav .active .dropdown-toggle .caret {
   border-top-color: #fff;
   border-bottom-color: #fff;
 }
-.bodywrapper #jnt_forgeModule .nav-tabs .active .dropdown-toggle .caret {
+.bodywrapper #jnt_forge .nav-tabs .active .dropdown-toggle .caret {
   border-top-color: #555555;
   border-bottom-color: #555555;
 }
-.bodywrapper #jnt_forgeModule .nav > .dropdown.active > a:hover,
-.bodywrapper #jnt_forgeModule .nav > .dropdown.active > a:focus {
+.bodywrapper #jnt_forge .nav > .dropdown.active > a:hover,
+.bodywrapper #jnt_forge .nav > .dropdown.active > a:focus {
   cursor: pointer;
 }
-.bodywrapper #jnt_forgeModule .nav-tabs .open .dropdown-toggle,
-.bodywrapper #jnt_forgeModule .nav-pills .open .dropdown-toggle,
-.bodywrapper #jnt_forgeModule .nav > li.dropdown.open.active > a:hover,
-.bodywrapper #jnt_forgeModule .nav > li.dropdown.open.active > a:focus {
+.bodywrapper #jnt_forge .nav-tabs .open .dropdown-toggle,
+.bodywrapper #jnt_forge .nav-pills .open .dropdown-toggle,
+.bodywrapper #jnt_forge .nav > li.dropdown.open.active > a:hover,
+.bodywrapper #jnt_forge .nav > li.dropdown.open.active > a:focus {
   color: #ffffff;
   background-color: #999999;
   border-color: #999999;
 }
-.bodywrapper #jnt_forgeModule .nav li.dropdown.open .caret,
-.bodywrapper #jnt_forgeModule .nav li.dropdown.open.active .caret,
-.bodywrapper #jnt_forgeModule .nav li.dropdown.open a:hover .caret,
-.bodywrapper #jnt_forgeModule .nav li.dropdown.open a:focus .caret {
+.bodywrapper #jnt_forge .nav li.dropdown.open .caret,
+.bodywrapper #jnt_forge .nav li.dropdown.open.active .caret,
+.bodywrapper #jnt_forge .nav li.dropdown.open a:hover .caret,
+.bodywrapper #jnt_forge .nav li.dropdown.open a:focus .caret {
   border-top-color: #ffffff;
   border-bottom-color: #ffffff;
   opacity: 1;
   filter: alpha(opacity=100);
 }
-.bodywrapper #jnt_forgeModule .tabs-stacked .open > a:hover,
-.bodywrapper #jnt_forgeModule .tabs-stacked .open > a:focus {
+.bodywrapper #jnt_forge .tabs-stacked .open > a:hover,
+.bodywrapper #jnt_forge .tabs-stacked .open > a:focus {
   border-color: #999999;
 }
-.bodywrapper #jnt_forgeModule .tabbable {
+.bodywrapper #jnt_forge .tabbable {
   *zoom: 1;
 }
-.bodywrapper #jnt_forgeModule .tabbable:before,
-.bodywrapper #jnt_forgeModule .tabbable:after {
+.bodywrapper #jnt_forge .tabbable:before,
+.bodywrapper #jnt_forge .tabbable:after {
   display: table;
   content: "";
   line-height: 0;
 }
-.bodywrapper #jnt_forgeModule .tabbable:after {
+.bodywrapper #jnt_forge .tabbable:after {
   clear: both;
 }
-.bodywrapper #jnt_forgeModule .tab-content {
+.bodywrapper #jnt_forge .tab-content {
   overflow: auto;
 }
-.bodywrapper #jnt_forgeModule .tabs-below > .nav-tabs,
-.bodywrapper #jnt_forgeModule .tabs-right > .nav-tabs,
-.bodywrapper #jnt_forgeModule .tabs-left > .nav-tabs {
+.bodywrapper #jnt_forge .tabs-below > .nav-tabs,
+.bodywrapper #jnt_forge .tabs-right > .nav-tabs,
+.bodywrapper #jnt_forge .tabs-left > .nav-tabs {
   border-bottom: 0;
 }
-.bodywrapper #jnt_forgeModule .tab-content > .tab-pane,
-.bodywrapper #jnt_forgeModule .pill-content > .pill-pane {
+.bodywrapper #jnt_forge .tab-content > .tab-pane,
+.bodywrapper #jnt_forge .pill-content > .pill-pane {
   display: none;
 }
-.bodywrapper #jnt_forgeModule .tab-content > .active,
-.bodywrapper #jnt_forgeModule .pill-content > .active {
+.bodywrapper #jnt_forge .tab-content > .active,
+.bodywrapper #jnt_forge .pill-content > .active {
   display: block;
 }
-.bodywrapper #jnt_forgeModule .tabs-below > .nav-tabs {
+.bodywrapper #jnt_forge .tabs-below > .nav-tabs {
   border-top: 1px solid #ddd;
 }
-.bodywrapper #jnt_forgeModule .tabs-below > .nav-tabs > li {
+.bodywrapper #jnt_forge .tabs-below > .nav-tabs > li {
   margin-top: -1px;
   margin-bottom: 0;
 }
-.bodywrapper #jnt_forgeModule .tabs-below > .nav-tabs > li > a {
+.bodywrapper #jnt_forge .tabs-below > .nav-tabs > li > a {
   -webkit-border-radius: 0 0 4px 4px;
   -moz-border-radius: 0 0 4px 4px;
   border-radius: 0 0 4px 4px;
 }
-.bodywrapper #jnt_forgeModule .tabs-below > .nav-tabs > li > a:hover,
-.bodywrapper #jnt_forgeModule .tabs-below > .nav-tabs > li > a:focus {
+.bodywrapper #jnt_forge .tabs-below > .nav-tabs > li > a:hover,
+.bodywrapper #jnt_forge .tabs-below > .nav-tabs > li > a:focus {
   border-bottom-color: transparent;
   border-top-color: #ddd;
 }
-.bodywrapper #jnt_forgeModule .tabs-below > .nav-tabs > .active > a,
-.bodywrapper #jnt_forgeModule .tabs-below > .nav-tabs > .active > a:hover,
-.bodywrapper #jnt_forgeModule .tabs-below > .nav-tabs > .active > a:focus {
+.bodywrapper #jnt_forge .tabs-below > .nav-tabs > .active > a,
+.bodywrapper #jnt_forge .tabs-below > .nav-tabs > .active > a:hover,
+.bodywrapper #jnt_forge .tabs-below > .nav-tabs > .active > a:focus {
   border-color: transparent #ddd #ddd #ddd;
 }
-.bodywrapper #jnt_forgeModule .tabs-left > .nav-tabs > li,
-.bodywrapper #jnt_forgeModule .tabs-right > .nav-tabs > li {
+.bodywrapper #jnt_forge .tabs-left > .nav-tabs > li,
+.bodywrapper #jnt_forge .tabs-right > .nav-tabs > li {
   float: none;
 }
-.bodywrapper #jnt_forgeModule .tabs-left > .nav-tabs > li > a,
-.bodywrapper #jnt_forgeModule .tabs-right > .nav-tabs > li > a {
+.bodywrapper #jnt_forge .tabs-left > .nav-tabs > li > a,
+.bodywrapper #jnt_forge .tabs-right > .nav-tabs > li > a {
   min-width: 74px;
   margin-right: 0;
   margin-bottom: 3px;
 }
-.bodywrapper #jnt_forgeModule .tabs-left > .nav-tabs {
+.bodywrapper #jnt_forge .tabs-left > .nav-tabs {
   float: left;
   margin-right: 19px;
   border-right: 1px solid #ddd;
 }
-.bodywrapper #jnt_forgeModule .tabs-left > .nav-tabs > li > a {
+.bodywrapper #jnt_forge .tabs-left > .nav-tabs > li > a {
   margin-right: -1px;
   -webkit-border-radius: 4px 0 0 4px;
   -moz-border-radius: 4px 0 0 4px;
   border-radius: 4px 0 0 4px;
 }
-.bodywrapper #jnt_forgeModule .tabs-left > .nav-tabs > li > a:hover,
-.bodywrapper #jnt_forgeModule .tabs-left > .nav-tabs > li > a:focus {
+.bodywrapper #jnt_forge .tabs-left > .nav-tabs > li > a:hover,
+.bodywrapper #jnt_forge .tabs-left > .nav-tabs > li > a:focus {
   border-color: #eeeeee #dddddd #eeeeee #eeeeee;
 }
-.bodywrapper #jnt_forgeModule .tabs-left > .nav-tabs .active > a,
-.bodywrapper #jnt_forgeModule .tabs-left > .nav-tabs .active > a:hover,
-.bodywrapper #jnt_forgeModule .tabs-left > .nav-tabs .active > a:focus {
+.bodywrapper #jnt_forge .tabs-left > .nav-tabs .active > a,
+.bodywrapper #jnt_forge .tabs-left > .nav-tabs .active > a:hover,
+.bodywrapper #jnt_forge .tabs-left > .nav-tabs .active > a:focus {
   border-color: #ddd transparent #ddd #ddd;
   *border-right-color: #ffffff;
 }
-.bodywrapper #jnt_forgeModule .tabs-right > .nav-tabs {
+.bodywrapper #jnt_forge .tabs-right > .nav-tabs {
   float: right;
   margin-left: 19px;
   border-left: 1px solid #ddd;
 }
-.bodywrapper #jnt_forgeModule .tabs-right > .nav-tabs > li > a {
+.bodywrapper #jnt_forge .tabs-right > .nav-tabs > li > a {
   margin-left: -1px;
   -webkit-border-radius: 0 4px 4px 0;
   -moz-border-radius: 0 4px 4px 0;
   border-radius: 0 4px 4px 0;
 }
-.bodywrapper #jnt_forgeModule .tabs-right > .nav-tabs > li > a:hover,
-.bodywrapper #jnt_forgeModule .tabs-right > .nav-tabs > li > a:focus {
+.bodywrapper #jnt_forge .tabs-right > .nav-tabs > li > a:hover,
+.bodywrapper #jnt_forge .tabs-right > .nav-tabs > li > a:focus {
   border-color: #eeeeee #eeeeee #eeeeee #dddddd;
 }
-.bodywrapper #jnt_forgeModule .tabs-right > .nav-tabs .active > a,
-.bodywrapper #jnt_forgeModule .tabs-right > .nav-tabs .active > a:hover,
-.bodywrapper #jnt_forgeModule .tabs-right > .nav-tabs .active > a:focus {
+.bodywrapper #jnt_forge .tabs-right > .nav-tabs .active > a,
+.bodywrapper #jnt_forge .tabs-right > .nav-tabs .active > a:hover,
+.bodywrapper #jnt_forge .tabs-right > .nav-tabs .active > a:focus {
   border-color: #ddd #ddd #ddd transparent;
   *border-left-color: #ffffff;
 }
-.bodywrapper #jnt_forgeModule .nav > .disabled > a {
+.bodywrapper #jnt_forge .nav > .disabled > a {
   color: #999999;
 }
-.bodywrapper #jnt_forgeModule .nav > .disabled > a:hover,
-.bodywrapper #jnt_forgeModule .nav > .disabled > a:focus {
+.bodywrapper #jnt_forge .nav > .disabled > a:hover,
+.bodywrapper #jnt_forge .nav > .disabled > a:focus {
   text-decoration: none;
   background-color: transparent;
   cursor: default;
 }
-.bodywrapper #jnt_forgeModule .media,
-.bodywrapper #jnt_forgeModule .media-body {
+.bodywrapper #jnt_forge .media,
+.bodywrapper #jnt_forge .media-body {
   overflow: hidden;
   *overflow: visible;
   zoom: 1;
 }
-.bodywrapper #jnt_forgeModule .media,
-.bodywrapper #jnt_forgeModule .media .media {
+.bodywrapper #jnt_forge .media,
+.bodywrapper #jnt_forge .media .media {
   margin-top: 15px;
 }
-.bodywrapper #jnt_forgeModule .media:first-child {
+.bodywrapper #jnt_forge .media:first-child {
   margin-top: 0;
 }
-.bodywrapper #jnt_forgeModule .media-object {
+.bodywrapper #jnt_forge .media-object {
   display: block;
 }
-.bodywrapper #jnt_forgeModule .media-heading {
+.bodywrapper #jnt_forge .media-heading {
   margin: 0 0 5px;
 }
-.bodywrapper #jnt_forgeModule .media > .pull-left {
+.bodywrapper #jnt_forge .media > .pull-left {
   margin-right: 10px;
 }
-.bodywrapper #jnt_forgeModule .media > .pull-right {
+.bodywrapper #jnt_forge .media > .pull-right {
   margin-left: 10px;
 }
-.bodywrapper #jnt_forgeModule .media-list {
+.bodywrapper #jnt_forge .media-list {
   margin-left: 0;
   list-style: none;
 }
@@ -1192,7 +1192,7 @@
     background-position: 0 0;
   }
 }
-.bodywrapper #jnt_forgeModule .progress {
+.bodywrapper #jnt_forge .progress {
   overflow: hidden;
   height: 20px;
   margin-bottom: 20px;
@@ -1211,7 +1211,7 @@
   -moz-border-radius: 4px;
   border-radius: 4px;
 }
-.bodywrapper #jnt_forgeModule .progress .bar {
+.bodywrapper #jnt_forge .progress .bar {
   width: 0%;
   height: 100%;
   color: #ffffff;
@@ -1238,12 +1238,12 @@
   -o-transition: width 0.6s ease;
   transition: width 0.6s ease;
 }
-.bodywrapper #jnt_forgeModule .progress .bar + .bar {
+.bodywrapper #jnt_forge .progress .bar + .bar {
   -webkit-box-shadow: inset 1px 0 0 rgba(0,0,0,.15), inset 0 -1px 0 rgba(0,0,0,.15);
   -moz-box-shadow: inset 1px 0 0 rgba(0,0,0,.15), inset 0 -1px 0 rgba(0,0,0,.15);
   box-shadow: inset 1px 0 0 rgba(0,0,0,.15), inset 0 -1px 0 rgba(0,0,0,.15);
 }
-.bodywrapper #jnt_forgeModule .progress-striped .bar {
+.bodywrapper #jnt_forge .progress-striped .bar {
   background-color: #149bdf;
   background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.25, rgba(255, 255, 255, 0.15)), color-stop(0.25, transparent), color-stop(0.5, transparent), color-stop(0.5, rgba(255, 255, 255, 0.15)), color-stop(0.75, rgba(255, 255, 255, 0.15)), color-stop(0.75, transparent), to(transparent));
   background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
@@ -1255,15 +1255,15 @@
   -o-background-size: 40px 40px;
   background-size: 40px 40px;
 }
-.bodywrapper #jnt_forgeModule .progress.active .bar {
+.bodywrapper #jnt_forge .progress.active .bar {
   -webkit-animation: progress-bar-stripes 2s linear infinite;
   -moz-animation: progress-bar-stripes 2s linear infinite;
   -ms-animation: progress-bar-stripes 2s linear infinite;
   -o-animation: progress-bar-stripes 2s linear infinite;
   animation: progress-bar-stripes 2s linear infinite;
 }
-.bodywrapper #jnt_forgeModule .progress-danger .bar,
-.bodywrapper #jnt_forgeModule .progress .bar-danger {
+.bodywrapper #jnt_forge .progress-danger .bar,
+.bodywrapper #jnt_forge .progress .bar-danger {
   background-color: #dd514c;
   background-image: -moz-linear-gradient(top, #ee5f5b, #c43c35);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ee5f5b), to(#c43c35));
@@ -1273,8 +1273,8 @@
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffee5f5b', endColorstr='#ffc43c35', GradientType=0);
 }
-.bodywrapper #jnt_forgeModule .progress-danger.progress-striped .bar,
-.bodywrapper #jnt_forgeModule .progress-striped .bar-danger {
+.bodywrapper #jnt_forge .progress-danger.progress-striped .bar,
+.bodywrapper #jnt_forge .progress-striped .bar-danger {
   background-color: #ee5f5b;
   background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.25, rgba(255, 255, 255, 0.15)), color-stop(0.25, transparent), color-stop(0.5, transparent), color-stop(0.5, rgba(255, 255, 255, 0.15)), color-stop(0.75, rgba(255, 255, 255, 0.15)), color-stop(0.75, transparent), to(transparent));
   background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
@@ -1282,8 +1282,8 @@
   background-image: -o-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
   background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
 }
-.bodywrapper #jnt_forgeModule .progress-success .bar,
-.bodywrapper #jnt_forgeModule .progress .bar-success {
+.bodywrapper #jnt_forge .progress-success .bar,
+.bodywrapper #jnt_forge .progress .bar-success {
   background-color: #5eb95e;
   background-image: -moz-linear-gradient(top, #62c462, #57a957);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#62c462), to(#57a957));
@@ -1293,8 +1293,8 @@
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff62c462', endColorstr='#ff57a957', GradientType=0);
 }
-.bodywrapper #jnt_forgeModule .progress-success.progress-striped .bar,
-.bodywrapper #jnt_forgeModule .progress-striped .bar-success {
+.bodywrapper #jnt_forge .progress-success.progress-striped .bar,
+.bodywrapper #jnt_forge .progress-striped .bar-success {
   background-color: #62c462;
   background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.25, rgba(255, 255, 255, 0.15)), color-stop(0.25, transparent), color-stop(0.5, transparent), color-stop(0.5, rgba(255, 255, 255, 0.15)), color-stop(0.75, rgba(255, 255, 255, 0.15)), color-stop(0.75, transparent), to(transparent));
   background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
@@ -1302,8 +1302,8 @@
   background-image: -o-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
   background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
 }
-.bodywrapper #jnt_forgeModule .progress-info .bar,
-.bodywrapper #jnt_forgeModule .progress .bar-info {
+.bodywrapper #jnt_forge .progress-info .bar,
+.bodywrapper #jnt_forge .progress .bar-info {
   background-color: #4bb1cf;
   background-image: -moz-linear-gradient(top, #5bc0de, #339bb9);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#5bc0de), to(#339bb9));
@@ -1313,8 +1313,8 @@
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff5bc0de', endColorstr='#ff339bb9', GradientType=0);
 }
-.bodywrapper #jnt_forgeModule .progress-info.progress-striped .bar,
-.bodywrapper #jnt_forgeModule .progress-striped .bar-info {
+.bodywrapper #jnt_forge .progress-info.progress-striped .bar,
+.bodywrapper #jnt_forge .progress-striped .bar-info {
   background-color: #5bc0de;
   background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.25, rgba(255, 255, 255, 0.15)), color-stop(0.25, transparent), color-stop(0.5, transparent), color-stop(0.5, rgba(255, 255, 255, 0.15)), color-stop(0.75, rgba(255, 255, 255, 0.15)), color-stop(0.75, transparent), to(transparent));
   background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
@@ -1322,8 +1322,8 @@
   background-image: -o-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
   background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
 }
-.bodywrapper #jnt_forgeModule .progress-warning .bar,
-.bodywrapper #jnt_forgeModule .progress .bar-warning {
+.bodywrapper #jnt_forge .progress-warning .bar,
+.bodywrapper #jnt_forge .progress .bar-warning {
   background-color: #faa732;
   background-image: -moz-linear-gradient(top, #fbb450, #f89406);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#fbb450), to(#f89406));
@@ -1333,8 +1333,8 @@
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fffbb450', endColorstr='#fff89406', GradientType=0);
 }
-.bodywrapper #jnt_forgeModule .progress-warning.progress-striped .bar,
-.bodywrapper #jnt_forgeModule .progress-striped .bar-warning {
+.bodywrapper #jnt_forge .progress-warning.progress-striped .bar,
+.bodywrapper #jnt_forge .progress-striped .bar-warning {
   background-color: #fbb450;
   background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.25, rgba(255, 255, 255, 0.15)), color-stop(0.25, transparent), color-stop(0.5, transparent), color-stop(0.5, rgba(255, 255, 255, 0.15)), color-stop(0.75, rgba(255, 255, 255, 0.15)), color-stop(0.75, transparent), to(transparent));
   background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
@@ -1342,108 +1342,108 @@
   background-image: -o-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
   background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
 }
-.bodywrapper #jnt_forgeModule .pull-right {
+.bodywrapper #jnt_forge .pull-right {
   float: right;
 }
-.bodywrapper #jnt_forgeModule .pull-left {
+.bodywrapper #jnt_forge .pull-left {
   float: left;
 }
-.bodywrapper #jnt_forgeModule .hide {
+.bodywrapper #jnt_forge .hide {
   display: none;
 }
-.bodywrapper #jnt_forgeModule .show {
+.bodywrapper #jnt_forge .show {
   display: block;
 }
-.bodywrapper #jnt_forgeModule .invisible {
+.bodywrapper #jnt_forge .invisible {
   visibility: hidden;
 }
-.bodywrapper #jnt_forgeModule .affix {
+.bodywrapper #jnt_forge .affix {
   position: fixed;
 }
-.bodywrapper #jnt_forgeModule .text-primary {
+.bodywrapper #jnt_forge .text-primary {
   color: #55ad33;
 }
-.bodywrapper #jnt_forgeModule a.text-primary:hover,
-.bodywrapper #jnt_forgeModule a.text-primary:focus {
+.bodywrapper #jnt_forge a.text-primary:hover,
+.bodywrapper #jnt_forge a.text-primary:focus {
   color: #428627;
 }
-.bodywrapper #jnt_forgeModule .box {
+.bodywrapper #jnt_forge .box {
   display: block;
   padding: 20px;
   margin-bottom: 20px;
   background-color: #ffffff;
   border: 1px solid #dddddd;
 }
-.bodywrapper #jnt_forgeModule .box.box-rounded {
+.bodywrapper #jnt_forge .box.box-rounded {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
 }
-.bodywrapper #jnt_forgeModule .box.box-tinted {
+.bodywrapper #jnt_forge .box.box-tinted {
   background-color: #fcfcfc;
 }
-.bodywrapper #jnt_forgeModule .box.box-margin-top {
+.bodywrapper #jnt_forge .box.box-margin-top {
   margin-top: 20px;
 }
-.bodywrapper #jnt_forgeModule .tag {
+.bodywrapper #jnt_forge .tag {
   color: #999999;
 }
-.bodywrapper #jnt_forgeModule .tag:before {
+.bodywrapper #jnt_forge .tag:before {
   content: "#";
 }
-.bodywrapper #jnt_forgeModule dl.dl-small dt,
-.bodywrapper #jnt_forgeModule dl.dl-small dl {
+.bodywrapper #jnt_forge dl.dl-small dt,
+.bodywrapper #jnt_forge dl.dl-small dl {
   font-size: 11.9px;
 }
-.bodywrapper #jnt_forgeModule dl.dl-uppercase dt {
+.bodywrapper #jnt_forge dl.dl-uppercase dt {
   text-transform: uppercase;
 }
-.bodywrapper #jnt_forgeModule .progress .ratingCount {
+.bodywrapper #jnt_forge .progress .ratingCount {
   padding-left: 6px;
 }
-.bodywrapper #jnt_forgeModule .progress .bar {
+.bodywrapper #jnt_forge .progress .bar {
   position: relative;
 }
-.bodywrapper #jnt_forgeModule .progress .bar .ratingCount {
+.bodywrapper #jnt_forge .progress .bar .ratingCount {
   position: absolute;
   right: 6px;
   padding-left: 0;
 }
-.bodywrapper #jnt_forgeModule .previousVersion {
+.bodywrapper #jnt_forge .previousVersion {
   border-bottom: 1px solid #dddddd;
   margin-bottom: 10px;
 }
-.bodywrapper #jnt_forgeModule .previousVersion:last-child {
+.bodywrapper #jnt_forge .previousVersion:last-child {
   border-bottom: none;
 }
-.bodywrapper #jnt_forgeModule .previousVersion:hover footer {
+.bodywrapper #jnt_forge .previousVersion:hover footer {
   color: #333333;
 }
-.bodywrapper #jnt_forgeModule .previousVersion header h3 {
+.bodywrapper #jnt_forge .previousVersion header h3 {
   display: inline-block;
   line-height: normal;
 }
-.bodywrapper #jnt_forgeModule .previousVersion header a {
+.bodywrapper #jnt_forge .previousVersion header a {
   margin: 10px 0;
 }
-.bodywrapper #jnt_forgeModule .previousVersion footer {
+.bodywrapper #jnt_forge .previousVersion footer {
   color: #999999;
   -webkit-transition: color 0.15s linear;
   -moz-transition: color 0.15s linear;
   -o-transition: color 0.15s linear;
   transition: color 0.15s linear;
 }
-.bodywrapper #jnt_forgeModule dl.inline dt,
-.bodywrapper #jnt_forgeModule dl.inline dd {
+.bodywrapper #jnt_forge dl.inline dt,
+.bodywrapper #jnt_forge dl.inline dd {
   display: inline;
 }
-.bodywrapper #jnt_forgeModule dl.inline dt {
+.bodywrapper #jnt_forge dl.inline dt {
   margin-left: 20px;
 }
-.bodywrapper #jnt_forgeModule dl.inline dt:first-child {
+.bodywrapper #jnt_forge dl.inline dt:first-child {
   margin-left: 0;
 }
-.bodywrapper #jnt_forgeModule .bar.bar-5stars {
+.bodywrapper #jnt_forge .bar.bar-5stars {
   background-color: #46a046;
   background-image: -moz-linear-gradient(top, #50b550, #378137);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#50b550), to(#378137));
@@ -1453,7 +1453,7 @@
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff50b550', endColorstr='#ff378137', GradientType=0);
 }
-.bodywrapper #jnt_forgeModule .bar.bar-4stars {
+.bodywrapper #jnt_forge .bar.bar-4stars {
   background-color: #61b861;
   background-image: -moz-linear-gradient(top, #74c474, #46a546);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#74c474), to(#46a546));
@@ -1463,7 +1463,7 @@
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff74c474', endColorstr='#ff46a546', GradientType=0);
 }
-.bodywrapper #jnt_forgeModule .bar.bar-3stars {
+.bodywrapper #jnt_forge .bar.bar-3stars {
   background-color: #ffcf3b;
   background-image: -moz-linear-gradient(top, #ffd75a, #ffc40d);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffd75a), to(#ffc40d));
@@ -1473,7 +1473,7 @@
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffd75a', endColorstr='#ffffc40d', GradientType=0);
 }
-.bodywrapper #jnt_forgeModule .bar.bar-2stars {
+.bodywrapper #jnt_forge .bar.bar-2stars {
   background-color: #faa732;
   background-image: -moz-linear-gradient(top, #fbb450, #f89406);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#fbb450), to(#f89406));
@@ -1483,7 +1483,7 @@
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fffbb450', endColorstr='#fff89406', GradientType=0);
 }
-.bodywrapper #jnt_forgeModule .bar.bar-1stars {
+.bodywrapper #jnt_forge .bar.bar-1stars {
   background-color: #c13227;
   background-image: -moz-linear-gradient(top, #d83a2e, #9d261d);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#d83a2e), to(#9d261d));
@@ -1493,42 +1493,42 @@
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffd83a2e', endColorstr='#ff9d261d', GradientType=0);
 }
-.bodywrapper #jnt_forgeModule .control-group.reviewRating .ui-stars-star,
-.bodywrapper #jnt_forgeModule .averageRating .ui-stars-star,
-.bodywrapper #jnt_forgeModule .moduleMetaData .ui-stars-star {
+.bodywrapper #jnt_forge .control-group.reviewRating .ui-stars-star,
+.bodywrapper #jnt_forge .averageRating .ui-stars-star,
+.bodywrapper #jnt_forge .moduleMetaData .ui-stars-star {
   float: none;
   display: inline-block;
   padding-top: 7px;
 }
-.bodywrapper #jnt_forgeModule .averageRating.box {
+.bodywrapper #jnt_forge .averageRating.box {
   margin-top: 20px;
 }
-.bodywrapper #jnt_forgeModule .reviewsHeader {
+.bodywrapper #jnt_forge .reviewsHeader {
   display: inline-block;
 }
-.bodywrapper #jnt_forgeModule .reviewRating .ui-stars-star {
+.bodywrapper #jnt_forge .reviewRating .ui-stars-star {
   cursor: default;
 }
-.bodywrapper #jnt_forgeModule .reviewRating,
-.bodywrapper #jnt_forgeModule .reviewTitle {
+.bodywrapper #jnt_forge .reviewRating,
+.bodywrapper #jnt_forge .reviewTitle {
   display: inline-block;
 }
-.bodywrapper #jnt_forgeModule #writeReviewToggle {
+.bodywrapper #jnt_forge #writeReviewToggle {
   margin-left: 12px;
   vertical-align: text-bottom;
 }
-.bodywrapper #jnt_forgeModule .review .replyReview {
+.bodywrapper #jnt_forge .review .replyReview {
   display: none;
 }
-.bodywrapper #jnt_forgeModule .review a.authorName {
+.bodywrapper #jnt_forge .review a.authorName {
   color: inherit;
   text-decoration: none;
   font-weight: bold;
 }
-.bodywrapper #jnt_forgeModule .review a.authorName:hover {
+.bodywrapper #jnt_forge .review a.authorName:hover {
   text-decoration: underline;
 }
-.bodywrapper #jnt_forgeModule .review time:before {
+.bodywrapper #jnt_forge .review time:before {
   content: "- ";
 }
 .bodywrapper .fade {
