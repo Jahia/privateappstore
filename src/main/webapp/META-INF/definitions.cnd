@@ -1,77 +1,71 @@
-<comnt = 'http://www.jahia.com/jahia/nt/1.0'>
-<commix = 'http://www.jahia.com/jahia/mix/1.0'>
-
-[commix:forgeModules] > jmix:droppableContent, jmix:editorialContent mixin
-
-[comnt:filterTab] > jnt:content, commix:forgeModules, jmix:bindedComponent
-
-[comnt:categorySwitcher] > jnt:content, commix:forgeModules, jmix:bindedComponent
-- categoryList (weakreference, category[autoSelectParent=false]) multiple
-
-[comnt:queryModule] > jnt:content,  jmix:list, commix:forgeModules
-- startNode (weakreference)
-- nbOfModulePerPage (long) = 9
-
-[comnt:moduleForm] > jnt:content, mix:title, commix:forgeModules
-- moduleRepository (weakreference)
-- screenshotsMaxNbr (long) = 10 mandatory
-- screenshotInputsDefaultNbr (long) = 3 mandatory
-
-[comnt:module] > jnt:content, mix:title, jmix:editorialContent, jmix:tagged, commix:forgeModules, jmix:reviews, jmix:rating
-- jcr:title (string) m
-- quickDescription (string, richtext) i18n
-- bigDescription (string, richtext) i18n
-- category (weakreference,category[root='module-categories']) mandatory
-- icon (weakreference, picker[type='image'])
-- promoImage (weakreference, picker[type='image'])
-+ screenshots (comnt:moduleScreenshotList) = comnt:moduleScreenshotList
-+ video (jnt:videostreaming) = jnt:videostreaming
-- authorName (string)
-- authorURL (string)
-- authorEmail (string)
-- codeRepository (string)
-- license  (weakreference,category[root='license'])
-- downloadCount (long) = 0 hidden onconflict=latest autocreated
-- supportedByJahia (boolean) = false autocreated
-- reviewedByJahia (boolean) = false autocreated
-- deleted (boolean) = false autocreated hidden
-- howToInstall (string, richtext) i18n
-- FAQ (string, richtext) i18n
-+ files (jnt:folder) = jnt:folder autocreated hidden
-+ * (comnt:moduleVersion)
-
-[comnt:moduleVersion]> jnt:content, jmix:editorialContent, commix:forgeModules
-+ * (jnt:file)
-- relatedJahiaVersion (weakreference,category[root='relatedJahiaVersion'])
-- releaseType (string, choicelist[resourceBundle]) = 'hotfix' m < 'hotfix', 'service-pack', 'upgrade'
-- status (weakreference,category[root='status'])
-- version (string)
-- fileDsaSignature (string)
-- changeLog (string, richtext)
-- activeVersion (boolean) = false autocreated
-
-[comnt:moduleScreenshotList] > jnt:content, jmix:list orderable
-+ * (comnt:moduleScreenshot) = comnt:moduleScreenshot
-
-[comnt:moduleScreenshot] > jnt:content
-- screenshot (weakreference, picker[type='image']) mandatory
+<jnt = 'http://www.jahia.org/jahia/nt/1.0'>
+<jmix = 'http://www.jahia.org/jahia/mix/1.0'>
 
 [jnt:review] > jnt:post
-- rating (long) mandatory
-+ * (jnt:post)
+ - rating (long) mandatory
+ + * (jnt:post)
 
-[jnt:addReview] > jnt:content, jmix:bindedComponent, commix:forgeModules
-- commentMandatory (boolean) = false mandatory
-- commentMinLength (long) = 50
+[jnt:addReview] > jnt:content, jmix:bindedComponent, jmix:socialComponent
+ - commentMandatory (boolean) = false mandatory
+ - commentMinLength (long) = 50
 
-[jnt:reviewsList] > jnt:content, jmix:bindedComponent, commix:forgeModules
+[jnt:reviewsList] > jnt:content, jmix:bindedComponent, jmix:socialComponent
 
 [jnt:reviews] > jnt:content, jmix:list orderable
-+ * (jnt:review) = jnt:review
+ + * (jnt:review) = jnt:review
 
 [jmix:reviews] mixin
-+ reviews (jnt:reviews) = jnt:reviews autocreated hidden
+ + reviews (jnt:reviews) = jnt:reviews autocreated hidden
 
 [jmix:reportedReview] mixin
-- reported (boolean) = true autocreated
-- unjustifiedReport (boolean)
+ - reported (boolean) = true autocreated
+ - unjustifiedReport (boolean)
+
+[jmix:forge] > jmix:droppableContent, jmix:editorialContent mixin
+
+[jnt:forgeCategoryFilter] > jnt:content, jmix:forge, jmix:bindedComponent
+ - categoryList (weakreference, category[autoSelectParent=false]) multiple
+
+[jnt:forgeModulesList] > jnt:content,  jmix:list, jmix:forge
+ - startNode (weakreference)
+ - nbOfModulePerPage (long) = 9
+
+[jnt:forgeModuleCreation] > jnt:content, mix:title, jmix:forge
+ - moduleRepository (weakreference)
+
+[jnt:forgeModule] > jnt:content, mix:title, jmix:editorialContent, jmix:tagged, jmix:forge, jmix:reviews, jmix:rating
+ - jcr:title (string) mandatory
+ - description (string, richtext) i18n mandatory
+ - category (weakreference,category[root='forge-categories'])
+ - icon (weakreference, picker[type='image'])
+ - authorName (string)
+ - authorURL (string)
+ - authorEmail (string)
+ - howToInstall (string, richtext) i18n
+ - FAQ (string, richtext) i18n
+ - codeRepository (string)
+ - license (weakreference,category[root='forge-licenses'])
+ - downloadCount (long) = 0 hidden onconflict=latest autocreated
+ - supportedByJahia (boolean) = false autocreated
+ - reviewedByJahia (boolean) = false autocreated
+ - deleted (boolean) = false autocreated hidden
+ + screenshots (jnt:forgeModuleScreenshotsList) = jnt:forgeModuleScreenshotsList
+ + video (jnt:videostreaming) = jnt:videostreaming
+ + files (jnt:folder) = jnt:folder autocreated hidden
+ + * (jnt:forgeModuleVersion)
+
+[jnt:forgeModuleVersion]> jnt:content, jmix:editorialContent, jmix:forge
+ - relatedJahiaVersion (weakreference,category[root='forge-jahia-versions'])
+ - releaseType (string, choicelist[resourceBundle]) = 'hotfix' m < 'hotfix', 'service-pack', 'upgrade'
+ - status (weakreference,category[root='forge-status'])
+ - versionNumber (string)
+ - fileDsaSignature (string)
+ - changeLog (string, richtext)
+ - activeVersion (boolean) = false autocreated
+ + * (jnt:file)
+
+[jnt:forgeModuleScreenshotsList] > jnt:content, jmix:list orderable
+ + * (jnt:forgeModuleScreenshot) = jnt:forgeModuleScreenshot
+
+[jnt:forgeModuleScreenshot] > jnt:content
+ - screenshot (weakreference, picker[type='image']) mandatory

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean class="org.jahia.modules.forge.actions.AddModule" >
+        <property name="name" value="AddModule"/>
+        <property name="requireAuthenticatedUser" value="true"/>
+    </bean>
+
+    <bean class="org.jahia.modules.forge.actions.EditModule" >
+        <property name="name" value="EditModule"/>
+        <property name="requireAuthenticatedUser" value="true"/>
+    </bean>
+
+    <bean class="org.jahia.modules.forge.actions.DeleteModule" >
+        <property name="name" value="DeleteModule"/>
+        <property name="requireAuthenticatedUser" value="true"/>
+    </bean>
+
+    <bean class="org.jahia.modules.forge.actions.AddModuleVersion" >
+        <property name="name" value="AddModuleVersion"/>
+        <property name="requireAuthenticatedUser" value="true"/>
+    </bean>
+
+    <bean class="org.jahia.modules.forge.actions.EditModuleVersion" >
+        <property name="name" value="EditModuleVersion"/>
+        <property name="requireAuthenticatedUser" value="true"/>
+    </bean>
+
+    <bean class="org.jahia.modules.forge.actions.DownloadCount" >
+        <property name="name" value="DownloadCount"/>
+        <property name="requireAuthenticatedUser" value="false"/>
+    </bean>
+
+    <bean class="org.jahia.modules.forge.actions.AddReview" >
+        <property name="name" value="AddReview"/>
+        <property name="requireAuthenticatedUser" value="false"/>
+    </bean>
+
+    <bean class="org.jahia.modules.forge.actions.ReplyReview" >
+        <property name="name" value="ReplyReview"/>
+        <property name="requireAuthenticatedUser" value="true"/>
+    </bean>
+
+    <bean class="org.jahia.modules.forge.actions.ReportReview" >
+        <property name="name" value="ReportReview"/>
+        <property name="requireAuthenticatedUser" value="true"/>
+        <property name="templatePath" value="/mails/templates/reportedReviewNotification.vm"/>
+        <property name="mailService" ref="MailService"/>
+    </bean>
+
+    <bean class="org.jahia.modules.forge.actions.UnjustifiedReport" >
+        <property name="name" value="UnjustifiedReport"/>
+        <property name="requireAuthenticatedUser" value="true"/>
+    </bean>
+
+    <bean class="org.jahia.modules.forge.actions.DeleteReview" >
+        <property name="name" value="DeleteReview"/>
+        <property name="requireAuthenticatedUser" value="true"/>
+    </bean>
+
+</beans>

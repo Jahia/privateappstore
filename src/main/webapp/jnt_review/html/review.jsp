@@ -19,7 +19,7 @@
 
 <template:addResources type="javascript" resources="html5shiv.js"/>
 <template:addResources type="css" resources="ui.stars.css, ui.stars.review.css"/>
-<template:addResources type="javascript" resources="jquery.min.js, bootstrap-modal.js, modulesForge.js"/>
+<template:addResources type="javascript" resources="jquery.min.js, bootstrap-modal.js, forge.js"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="createdBy" value="${currentNode.properties['jcr:createdBy'].string}"/>
@@ -246,7 +246,7 @@
 
         <c:forEach items="${replies.nodes}" var="reply">
 
-            <template:module node="${reply}" view="reply">
+            <template:module node="${reply}" view="reviewReply">
                 <%--<template:param name="module.cache.additional.key" value="${reply.identifier}"/>
                 <template:param name="cache.mainResource.flushParent" value="true"/>
                 <template:param name="isForgeAdmin" value="${isForgeAdmin}"/>

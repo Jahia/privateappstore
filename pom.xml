@@ -44,11 +44,16 @@
         <version>6.6.1.0</version>
     </parent>
     <groupId>org.jahia.modules</groupId>
-    <artifactId>forgeModules</artifactId>
-    <name>Forge Modules</name>
+    <artifactId>forge</artifactId>
+    <name>Jahia Forge</name>
     <version>1.1</version>
     <packaging>war</packaging>
-    <description>This is the custom module (Forge Modules) for running on a Jahia server.</description>
+    <description>This is the custom module (Forge) for running on a Jahia server.</description>
+    <scm>
+        <connection>scm:git:git@github.com:Jahia/forge.git</connection>
+        <url>scm:git:git@github.com:Jahia/forge.git</url>
+        <developerConnection>scm:git:git@github.com:Jahia/forge.git</developerConnection>
+    </scm>
     <repositories>
         <repository>
             <id>jahiaRepository</id>

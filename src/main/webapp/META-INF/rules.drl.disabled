@@ -1,4 +1,4 @@
-package org.jahia.modules.forgeModules.rules
+package org.jahia.modules.forge.rules
 
 #list any import classes here.
 import org.jahia.services.content.rules.*

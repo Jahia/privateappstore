@@ -57,7 +57,8 @@
           var transition = $.support.transition && that.$element.hasClass('fade')
 
           if (!that.$element.parent().length) {
-            that.$element.appendTo(document.body) //don't move modals dom position
+            //that.$element.appendTo(document.body) //don't move modals dom position
+            that.$element.appendTo(".bodywrapper") //don't move modals dom position
           }
 
           that.$element.show()
@@ -159,8 +160,10 @@
         if (this.isShown && this.options.backdrop) {
           var doAnimate = $.support.transition && animate
 
-          this.$backdrop = $('<div class="modal-backdrop ' + animate + '" />')
-            .appendTo(document.body)
+         /* this.$backdrop = $('<div class="modal-backdrop ' + animate + '" />')
+            .appendTo(document.body)      */
+            this.$backdrop = $('<div class="modal-backdrop ' + animate + '" />')
+                .appendTo(".bodywrapper")
 
           this.$backdrop.click(
             this.options.backdrop == 'static' ?
