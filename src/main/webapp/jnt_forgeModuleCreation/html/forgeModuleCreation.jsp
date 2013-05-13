@@ -16,7 +16,7 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 <%--@elvariable id="acl" type="java.lang.String"--%>
 
-<template:addResources type="javascript" resources="jquery.min.js,jquery.validate.js"/>
+<template:addResources type="javascript" resources="html5shiv.js,jquery.min.js,jquery.validate.js"/>
 <template:addResources type="css" resources="forge.css"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
@@ -72,6 +72,8 @@
     <template:tokenizedForm>
         <form id="forgeModuleCreationForm-${id}" action="<c:url value='${modulesRepositoryPath}.createModule.do'/>" method="post">
             <fieldset>
+
+                <input type="hidden" name="jcrNormalizeNodeName" value="true"/>
 
                 <div class="control-group">
                     <label class="control-label" for="jcr:title"><fmt:message key="jnt_forgeModule.label.title"/></label>

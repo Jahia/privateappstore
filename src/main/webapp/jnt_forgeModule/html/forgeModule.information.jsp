@@ -4,6 +4,8 @@
 <%@ taglib prefix="utility" uri="http://www.jahia.org/tags/utilityLib" %>
 <%@ taglib prefix="template" uri="http://www.jahia.org/tags/templateLib" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="functions" uri="http://www.jahia.org/tags/functions" %>
+<%@ taglib prefix="user" uri="http://www.jahia.org/tags/user" %>
 <%@ taglib prefix="query" uri="http://www.jahia.org/tags/queryLib" %>
 <%--@elvariable id="currentNode" type="org.jahia.services.content.JCRNodeWrapper"--%>
 <%--@elvariable id="out" type="java.io.PrintWriter"--%>
@@ -20,7 +22,6 @@
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="title" value="${currentNode.properties['jcr:title'].string}"/>
 <c:set var="icon" value="${currentNode.properties['icon'].node}"/>
-<c:set var="authorName" value="${currentNode.properties['authorName'].string}"/>
 <c:set var="authorURL" value="${currentNode.properties['authorURL'].string}"/>
 <c:set var="authorEmail" value="${currentNode.properties['authorEmail'].string}"/>
 <c:set var="description" value="${currentNode.properties['description'].string}"/>
@@ -33,6 +34,22 @@
 <jcr:nodeProperty node="${currentNode}" name="j:tags" var="assignedTags"/>
 <jcr:node var="videoNode" path="${currentNode.path}/video"/>
 
+<c:set var="authorUsername" value="${currentNode.properties['jcr:createdBy'].string}"/>
+<c:set var="authorFullName" value="${user:fullName(user:lookupUser(authorUsername))}"/>
+<c:set var="authorOrganisation" value="${user:lookupUser(authorUsername).properties['j:organization']}"/>
+<c:set var="authorNameDisplayedAs" value="${currentNode.properties['authorNameDisplayedAs'].string}"/>
+<c:choose>
+    <c:when test="${authorNameDisplayedAs eq 'username'}">
+        <c:set var="authorName" value="${authorUsername}"/>
+    </c:when>
+    <c:when test="${authorNameDisplayedAs eq 'fullName'}">
+        <c:set var="authorName" value="${authorFullName}"/>
+    </c:when>
+    <c:when test="${authorNameDisplayedAs eq 'organisation'}">
+        <c:set var="authorName" value="${authorOrganisation}"/>
+    </c:when>
+</c:choose>
+
 <template:include view="hidden.sql">
     <template:param name="getActiveVersion" value="true"/>
 </template:include>
@@ -41,6 +58,74 @@
 
 <jcr:nodeProperty node="${activeVersion}" name="versionNumber" var="versionNumber"/>
 <jcr:nodeProperty node="${activeVersion}" name="relatedJahiaVersion" var="relatedJahiaVersion"/>
+
+
+<c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}"/>
+<c:if test="${isDeveloper}">
+    <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
+</c:if>
+
+<c:if test="${isDeveloper && not viewAsUser}">
+
+    <fmt:message var="labelNotSelected" key="jnt_forgeModule.label.notSelected"/>
+    <fmt:message var="labelEmpty" key="jnt_forgeModule.label.empty"/>
+
+    <jcr:node var="moduleCategories" path="/sites/systemsite/categories/forge-categories/module-categories"/>
+
+    <template:addResources type="inlinejavascript">
+        <script type="text/javascript">
+
+            var categories = [];
+
+            <c:forEach items="${jcr:getNodes(moduleCategories, 'jnt:category')}" var="moduleCategory">
+                categories.push({value: '${moduleCategory.identifier}', text: '${moduleCategory.displayableName}'});
+            </c:forEach>
+
+            $(document).ready(function() {
+
+                $('#category-${id}').editable({
+                    source: categories,
+                    <%-- TODO pre selected value --%>
+                    value: '${category.node.identifier}',
+                    <jsp:include page="../../commons/bootstrap-editable-options.jsp">
+                        <jsp:param name="postURL" value='${postURL}'/>
+                    </jsp:include>
+                });
+
+                $('#authorName-information-${id}').editable({
+                    source: [{value:'username', text:'${authorUsername}'},
+                        {value:'fullName', text:'${not empty authorFullName ? authorFullName : 'fullName'}'},
+                        {value:'organisation', text: '${not empty authorOrganisation ? authorOrganisation : 'organisation'}'}],
+                    value: '${authorNameDisplayedAs}',
+
+                    <%--success: function(response, newValue) {
+                        if (${authorNameDisplayedAs eq 'organisation'} || newValue == "organisation")
+                            document.location = '${currentNode.url}';
+                        else {
+                            var newAuthorName = $(this).next('.editable-container').find('option[value='+newValue+']').html();
+                            $('#authorName-header-${id}').html(newAuthorName).editable('setValue', newValue);
+                        }
+                    }--%>
+
+                    <jsp:include page="../../commons/bootstrap-editable-options.jsp">
+                        <jsp:param name="customSuccess" value="
+                            if (${authorNameDisplayedAs eq 'organisation'} || newValue == 'organisation')
+                                document.location = '${currentNode.url}';
+                            else {
+                                var newAuthorName = $(this).next('.editable-container').find('option[value='+newValue+']').html();
+                                $('#authorName-header-${id}').html(newAuthorName).editable('setValue', newValue);
+                            }"/>
+                    </jsp:include>
+                });
+
+            });
+
+        </script>
+    </template:addResources>
+
+</c:if>
+
+
 
 <aside class="moduleInformation" itemtype="http://schema.org/SoftwareApplication">
 
@@ -72,17 +157,26 @@
         <dt><fmt:message key="jnt_forgeModule.label.fileSize"/></dt>
         <dd itemprop="fileSize">${jcr:humanReadableFileLength(activeVersionBinary)}</dd>
 
-        <div itemtype="http://schema.org/Organization" itemscope="" itemprop="author">
+        <span itemtype="http://schema.org/Organization" itemscope="" itemprop="author">
 
             <dt><fmt:message key="jnt_forgeModule.label.authorName"/></dt>
-            <dd itemprop="name">${authorName}</dd>
+            <dd itemprop="name">
+                <c:if test="${isDeveloper && not viewAsUser}">
+                    <a data-original-title="<fmt:message key="jnt_forgeModule.label.askAuthorNameDisplayedAs"/>" data-name="authorNameDisplayedAs" data-pk="1" data-type="select"
+                       id="authorName-information-${id}" href="#" class="editable editable-click">
+                </c:if>
+                ${authorName}
+                <c:if test="${isDeveloper && not viewAsUser}">
+                    </a>
+                </c:if>
+            </dd>
 
             <span content="${authorURL}" itemprop="url"></span>
             <span content="${authorEmail}" itemprop="email"></span>
 
-        </div>
+        </span>
 
-        <c:if test="${jcr:isNodeType(currentNode, 'jmix:rating')}">
+        <c:if test="${jcr:isNodeType(currentNode, 'jmix:rating') && nbOfVotes gt 0}">
             <dt><fmt:message key="jnt_forgeModule.label.rating"/></dt>
             <dd itemtype="http://schema.org/AggregateRating" itemscope="" itemprop="aggregateRating">
                 <span itemprop="worstRating" content="1"></span>
@@ -96,7 +190,16 @@
         </c:if>
 
         <dt><h4><fmt:message key="jnt_forgeModule.label.category"/></h4></dt>
-        <dd itemprop="applicationCategory">${category.node.displayableName}</dd>
+        <dd itemprop="applicationCategory">
+            <c:if test="${isDeveloper && not viewAsUser}">
+                <a data-original-title="<fmt:message key="jnt_forgeModule.label.askCategory"/>" data-name="category" data-pk="1" data-type="select"
+                   id="category-${id}" href="#" class="editable editable-click">
+            </c:if>
+            ${not empty category ? category.node.displayableName : labelNotSelected}
+            <c:if test="${isDeveloper && not viewAsUser}">
+                </a>
+            </c:if>
+        </dd>
 
     </dl>
 

@@ -1531,6 +1531,13 @@
 .bodywrapper #jnt_forge .review time:before {
   content: "- ";
 }
+.bodywrapper #jnt_forge #moduleHeader header > h1 {
+  margin-bottom: 0;
+}
+.bodywrapper #jnt_forge #moduleHeader .moduleIcon {
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
 .bodywrapper .fade {
   opacity: 0;
   -webkit-transition: opacity 0.15s linear;

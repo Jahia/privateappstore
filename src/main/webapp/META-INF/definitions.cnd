@@ -38,7 +38,7 @@
  - description (string, richtext) i18n mandatory
  - category (weakreference,category[root='forge-categories'])
  - icon (weakreference, picker[type='image'])
- - authorName (string)
+ - authorNameDisplayedAs (string, choicelist[resourceBundle]) = 'username' autocreated < 'username', 'fullName', 'organisation'
  - authorURL (string)
  - authorEmail (string)
  - howToInstall (string, richtext) i18n
