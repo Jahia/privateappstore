@@ -79,7 +79,6 @@
         <script type="text/javascript">
 
             var categories = [];
-
             <c:forEach items="${jcr:getNodes(moduleCategories, 'jnt:category')}" var="moduleCategory">
                 categories.push({value: '${moduleCategory.identifier}', text: '${moduleCategory.displayableName}'});
             </c:forEach>
@@ -100,16 +99,6 @@
                         {value:'fullName', text:'${not empty authorFullName ? authorFullName : 'fullName'}'},
                         {value:'organisation', text: '${not empty authorOrganisation ? authorOrganisation : 'organisation'}'}],
                     value: '${authorNameDisplayedAs}',
-
-                    <%--success: function(response, newValue) {
-                        if (${authorNameDisplayedAs eq 'organisation'} || newValue == "organisation")
-                            document.location = '${currentNode.url}';
-                        else {
-                            var newAuthorName = $(this).next('.editable-container').find('option[value='+newValue+']').html();
-                            $('#authorName-header-${id}').html(newAuthorName).editable('setValue', newValue);
-                        }
-                    }--%>
-
                     <jsp:include page="../../commons/bootstrap-editable-options.jsp">
                         <jsp:param name="postURL" value="${postURL}"/>
                         <jsp:param name="customSuccess" value="
@@ -158,8 +147,9 @@
         <dt><fmt:message key="jnt_forgeModule.label.relatedJahiaVersion"/></dt>
         <dd>${relatedJahiaVersion.node.displayableName}</dd>
 
+
         <dt><fmt:message key="jnt_forgeModule.label.fileSize"/></dt>
-        <dd itemprop="fileSize">${jcr:humanReadableFileLength(activeVersionBinary)}</dd>
+        <dd itemprop="fileSize">${not empty activeVersion ? jcr:humanReadableFileLength(activeVersionBinary) : ''}</dd>
 
         <span itemtype="http://schema.org/Organization" itemscope="" itemprop="author">
 

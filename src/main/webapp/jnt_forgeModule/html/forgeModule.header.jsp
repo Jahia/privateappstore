@@ -128,7 +128,26 @@
         </div>
     </c:if>
 
-    <jcr:nodeProperty node="${activeVersion}" name="versionNumber" var="versionNumber"/>
-    <a class="btn btn-block" href="${activeVersionBinary.url}" onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')">Download version ${versionNumber.string}</a>
+    <c:choose>
+
+        <c:when test="${not empty activeVersion}">
+            <jcr:nodeProperty node="${activeVersion}" name="versionNumber" var="versionNumber"/>
+            <a class="btn btn-block" href="${activeVersionBinary.url}"
+               <c:if test="${not isDeveloper}">onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')"</c:if>>
+                <fmt:message key="jnt_forgeModule.label.downloadVersion">
+                    <fmt:param value="${versionNumber.string}"/>
+                </fmt:message>
+            </a>
+        </c:when>
+
+        <c:otherwise>
+            <a class="btn btn-block disabled" href="#">
+                <fmt:message key="jnt_forgeModule.label.downloadVersion">
+                    <fmt:param value="X.X.X.X"/>
+                </fmt:message>
+            </a>
+        </c:otherwise>
+
+    </c:choose>
 
 </section>
