@@ -18,25 +18,9 @@
 <template:addResources type="javascript" resources="jquery.min.js,jquery.validate.js"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
-<uiComponents:ckeditor selector="jahia-moduleVersion-changeLog-${id}"/>
+<c:set var="hasModuleVersions" value="${jcr:hasChildrenOfType(currentNode, 'jnt:forgeModuleVersion')}"/>
 
-<c:choose>
-    <c:when test="${jcr:isNodeType(renderContext.mainResource.node,'comnt:moduleVersion')}">
-        <c:set var="targetNode" value="${url.base}${renderContext.mainResource.node.path}"/>
-        <c:set var="currentModule" value="${url.base}${renderContext.mainResource.node}"/>
-        <c:set var="edition" value="true"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="moduleBinary" var="moduleBinary"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="changeLog" var="changeLog"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="relatedJahiaVersion" var="relatedJahiaVersion"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="releaseType" var="releaseType"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="status" var="status"/>
-        <jcr:nodeProperty node="${renderContext.mainResource.node}" name="versionNumber" var="versionNumber"/>
-    </c:when>
-    <c:otherwise>
-        <c:set var="targetNode" value="${url.base}${currentNode.path}"/>
-        <c:set var="edition" value="false"/>
-    </c:otherwise>
-</c:choose>
+<uiComponents:ckeditor selector="jahia-moduleVersion-changeLog-${id}"/>
 
 <template:addResources type="inlinejavascript">
     <script type="text/javascript">
@@ -44,10 +28,10 @@
         $(document).ready(function() {
 
             jQuery.validator.addMethod("regexp", function(value, element, param) {
-                          return this.optional(element) || param.test(value);
-                        });
+                return this.optional(element) || param.test(value);
+            });
 
-                $("#moduleVersionForm-${id}").validate({
+            var validator = $("#moduleVersionForm-${id}").validate({
                 rules: {
 
                     'versionNumber': {
@@ -56,9 +40,7 @@
                     },
 
                     'moduleBinary': {
-                        <c:if test="${not edition}">
-                            required: true,
-                        </c:if>
+                        required: true,
                         regexp: /(\S+?)\.(jar|war)$/i
                     },
 
@@ -83,41 +65,45 @@
                         required: "<fmt:message key='forge.label.askChangeLog'/>",
                         minlength: "<fmt:message key='forge.label.changeLogSizeWarning'/>"
                     }
+                },
+                submitHandler: function(form) {
+                    $.post('<c:url value='${url.base}${currentNode.path}.addModuleVersion.do'/>',$(form).serialize(), function(data) {
+                        if(data['error'] == "versionNumber") {
+                            validator.showErrors({versionNumber:"<fmt:message key="jnt_forgeModuleVersion.label.versionNumberAlreadyUsed"/>"});
+                        }
+                    }, "json");
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).addClass("error").removeClass(validClass).parents('.control-group').addClass("error");
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).removeClass("error").addClass(validClass).parents('.control-group').removeClass("error");
                 }
             });
-
-            /*var form = $("#newModuleForm");
-            form.attr("enctype", "multipart/form-data")*/
-            $("#releaseType").val('${releaseType}');
-
         });
 
     </script>
 </template:addResources>
 
 <template:tokenizedForm>
-    <form action="<c:url value='${targetNode}.${edition ? "editModuleVersion" : "addModuleVersion"}.do'/>" method="post" id="moduleVersionForm-${id}" enctype="multipart/form-data"  accept="application/json">
+    <form action="<c:url value='${url.base}${currentNode.path}.addModuleVersion.do'/>" method="post" id="moduleVersionForm-${id}" enctype="multipart/form-data">
         <fieldset>
+            <input type="hidden" name="jcrNormalizeNodeName" value="true"/>
 
             <div class="control-group">
                 <label class="control-label" for="versionNumber"><fmt:message key="jnt_forgeModuleVersion.versionNumber"/></label>
                 <div class="controls">
                     <input placeholder="<fmt:message key="jnt_forgeModuleVersion.versionNumber" />" class="span16" type="text"
-                           name="versionNumber" id="versionNumber" value="${versionNumber.string}"/>
+                           name="versionNumber" id="versionNumber"/>
                 </div>
             </div>
-
 
             <div class="control-group">
                 <label class="control-label" for="moduleBinary"><fmt:message key="jnt_forgeModuleVersion.moduleFile"/></label>
                 <div class="controls">
 
-                    <c:if test="${not empty moduleBinary.node.name}">
-                        <p>${moduleBinary.node.name}&nbsp<a href="#" onclick="$('#moduleBinary').show();">Update</a></p>
-                        <c:set var="binaryFieldDisplay" value="style=\"display: none;\""/>
-                    </c:if>
                     <input placeholder="<fmt:message key="jnt_forgeModuleVersion.moduleFile" />" class="span16" type="file"
-                           name="moduleBinary" id="moduleBinary" value="${moduleBinary.node.name}" ${binaryFieldDisplay}/>
+                           name="moduleBinary" id="moduleBinary"/>
                 </div>
             </div>
 
@@ -127,14 +113,9 @@
                     <textarea rows="7" cols="35" id="jahia-moduleVersion-changeLog-${id}"
                               placeholder="<fmt:message key="jnt_forgeModuleVersion.changeLog" />" class="jahia-ckeditor span16"
                            name="changeLog">
-                        <c:if test="${not empty changeLog.string}">
-                            ${fn:escapeXml(changeLog.string)}
-                        </c:if>
                     </textarea>
                 </div>
             </div>
-
-
 
             <div class="control-group">
                 <label class="control-label" for="releaseType"><fmt:message key="jnt_forgeModule.releaseType"/></label>
@@ -163,22 +144,22 @@
 
             <jcr:node var="jahiaVersionCategory" path="/sites/systemsite/categories/forge-categories/status"/>
             <c:if test="${not empty jahiaVersionCategory.node}">
-            <div class="control-group">
-                <label class="control-label" for="jahiAppStatus"><fmt:message key="jnt_forgeModule.jahiAppStatus"/></label>
-                <div class="controls">
-                    <input type="text" id="jahiAppStatus" name="jahiAppStatus" value=""/>
-                    <input type="text" id="categoryFieldDisplay2" name="categoryFieldDisplay2" readonly="readonly" />
-                    <uiComponents:treeItemSelector fieldId="jahiAppStatus" displayFieldId="categoryFieldDisplay2" nodeTypes="jnt:category"
-                        selectableNodeTypes="jnt:category" root="/sites/systemsite/categories/forge-categories/status"
-                        includeChildren="false" displayIncludeChildren="false" valueType="identifier" />
+                <div class="control-group">
+                    <label class="control-label" for="status"><fmt:message key="jnt_forgeModule.status"/></label>
+                    <div class="controls">
+                        <input type="text" id="status" name="jahiAppStatus" value=""/>
+                        <input type="text" id="categoryFieldDisplay2" name="categoryFieldDisplay2" readonly="readonly" />
+                        <uiComponents:treeItemSelector fieldId="jahiAppStatus" displayFieldId="categoryFieldDisplay2" nodeTypes="jnt:category"
+                            selectableNodeTypes="jnt:category" root="/sites/systemsite/categories/forge-categories/status"
+                            includeChildren="false" displayIncludeChildren="false" valueType="identifier" />
+                    </div>
                 </div>
-            </div>
             </c:if>
 
             <div class="control-group">
                 <label class="control-label" for="activeVersion"><fmt:message key="jnt_forgeModuleVersion.activeVersion"/></label>
                 <div class="controls">
-                    <input type="checkbox" id="activeVersion" name="activeVersion" checked="true"/>
+                    <input type="checkbox" id="activeVersion" name="activeVersion" checked="true" ${hasModuleVersions ? '' : 'disabled'}/>
                 </div>
             </div>
 
@@ -193,6 +174,3 @@
 
     </form>
 </template:tokenizedForm>
-<c:if test="${edition}">
-    <div class="edit"><a href="<c:url value='${targetNode}.html'/>">Back</a></div>
-</c:if>
