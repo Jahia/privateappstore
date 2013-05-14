@@ -22,12 +22,14 @@
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="FAQ" value="${currentNode.properties['FAQ'].string}"/>
 <c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}"/>
+<c:if test="${isDeveloper}">
+    <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
+</c:if>
 <c:set var="isEmptyTab" value="false"/>
 
-<c:if test="${isDeveloper}">
+<c:if test="${isDeveloper && not viewAsUser}">
 
-    <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
-
+    <c:url var="postURL" value="${url.base}${renderContext.mainResource.node.path}"/>
     <template:addResources type="inlinejavascript">
 
         <script type="text/javascript">
@@ -35,7 +37,9 @@
             $(document).ready(function() {
 
                 $('#FAQ-${id}').editable({
-                    <jsp:include page="../../commons/bootstrap-editable-options-wysihtml5.jsp"/>
+                    <jsp:include page="../../commons/bootstrap-editable-options-wysihtml5.jsp">
+                        <jsp:param name="postURL" value="${postURL}"/>
+                    </jsp:include>
                 });
 
                 $('#toggle-FAQ-${id}').click(function(e) {

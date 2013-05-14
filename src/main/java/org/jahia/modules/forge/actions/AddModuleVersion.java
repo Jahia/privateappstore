@@ -10,9 +10,12 @@ import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
+import org.jahia.taglibs.jcr.node.JCRTagUtils;
 import org.jahia.tools.files.FileUpload;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 
+import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -30,30 +33,21 @@ public class AddModuleVersion extends Action {
                                   URLResolver urlResolver) throws Exception {
 
         JCRNodeWrapper module = resource.getNode();
-
         String moduleTitle = module.getPropertyAsString("jcr:title");
         String versionNumber = getParameter(parameters, "versionNumber");
+        boolean hasModuleVersions = JCRTagUtils.hasChildrenOfType(module, "jnt:forgeModuleVersion");
 
-        logger.info("Start adding module release " + versionNumber + " of " + moduleTitle);
+        logger.info("Start adding module version " + versionNumber + " of " + moduleTitle);
+
+        if (hasModuleVersions && !hasValidVersionNumber(module, versionNumber)) {
+            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", "versionNumber"));
+        }
 
         JCRNodeWrapper moduleVersion = createNode(req, parameters, module, "jnt:forgeModuleVersion", moduleTitle+"-"+versionNumber, false);
 
-        String statusUUID = getParameter(parameters, "jahiAppStatus");
-        String relatedJahiaVersionUUID = getParameter(parameters, "relatedJahiaVersion");
-        String releaseType = getParameter(parameters, "releaseType");
         String activeVersion = getParameter(parameters, "activeVersion");
 
-        if (statusUUID != null) {
-            JCRNodeWrapper status = session.getNodeByUUID(statusUUID);
-            moduleVersion.setProperty("status",status);
-        }
-
-        if (relatedJahiaVersionUUID != null) {
-            JCRNodeWrapper relatedJahiaVersion = session.getNodeByUUID(relatedJahiaVersionUUID);
-            moduleVersion.setProperty("relatedJahiaVersion",relatedJahiaVersion);
-        }
-
-        if (activeVersion != null && activeVersion.equals("on"))
+        if (!hasModuleVersions || (activeVersion != null && activeVersion.equals("on")))
             moduleVersion.setProperty("activeVersion", true);
 
         if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
@@ -62,18 +56,32 @@ public class AddModuleVersion extends Action {
         }
 
         final FileUpload fu = (FileUpload) req.getAttribute(FileUpload.FILEUPLOAD_ATTRIBUTE);
-
         DiskFileItem moduleBinary = fu.getFileItems().get("moduleBinary");
 
         moduleVersion.uploadFile(moduleBinary.getName(), moduleBinary.getInputStream(), moduleBinary.getContentType());
 
         session.save();
 
-        logger.info("Module release " + versionNumber + " of " + moduleTitle + " successfully added");
+        logger.info("Module version " + versionNumber + " of " + moduleTitle + " successfully added");
 
-        // TODO
-        return new ActionResult(HttpServletResponse.SC_OK, moduleVersion.getPath(), Render.serializeNodeToJSON(moduleVersion));
+        return new ActionResult(HttpServletResponse.SC_OK, module.getPath(), Render.serializeNodeToJSON(moduleVersion));
 
+    }
+
+    private boolean hasValidVersionNumber(JCRNodeWrapper module, String versionNumber) throws RepositoryException {
+
+        List<JCRNodeWrapper> moduleVersions = JCRTagUtils.getChildrenOfType(module, "jnt:forgeModuleVersion");
+        boolean validVersionNumber = true;
+
+        for (JCRNodeWrapper moduleVersion : moduleVersions) {
+
+            if (moduleVersion.getProperty("versionNumber").getString().equals(versionNumber)) {
+                validVersionNumber = false;
+                break;
+            }
+        }
+
+        return validVersionNumber;
     }
 
 }

@@ -28,7 +28,7 @@ params: function(params) {
     data['jcrMethodToCall'] = 'put';
     return data;
 },
-url: '<c:url value="${url.base}${renderContext.mainResource.node.path}"/>',
+url: '${param.postURL}',
 success: function(response, newValue) {
     $('#jnt_forge').triggerHandler('forgeModuleUpdated');
 

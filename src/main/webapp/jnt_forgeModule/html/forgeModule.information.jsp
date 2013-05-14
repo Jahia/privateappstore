@@ -55,6 +55,8 @@
 </template:include>
 <c:set value="${moduleMap.activeVersion}" var="activeVersion"/>
 <c:set value="${moduleMap.activeVersionBinary}" var="activeVersionBinary"/>
+<template:addCacheDependency node="${activeVersion}"/>
+
 
 <jcr:nodeProperty node="${activeVersion}" name="versionNumber" var="versionNumber"/>
 <jcr:nodeProperty node="${activeVersion}" name="relatedJahiaVersion" var="relatedJahiaVersion"/>
@@ -69,6 +71,7 @@
 
     <fmt:message var="labelNotSelected" key="jnt_forgeModule.label.notSelected"/>
     <fmt:message var="labelEmpty" key="jnt_forgeModule.label.empty"/>
+    <c:url var="postURL" value="${url.base}${renderContext.mainResource.node.path}"/>
 
     <jcr:node var="moduleCategories" path="/sites/systemsite/categories/forge-categories/module-categories"/>
 
@@ -108,6 +111,7 @@
                     }--%>
 
                     <jsp:include page="../../commons/bootstrap-editable-options.jsp">
+                        <jsp:param name="postURL" value="${postURL}"/>
                         <jsp:param name="customSuccess" value="
                             if (${authorNameDisplayedAs eq 'organisation'} || newValue == 'organisation')
                                 document.location = '${currentNode.url}';

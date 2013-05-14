@@ -19,6 +19,10 @@
 <template:addResources type="javascript" resources="html5shiv.js, forge.js"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
+<c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}"/>
+<c:if test="${isDeveloper}">
+    <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
+</c:if>
 
 <template:include view="hidden.sql">
     <template:param name="getActiveVersion" value="true"/>
@@ -27,27 +31,41 @@
 <c:set value="${moduleMap.activeVersion}" var="activeVersion"/>
 <c:set value="${moduleMap.previousVersions}" var="previousVersions"/>
 
+<c:if test="${isDeveloper && not viewAsUser}">
+
+    <template:addResources type="inlinejavascript">
+        <script type="text/javascript">
+
+            $(document).ready(function() {
+
+                $('.makeActiveVersion').click( function() {
+
+                    var boostrapTab = $(this).parents('.tab-pane').attr('id');
+
+                    var data = {};
+                    data['activeVersion'] = true;
+                    data['jcrMethodToCall'] = 'put';
+
+                    $.post($(this).attr("data-target"), data, function() {
+                        window.location = '${currentNode.url}' + "?bootstrapTab=" + boostrapTab;
+                    }, "json");
+                });
+
+            });
+        </script>
+    </template:addResources>
+</c:if>
+
 <article id="moduleChangeLog">
 
     <section class="whatsNew">
 
-        <jcr:nodeProperty node="${activeVersion}" name="changeLog" var="changeLog"/>
-        <jcr:nodeProperty node="${activeVersion}" name="versionNumber" var="versionNumber"/>
-        <jcr:nodeProperty node="${activeVersion}" name="relatedJahiaVersion" var="relatedJahiaVersion"/>
-        <jcr:nodeProperty node="${activeVersion}" name="moduleBinary" var="moduleBinary"/>
-
-        <h2>What's new in ${versionNumber.string}</h2>
-
-        ${changeLog.string}
-
-        <footer>
-            <dl class="inline">
-                <dt>Requires Jahia:</dt>
-                <dd>${relatedJahiaVersion.node.displayableName}</dd>
-                <dt>Updated:</dt>
-                <dd><fmt:formatDate value="${moduleBinary.node.contentLastModifiedAsDate}" pattern="yyyy-MM-dd" /></dd>
-            </dl>
-        </footer>
+        <c:set target="${moduleMap}" property="moduleBinary" value="${moduleMap.activeVersionBinary}"/>
+        <template:module node="${activeVersion}" view="changeLog">
+            <template:param name="isActiveVersion" value="true"/>
+            <template:param name="isDeveloper" value="${isDeveloper}"/>
+            <template:param name="viewAsUser" value="${viewAsUser}"/>
+        </template:module>
 
     </section>
 
@@ -55,44 +73,26 @@
 
         <section class="previousVersions">
 
-            <h2>Previous versions</h2>
+            <h2><fmt:message key="jnt_forgeModule.label.previousVersions"/></h2>
 
             <c:forEach items="${previousVersions.nodes}" var="previousVersion">
 
                 <article class="previousVersion">
 
-                    <jcr:nodeProperty node="${previousVersion}" name="changeLog" var="changeLog"/>
-                    <jcr:nodeProperty node="${previousVersion}" name="versionNumber" var="versionNumber"/>
-                    <jcr:nodeProperty node="${previousVersion}" name="relatedJahiaVersion" var="relatedJahiaVersion"/>
-
                     <jcr:sql
-                        var="moduleBinaries"
-                        sql="SELECT * FROM [jnt:file] WHERE ischildnode(['${previousVersion.path}'])
+                            var="moduleBinaries"
+                            sql="SELECT * FROM [jnt:file] WHERE ischildnode(['${previousVersion.path}'])
                           ORDER BY ['jcr:lastModified'] DESC" limit ='1'/>
 
                     <c:forEach items="${moduleBinaries.nodes}" var="moduleBinaryNode">
-                        <c:set value="${moduleBinaryNode}" var="moduleBinary"/>
+                        <c:set target="${moduleMap}" property="moduleBinary" value="${moduleBinaryNode}"/>
                     </c:forEach>
 
-                    <header>
-                        <h3>${versionNumber.string}</h3>
-                        <a class="btn btn-small pull-right" href="${moduleBinary.url}" onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')">Download version ${versionNumber.string}</a>
-                    </header>
-
-                    <div class="clearfix">
-
-                        ${changeLog.string}
-
-                    </div>
-
-                    <footer>
-                        <dl class="inline">
-                            <dt>Requires Jahia:</dt>
-                                <dd>${relatedJahiaVersion.node.displayableName}</dd>
-                            <dt>Updated:</dt>
-                                <dd><fmt:formatDate value="${moduleBinary.contentLastModifiedAsDate}" pattern="yyyy-MM-dd" /></dd>
-                        </dl>
-                    </footer>
+                    <template:module node="${previousVersion}" view="changeLog">
+                        <template:param name="isActiveVersion" value="false"/>
+                        <template:param name="isDeveloper" value="${isDeveloper}"/>
+                        <template:param name="viewAsUser" value="${viewAsUser}"/>
+                    </template:module>
 
                 </article>
 

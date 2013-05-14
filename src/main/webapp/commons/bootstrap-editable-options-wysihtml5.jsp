@@ -28,18 +28,32 @@ params: function(params) {
     data['jcrMethodToCall'] = 'put';
     return data;
 },
-url: '<c:url value="${url.base}${renderContext.mainResource.node.path}"/>',
+url: '${param.postURL}',
 success: function(response, newValue) {
     $('#jnt_forge').triggerHandler('forgeModuleUpdated');
 
     ${not empty param.customSuccess ? param.customSuccess : ''}
 },
 wysihtml5: {
-    "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
-    "emphasis": true, //Italics, bold, etc. Default true
-    "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
-    "html": false, //Button which allows you to edit the generated HTML. Default false
-    "link": true, //Button to insert a link. Default true
-    "image": false, //Button to insert an image. Default true,
-    "color": false //Button to change color of font
+    <c:choose>
+        <c:when test="${empty param.fullEditor || param.fullEditor}">
+            "emphasis": true, //Italics, bold, etc. Default true
+            "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
+            "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
+            "html": false, //Button which allows you to edit the generated HTML. Default false
+            "link": true, //Button to insert a link. Default true
+            "image": false, //Button to insert an image. Default true,
+            "color": false //Button to change color of font
+        </c:when>
+        <c:otherwise>
+            "emphasis": true, //Italics, bold, etc. Default true
+            "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
+            "font-styles": false, //Font styling, e.g. h1, h2, etc. Default true
+            "html": false, //Button which allows you to edit the generated HTML. Default false
+            "link": false, //Button to insert a link. Default true
+            "image": false, //Button to insert an image. Default true,
+            "color": false //Button to change color of font
+        </c:otherwise>
+
+    </c:choose>
 }

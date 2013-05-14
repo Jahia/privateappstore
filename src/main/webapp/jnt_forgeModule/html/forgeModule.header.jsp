@@ -57,8 +57,12 @@
 </template:include>
 <c:set value="${moduleMap.activeVersion}" var="activeVersion"/>
 <c:set value="${moduleMap.activeVersionBinary}" var="activeVersionBinary"/>
+<template:addCacheDependency node="${activeVersion}"/>
 
 <c:if test="${isDeveloper && not viewAsUser}">
+
+    <c:url var="postURL" value="${url.base}${renderContext.mainResource.node.path}"/>
+
     <template:addResources type="inlinejavascript">
 
         <script type="text/javascript">
@@ -71,6 +75,7 @@
                         {value:'organisation', text: '${not empty authorOrganisation ? authorOrganisation : 'organisation'}'}],
                     value: '${authorNameDisplayedAs}',
                     <jsp:include page="../../commons/bootstrap-editable-options.jsp">
+                        <jsp:param name="postURL" value="${postURL}"/>
                         <jsp:param name="customSuccess" value="
                             if (${authorNameDisplayedAs eq 'organisation'} || newValue == 'organisation')
                                 document.location = '${currentNode.url}';

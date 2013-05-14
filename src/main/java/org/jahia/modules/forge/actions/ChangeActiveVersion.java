@@ -46,8 +46,5 @@ public class ChangeActiveVersion  implements BackgroundAction {
         } catch (RepositoryException e) {
             logger.warn(e.getMessage(), e);
         }
-
-
-
     }
 }

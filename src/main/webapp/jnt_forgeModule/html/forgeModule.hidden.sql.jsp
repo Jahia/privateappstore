@@ -22,7 +22,7 @@
         sql="SELECT * FROM [jnt:forgeModuleVersion] AS moduleVersion
             INNER JOIN [jnt:file] AS moduleBinary ON ischildnode(moduleBinary,moduleVersion)
             WHERE isdescendantnode(moduleVersion,['${currentNode.path}']) AND moduleVersion.activeVersion = true
-            ORDER BY moduleBinary.['jcr:created'] DESC"
+            ORDER BY moduleVersion.['jcr:lastModified'] DESC"
         limit= '1' />
 
     <c:forEach items="${query.rows}" var="row">

@@ -22,11 +22,13 @@
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="howToInstall" value="${currentNode.properties['howToInstall'].string}"/>
 <c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}"/>
+<c:if test="${isDeveloper}">
+    <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
+</c:if>
 <c:set var="isEmptyTab" value="false"/>
 
-<c:if test="${isDeveloper}">
-
-    <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
+<c:if test="${isDeveloper && not viewAsUser}">
+    <c:url var="postURL" value="${url.base}${renderContext.mainResource.node.path}"/>
 
     <template:addResources type="inlinejavascript">
 
@@ -35,7 +37,9 @@
             $(document).ready(function() {
 
                 $('#howToInstall-${id}').editable({
-                    <jsp:include page="../../commons/bootstrap-editable-options-wysihtml5.jsp"/>
+                    <jsp:include page="../../commons/bootstrap-editable-options-wysihtml5.jsp">
+                        <jsp:param name="postURL" value="${postURL}"/>
+                    </jsp:include>
                 });
 
                 $('#toggle-howToInstall-${id}').click(function(e) {

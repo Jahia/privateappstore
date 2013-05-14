@@ -51,7 +51,10 @@
 <c:set value="${moduleMap.activeVersionBinary}" var="activeVersionBinary"/>
 
 <c:if test="${isDeveloper && not viewAsUser}">
+
+    <c:url var="postURL" value="${url.base}${renderContext.mainResource.node.path}"/>
     <fmt:message var="labelEmpty" key="jnt_forgeModule.label.empty"/>
+
     <template:addResources type="inlinejavascript">
 
         <script type="text/javascript">
@@ -59,7 +62,9 @@
             $(document).ready(function() {
 
                 $('#description-${id}').editable({
-                    <jsp:include page="../../commons/bootstrap-editable-options-wysihtml5.jsp"/>
+                    <jsp:include page="../../commons/bootstrap-editable-options-wysihtml5.jsp">
+                        <jsp:param name="postURL" value="${postURL}"/>
+                    </jsp:include>
                 });
 
                 $('#toggle-description-${id}').click(function(e) {
@@ -70,14 +75,18 @@
 
                 $('#authorURL-${id}').editable({
                     value: '${not empty authorURL ? authorURL : ''}',
-                    <jsp:include page="../../commons/bootstrap-editable-options.jsp"/>
+                    <jsp:include page="../../commons/bootstrap-editable-options.jsp">
+                        <jsp:param name="postURL" value="${postURL}"/>
+                    </jsp:include>
                 });
 
                 <c:choose>
                     <c:when test="${authorIsOrganisation}">
                         $('#authorEmail-${id}').editable({
                             value: '${not empty authorEmail ? authorEmail : ''}',
-                            <jsp:include page="../../commons/bootstrap-editable-options.jsp"/>
+                            <jsp:include page="../../commons/bootstrap-editable-options.jsp">
+                                <jsp:param name="postURL" value="${postURL}"/>
+                            </jsp:include>
                         });
                     </c:when>
                     <c:otherwise>
