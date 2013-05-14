@@ -5,6 +5,8 @@
 <%@ taglib prefix="template" uri="http://www.jahia.org/tags/templateLib" %>
 <%@ taglib prefix="uiComponents" uri="http://www.jahia.org/tags/uiComponentsLib" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="functions" uri="http://www.jahia.org/tags/functions" %>
+<%@ taglib prefix="user" uri="http://www.jahia.org/tags/user" %>
 <%@ taglib prefix="query" uri="http://www.jahia.org/tags/queryLib" %>
 <%--@elvariable id="currentNode" type="org.jahia.services.content.JCRNodeWrapper"--%>
 <%--@elvariable id="out" type="java.io.PrintWriter"--%>
@@ -25,7 +27,24 @@
 <c:set var="boundComponent"
        value="${uiComponents:getBindedComponent(currentNode, renderContext, 'j:bindedComponent')}"/>
 
-<c:if test="${not empty boundComponent}">
+<c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(boundComponent, 'jcr:all_live')}"/>
+<c:if test="${isDeveloper}">
+    <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
+</c:if>
+
+<c:set var="isFirstReview" value="true"/>
+<c:if test="${jcr:hasChildrenOfType(boundComponent, 'jnt:reviews')}">
+    <jcr:node var="reviews" path="${boundComponent.path}/reviews"/>
+    <c:set var="isFirstReview" value="${not jcr:hasChildrenOfType(reviews, 'jnt:review')}"/>
+</c:if>
+
+<c:if test="${isFirstReview && isDeveloper && not viewAsUser}">
+    <div class="alert alert-info">
+        <fmt:message key="jnt_addReview.label.admin.firstReview"/>
+    </div>
+</c:if>
+
+<c:if test="${not empty boundComponent && (not isDeveloper || viewAsUser)}">
 
     <template:addResources type="inlinejavascript">
 
@@ -58,12 +77,15 @@
                         </c:if>
                     },
                     submitHandler: function(form) {
+
+                        <c:if test="${isDeveloper && viewAsUser}">
+                            return;
+                        </c:if>
                         if ($.trim($('#reviewComment-088857c6-3257-435e-89db-68faf7f57039').val()).length == 0) {
                             $('#reviewTitle-088857c6-3257-435e-89db-68faf7f57039').val("");
                             $('#reviewComment-088857c6-3257-435e-89db-68faf7f57039').val("");
                         }
                         $('#reviewRating-${boundComponent.identifier}').find('input[name="j:lastVote"]').removeAttr("disabled");
-                        //form.submit();
                         moduleDoAddReview("<c:url value='${url.base}${boundComponent.path}'/>", $(form), $(form).parents('.tab-pane').attr('id'));
                     },
                     highlight: function(element, errorClass, validClass) {
@@ -80,7 +102,9 @@
                     disableValue: false
                 });
 
-                $("#writeReview").hide();
+                <c:if test="${not isFirstReview}">
+                    $("#writeReview").hide();
+                </c:if>
 
                 $("#writeReviewToggle").click(function(){
                     $("#writeReview").slideToggle();
@@ -93,12 +117,18 @@
 
     </template:addResources>
 
-    <button class="btn btn-small" id="writeReviewToggle"><fmt:message key="jnt_addReview.label.writeReview"/></button>
+    <button class="btn btn-small ${isFirstReview ? 'btn-inverse': ''}" id="writeReviewToggle"><fmt:message key="jnt_addReview.label.writeReview"/></button>
+
+    <c:if test="${isFirstReview}">
+        <div class="alert alert-info">
+            <fmt:message key="jnt_addReview.label.firstReview"/>
+        </div>
+    </c:if>
 
     <section id="writeReview" class="box box-rounded box-tinted box-margin-top">
 
         <template:tokenizedForm>
-            <form action="<c:url value='${url.base}${boundComponent.path}.chain.do'/>" method="post" id="writeReviewForm" class="form-horizontal">
+            <form action="<c:if test="${not isDeveloper || viewAsUser}"><c:url value='${url.base}${boundComponent.path}.chain.do'/></c:if>" method="post" id="writeReviewForm" class="form-horizontal">
                 <input type="hidden" name="jcrNodeType" value="jnt:review"/>
                 <input type="hidden" name="chainOfAction" value="rate,addReview"/>
 
