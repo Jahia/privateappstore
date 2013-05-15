@@ -1539,6 +1539,16 @@
   margin-bottom: 20px;
   margin-top: 20px;
 }
+.bodywrapper #jnt_forge .viewAs {
+  opacity: 0.4;
+  -webkit-transition: opacity 0.35s ease;
+  -moz-transition: opacity 0.35s ease;
+  -o-transition: opacity 0.35s ease;
+  transition: opacity 0.35s ease;
+}
+.bodywrapper #jnt_forge .viewAs:hover {
+  opacity: 1;
+}
 .bodywrapper .fade {
   opacity: 0;
   -webkit-transition: opacity 0.15s linear;

@@ -1,5 +1,6 @@
 package org.jahia.modules.forge.actions;
 
+import org.jahia.api.Constants;
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
 import org.jahia.bin.Render;
@@ -14,6 +15,8 @@ import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +41,12 @@ public class CreateModule extends Action {
         logger.info("Start creating Forge Module " + title);
 
         JCRNodeWrapper module = createNode(req, parameters, repository, "jnt:forgeModule", title, false);
+
+        if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
+            List<String> roles = Arrays.asList("owner");
+            module.grantRoles("u:" + session.getUser().getUsername(), new HashSet<String>(roles));
+        }
+
         session.save();
 
         logger.info("Forge Module " + title + " successfully created and added to forge repository " + repository.getPath());

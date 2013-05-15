@@ -137,7 +137,7 @@
             </predefined--rows-960gs>
           </pagecontent>
         </dev>
-        <forge-module-creation j:hiddenTemplate="false" j:invertCondition="false" j:originWS="default" j:requireLoggedUser="false" j:requirePrivilegedUser="false" j:view="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:pageTemplate">
+        <forge-module-creation j:hiddenTemplate="false" j:invertCondition="false" j:originWS="default" j:requireLoggedUser="false" j:requirePrivilegedUser="false" j:requiredPermissions="" j:view="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:pageTemplate">
           <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
           <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Module Creation" />
           <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
@@ -162,9 +162,12 @@
                 <main-resource-display j:mainResourceView="header" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
                   <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
                 </main-resource-display>
-                <main-resource-display-1 j:mainResourceView="developerPanel" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
+                <developer-panel j:mainResourceView="developerPanel" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
                   <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                </main-resource-display-1>
+                </developer-panel>
+                <forge-admin-panel j:mainResourceView="forgeAdminPanel" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
+                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
+                </forge-admin-panel>
               </module-aside>
               <module-main j:originWS="default" jcr:primaryType="jnt:contentList">
                 <bootstrap-tabular-list fadeIn="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapTabularList" tabsPosition="top">

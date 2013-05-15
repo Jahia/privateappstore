@@ -20,10 +20,14 @@
 <template:addResources type="javascript" resources="jquery.js, html5shiv.js, forge.js"/>
 <template:addResources type="css" resources="forge.css"/>
 
-<c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}"/>
-
+<c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')
+    && not jcr:hasPermission(currentNode.parent, 'jcr:all_live')}"/>
 <c:if test="${isDeveloper}">
     <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
+</c:if>
+<c:set var="isForgeAdmin" value="${renderContext.loggedIn && jcr:hasPermission(currentNode.parent, 'jcr:all_live')}"/>
+
+<c:if test="${isDeveloper || isForgeAdmin}">
     <template:addResources type="javascript" resources="bootstrap.js, bootstrap-editable.js, wysihtml5-0.3.0.js, bootstrap-wysihtml5.js, wysihtml5.js"/>
     <%--<template:addResources type="javascript" resources="bootstrap.js, bootstrap-editable.js, wysihtml5-0.3.0.js, bootstrap-wysihtml5-0.0.2.js, wysihtml5.js"/>--%>
     <template:addResources type="css" resources="bootstrap-editable.css, wysiwyg-color.css, forge.edition.css"/>

@@ -20,7 +20,8 @@
 <template:addResources type="javascript" resources="jquery.js, html5shiv.js, forge.js"/>
 <template:addResources type="css" resources="forge.css"/>
 
-<c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}"/>
+<c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')
+    && not jcr:hasPermission(currentNode.parent, 'jcr:all_live')}"/>
 
 <c:if test="${isDeveloper}">
 
@@ -80,13 +81,16 @@
 
     </template:addResources>
 
-    <section id="moduleDeveloperPanel">
+    <section id="moduleDeveloperPanel" ${viewAsUser ? 'class="viewAs"' : ''}>
 
+        <h4><fmt:message key="jnt_forgeModule.label.developer.title"/></h4>
 
+        <h6><fmt:message key="jnt_forgeModule.label.developer.modulePageCompletion"/></h6>
         <div class="progress">
             <div id="completion-${id}" class="bar"><span class="ratingCount"></span></div>
         </div>
 
+        <h6><fmt:message key="jnt_forgeModule.label.developer.todoList"/></h6>
         <ul id="todoList-${id}" class="incomplete">
         </ul>
 

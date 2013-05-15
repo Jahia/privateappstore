@@ -19,7 +19,8 @@
 <template:addResources type="javascript" resources="html5shiv.js, forge.js"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
-<c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}"/>
+<c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')
+    && not jcr:hasPermission(currentNode.parent, 'jcr:all_live')}"/>
 <c:if test="${isDeveloper}">
     <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
 </c:if>
@@ -58,16 +59,33 @@
 
 <article id="moduleChangeLog">
 
-    <section class="whatsNew">
+    <c:choose>
 
-        <c:set target="${moduleMap}" property="moduleBinary" value="${moduleMap.activeVersionBinary}"/>
-        <template:module node="${activeVersion}" view="changeLog">
-            <template:param name="isActiveVersion" value="true"/>
-            <template:param name="isDeveloper" value="${isDeveloper}"/>
-            <template:param name="viewAsUser" value="${viewAsUser}"/>
-        </template:module>
+        <c:when test="${not empty activeVersion}">
 
-    </section>
+            <section class="whatsNew">
+
+                <c:set target="${moduleMap}" property="moduleBinary" value="${moduleMap.activeVersionBinary}"/>
+                <template:module node="${activeVersion}" view="changeLog">
+                    <template:param name="isActiveVersion" value="true"/>
+                    <template:param name="isDeveloper" value="${isDeveloper}"/>
+                    <template:param name="viewAsUser" value="${viewAsUser}"/>
+                </template:module>
+
+            </section>
+
+        </c:when>
+        <c:otherwise>
+
+            <c:if test="${isDeveloper && not viewAsUser}">
+                <div class="alert alert-info">
+                    <fmt:message key="jnt_forgeModule.label.developer.emptyChangeLog"/>
+                </div>
+            </c:if>
+
+        </c:otherwise>
+
+    </c:choose>
 
     <c:if test="${functions:length(previousVersions.nodes) > 0}">
 

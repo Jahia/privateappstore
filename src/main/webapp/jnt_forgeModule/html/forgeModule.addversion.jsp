@@ -66,13 +66,13 @@
                         minlength: "<fmt:message key='forge.label.changeLogSizeWarning'/>"
                     }
                 },
-                submitHandler: function(form) {
+                <%--submitHandler: function(form) {
                     $.post('<c:url value='${url.base}${currentNode.path}.addModuleVersion.do'/>',$(form).serialize(), function(data) {
                         if(data['error'] == "versionNumber") {
                             validator.showErrors({versionNumber:"<fmt:message key="jnt_forgeModuleVersion.label.versionNumberAlreadyUsed"/>"});
                         }
                     }, "json");
-                },
+                },  --%>
                 highlight: function(element, errorClass, validClass) {
                     $(element).addClass("error").removeClass(validClass).parents('.control-group').addClass("error");
                 },
@@ -101,7 +101,6 @@
             <div class="control-group">
                 <label class="control-label" for="moduleBinary"><fmt:message key="jnt_forgeModuleVersion.moduleFile"/></label>
                 <div class="controls">
-
                     <input placeholder="<fmt:message key="jnt_forgeModuleVersion.moduleFile" />" class="span16" type="file"
                            name="moduleBinary" id="moduleBinary"/>
                 </div>
@@ -110,10 +109,8 @@
             <div class="control-group">
                 <label class="control-label" for="jahia-moduleVersion-changeLog-${id}"><fmt:message key="jnt_forgeModuleVersion.changeLog"/></label>
                 <div class="controls">
-                    <textarea rows="7" cols="35" id="jahia-moduleVersion-changeLog-${id}"
-                              placeholder="<fmt:message key="jnt_forgeModuleVersion.changeLog" />" class="jahia-ckeditor span16"
-                           name="changeLog">
-                    </textarea>
+                    <textarea rows="7" cols="35" id="jahia-moduleVersion-changeLog-${id}" class="jahia-ckeditor span16"
+                        placeholder="<fmt:message key="jnt_forgeModuleVersion.changeLog" />" name="changeLog"></textarea>
                 </div>
             </div>
 
