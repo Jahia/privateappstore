@@ -48,6 +48,7 @@
  - downloadCount (long) = 0 hidden onconflict=latest autocreated
  - supportedByJahia (boolean) = false autocreated
  - reviewedByJahia (boolean) = false autocreated
+ - published (boolean) = false autocreated
  - deleted (boolean) = false autocreated hidden
  + screenshots (jnt:forgeModuleScreenshotsList) = jnt:forgeModuleScreenshotsList
  + video (jnt:videostreaming) = jnt:videostreaming

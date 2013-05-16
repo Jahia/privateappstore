@@ -27,6 +27,7 @@
 
     <c:set var="id" value="${currentNode.identifier}"/>
     <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
+    <c:set var="published" value="${currentNode.properties['published'].boolean}" />
 
     <template:addResources type="inlinejavascript">
 
@@ -64,9 +65,6 @@
                         $('#todoList-${id}').empty().append(items.join(''));
 
                     }, "json");
-
-
-
                 }
 
                 updateCompletionStatus();
@@ -74,6 +72,34 @@
                 $('#jnt_forge').on('forgeModuleUpdated', function() {
                     updateCompletionStatus();
                 });
+
+                $('#publishModule-${id}').click(function() {
+
+                    var btn = $(this);
+
+                    if (!btn.hasClass('disabled')) {
+
+                        var data = {};
+                        data['publish'] = btn.attr("data-value") == "false";
+
+                        $.post('<c:url value='${url.base}${currentNode.path}.publishModule.do'/>', data, function(result) {
+
+                            var published = result['published'];
+                            if (result['published'] != null) {
+                                btn.toggleClass('btn-success btn-danger');
+                                btn.attr("data-value", result['published']);
+
+                                if (published)
+                                    btn.text('<fmt:message key="jnt_forgeModule.label.developer.unpublish"/>');
+                                else
+                                    btn.text('<fmt:message key="jnt_forgeModule.label.developer.publish"/>');
+                            }
+
+                        }, "json");
+                    }
+                });
+
+                $('#viewAsUserBtn-${id}').tooltip();
 
             });
 
@@ -96,8 +122,17 @@
 
         <div class="btn-group">
             <a class="btn btn-small" href="<c:url value="${url.base}${currentNode.path}.forge-module-add-version.html"/>"><fmt:message key="jnt_forgeModule.label.developer.addVersion"/></a>
-            <a class="btn btn-small ${viewAsUser ? 'btn-primary' : ''}" href="<c:url value="${url.base}${currentNode.path}.html${viewAsUser ? '' : '?viewAs=user'}"/>"><fmt:message key="jnt_forgeModule.label.developer.viewAs"/></a>
-            <button id="publishModule-${id}" class="btn btn-small disabled"><fmt:message key="jnt_forgeModule.label.developer.publish"/></button>
+            <a class="btn btn-small ${viewAsUser ? 'btn-primary' : ''}" id="viewAsUserBtn-${id}"
+                href="<c:url value="${url.base}${currentNode.path}.html${viewAsUser ? '' : '?viewAs=user'}"/>"
+                data-placement="bottom" data-toggle="tooltip" title="<fmt:message key="jnt_forgeModule.label.developer.viewAs.tooltip"/>">
+                <fmt:message key="jnt_forgeModule.label.developer.viewAs"/>
+            </a>
+            <button id="publishModule-${id}" class="btn btn-small ${published ? 'btn-success': 'btn-danger'} disabled" data-value="${published}">
+                <c:choose>
+                    <c:when test="${published}"><fmt:message key="jnt_forgeModule.label.developer.unpublish"/></c:when>
+                    <c:otherwise><fmt:message key="jnt_forgeModule.label.developer.publish"/></c:otherwise>
+                </c:choose>
+            </button>
         </div>
 
     </section>

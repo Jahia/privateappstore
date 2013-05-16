@@ -42,7 +42,7 @@
                     data['jcrMethodToCall'] = 'put';
 
                     $.post('<c:url value='${url.base}${currentNode.path}'/>', data, function(result) {
-                        btn.toggleClass('btn-success').toggleClass('btn-danger');
+                        btn.toggleClass('btn-success btn-danger');
                         btn.attr('data-value', result[dataName]);
                     },"json")
 

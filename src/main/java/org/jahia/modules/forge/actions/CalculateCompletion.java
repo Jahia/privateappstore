@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 
 import javax.jcr.ItemNotFoundException;
 import javax.jcr.PathNotFoundException;
+import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -36,36 +37,83 @@ public class CalculateCompletion  extends Action {
     private static final int NODE = 300;
     private static final int SCREENSHOTS = 400;
     private static final int VERSIONS = 500;
+    private static final int SKIP = 900;
 
-    private boolean canBePublished = false;
-    private int completion = 0, index = 0;
-    private Map<Integer, Map<String, Object>> todoList = new LinkedHashMap<Integer, Map<String, Object>>();
+    private static boolean canBePublished = true;
+    private static int completion = 0, index = 0;
+    private static Map<Integer, Map<String, Object>> todoList = new LinkedHashMap<Integer, Map<String, Object>>();
+    private static List<Object[]> mandatoryProperties, otherProperties;
+
+    private static void initMandatoryProperties(JCRNodeWrapper module) throws RepositoryException {
+
+        if (mandatoryProperties == null)
+            mandatoryProperties = new ArrayList<Object[]>();
+        else
+            mandatoryProperties.clear();
+
+        mandatoryProperties.add(new Object[]{"jcr:title", TEXT, 20});
+        mandatoryProperties.add(new Object[]{"description", TEXT, 20});
+        mandatoryProperties.add(new Object[]{"category", WEAKREFERENCE, 10});
+        mandatoryProperties.add(new Object[]{"versions", VERSIONS, 10});
+        // TODO
+        //mandatoryProperties.add(new Object[]{"screenshots", SCREENSHOTS, 10});
+
+        int authorEmailType;
+        if (module.getPropertyAsString("authorNameDisplayedAs").equals("organisation")
+                || module.getSession().getUser().getProperty("j:email").isEmpty())
+            authorEmailType = TEXT;
+        else
+            authorEmailType = SKIP;
+        mandatoryProperties.add(new Object[]{"authorEmail", authorEmailType, 5});
+    }
+
+    private static void initOtherProperties(JCRNodeWrapper module) {
+
+        otherProperties = new ArrayList<Object[]>();
+
+        otherProperties.add(new Object[]{"howToInstall", TEXT, 10});
+        otherProperties.add(new Object[]{"authorURL", NODE, 5});
+        otherProperties.add(new Object[]{"video", NODE, 5});
+        otherProperties.add(new Object[]{"FAQ", NODE, 5});
+    }
 
     @Override
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource,
                                   JCRSessionWrapper session, Map<String, List<String>> parameters,
                                   URLResolver urlResolver) throws Exception {
-
-        canBePublished = false;
+        canBePublished = true;
         completion = 0;
         index = 0;
         todoList.clear();
 
         JCRNodeWrapper module = resource.getNode();
 
+        initMandatoryProperties(module);
+        if (otherProperties == null)
+            initOtherProperties(module);
+
+        for (Object[] property : mandatoryProperties) {
+            checkProperty((String) property[0], (Integer) property[1], (Integer) property[2], true, session, module);
+        }
+        for (Object[] property : otherProperties) {
+            checkProperty((String) property[0], (Integer) property[1], (Integer) property[2], false, session, module);
+        }
+
+        /*
         checkProperty("jcr:title", TEXT, 20, true, session, module);
         checkProperty("description", TEXT, 20, true, session, module);
         checkProperty("category", WEAKREFERENCE, 10, true, session, module);
-        checkProperty("screenshots", SCREENSHOTS, 10, true, session, module);
+        // TODO
+        //checkProperty("screenshots", SCREENSHOTS, 10, true, session, module);
         checkProperty("versions", VERSIONS, 10, true, session, module);
         if (module.getPropertyAsString("authorNameDisplayedAs").equals("organisation"))
             checkProperty("authorEmail", TEXT, 5, true, session, module);
         else
-            completion += 5;
+            checkProperty("authorEmail", SKIP, 5, true, session, module);
         checkProperty("howToInstall", TEXT, 10, false, session, module);
         checkProperty("video", NODE, 5, false, session, module);
         checkProperty("FAQ", TEXT, 5, false, session, module);
-        checkProperty("authorURL", TEXT, 5, false, session, module);
+        checkProperty("authorURL", TEXT, 5, false, session, module);  */
 
         JSONObject data = new JSONObject();
         data.put("completion", completion);
@@ -75,8 +123,40 @@ public class CalculateCompletion  extends Action {
         return new ActionResult(HttpServletResponse.SC_OK, null, data);
     }
 
+    public static boolean isPublishable(JCRNodeWrapper module) throws RepositoryException {
+
+        canBePublished = true;
+        JCRSessionWrapper session = module.getSession();
+        initMandatoryProperties(module);
+
+        for (Object[] property : mandatoryProperties) {
+            checkProperty((String) property[0], (Integer) property[1], (Integer) property[2], true, session, module, true);
+        }
+
+        /*checkProperty("jcr:title", TEXT, 20, true, session, module, true);
+        if (!canBePublished) return canBePublished;
+        checkProperty("description", TEXT, 20, true, session, module, true);
+        if (!canBePublished) return canBePublished;
+        checkProperty("category", WEAKREFERENCE, 10, true, session, module, true);
+        if (!canBePublished) return canBePublished;
+        // TODO
+        //checkProperty("screenshots", SCREENSHOTS, 10, true, session, module, true);
+        checkProperty("versions", VERSIONS, 10, true, session, module, true);
+        if (!canBePublished) return canBePublished;
+        if (module.getPropertyAsString("authorNameDisplayedAs").equals("organisation"))
+            checkProperty("authorEmail", TEXT, 5, true, session, module, true);
+        */
+
+        return canBePublished;
+    }
+
     private void checkProperty(String name, int type, int percentage, boolean mandatory,
-                               JCRSessionWrapper session, JCRNodeWrapper module) {
+                                      JCRSessionWrapper session, JCRNodeWrapper module) {
+        checkProperty(name, type, percentage, mandatory, session, module, false);
+    }
+
+    private static void checkProperty(String name, int type, int percentage, boolean mandatory,
+                               JCRSessionWrapper session, JCRNodeWrapper module, boolean simpleCheck) {
 
         boolean completed = true;
 
@@ -131,14 +211,20 @@ public class CalculateCompletion  extends Action {
                     completed = false;
                 break;
 
+            case SKIP:
+                break;
         }
 
         if (completed) {
+            if (simpleCheck)
+                return;
             completion += percentage;
         }
         else {
             if (mandatory) {
                 canBePublished = false;
+                if (simpleCheck)
+                    return;
             }
 
             Map<String, Object> propertyMap = new HashMap<String, Object>();
@@ -151,7 +237,7 @@ public class CalculateCompletion  extends Action {
 
     }
 
-    private boolean isEmptyHtmlText(String html) {
+    private static boolean isEmptyHtmlText(String html) {
 
         Source source = new Source(html);
         TextExtractor textExtractor = source.getTextExtractor();

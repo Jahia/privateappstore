@@ -34,7 +34,8 @@
 <c:set var="authorURL" value="${currentNode.properties['authorURL'].string}"/>
 <c:set var="authorEmail" value="${currentNode.properties['authorEmail'].string}"/>
 <c:set var="authorUsername" value="${currentNode.properties['jcr:createdBy'].string}"/>
-<c:set var="userEmail" value="${user:lookupUser(authorUsername).properties['j:email']}"/>
+<c:set var="author" value="${user:lookupUser(authorUsername)}"/>
+<c:set var="userEmail" value="${author.properties['j:email']}"/>
 <c:set var="description" value="${currentNode.properties['description'].string}"/>
 <c:set var="category" value="${currentNode.properties['category']}"/>
 <c:set var="nbOfVotes"
@@ -45,6 +46,7 @@
 <jcr:nodeProperty node="${currentNode}" name="j:tags" var="assignedTags"/>
 <jcr:node var="videoNode" path="${currentNode.path}/video"/>
 
+<template:addCacheDependency path="${author.localPath}"/>
 <template:include view="hidden.sql">
     <template:param name="getActiveVersion" value="true"/>
 </template:include>
@@ -93,7 +95,14 @@
                     <c:otherwise>
                         $('#authorEmail-${id}').popover({
                             title: '<fmt:message key="jnt_forgeModule.label.editAuthorEmail"/>',
-                            content: '<fmt:message key="jnt_forgeModule.label.uneditableAuthorEmail"/>',
+                            <c:choose>
+                                <c:when test="${not empty userEmail}">
+                                    content: '<fmt:message key="jnt_forgeModule.label.uneditableAuthorEmail"/>',
+                                </c:when>
+                                <c:otherwise>
+                                    content: '<fmt:message key="jnt_forgeModule.label.emptyAuthorEmail"/>',
+                                </c:otherwise>
+                            </c:choose>
                             placement: 'top'
                         });
                     </c:otherwise>
@@ -142,18 +151,9 @@
 
                 </c:if>
 
-                <c:choose>
-
-                    <c:when test="${not empty description}">
-                        ${description}
-                    </c:when>
-
-                    <%-- TODO --%>
-                    <c:otherwise>
-
-                    </c:otherwise>
-
-                </c:choose>
+                <c:if test="${not empty description}">
+                    ${description}
+                </c:if>
 
                 <c:if test="${isDeveloper && not viewAsUser}">
             </div>
@@ -175,7 +175,7 @@
                                    data-type="text" data-name="authorEmail" href="#"><fmt:message key="jnt_forgeModule.label.editAuthorEmail"/></a>
                             </c:when>
                             <c:otherwise>
-                                <a id="authorEmail-${id}" class="btn btn-small btn-primary" href="#">${userEmail}</a>
+                                <a id="authorEmail-${id}" class="btn btn-small btn-primary" href="#">${not empty userEmail ? userEmail : labelEmpty}</a>
                             </c:otherwise>
                         </c:choose>
 
