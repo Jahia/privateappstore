@@ -8,6 +8,7 @@ import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,19 +18,24 @@ import java.util.Map;
 
 
 /**
- * Created with IntelliJ IDEA.
- * User: fabriceaissah
- * Date: 2/25/13
- * Time: 4:16 PM
- * To change this template use File | Settings | File Templates.
+ * Date: 2013-05-17
+ *
+ * @author Frédéric PIERRE
+ * @version 1.0
  */
 public class DeleteModule extends Action {
+
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(DeleteModule.class);
+
     @Override
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource, JCRSessionWrapper session, Map<String, List<String>> parameters, URLResolver urlResolver) throws Exception {
-        JCRNodeWrapper node = resource.getNode();
-        node.setProperty("deleted",true);
+
+        JCRNodeWrapper module = resource.getNode();
+
+        session.checkout(module);
+        module.setProperty("deleted",true);
         session.save();
-        return new ActionResult(HttpServletResponse.SC_OK, node.getPath(), Render.serializeNodeToJSON(node));
+
+        return new ActionResult(HttpServletResponse.SC_OK, module.getParent().getPath(), new JSONObject());
     }
 }

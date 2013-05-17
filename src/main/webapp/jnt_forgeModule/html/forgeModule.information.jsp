@@ -35,9 +35,11 @@
 <jcr:node var="videoNode" path="${currentNode.path}/video"/>
 
 <c:set var="authorUsername" value="${currentNode.properties['jcr:createdBy'].string}"/>
-<c:set var="authorFullName" value="${user:fullName(user:lookupUser(authorUsername))}"/>
-<c:set var="authorOrganisation" value="${user:lookupUser(authorUsername).properties['j:organization']}"/>
+<c:set var="author" value="${user:lookupUser(authorUsername)}"/>
+<c:set var="authorFullName" value="${user:fullName(author)}"/>
+<c:set var="authorOrganisation" value="${author.properties['j:organization']}"/>
 <c:set var="authorNameDisplayedAs" value="${currentNode.properties['authorNameDisplayedAs'].string}"/>
+<template:addCacheDependency path="${author.localPath}"/>
 <c:choose>
     <c:when test="${authorNameDisplayedAs eq 'username'}">
         <c:set var="authorName" value="${authorUsername}"/>
@@ -72,6 +74,8 @@
 
     <fmt:message var="labelNotSelected" key="jnt_forgeModule.label.notSelected"/>
     <fmt:message var="labelEmpty" key="jnt_forgeModule.label.empty"/>
+    <fmt:message var="labelEmptyOrganisation" key="jnt_forgeModule.label.developer.emptyOrganisation"/>
+    <fmt:message var="labelEmptyFullName" key="jnt_forgeModule.label.developer.emptyFullName"/>
     <c:url var="postURL" value="${url.base}${renderContext.mainResource.node.path}"/>
 
     <jcr:node var="moduleCategories" path="/sites/systemsite/categories/forge-categories/module-categories"/>
@@ -86,6 +90,18 @@
 
             $(document).ready(function() {
 
+                <c:if test="${empty authorOrganisation}">
+                $('#authorName-information-${id}').on('shown', function(e, editable) {
+                    $(this).next('.editable-container').find('.editable-input select option[value="organisation"]').attr("disabled","true");
+                });
+                </c:if>
+
+                <c:if test="${empty authorFullName || authorFullName eq authorUsername}">
+                $('#authorName-information-${id}').on('shown', function(e, editable) {
+                    $(this).next('.editable-container').find('.editable-input select option[value="fullName"]').attr("disabled","true");
+                });
+                </c:if>
+
                 $('#category-${id}').editable({
                     source: categories,
                     <%-- TODO pre selected value --%>
@@ -97,8 +113,8 @@
 
                 $('#authorName-information-${id}').editable({
                     source: [{value:'username', text:'${authorUsername}'},
-                        {value:'fullName', text:'${not empty authorFullName ? authorFullName : 'fullName'}'},
-                        {value:'organisation', text: '${not empty authorOrganisation ? authorOrganisation : 'organisation'}'}],
+                        {value:'fullName', text:'${not empty authorFullName &&  authorFullName ne authorUsername ? authorFullName : labelEmptyFullName}'},
+                        {value:'organisation', text: '${not empty authorOrganisation ? authorOrganisation : labelEmptyOrganisation}'}],
                     value: '${authorNameDisplayedAs}',
                     <jsp:include page="../../commons/bootstrap-editable-options.jsp">
                         <jsp:param name="postURL" value="${postURL}"/>

@@ -28,8 +28,10 @@
 <c:set var="isForgeAdmin" value="${renderContext.loggedIn && jcr:hasPermission(currentNode.parent, 'jcr:all_live')}"/>
 
 <c:if test="${isDeveloper || isForgeAdmin}">
-    <template:addResources type="javascript" resources="bootstrap.js, bootstrap-editable.js, wysihtml5-0.3.0.js, bootstrap-wysihtml5.js, wysihtml5.js"/>
-    <%--<template:addResources type="javascript" resources="bootstrap.js, bootstrap-editable.js, wysihtml5-0.3.0.js, bootstrap-wysihtml5-0.0.2.js, wysihtml5.js"/>--%>
+    <template:addResources type="javascript" resources="jquery.js,bootstrap-transition.js,bootstrap-alert.js,bootstrap-button.js
+        ,bootstrap-carousel.js,bootstrap-collapse.js,bootstrap-dropdown.js,bootstrap-modal.js,bootstrap-tooltip.js,bootstrap-popover.js
+        ,bootstrap-scrollspy.js,bootstrap-tab.js,bootstrap-typehead.js,bootstrap-affix.js"/>
+    <template:addResources type="javascript" resources="bootstrap-editable.js, wysihtml5-0.3.0.js, bootstrap-wysihtml5.js, wysihtml5.js"/>
     <template:addResources type="css" resources="bootstrap-editable.css, wysiwyg-color.css, forge.edition.css"/>
 </c:if>
 
@@ -38,9 +40,11 @@
 <c:set var="icon" value="${currentNode.properties['icon'].node}"/>
 
 <c:set var="authorUsername" value="${currentNode.properties['jcr:createdBy'].string}"/>
-<c:set var="authorFullName" value="${user:fullName(user:lookupUser(authorUsername))}"/>
-<c:set var="authorOrganisation" value="${user:lookupUser(authorUsername).properties['j:organization']}"/>
+<c:set var="author" value="${user:lookupUser(authorUsername)}"/>
+<c:set var="authorFullName" value="${user:fullName(author)}"/>
+<c:set var="authorOrganisation" value="${author.properties['j:organization']}"/>
 <c:set var="authorNameDisplayedAs" value="${currentNode.properties['authorNameDisplayedAs'].string}"/>
+<template:addCacheDependency path="${author.localPath}"/>
 <c:choose>
     <c:when test="${authorNameDisplayedAs eq 'username'}">
         <c:set var="authorName" value="${authorUsername}"/>
@@ -66,6 +70,8 @@
 <c:if test="${isDeveloper && not viewAsUser}">
 
     <c:url var="postURL" value="${url.base}${renderContext.mainResource.node.path}"/>
+    <fmt:message var="labelEmptyOrganisation" key="jnt_forgeModule.label.developer.emptyOrganisation"/>
+    <fmt:message var="labelEmptyFullName" key="jnt_forgeModule.label.developer.emptyFullName"/>
 
     <template:addResources type="inlinejavascript">
 
@@ -73,10 +79,22 @@
 
             $(document).ready(function() {
 
+                <c:if test="${empty authorOrganisation}">
+                    $('#authorName-header-${id}').on('shown', function(e, editable) {
+                        $(this).next('.editable-container').find('.editable-input select option[value="organisation"]').attr("disabled","true");
+                    });
+                </c:if>
+
+                <c:if test="${empty authorFullName || authorFullName eq authorUsername}">
+                $('#authorName-header-${id}').on('shown', function(e, editable) {
+                    $(this).next('.editable-container').find('.editable-input select option[value="fullName"]').attr("disabled","true");
+                });
+                </c:if>
+
                 $('#authorName-header-${id}').editable({
                     source: [{value:'username', text:'${authorUsername}'},
-                        {value:'fullName', text:'${not empty authorFullName ? authorFullName : 'fullName'}'},
-                        {value:'organisation', text: '${not empty authorOrganisation ? authorOrganisation : 'organisation'}'}],
+                        {value:'fullName', text:'${not empty authorFullName &&  authorFullName ne authorUsername ? authorFullName : labelEmptyFullName}'},
+                        {value:'organisation', text: '${not empty authorOrganisation ? authorOrganisation : labelEmptyOrganisation}'}],
                     value: '${authorNameDisplayedAs}',
                     <jsp:include page="../../commons/bootstrap-editable-options.jsp">
                         <jsp:param name="postURL" value="${postURL}"/>

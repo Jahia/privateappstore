@@ -19,7 +19,6 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
 <template:addResources type="javascript" resources="html5shiv.js"/>
-<%--<template:addResources type="css" resources="bootstrap.css"/>--%>
 <template:addResources type="javascript" resources="jquery.min.js, bootstrap-alert.js"/>
 
 <c:set var="boundComponent"

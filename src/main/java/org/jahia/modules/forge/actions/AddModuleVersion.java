@@ -43,7 +43,7 @@ public class AddModuleVersion extends Action {
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", "versionNumber"));
         }
 
-        JCRNodeWrapper moduleVersion = createNode(req, parameters, module, "jnt:forgeModuleVersion", moduleTitle+"-"+versionNumber, false);
+        JCRNodeWrapper moduleVersion = createNode(req, parameters, module, "jnt:forgeModuleVersion", module.getName()+"-"+versionNumber, false);
 
         String activeVersion = getParameter(parameters, "activeVersion");
 
