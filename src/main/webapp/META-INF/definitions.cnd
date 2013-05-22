@@ -30,6 +30,8 @@
  - startNode (weakreference)
  - nbOfModulePerPage (long) = 9
 
+[jnt:forgeMyModulesList] > jnt:content,  jmix:list, jmix:forge
+
 [jnt:forgeModuleCreation] > jnt:content, mix:title, jmix:forge
  - modulesRepository (weakreference)
 
