@@ -34,23 +34,7 @@
 <jcr:nodeProperty node="${currentNode}" name="j:tags" var="assignedTags"/>
 <jcr:node var="videoNode" path="${currentNode.path}/video"/>
 
-<c:set var="authorUsername" value="${currentNode.properties['jcr:createdBy'].string}"/>
-<c:set var="author" value="${user:lookupUser(authorUsername)}"/>
-<c:set var="authorFullName" value="${user:fullName(author)}"/>
-<c:set var="authorOrganisation" value="${author.properties['j:organization']}"/>
-<c:set var="authorNameDisplayedAs" value="${currentNode.properties['authorNameDisplayedAs'].string}"/>
-<template:addCacheDependency path="${author.localPath}"/>
-<c:choose>
-    <c:when test="${authorNameDisplayedAs eq 'username'}">
-        <c:set var="authorName" value="${authorUsername}"/>
-    </c:when>
-    <c:when test="${authorNameDisplayedAs eq 'fullName'}">
-        <c:set var="authorName" value="${authorFullName}"/>
-    </c:when>
-    <c:when test="${authorNameDisplayedAs eq 'organisation'}">
-        <c:set var="authorName" value="${authorOrganisation}"/>
-    </c:when>
-</c:choose>
+<%@include file="../../commons/authorName.jspf"%>
 
 <template:include view="hidden.sql">
     <template:param name="getActiveVersion" value="true"/>
