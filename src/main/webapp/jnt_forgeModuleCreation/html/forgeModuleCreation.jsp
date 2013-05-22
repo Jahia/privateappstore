@@ -33,11 +33,16 @@
             // Set JQuery to traditional
             $.ajaxSetup({traditional: true, cache:false});
 
-            $("#forgeModuleCreationForm-${id}").validate({
+            jQuery.validator.addMethod("regexp", function(value, element, param) {
+                return this.optional(element) || param.test(value);
+            });
+
+            var validator = $("#forgeModuleCreationForm-${id}").validate({
 
                 rules: {
                     'jcr:title': {
                         required: true,
+                        regexp: /^[^"]*$/i,
                         minlength: 2
                     },
                     'description': {
@@ -48,12 +53,26 @@
                 messages: {
                     'jcr:title': {
                         required: "<fmt:message key='forge.label.askTitle'/>",
+                        regexp: "<fmt:message key="jnt_forgeModuleCreation.label.error.doubleQuote"/>",
                         minlength: "<fmt:message key='forge.label.titleSizeWarning'/>"
                     },
                     'description': {
                         required: "<fmt:message key='forge.label.askDescription'/>",
                         minlength: "<fmt:message key='forge.label.descriptionSizeWarning'/>"
                     }
+                },
+                submitHandler: function(form) {
+                    $.post('<c:url value='${modulesRepositoryPath}.createModule.do'/>',$(form).serialize(), function(data) {
+                        if(data['error'] == "titleAlreadyUsed") {
+                            validator.showErrors({'jcr:title':"<fmt:message key="jnt_forgeModuleCreation.label.error.titleAlreadyUse"/>"});
+                        }
+                    }, "json");
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).addClass("error").removeClass(validClass).parents('.control-group').addClass("error");
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).removeClass("error").addClass(validClass).parents('.control-group').removeClass("error");
                 }
             });
 
@@ -74,6 +93,7 @@
             <fieldset>
 
                 <input type="hidden" name="jcrNormalizeNodeName" value="true"/>
+                <input type="hidden" name="allowsMultipleSubmits" value="true"/>
 
                 <div class="control-group">
                     <label class="control-label" for="jcr:title"><fmt:message key="jnt_forgeModule.label.title"/></label>

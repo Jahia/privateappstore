@@ -1,18 +1,23 @@
 package org.jahia.modules.forge.actions;
 
+import org.apache.jackrabbit.spi.commons.query.sql.JCRSQLQueryBuilder;
 import org.jahia.api.Constants;
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
 import org.jahia.bin.Render;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
+import org.jahia.services.query.QueryResultWrapper;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
 import org.jahia.services.usermanager.JahiaUser;
 import org.jahia.services.usermanager.jcr.JCRUser;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
@@ -39,6 +44,21 @@ public class CreateModule extends Action {
         JCRNodeWrapper repository = resource.getNode();
 
         logger.info("Start creating Forge Module " + title);
+
+        QueryManager queryManager = session.getWorkspace().getQueryManager();
+
+        StringBuilder sb = new StringBuilder("SELECT * FROM [jnt:forgeModule] as module");
+        sb.append(" WHERE isdescendantnode(module, ['").append(repository.getPath()).append("'])");
+        sb.append(" AND module.[jcr:title] = \"").append(title).append("\"");
+
+        String query = sb.toString();
+        Query q = queryManager.createQuery(query, Query.JCR_SQL2);
+        QueryResultWrapper queryResult = (QueryResultWrapper) q.execute();
+
+        boolean isValidTitle = queryResult.getNodes().getSize() == 0;
+
+        if (!isValidTitle)
+            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", "titleAlreadyUsed"));
 
         JCRNodeWrapper module = createNode(req, parameters, repository, "jnt:forgeModule", title, false);
 
