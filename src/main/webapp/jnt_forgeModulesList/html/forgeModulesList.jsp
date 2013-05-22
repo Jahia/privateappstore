@@ -17,11 +17,22 @@
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
-<jcr:nodeProperty var="startNode" node="${currentNode}" name="startNode"/>
-<c:set var="statement"
-       value="SELECT * FROM [jnt:forgeModule]
-                WHERE ISDESCENDANTNODE('${startNode.node.path}') AND [published]=true
-                ORDER BY [jcr:created] DESC"/>
+<template:include view="hidden.header"/>
 
-<query:definition var="listQuery" statement="${statement}"/>
-<c:set target="${moduleMap}" property="listQuery" value="${listQuery}" />
+<c:set var="columnsNumber" value="${currentNode.properties['columnsNumber'].long}"/>
+
+<c:forEach items="${moduleMap.currentList}" var="module" varStatus="status" begin="${moduleMap.begin}" end="${moduleMap.end}">
+
+    <c:if test="${status.index % columnsNumber eq 0}">
+        <div class="row-fluid">
+    </c:if>
+
+    <div class="span${functions:round(12 / columnsNumber)}">
+        <template:module node="${module}"/>
+    </div>
+
+    <c:if test="${status.index % columnsNumber eq columnsNumber - 1}">
+        </div>
+    </c:if>
+
+</c:forEach>

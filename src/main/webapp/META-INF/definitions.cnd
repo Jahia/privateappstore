@@ -28,6 +28,7 @@
 
 [jnt:forgeModulesList] > jnt:content,  jmix:list, jmix:forge
  - startNode (weakreference)
+ - columnsNumber (long) = 3 autocreated mandatory
  - nbOfModulePerPage (long) = 9
 
 [jnt:forgeMyModulesList] > jnt:content,  jmix:list, jmix:forge

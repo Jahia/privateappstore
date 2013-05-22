@@ -4,6 +4,8 @@
 <%@ taglib prefix="utility" uri="http://www.jahia.org/tags/utilityLib" %>
 <%@ taglib prefix="template" uri="http://www.jahia.org/tags/templateLib" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="functions" uri="http://www.jahia.org/tags/functions" %>
+<%@ taglib prefix="user" uri="http://www.jahia.org/tags/user" %>
 <%@ taglib prefix="query" uri="http://www.jahia.org/tags/queryLib" %>
 <%--@elvariable id="currentNode" type="org.jahia.services.content.JCRNodeWrapper"--%>
 <%--@elvariable id="out" type="java.io.PrintWriter"--%>
@@ -15,41 +17,27 @@
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
+<template:addResources type="javascript" resources="html5shiv.js"/>
+<template:addResources type="css" resources="forge.css"/>
 
-<div class="module moduleviewlist">
-    <div style="float: left;">
-        <c:url value="${url.base}${currentNode.path}.html" var="moduleUrl" />
-        <h2><a href="${moduleUrl}">${currentNode.properties['jcr:title'].string}</a></h2>
-        <a href="${moduleUrl}">
-            <c:url value="${currentNode.properties.icon.node.url}" var="iconUrl" />
-            <img alt="icon" src="${currentNode.properties.icon.node.thumbnailUrls['thumbnail']}" class="moduleicon">
+<c:set var="id" value="${currentNode.identifier}"/>
+<c:set var="title" value="${currentNode.properties['jcr:title'].string}"/>
+<c:set var="icon" value="${currentNode.properties['icon'].node}"/>
+<c:set var="description" value="${currentNode.properties['description'].string}"/>
+
+<%@include file="../../commons/authorName.jspf"%>
+
+<section class="forgeModule">
+
+    <header>
+        <a href="<c:url value="${currentNode.url}"/>">
+            <img class="moduleIcon media-object" src="${not empty icon.url ? icon.url : '/modules/forge/img/icon.png'}"
+                 alt="<fmt:message key="jnt_forgeModule.label.moduleIcon"><fmt:param value="${title}"/></fmt:message>"/>
         </a>
+        <a href="<c:url value="${currentNode.url}"/>"><h4>${title}</h4></a>
+        <a class="moduleAuthor">${authorName}</a>
+    </header>
 
-        <c:if test="${jcr:isNodeType(currentNode,'jmix:rating')}">
-            <c:url value="${url.currentModule}/img/rating_${fn:substringBefore(currentNode.properties['j:sumOfVotes'].long / currentNode.properties['j:nbOfVotes'].long,'.')}.png" var="ratingUrl" />
-            <div class="ratingbox floatright"><img alt="rating" src="${ratingUrl}"><small> ${currentNode.properties['j:nbOfVotes'].string} ratings</small></div>
-        </c:if>
+    <p>${functions:abbreviate(functions:removeHtmlTags(description), 100,120,'...')}</p>
 
-        <c:if test="${currentNode.properties.supportedByJahia.boolean}">
-            <c:url value="${url.currentModule}/img/jahia_certified.png" var="jahiaCertifiedUrl" />
-            <div class="certified"><img alt="Jahia Certified" src="${jahiaCertifiedUrl}"></div>
-        </c:if>
-
-        <c:if test="${currentNode.properties.reviewedByJahia.boolean}">
-            <div class="reviewed"><p><fmt:message key="forge.reviewedByJahia"/></p></div>
-        </c:if>
-
-        <c:url value="${currentNode.properties.authorURL.string}" var="authorURL" />
-        <p class="moduleinfo"><fmt:message key="forge.by"/>&nbsp;<a href="${currentNode.properties.authorURL.string}">${currentNode.properties.authorName.string}</a> - <fmt:formatDate value="${currentNode.properties.date.time}" type="date" dateStyle="long"/></p>
-        <p>${currentNode.properties.description.string}</p>
-    </div>
-    <div style="float: left;">
-        <c:if test="${not empty currentNode.properties.relatedJahiaVersion.node}">
-            <p><fmt:message key="forge.JahiaVersion"/>: ${currentNode.properties.relatedJahiaVersion.node.properties['jcr:title'].string}</p>
-        </c:if>
-        <c:if test="${not empty currentNode.properties.jahiAppStatus.node}">
-            <p><fmt:message key="forge.status"/>: ${currentNode.properties.jahiAppStatus.node.properties['jcr:title'].string}</p>
-        </c:if>
-    </div>
-</div>
-<div class="clear"></div>
+</section>

@@ -29,7 +29,7 @@
                 </forge-my-modules-list>
               </bootstrap-row-col1>
               <bootstrap-row-col2 j:originWS="default" jcr:primaryType="jnt:contentList">
-                <forgeModulesList j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:forgeModulesList" nbOfModulePerPage="20" startNode="/templateSets/forge/contents/forge-modules-repository">
+                <forgeModulesList j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:forgeModulesList" nbOfModulePerPage="20" columnsNumber="3" startNode="/templateSets/forge/contents/forge-modules-repository">
                   <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
                 </forgeModulesList>
               </bootstrap-row-col2>
