@@ -72,7 +72,7 @@ public class CalculateCompletion  extends Action {
         otherProperties = new ArrayList<Object[]>();
 
         otherProperties.add(new Object[]{"howToInstall", TEXT, 10});
-        otherProperties.add(new Object[]{"authorURL", NODE, 5});
+        otherProperties.add(new Object[]{"authorURL", TEXT, 5});
         otherProperties.add(new Object[]{"video", NODE, 5});
         otherProperties.add(new Object[]{"FAQ", TEXT, 5});
     }
