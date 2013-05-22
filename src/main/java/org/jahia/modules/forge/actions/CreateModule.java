@@ -71,6 +71,6 @@ public class CreateModule extends Action {
 
         logger.info("Forge Module " + title + " successfully created and added to forge repository " + repository.getPath());
 
-        return new ActionResult(HttpServletResponse.SC_OK, module.getPath(), Render.serializeNodeToJSON(module));
+        return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("moduleUrl", module.getUrl()));
     }
 }

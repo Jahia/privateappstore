@@ -62,9 +62,13 @@
                     }
                 },
                 submitHandler: function(form) {
-                    $.post('<c:url value='${modulesRepositoryPath}.createModule.do'/>',$(form).serialize(), function(data) {
-                        if(data['error'] == "titleAlreadyUsed") {
+                    $.post('<c:url value='${modulesRepositoryPath}.createModule.do'/>',$(form).serialize(), function(result) {
+                        if(result['error'] == "titleAlreadyUsed") {
                             validator.showErrors({'jcr:title':"<fmt:message key="jnt_forgeModuleCreation.label.error.titleAlreadyUse"/>"});
+                        }
+                        else {
+                            if (result['moduleUrl'] != "")
+                                window.location = result['moduleUrl'];
                         }
                     }, "json");
                 },
