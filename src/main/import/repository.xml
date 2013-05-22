@@ -179,36 +179,87 @@
       </publish-your-module>
     </forge>
   </templateSets>
-    <systemsite jcr:primaryType="jnt:virtualsite">
-        <categories jcr:primaryType="jnt:category">
-            <forge-categories xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:jnt="http://www.jahia.org/jahia/nt/1.0" xmlns:test="http://www.apache.org/jackrabbit/test" xmlns:docmix="http://www.jahia.org/jahia/docspace/mix/1.0" xmlns:jmix="http://www.jahia.org/jahia/mix/1.0" xmlns:j="http://www.jahia.org/jahia/1.0" xmlns:mix="http://www.jcp.org/jcr/mix/1.0" xmlns:comnt="http://www.jahia.com/jahia/nt/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:test_templates="http://www.jahia.org/jahia/test_templates/nt/1.0" xmlns:docnt="http://www.jahia.org/jahia/docspace/nt/1.0" xmlns:sv="http://www.jcp.org/jcr/sv/1.0" xmlns:commix="http://www.jahia.com/jahia/mix/1.0" xmlns:rep="internal" j:lastPublished="2013-05-07T10:23:01.614-04:00" j:lastPublishedBy="root" j:originWS="default" j:published="true" jcr:created="2013-05-07T10:23:01.354-04:00" jcr:createdBy="root" jcr:lastModified="2013-05-07T10:23:01.610-04:00" jcr:lastModifiedBy="root" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:category">
-                <j:translation_en j:lastPublished="2013-05-07T10:23:01.715-04:00" j:lastPublishedBy="root" j:published="true" jcr:language="en" jcr:lastModified="2013-05-07T10:23:01.711-04:00" jcr:lastModifiedBy="root" jcr:primaryType="jnt:translation" jcr:title="Forge Categories"/>
-                <module-categories j:lastPublished="2013-05-07T10:23:22.608-04:00" j:lastPublishedBy="root" j:originWS="default" j:published="true" jcr:created="2013-05-07T10:23:22.471-04:00" jcr:createdBy="root" jcr:lastModified="2013-05-07T10:23:22.605-04:00" jcr:lastModifiedBy="root" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:category">
-                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                    <j:translation_en j:lastPublished="2013-05-07T10:23:22.710-04:00" j:lastPublishedBy="root" j:published="true" jcr:language="en" jcr:lastModified="2013-05-07T10:23:22.706-04:00" jcr:lastModifiedBy="root" jcr:primaryType="jnt:translation" jcr:title="Module Categories"/>
-                    <productivity j:lastPublished="2013-05-07T10:24:21.599-04:00" j:lastPublishedBy="root" j:originWS="default" j:published="true" jcr:created="2013-05-07T10:24:21.428-04:00" jcr:createdBy="root" jcr:lastModified="2013-05-07T10:24:21.595-04:00" jcr:lastModifiedBy="root" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:category">
+    <sites jcr:primaryType="jnt:virtualsitesFolder">
+        <systemsite jcr:primaryType="jnt:virtualsite">
+            <categories jcr:primaryType="jnt:category">
+                <forge-categories j:lastPublished="2013-05-07T10:23:01.614-04:00" j:lastPublishedBy="root"
+                                  j:originWS="default" j:published="true" jcr:created="2013-05-07T10:23:01.354-04:00"
+                                  jcr:createdBy="root" jcr:lastModified="2013-05-07T10:23:01.610-04:00"
+                                  jcr:lastModifiedBy="root" jcr:mixinTypes="jmix:accessControlled"
+                                  jcr:primaryType="jnt:category">
+                    <j:translation_en j:lastPublished="2013-05-07T10:23:01.715-04:00" j:lastPublishedBy="root"
+                                      j:published="true" jcr:language="en"
+                                      jcr:lastModified="2013-05-07T10:23:01.711-04:00" jcr:lastModifiedBy="root"
+                                      jcr:primaryType="jnt:translation" jcr:title="Forge Categories"/>
+                    <module-categories j:lastPublished="2013-05-07T10:23:22.608-04:00" j:lastPublishedBy="root"
+                                       j:originWS="default" j:published="true"
+                                       jcr:created="2013-05-07T10:23:22.471-04:00" jcr:createdBy="root"
+                                       jcr:lastModified="2013-05-07T10:23:22.605-04:00" jcr:lastModifiedBy="root"
+                                       jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:category">
                         <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                        <j:translation_en j:lastPublished="2013-05-07T10:24:21.699-04:00" j:lastPublishedBy="root" j:published="true" jcr:language="en" jcr:lastModified="2013-05-07T10:24:21.695-04:00" jcr:lastModifiedBy="root" jcr:primaryType="jnt:translation" jcr:title="Productivity"/>
-                    </productivity>
-                    <social j:lastPublished="2013-05-07T10:24:27.766-04:00" j:lastPublishedBy="root" j:originWS="default" j:published="true" jcr:created="2013-05-07T10:24:27.076-04:00" jcr:createdBy="root" jcr:lastModified="2013-05-07T10:24:27.624-04:00" jcr:lastModifiedBy="root" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:category">
-                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                        <j:translation_en j:lastPublished="2013-05-07T10:24:27.895-04:00" j:lastPublishedBy="root" j:published="true" jcr:language="en" jcr:lastModified="2013-05-07T10:24:27.891-04:00" jcr:lastModifiedBy="root" jcr:primaryType="jnt:translation" jcr:title="Social"/>
-                    </social>
-                    <communication j:lastPublished="2013-05-07T10:24:37.086-04:00" j:lastPublishedBy="root" j:originWS="default" j:published="true" jcr:created="2013-05-07T10:24:36.963-04:00" jcr:createdBy="root" jcr:lastModified="2013-05-07T10:24:37.083-04:00" jcr:lastModifiedBy="root" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:category">
-                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                        <j:translation_en j:lastPublished="2013-05-07T10:24:37.197-04:00" j:lastPublishedBy="root" j:published="true" jcr:language="en" jcr:lastModified="2013-05-07T10:24:37.193-04:00" jcr:lastModifiedBy="root" jcr:primaryType="jnt:translation" jcr:title="Communication"/>
-                    </communication>
-                    <game j:lastPublished="2013-05-07T10:24:42.387-04:00" j:lastPublishedBy="root" j:originWS="default" j:published="true" jcr:created="2013-05-07T10:24:42.261-04:00" jcr:createdBy="root" jcr:lastModified="2013-05-07T10:24:42.384-04:00" jcr:lastModifiedBy="root" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:category">
-                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                        <j:translation_en j:lastPublished="2013-05-07T10:24:42.487-04:00" j:lastPublishedBy="root" j:published="true" jcr:language="en" jcr:lastModified="2013-05-07T10:24:42.483-04:00" jcr:lastModifiedBy="root" jcr:primaryType="jnt:translation" jcr:title="Game"/>
-                    </game>
-                    <business j:lastPublished="2013-05-07T10:24:48.348-04:00" j:lastPublishedBy="root" j:originWS="default" j:published="true" jcr:created="2013-05-07T10:24:48.236-04:00" jcr:createdBy="root" jcr:lastModified="2013-05-07T10:24:48.344-04:00" jcr:lastModifiedBy="root" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:category">
-                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                        <j:translation_en j:lastPublished="2013-05-07T10:24:48.446-04:00" j:lastPublishedBy="root" j:published="true" jcr:language="en" jcr:lastModified="2013-05-07T10:24:48.443-04:00" jcr:lastModifiedBy="root" jcr:primaryType="jnt:translation" jcr:title="Business"/>
-                    </business>
-                </module-categories>
-            </forge-categories>
-        </categories>
-    </systemsite>
+                        <j:translation_en j:lastPublished="2013-05-07T10:23:22.710-04:00" j:lastPublishedBy="root"
+                                          j:published="true" jcr:language="en"
+                                          jcr:lastModified="2013-05-07T10:23:22.706-04:00" jcr:lastModifiedBy="root"
+                                          jcr:primaryType="jnt:translation" jcr:title="Module Categories"/>
+                        <productivity j:lastPublished="2013-05-07T10:24:21.599-04:00" j:lastPublishedBy="root"
+                                      j:originWS="default" j:published="true"
+                                      jcr:created="2013-05-07T10:24:21.428-04:00" jcr:createdBy="root"
+                                      jcr:lastModified="2013-05-07T10:24:21.595-04:00" jcr:lastModifiedBy="root"
+                                      jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:category">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <j:translation_en j:lastPublished="2013-05-07T10:24:21.699-04:00" j:lastPublishedBy="root"
+                                              j:published="true" jcr:language="en"
+                                              jcr:lastModified="2013-05-07T10:24:21.695-04:00" jcr:lastModifiedBy="root"
+                                              jcr:primaryType="jnt:translation" jcr:title="Productivity"/>
+                        </productivity>
+                        <social j:lastPublished="2013-05-07T10:24:27.766-04:00" j:lastPublishedBy="root"
+                                j:originWS="default" j:published="true" jcr:created="2013-05-07T10:24:27.076-04:00"
+                                jcr:createdBy="root" jcr:lastModified="2013-05-07T10:24:27.624-04:00"
+                                jcr:lastModifiedBy="root" jcr:mixinTypes="jmix:accessControlled"
+                                jcr:primaryType="jnt:category">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <j:translation_en j:lastPublished="2013-05-07T10:24:27.895-04:00" j:lastPublishedBy="root"
+                                              j:published="true" jcr:language="en"
+                                              jcr:lastModified="2013-05-07T10:24:27.891-04:00" jcr:lastModifiedBy="root"
+                                              jcr:primaryType="jnt:translation" jcr:title="Social"/>
+                        </social>
+                        <communication j:lastPublished="2013-05-07T10:24:37.086-04:00" j:lastPublishedBy="root"
+                                       j:originWS="default" j:published="true"
+                                       jcr:created="2013-05-07T10:24:36.963-04:00" jcr:createdBy="root"
+                                       jcr:lastModified="2013-05-07T10:24:37.083-04:00" jcr:lastModifiedBy="root"
+                                       jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:category">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <j:translation_en j:lastPublished="2013-05-07T10:24:37.197-04:00" j:lastPublishedBy="root"
+                                              j:published="true" jcr:language="en"
+                                              jcr:lastModified="2013-05-07T10:24:37.193-04:00" jcr:lastModifiedBy="root"
+                                              jcr:primaryType="jnt:translation" jcr:title="Communication"/>
+                        </communication>
+                        <game j:lastPublished="2013-05-07T10:24:42.387-04:00" j:lastPublishedBy="root"
+                              j:originWS="default" j:published="true" jcr:created="2013-05-07T10:24:42.261-04:00"
+                              jcr:createdBy="root" jcr:lastModified="2013-05-07T10:24:42.384-04:00"
+                              jcr:lastModifiedBy="root" jcr:mixinTypes="jmix:accessControlled"
+                              jcr:primaryType="jnt:category">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <j:translation_en j:lastPublished="2013-05-07T10:24:42.487-04:00" j:lastPublishedBy="root"
+                                              j:published="true" jcr:language="en"
+                                              jcr:lastModified="2013-05-07T10:24:42.483-04:00" jcr:lastModifiedBy="root"
+                                              jcr:primaryType="jnt:translation" jcr:title="Game"/>
+                        </game>
+                        <business j:lastPublished="2013-05-07T10:24:48.348-04:00" j:lastPublishedBy="root"
+                                  j:originWS="default" j:published="true" jcr:created="2013-05-07T10:24:48.236-04:00"
+                                  jcr:createdBy="root" jcr:lastModified="2013-05-07T10:24:48.344-04:00"
+                                  jcr:lastModifiedBy="root" jcr:mixinTypes="jmix:accessControlled"
+                                  jcr:primaryType="jnt:category">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <j:translation_en j:lastPublished="2013-05-07T10:24:48.446-04:00" j:lastPublishedBy="root"
+                                              j:published="true" jcr:language="en"
+                                              jcr:lastModified="2013-05-07T10:24:48.443-04:00" jcr:lastModifiedBy="root"
+                                              jcr:primaryType="jnt:translation" jcr:title="Business"/>
+                        </business>
+                    </module-categories>
+                </forge-categories>
+            </categories>
+        </systemsite>
+    </sites>
 </content>
 
