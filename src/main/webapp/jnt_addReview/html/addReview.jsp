@@ -106,26 +106,26 @@
 
                 <c:if test="${not isFirstReview}">
                     $("#writeReview").hide();
+
+                    $("#writeReviewToggle").click(function(){
+                        $("#writeReview").slideToggle();
+                        $(this).toggleClass("btn-inverse");
+                    });
                 </c:if>
-
-                $("#writeReviewToggle").click(function(){
-                    $("#writeReview").slideToggle();
-                    $(this).toggleClass("btn-inverse");
-                });
-
             });
 
         </script>
 
     </template:addResources>
 
-    <button class="btn btn-small ${isFirstReview ? 'btn-inverse': ''}" id="writeReviewToggle"><fmt:message key="jnt_addReview.label.writeReview"/></button>
-
-    <c:if test="${isFirstReview}">
-        <div class="alert alert-info">
-            <fmt:message key="jnt_addReview.label.firstReview"/>
-        </div>
-    </c:if>
+    <c:choose>
+        <c:when test="${isFirstReview}">
+            <div class="alert alert-info"><fmt:message key="jnt_addReview.label.firstReview"/></div>
+        </c:when>
+        <c:otherwise>
+            <button class="btn btn-small" id="writeReviewToggle"><fmt:message key="jnt_addReview.label.writeReview"/></button>
+        </c:otherwise>
+    </c:choose>
 
     <section id="writeReview" class="box box-rounded box-tinted box-margin-top">
 
