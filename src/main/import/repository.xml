@@ -108,8 +108,8 @@
                       <main-resource-display j:mainResourceView="screenshots" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
                           <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
                       </main-resource-display>
-                      <file-upload-form j:view="forge" jcr:mixinTypes="jmix:accessControlled jmix:renderable" jcr:primaryType="jnt:fileUpload">
-                          <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
+                      <file-upload-form j:invertCondition="false"  j:requireLoggedUser="true" j:requirePrivilegedUser="false" j:requiredPermissions="/permissions/repository-permissions/jcr:all_live" j:view="forge" jcr:mixinTypes="jmix:accessControlled jmix:renderable jmix:requiredPermissions" jcr:primaryType="jnt:fileUpload" >
+                          <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />;
                       </file-upload-form>
                   </screenshots>
                   <video j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentList">
