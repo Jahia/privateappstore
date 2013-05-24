@@ -60,7 +60,7 @@
     <fmt:message var="labelEmpty" key="jnt_forgeModule.label.empty"/>
     <fmt:message var="labelEmptyOrganisation" key="jnt_forgeModule.label.developer.emptyOrganisation"/>
     <fmt:message var="labelEmptyFullName" key="jnt_forgeModule.label.developer.emptyFullName"/>
-    <c:url var="postURL" value="${url.base}${renderContext.mainResource.node.path}"/>
+    <c:url var="postURL" value="${url.base}${currentNode.path}"/>
 
     <jcr:node var="moduleCategories" path="/sites/systemsite/categories/forge-categories/module-categories"/>
 

@@ -25,7 +25,7 @@ ajaxOptions: {
 params: function(params) {
     var data = {};
     data[params.name] = params.value;
-    data['jcrMethodToCall'] = 'put';
+    data['jcrMethodToCall'] = '${not empty param.jcrMethodToCall ? param.jcrMethodToCall : 'put'}';
     return data;
 },
 url: '${param.postURL}',

@@ -300,6 +300,28 @@
   font-style: normal;
   line-height: 20px;
 }
+.bodywrapper #jnt_forge .fade {
+  opacity: 0;
+  -webkit-transition: opacity 0.15s linear;
+  -moz-transition: opacity 0.15s linear;
+  -o-transition: opacity 0.15s linear;
+  transition: opacity 0.15s linear;
+}
+.bodywrapper #jnt_forge .fade.in {
+  opacity: 1;
+}
+.bodywrapper #jnt_forge .collapse {
+  position: relative;
+  height: 0;
+  overflow: hidden;
+  -webkit-transition: height 0.35s ease;
+  -moz-transition: height 0.35s ease;
+  -o-transition: height 0.35s ease;
+  transition: height 0.35s ease;
+}
+.bodywrapper #jnt_forge .collapse.in {
+  height: auto;
+}
 .bodywrapper #jnt_forge .close {
   float: right;
   font-size: 20px;
@@ -1385,10 +1407,16 @@
 .bodywrapper #jnt_forge .box.box-margin-top {
   margin-top: 20px;
 }
-.bodywrapper #jnt_forge .tag {
+.bodywrapper #jnt_forge .moduleTags > h5 {
+  display: inline-block;
+}
+.bodywrapper #jnt_forge .moduleTags > ul {
+  display: inline-block;
+}
+.bodywrapper #jnt_forge .moduleTags .tag {
   color: #999999;
 }
-.bodywrapper #jnt_forge .tag:before {
+.bodywrapper #jnt_forge .moduleTags .tag:before {
   content: "#";
 }
 .bodywrapper #jnt_forge dl.dl-small dt,

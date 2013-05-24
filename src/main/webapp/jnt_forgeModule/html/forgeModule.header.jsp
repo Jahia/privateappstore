@@ -31,8 +31,8 @@
     <template:addResources type="javascript" resources="jquery.js,bootstrap-transition.js,bootstrap-alert.js,bootstrap-button.js
         ,bootstrap-carousel.js,bootstrap-collapse.js,bootstrap-dropdown.js,bootstrap-modal.js,bootstrap-tooltip.js,bootstrap-popover.js
         ,bootstrap-scrollspy.js,bootstrap-tab.js,bootstrap-typehead.js,bootstrap-affix.js"/>
-    <template:addResources type="javascript" resources="bootstrap-editable.js, wysihtml5-0.3.0.js, bootstrap-wysihtml5.js, wysihtml5.js"/>
-    <template:addResources type="css" resources="bootstrap-editable.css, wysiwyg-color.css, forge.edition.css"/>
+    <template:addResources type="javascript" resources="select2.js, bootstrap-editable.js, wysihtml5-0.3.0.js, bootstrap-wysihtml5.js, wysihtml5.js"/>
+    <template:addResources type="css" resources="select2.css, select2-bootstrap.css, bootstrap-editable.css, wysiwyg-color.css, forge.edition.css"/>
 </c:if>
 
 <c:set var="id" value="${currentNode.identifier}"/>
@@ -53,7 +53,7 @@
 
 <c:if test="${isDeveloper && not viewAsUser}">
 
-    <c:url var="postURL" value="${url.base}${renderContext.mainResource.node.path}"/>
+    <c:url var="postURL" value="${url.base}${currentNode.path}"/>
     <fmt:message var="labelEmptyOrganisation" key="jnt_forgeModule.label.developer.emptyOrganisation"/>
     <fmt:message var="labelEmptyFullName" key="jnt_forgeModule.label.developer.emptyFullName"/>
 

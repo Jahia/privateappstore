@@ -30,7 +30,7 @@
 
 <c:if test="${isDeveloper && not viewAsUser}">
 
-    <c:url var="postURL" value="${url.base}${renderContext.mainResource.node.path}"/>
+    <c:url var="postURL" value="${url.base}${currentNode.path}"/>
     <template:addResources type="inlinejavascript">
 
         <script type="text/javascript">

@@ -55,7 +55,7 @@
 
 <c:if test="${isDeveloper && not viewAsUser}">
 
-    <c:url var="postURL" value="${url.base}${renderContext.mainResource.node.path}"/>
+    <c:url var="postURL" value="${url.base}${currentNode.path}"/>
     <fmt:message var="labelEmpty" key="jnt_forgeModule.label.empty"/>
 
     <template:addResources type="inlinejavascript">
@@ -107,7 +107,27 @@
                         });
                     </c:otherwise>
                 </c:choose>
+                
+                <jcr:sql var="tags" sql="SELECT * FROM [jnt:tag] WHERE ischildnode(['${renderContext.site.path}/tags'])"/>
 
+                <c:set var="tagsList" value=""/>
+                <c:forEach items="${tags.nodes}" var="tag" varStatus="status">
+                    <%--<c:set var="tagsList" value="${tagsList} {id: '${tag.identifier}', text:'${tag.name}'} ${not status.last ? ',': ''}"/>--%>
+                    <c:set var="tagsList" value="${tagsList} '${tag.name}'${not status.last ? ',': ''}"/>
+                </c:forEach>
+
+                $('#tags-${id}').editable({
+                    inputclass: 'input-large',
+                    select2: {
+                        tags: [${tagsList}],
+                        tokenSeparators: [",", " "]
+                    },
+                    source: [${tagsList}],
+                    <jsp:include page="../../commons/bootstrap-editable-options.jsp">
+                        <jsp:param name="postURL" value="${postURL}.editTags.do"/>
+                        <jsp:param name="jcrMethodToCall" value="post"/>
+                    </jsp:include>
+                });
 
                 <%--$.fn.addPopover = function() {
                     this.popover({
@@ -146,7 +166,7 @@
                 <a id="toggle-description-${id}" href="#"><i class="icon-pencil"></i>&nbsp;<fmt:message key="jnt_forgeModule.label.edit"/></a>
             </p>
 
-            <div data-original-title="<fmt:message key="jnt_forgeModule.label.FAQ"/>" data-toggle="manual" data-name="description" data-type="wysihtml5"
+            <div data-original-title="<fmt:message key="jnt_forgeModule.label.description"/>" data-toggle="manual" data-name="description" data-type="wysihtml5"
                  data-pk="1" id="description-${id}" class="editable" tabindex="-1">
 
                 </c:if>
@@ -179,6 +199,15 @@
                             </c:otherwise>
                         </c:choose>
 
+                        <section class="moduleTags">
+
+                            <h5><fmt:message key="jnt_forgeModule.label.tags"/></h5>
+                            <a href="#" id="tags-${id}" class="editable editable-click" data-type="select2" data-pk="1" data-original-title="Select country">
+                                <c:forEach items="${assignedTags}" var="tag" varStatus="status">${tag.node.name}${not status.last ? ', ' : ''}</c:forEach>
+                            </a>
+
+                        </section>
+
                     </c:when>
 
                     <c:otherwise>
@@ -195,24 +224,25 @@
                         </c:choose>
                         <c:if test="${not empty authorEmail}">
                         </c:if>
+
+                        <c:if test="${not empty assignedTags}">
+
+                            <section class="moduleTags">
+
+                                <h5><fmt:message key="jnt_forgeModule.label.tags"/></h5>
+                                <ul class="inline">
+                                    <c:forEach items="${assignedTags}" var="tag" varStatus="status">
+                                        <li class="tag">${tag.node.name}</li>
+                                    </c:forEach>
+                                </ul>
+
+                            </section>
+
+                        </c:if>
+
                     </c:otherwise>
 
                 </c:choose>
-
-                <c:if test="${not empty assignedTags}">
-
-                    <section class="moduleTags">
-
-                        <header><fmt:message key="jnt_forgeModule.label.tags"/></header>
-                        <ul class="inline">
-                            <c:forEach items="${assignedTags}" var="tag" varStatus="status">
-                                <li class="tag">${tag.node.name}</li>
-                            </c:forEach>
-                        </ul>
-
-                    </section>
-
-                </c:if>
 
             </footer>
 
