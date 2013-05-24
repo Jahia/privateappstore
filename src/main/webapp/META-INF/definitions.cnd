@@ -53,9 +53,8 @@
  - reviewedByJahia (boolean) = false autocreated
  - published (boolean) = false autocreated
  - deleted (boolean) = false autocreated hidden
- + screenshots (jnt:forgeModuleScreenshotsList) = jnt:forgeModuleScreenshotsList
+ + screenshots (jnt:forgeModuleScreenshotsList) = jnt:forgeModuleScreenshotsList autocreated hidden
  + video (jnt:videostreaming) = jnt:videostreaming
- + files (jnt:folder) = jnt:folder autocreated hidden
  + * (jnt:forgeModuleVersion)
 
 [jnt:forgeModuleVersion]> jnt:content, jmix:editorialContent, jmix:forge
@@ -69,7 +68,4 @@
  + * (jnt:file)
 
 [jnt:forgeModuleScreenshotsList] > jnt:content, jmix:list orderable
- + * (jnt:forgeModuleScreenshot) = jnt:forgeModuleScreenshot
-
-[jnt:forgeModuleScreenshot] > jnt:content
- - screenshot (weakreference, picker[type='image']) mandatory
+ + * (jnt:file) = jnt:file
