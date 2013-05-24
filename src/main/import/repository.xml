@@ -24,12 +24,16 @@
                     <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Publish your module" />
                   </publish-your-module>
                 </actions>
-                  <facets-list j:view="forge" j:bindedComponent="/templateSets/forge/contents/forge-modules-repository" j:originWS="default" j:type="jnt:forgeModule" jcr:created="2013-05-23T10:40:32.143-04:00" jcr:createdBy="root" jcr:lastModified="2013-05-23T11:26:31.925-04:00" jcr:lastModifiedBy="root" jcr:mixinTypes="jmix:accessControlled jmix:renderable" jcr:primaryType="jnt:facets">
+                  <facets-list j:view="forge" j:bindedComponent="/templateSets/forge/contents/forge-modules-repository" j:type="jnt:forgeModule" jcr:mixinTypes="jmix:accessControlled jmix:renderable" jcr:primaryType="jnt:facets">
                       <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                      <field-facet facet="Category" field="jnt:forgeModule;category" j:originWS="default" jcr:created="2013-05-23T10:41:04.674-04:00" jcr:createdBy="root" jcr:lastModified="2013-05-23T10:41:04.761-04:00" jcr:lastModifiedBy="root" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:fieldFacet" limit="100" mincount="1" missing="false" offset="0">
+                      <field-facet facet="Category" field="jnt:forgeModule;category" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:fieldFacet" limit="100" mincount="1" missing="false" offset="0">
                           <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                          <j:translation_en jcr:language="en" jcr:lastModified="2013-05-23T10:41:04.831-04:00" jcr:lastModifiedBy="root" jcr:primaryType="jnt:translation" label="Category" />
+                          <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" label="Category" />
                       </field-facet>
+                      <field-facet-1 facet="Tags" field="jmix:tagged;j:tags" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:fieldFacet" limit="100" mincount="1" missing="false" offset="0">
+                          <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
+                          <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" label="Tags" />
+                      </field-facet-1>
                   </facets-list>
                 <forge-my-modules-list j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:forgeMyModulesList">
                   <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
