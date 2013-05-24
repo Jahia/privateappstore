@@ -14,13 +14,13 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 <%--@elvariable id="acl" type="java.lang.String"--%>
 <c:if test="${!empty activeFacetsVars[activeFacetMapVarName]}">
-    <div class="activefacetsList">
     <h4><fmt:message key="facets.activeFacets"/></h4>
-    <ul>
+    <ul class="inline">
 </c:if>
 <c:forEach items="${activeFacetsVars[activeFacetMapVarName]}" var="facet" varStatus="activeFacetStat">
     <c:forEach items="${facet.value}" var="facetValue">
-        <c:set var="facetParam" value="${facet:getDeleteFacetUrl(facet, facetValue, activeFacetsVars[facetParamVarName])}"/>
+        <c:set var="facetParam"
+               value="${facet:getDeleteFacetUrl(facet, facetValue, activeFacetsVars[facetParamVarName])}"/>
         <c:url var="facetUrl" value="${url.mainResource}">
             <c:if test="${not empty facetParam}">
                 <c:param name="${facetParamVarName}" value="${functions:encodeUrlParam(facetParam)}"/>
@@ -30,21 +30,18 @@
             <%--hack to avoid url rewriting from filters--%>
             <c:when test="${empty facetParam}">
                 <li>
-                    <facet:facetValueLabel currentActiveFacet="${facet}" currentActiveFacetValue="${facetValue}" facetValueLabels="${facetValueLabels}"/>
-                    &nbsp;<a onclick="window.location='${facetUrl}'"><fmt:message key="facets.remove"/></a>
+                    <span class="label label-success"><facet:facetValueLabel currentActiveFacet="${facet}" currentActiveFacetValue="${facetValue}" facetValueLabels="${facetValueLabels}"/>&nbsp;<a onclick="window.location='${facetUrl}'">&times;</a></span>
                 </li>
             </c:when>
             <c:otherwise>
                 <li>
-                    <facet:facetValueLabel currentActiveFacet="${facet}" currentActiveFacetValue="${facetValue}" facetValueLabels="${facetValueLabels}"/>
-                    &nbsp;<a href="${facetUrl}"><fmt:message key="facets.remove"/></a>
+                    <span class="label label-success"><facet:facetValueLabel currentActiveFacet="${facet}" currentActiveFacetValue="${facetValue}"
+                                           facetValueLabels="${facetValueLabels}"/>&nbsp;<a href="${facetUrl}">&times;</a></span>
                 </li>
             </c:otherwise>
         </c:choose>
     </c:forEach>
 </c:forEach>
 <c:if test="${!empty activeFacetsVars[activeFacetMapVarName]}">
-    <div class="clear" />
     </ul>
-    </div>
 </c:if>

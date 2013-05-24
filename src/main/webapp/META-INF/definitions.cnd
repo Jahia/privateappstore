@@ -31,7 +31,7 @@
  - columnsNumber (long) = 3 autocreated mandatory
  - nbOfModulePerPage (long) = 9
 
-[jnt:forgeMyModulesList] > jnt:content,  jmix:list, jmix:forge
+[jnt:forgeMyModulesList] > jnt:content,  jmix:list, jmix:forge, mix:title
 
 [jnt:forgeModuleCreation] > jnt:content, mix:title, jmix:forge
  - modulesRepository (weakreference)

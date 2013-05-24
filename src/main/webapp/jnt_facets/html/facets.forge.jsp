@@ -199,11 +199,8 @@
 </query:definition>
 <jcr:jqom var="result" qomBeanName="listQuery" scope="request"/>
 <c:if test="${not result.facetResultsEmpty or not empty param[facetParamVarName]}">
-    <div class="facets">
+    <div >
         <%@include file="activeFacets.jspf" %>
-        <c:if test="${facet:isUnappliedFacetExisting(result, activeFacetsVars[activeFacetMapVarName])}">
-            <h4><fmt:message key="facets.SelectFilter"/></h4> <br/>
-        </c:if>
         <c:forEach items="${result.facetFields}" var="currentFacet">
             <%@include file="facetDisplay.jspf" %>
         </c:forEach>
@@ -220,7 +217,7 @@
             </ul>
         </c:if>
 
-        <div class="facetsList">
+        <div>
             <h5>${mappedFacetLabel}</h5>
             <ul>
                 </c:if>
