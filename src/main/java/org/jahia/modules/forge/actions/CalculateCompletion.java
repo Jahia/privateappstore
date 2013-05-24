@@ -37,6 +37,7 @@ public class CalculateCompletion  extends Action {
     private static final int NODE = 300;
     private static final int SCREENSHOTS = 400;
     private static final int VERSIONS = 500;
+    private static final int TAGS = 600;
     private static final int SKIP = 900;
 
     private static boolean canBePublished = true;
@@ -75,6 +76,7 @@ public class CalculateCompletion  extends Action {
         otherProperties.add(new Object[]{"authorURL", TEXT, 5});
         otherProperties.add(new Object[]{"video", NODE, 5});
         otherProperties.add(new Object[]{"FAQ", TEXT, 5});
+        otherProperties.add(new Object[]{"j:tags", TAGS, 5});
     }
 
     @Override
@@ -99,22 +101,6 @@ public class CalculateCompletion  extends Action {
             checkProperty((String) property[0], (Integer) property[1], (Integer) property[2], false, session, module);
         }
 
-        /*
-        checkProperty("jcr:title", TEXT, 20, true, session, module);
-        checkProperty("description", TEXT, 20, true, session, module);
-        checkProperty("category", WEAKREFERENCE, 10, true, session, module);
-        // TODO
-        //checkProperty("screenshots", SCREENSHOTS, 10, true, session, module);
-        checkProperty("versions", VERSIONS, 10, true, session, module);
-        if (module.getPropertyAsString("authorNameDisplayedAs").equals("organisation"))
-            checkProperty("authorEmail", TEXT, 5, true, session, module);
-        else
-            checkProperty("authorEmail", SKIP, 5, true, session, module);
-        checkProperty("howToInstall", TEXT, 10, false, session, module);
-        checkProperty("video", NODE, 5, false, session, module);
-        checkProperty("FAQ", TEXT, 5, false, session, module);
-        checkProperty("authorURL", TEXT, 5, false, session, module);  */
-
         JSONObject data = new JSONObject();
         data.put("completion", completion);
         data.put("todoList", todoList);
@@ -131,21 +117,9 @@ public class CalculateCompletion  extends Action {
 
         for (Object[] property : mandatoryProperties) {
             checkProperty((String) property[0], (Integer) property[1], (Integer) property[2], true, session, module, true);
+            if (!canBePublished)
+                return canBePublished;
         }
-
-        /*checkProperty("jcr:title", TEXT, 20, true, session, module, true);
-        if (!canBePublished) return canBePublished;
-        checkProperty("description", TEXT, 20, true, session, module, true);
-        if (!canBePublished) return canBePublished;
-        checkProperty("category", WEAKREFERENCE, 10, true, session, module, true);
-        if (!canBePublished) return canBePublished;
-        // TODO
-        //checkProperty("screenshots", SCREENSHOTS, 10, true, session, module, true);
-        checkProperty("versions", VERSIONS, 10, true, session, module, true);
-        if (!canBePublished) return canBePublished;
-        if (module.getPropertyAsString("authorNameDisplayedAs").equals("organisation"))
-            checkProperty("authorEmail", TEXT, 5, true, session, module, true);
-        */
 
         return canBePublished;
     }
@@ -211,6 +185,18 @@ public class CalculateCompletion  extends Action {
                     completed = false;
                 break;
 
+            case TAGS:
+
+                try {
+                    if (module.getProperty(name).getValues().length == 0)
+                        completed = false;
+                } catch (PathNotFoundException e) {
+                    completed = false;
+                } catch (Exception e) {
+                    logger.warn(e.getMessage(), e);
+                }
+                break;
+
             case SKIP:
                 break;
         }
@@ -229,7 +215,7 @@ public class CalculateCompletion  extends Action {
 
             Map<String, Object> propertyMap = new HashMap<String, Object>();
             propertyMap.put("name",
-                    new JahiaResourceBundle(session.getLocale(), "Jahia Forge").get("jnt_forgeModule."+name, name));
+                new JahiaResourceBundle(session.getLocale(), "Jahia Forge").get("jnt_forgeModule."+name.replace(':', '_'), name));
             propertyMap.put("mandatory", mandatory);
 
             todoList.put(index++, propertyMap);
