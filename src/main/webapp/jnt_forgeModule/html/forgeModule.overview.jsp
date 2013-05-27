@@ -103,7 +103,8 @@
                                     content: '<fmt:message key="jnt_forgeModule.label.emptyAuthorEmail"/>',
                                 </c:otherwise>
                             </c:choose>
-                            placement: 'top'
+                            placement: 'top',
+                            trigger: 'hover'
                         });
                     </c:otherwise>
                 </c:choose>
@@ -202,7 +203,7 @@
                         <section class="moduleTags">
 
                             <h5><fmt:message key="jnt_forgeModule.label.tags"/></h5>
-                            <a href="#" id="tags-${id}" class="editable editable-click" data-type="select2" data-pk="1" data-original-title="Select country">
+                            <a href="#" id="tags-${id}" class="editable editable-click" data-type="select2" data-pk="1" data-original-title="<fmt:message key="jnt_forgeModule.label.developer.addTag"/>">
                                 <c:forEach items="${assignedTags}" var="tag" varStatus="status">${tag.node.name}${not status.last ? ', ' : ''}</c:forEach>
                             </a>
 

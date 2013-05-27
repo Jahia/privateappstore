@@ -33,53 +33,63 @@
 <c:set var="targetNode" value="${renderContext.mainResource.node}"/>
 <c:if test="${jcr:isNodeType(renderContext.mainResource.node, 'jnt:forgeModule')}">
     <jcr:node var="targetNode" path="${renderContext.mainResource.node.path}/screenshots"/>
+    <c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(renderContext.mainResource.node, 'jcr:all_live')
+    && not jcr:hasPermission(renderContext.mainResource.node.parent, 'jcr:all_live')}"/>
+    <c:if test="${isDeveloper}">
+        <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}"/>
+    </c:if>
 </c:if>
-<c:if test="${!empty currentNode.properties.target}">
-    <c:set var="targetNode" value="${currentNode.properties.target.node}"/>
-</c:if>
-<template:tokenizedForm allowsMultipleSubmits="true">
-    <form class="file_upload" id="file_upload${currentNode.identifier}"
-          action="<c:url value='${url.base}${targetNode.path}'/>" method="POST" enctype="multipart/form-data"
-          accept="application/json">
-        <div id="file_upload_container">
-            <input type="file" name="file" multiple>
-            <button><fmt:message key="label.upload"/></button>
-            <div id="drop-box-file-upload-${currentNode.identifier}"><fmt:message key="label.dropHere"/></div>
-        </div>
-        <c:url var="targetNodePath" value="${url.base}${renderContext.mainResource.node.path}.screenshots.html.ajax">
-            <c:param name="targetNodePath" value="${targetNode.path}"/>
-        </c:url>
 
-    </form>
-</template:tokenizedForm>
-<table id="files${currentNode.identifier}" class="table"></table>
-<script>
-    /*global $ */
-    $(function () {
-        $('#file_upload${currentNode.identifier}').fileUploadUI({
-            namespace: 'file_upload_${currentNode.identifier}',
-            onComplete: function (event, files, index, xhr, handler) {
-                $('#fileList${renderContext.mainResource.node.identifier}').load('${targetNodePath}');
-            },
-            uploadTable: $('#files${currentNode.identifier}'),
-            dropZone: $('#file_upload_container'),
-            beforeSend: function (event, files, index, xhr, handler, callBack) {
-                handler.formData = {
-                    'jcrNodeType': "jnt:file",
-                    'jcrReturnContentType': "json",
-                    'jcrReturnContentTypeOverride': 'application/json; charset=UTF-8',
-                    'jcrRedirectTo': "<c:url value='${url.base}${renderContext.mainResource.node.path}'/>",
-                    'jcrNewNodeOutputFormat': "${renderContext.mainResource.template}.html",
-                    'form-token': $('#file_upload${currentNode.identifier} input[name=form-token]').val()
-                };
-                callBack();
-            },
-            buildUploadRow: function (files, index) {
-                return $('<tr><td>' + files[index].name + '<\/td>' +
-                         '<td class="file_upload_progress"><div><\/div><\/td>' + '<td class="file_upload_cancel">' +
-                         '<button class="ui-state-default ui-corner-all" title="Cancel">' +
-                         '<span class="ui-icon ui-icon-cancel">Cancel<\/span>' + '<\/button><\/td><\/tr>');
-            }
+<c:if test="${isDeveloper && not viewAsUser}">
+
+    <c:if test="${!empty currentNode.properties.target}">
+        <c:set var="targetNode" value="${currentNode.properties.target.node}"/>
+    </c:if>
+    <template:tokenizedForm allowsMultipleSubmits="true">
+        <form class="file_upload" id="file_upload${currentNode.identifier}"
+              action="<c:url value='${url.base}${targetNode.path}'/>" method="POST" enctype="multipart/form-data"
+              accept="application/json">
+            <div id="file_upload_container">
+                <input type="file" name="file" multiple>
+                <button><fmt:message key="label.upload"/></button>
+                <div id="drop-box-file-upload-${currentNode.identifier}"><fmt:message key="label.dropHere"/></div>
+            </div>
+            <c:url var="targetNodePath" value="${url.base}${renderContext.mainResource.node.path}.screenshots.html.ajax">
+                <c:param name="targetNodePath" value="${targetNode.path}"/>
+            </c:url>
+
+        </form>
+    </template:tokenizedForm>
+    <table id="files${currentNode.identifier}" class="table"></table>
+    <script>
+        /*global $ */
+        $(function () {
+            $('#file_upload${currentNode.identifier}').fileUploadUI({
+                namespace: 'file_upload_${currentNode.identifier}',
+                onComplete: function (event, files, index, xhr, handler) {
+                    $('#fileList${renderContext.mainResource.node.identifier}').load('${targetNodePath}');
+                },
+                uploadTable: $('#files${currentNode.identifier}'),
+                dropZone: $('#file_upload_container'),
+                beforeSend: function (event, files, index, xhr, handler, callBack) {
+                    handler.formData = {
+                        'jcrNodeType': "jnt:file",
+                        'jcrReturnContentType': "json",
+                        'jcrReturnContentTypeOverride': 'application/json; charset=UTF-8',
+                        'jcrRedirectTo': "<c:url value='${url.base}${renderContext.mainResource.node.path}'/>",
+                        'jcrNewNodeOutputFormat': "${renderContext.mainResource.template}.html",
+                        'form-token': $('#file_upload${currentNode.identifier} input[name=form-token]').val()
+                    };
+                    callBack();
+                },
+                buildUploadRow: function (files, index) {
+                    return $('<tr><td>' + files[index].name + '<\/td>' +
+                             '<td class="file_upload_progress"><div><\/div><\/td>' + '<td class="file_upload_cancel">' +
+                             '<button class="ui-state-default ui-corner-all" title="Cancel">' +
+                             '<span class="ui-icon ui-icon-cancel">Cancel<\/span>' + '<\/button><\/td><\/tr>');
+                }
+            });
         });
-    });
-</script>
+    </script>
+
+</c:if>

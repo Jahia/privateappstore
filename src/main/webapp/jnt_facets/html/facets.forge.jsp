@@ -199,7 +199,7 @@
 </query:definition>
 <jcr:jqom var="result" qomBeanName="listQuery" scope="request"/>
 <c:if test="${not result.facetResultsEmpty or not empty param[facetParamVarName]}">
-    <div >
+    <div id="forgeFacets">
         <%@include file="activeFacets.jspf" %>
         <c:forEach items="${result.facetFields}" var="currentFacet">
             <%@include file="facetDisplay.jspf" %>

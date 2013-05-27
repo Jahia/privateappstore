@@ -4,6 +4,8 @@
 <%@ taglib prefix="utility" uri="http://www.jahia.org/tags/utilityLib" %>
 <%@ taglib prefix="template" uri="http://www.jahia.org/tags/templateLib" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="functions" uri="http://www.jahia.org/tags/functions" %>
+<%@ taglib prefix="user" uri="http://www.jahia.org/tags/user" %>
 <%@ taglib prefix="query" uri="http://www.jahia.org/tags/queryLib" %>
 <%--@elvariable id="currentNode" type="org.jahia.services.content.JCRNodeWrapper"--%>
 <%--@elvariable id="out" type="java.io.PrintWriter"--%>
@@ -16,31 +18,110 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
 <template:addResources type="javascript" resources="jquery.min.js,jquery-ui.min.js"/>
-<template:addResources type="css" resources="jquery-ui.smoothness.css, modulesForge.css"/>
+<template:addResources type="css" resources="jquery-ui.smoothness.css"/>
 
-<c:set var="screenshotsNodes" value="${jcr:getNodes(currentNode, 'comnt:moduleScreenshot')}"/>
+<c:set var="id" value="${currentNode.identifier}"/>
+<c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(currentNode.parent, 'jcr:all_live')
+    && not jcr:hasPermission(currentNode.parent.parent, 'jcr:all_live')}"/>
+<c:if test="${isDeveloper}">
+    <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}"/>
+</c:if>
+
+<template:include view="hidden.header"/>
+<c:set var="columnsNumber" value="4"/>
 
 <template:addResources type="inlinejavascript">
     <script type="text/javascript">
 
     $(document).ready(function() {
 
-        $('#moduleScreenshotList').sortable({
-           revert: true
-        });
+        <c:choose>
 
-        $('#moduleScreenshotList, #moduleScreenshotList li').disableSelection();
+            <c:when test="${isDeveloper && not viewAsUser}">
+
+                $('#moduleScreenshotsList').sortable({
+                   revert: true
+                });
+
+                $('#moduleScreenshotsList').on('sortstop', function(event, ui) {
+
+                    var movedScreenshot = $(ui.item[0]);
+                    var folder = movedScreenshot.attr("data-parent-path");
+
+                    var data = {};
+                    data['source'] = folder + "/" + movedScreenshot.attr("data-name");
+
+                    if (movedScreenshot.is(':last-child')) {
+                        data['target'] = folder;
+                        data['action'] = "moveAfter";
+                    }
+                    else {
+                        data['target'] = folder + "/" + movedScreenshot.next().attr("data-name");
+                        data['action'] = "moveBefore";
+                    }
+
+                    $.post('<c:url value="${url.base}${currentNode.path}.move.do"/>', data, function () {
+
+                    }, "json");
+                });
+
+                $('#moduleScreenshotsList, #moduleScreenshotsList li').disableSelection();
+
+            </c:when>
+
+            <c:otherwise>
+
+                $('screenshotsCarousel-${id}').carousel();
+
+            </c:otherwise>
+
+        </c:choose>
+
     });
 
     </script>
 </template:addResources>
 
-<ul id="moduleScreenshotList">
-    <c:forEach var="moduleScreenshot" items="${screenshotsNodes}">
+<c:choose>
 
-        <li class="${moduleScreenshot.displayableName}">
-            <template:module node="${moduleScreenshot}"/>
-        </li>
+    <c:when test="${isDeveloper && not viewAsUser}">
+        <div class="row-fluid">
+            <ul id="moduleScreenshotsList" class="thumbnails">
+                <c:forEach var="moduleScreenshot" items="${moduleMap.currentList}" varStatus="status">
+                    <li class="span${functions:round(12/columnsNumber)}${status.index % columnsNumber eq 0 ? '' : ''}"
+                        data-name="${moduleScreenshot.name}" data-parent-path="${moduleScreenshot.parent.path}">
+                        <img src="${moduleScreenshot.thumbnailUrls['thumbnail2']}"/>
+                    </li>
+                </c:forEach>
+            </ul>
+        </div>
+    </c:when>
 
-    </c:forEach>
-</ul>
+    <c:otherwise>
+
+        <div id="screenshotsCarousel-${id}" class="carousel slide">
+
+            <ol class="carousel-indicators">
+                <c:forEach var="moduleScreenshot" items="${moduleMap.currentList}" varStatus="status">
+                    <li data-target="#screenshotsCarousel-${id}" data-slide-to="${status.index}" class="${status.first ? 'active' : ''}"></li>
+                </c:forEach>
+            </ol>
+
+            <div class="carousel-inner">
+                <c:forEach var="moduleScreenshot" items="${moduleMap.currentList}" varStatus="status">
+                    <div class="${status.first ? 'active ' : ''}item">
+                        <template:module node="${moduleScreenshot}" view="${moduleMap.subNodesView}" editable="${moduleMap.editable}"/>
+                    </div>
+                </c:forEach>
+            </div>
+
+            <a class="carousel-control left" href="#screenshotsCarousel-${id}" data-slide="prev">&lsaquo;</a>
+            <a class="carousel-control right" href="#screenshotsCarousel-${id}" data-slide="next">&rsaquo;</a>
+
+        </div>
+
+    </c:otherwise>
+
+</c:choose>
+
+<template:include view="hidden.footer"/>

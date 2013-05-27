@@ -29,13 +29,12 @@
 
 <div id="fileList${renderContext.mainResource.node.identifier}">
 
-    <section id="moduleScreenshot">
+    <section id="moduleScreenshots">
+
         <h2><fmt:message key="jnt_forgeModule.label.screenshots"/></h2>
-    </section>
-    <c:if test="${isDeveloper and not viewAsUser}">
+
         <template:addCacheDependency path="${currentNode.path}/screenshots"/>
-        <section>
-            <template:module path="${currentNode.path}/screenshots" view="bootstrap-thumbnails"/>
-        </section>
-    </c:if>
+        <template:module path="${currentNode.path}/screenshots"/>
+
+    </section>
 </div>

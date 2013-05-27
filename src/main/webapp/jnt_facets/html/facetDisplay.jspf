@@ -13,7 +13,7 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 <%--@elvariable id="acl" type="java.lang.String"--%>
 <c:if test="${facet:isUnappliedFacetValueExisting(currentFacet, activeFacetsVars[activeFacetMapVarName])}">
-    <h5><facet:facetLabel currentFacetField="${currentFacet}" facetLabels="${facetLabels}"/></h5>
+    <h4><facet:facetLabel currentFacetField="${currentFacet}" facetLabels="${facetLabels}"/></h4>
 </c:if>
 <ul class="inline">
     <c:forEach items="${currentFacet.values}" var="facetValue">

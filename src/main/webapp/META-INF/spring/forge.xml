@@ -8,16 +8,6 @@
         <property name="requireAuthenticatedUser" value="true"/>
     </bean>
 
-    <bean class="org.jahia.modules.forge.actions.AddModule" >
-        <property name="name" value="AddModule"/>
-        <property name="requireAuthenticatedUser" value="true"/>
-    </bean>
-
-    <bean class="org.jahia.modules.forge.actions.EditModule" >
-        <property name="name" value="EditModule"/>
-        <property name="requireAuthenticatedUser" value="true"/>
-    </bean>
-
     <bean class="org.jahia.modules.forge.actions.DeleteModule" >
         <property name="name" value="DeleteModule"/>
         <property name="requireAuthenticatedUser" value="true"/>
