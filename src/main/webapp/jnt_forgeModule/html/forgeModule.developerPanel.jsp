@@ -57,12 +57,26 @@
                         else
                             $('#publishModule-${id}').addClass('disabled').removeClass("btn-danger");
 
-                        var items = [];
-                        $.each(data['todoList'], function(key, val) {
-                            items.push('<li'+ (val['mandatory'] ? ' class="text-error"' : '' ) + '>' + val['name'] + '</li>');
-                        });
+                        var todoList = $('#todoList-${id}');
+                        var todoListWrapper = $('#todoListWrapper-${id}');
 
-                        $('#todoList-${id}').empty().append(items.join(''));
+                        if (completion == 100) {
+                            todoListWrapper.slideUp();
+                            todoList.empty().addClass('completed');
+                        }
+                        else {
+                            var items = [];
+                            $.each(data['todoList'], function(key, val) {
+                                items.push('<li'+ (val['mandatory'] ? ' class="text-error"' : '' ) + '>' + val['name'] + '</li>');
+                            });
+
+                            todoList.empty().append(items.join(''));
+
+                            if (todoList.hasClass('completed')) {
+                                todoListWrapper.slideDown();
+                                todoList.removeClass('completed');
+                            }
+                        }
 
                     }, "json");
                 }
@@ -116,9 +130,11 @@
             <div id="completion-${id}" class="bar"><span class="ratingCount"></span></div>
         </div>
 
-        <h6><fmt:message key="jnt_forgeModule.label.developer.todoList"/></h6>
-        <ul id="todoList-${id}" class="incomplete">
-        </ul>
+        <div id="todoListWrapper-${id}">
+            <h6><fmt:message key="jnt_forgeModule.label.developer.todoList"/></h6>
+            <ul id="todoList-${id}">
+            </ul>
+        </div>
 
         <div class="btn-group">
             <a class="btn btn-small" href="<c:url value="${url.base}${currentNode.path}.forge-module-add-version.html"/>"><fmt:message key="jnt_forgeModule.label.developer.addVersion"/></a>

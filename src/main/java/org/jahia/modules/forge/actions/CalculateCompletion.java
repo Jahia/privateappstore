@@ -56,8 +56,8 @@ public class CalculateCompletion  extends Action {
         mandatoryProperties.add(new Object[]{"description", TEXT, 20});
         mandatoryProperties.add(new Object[]{"category", WEAKREFERENCE, 10});
         mandatoryProperties.add(new Object[]{"versions", VERSIONS, 10});
-        // TODO
-        //mandatoryProperties.add(new Object[]{"screenshots", SCREENSHOTS, 10});
+        mandatoryProperties.add(new Object[]{"screenshots", SCREENSHOTS, 5});
+        // TODO icon
 
         int authorEmailType;
         if (module.getPropertyAsString("authorNameDisplayedAs").equals("organisation")
@@ -72,7 +72,7 @@ public class CalculateCompletion  extends Action {
 
         otherProperties = new ArrayList<Object[]>();
 
-        otherProperties.add(new Object[]{"howToInstall", TEXT, 10});
+        otherProperties.add(new Object[]{"howToInstall", TEXT, 5});
         otherProperties.add(new Object[]{"authorURL", TEXT, 5});
         otherProperties.add(new Object[]{"video", NODE, 5});
         otherProperties.add(new Object[]{"FAQ", TEXT, 5});
@@ -170,7 +170,7 @@ public class CalculateCompletion  extends Action {
 
                 try {
                     JCRNodeWrapper screenshotsList = module.getNode(name);
-                    if (!JCRTagUtils.hasChildrenOfType(screenshotsList, "jnt:forgeModuleScreenshot"))
+                    if (!JCRTagUtils.hasChildrenOfType(screenshotsList, "jnt:file"))
                         completed = false;
                 } catch (PathNotFoundException e) {
                     completed = false;
