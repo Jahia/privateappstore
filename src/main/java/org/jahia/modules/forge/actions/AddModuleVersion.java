@@ -1,6 +1,7 @@
 package org.jahia.modules.forge.actions;
 
 import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.tika.Tika;
 import org.jahia.api.Constants;
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
@@ -57,6 +58,16 @@ public class AddModuleVersion extends Action {
 
         final FileUpload fu = (FileUpload) req.getAttribute(FileUpload.FILEUPLOAD_ATTRIBUTE);
         DiskFileItem moduleBinary = fu.getFileItems().get("moduleBinary");
+
+        String moduleBinaryName = moduleBinary.getName();
+        String moduleBinaryExtension = moduleBinaryName.substring(moduleBinaryName.lastIndexOf('.') + 1).toLowerCase();
+
+        Tika tika = new Tika();
+        String mediaType = tika.detect(moduleBinary.getInputStream());
+
+        if ( !( (moduleBinaryExtension.equals("war") || moduleBinaryExtension.equals("jar"))
+                && mediaType.equals("application/zip") ))
+            return ActionResult.BAD_REQUEST;
 
         moduleVersion.uploadFile(moduleBinary.getName(), moduleBinary.getInputStream(), moduleBinary.getContentType());
 
