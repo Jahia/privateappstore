@@ -46,10 +46,10 @@
         <c:set var="targetNode" value="${currentNode.properties.target.node}"/>
     </c:if>
     <template:tokenizedForm allowsMultipleSubmits="true">
-        <form class="file_upload" id="file_upload${currentNode.identifier}"
+        <form class="file_upload" id="file_upload_${currentNode.identifier}"
               action="<c:url value='${url.base}${targetNode.path}'/>" method="POST" enctype="multipart/form-data"
               accept="application/json">
-            <div id="file_upload_container">
+            <div id="file_upload_container" class="btn btn-block">
                 <input type="file" name="file" multiple>
                 <button><fmt:message key="label.upload"/></button>
                 <div id="drop-box-file-upload-${currentNode.identifier}"><fmt:message key="label.dropHere"/></div>
@@ -64,11 +64,17 @@
     <script>
         /*global $ */
         $(function () {
-            $('#file_upload${currentNode.identifier}').fileUploadUI({
+            $('#file_upload_${currentNode.identifier}').fileUploadUI({
                 namespace: 'file_upload_${currentNode.identifier}',
                 onComplete: function (event, files, index, xhr, handler) {
-                    $('#fileList${renderContext.mainResource.node.identifier}').load('${targetNodePath}');
+                    <%--$('#fileList${renderContext.mainResource.node.identifier}').load('${targetNodePath}', function () {--%>
+                        <%--$('#moduleScreenshotsList').triggerHandler('uploadCompleted');--%>
+                    <%--});--%>
+                    var boostrapTab = $('#file_upload_${currentNode.identifier}').parents('.tab-pane').attr('id');
+
+                    window.location = "<c:url value="${url.base}${renderContext.mainResource.node.path}.html?bootstrapTab="/>" + boostrapTab;
                 },
+                acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
                 uploadTable: $('#files${currentNode.identifier}'),
                 dropZone: $('#file_upload_container'),
                 beforeSend: function (event, files, index, xhr, handler, callBack) {

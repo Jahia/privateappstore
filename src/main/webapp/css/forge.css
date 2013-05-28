@@ -1925,6 +1925,9 @@
 .bodywrapper #jnt_forge #forgeFacets ul.inline li span.label a:hover {
   color: inherit;
 }
+.bodywrapper #jnt_forge #moduleScreenshotsList .moduleScreenshot img.move-screenshot {
+  cursor: move;
+}
 .bodywrapper .fade {
   opacity: 0;
   -webkit-transition: opacity 0.15s linear;

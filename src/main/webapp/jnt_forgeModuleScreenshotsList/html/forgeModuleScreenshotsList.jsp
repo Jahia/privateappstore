@@ -63,6 +63,16 @@
                     $.post('<c:url value="${url.base}${currentNode.path}.move.do"/>', data, function () {
 
                     }, "json");
+
+                });
+
+                $('.remove-screenshot').click(function() {
+                    var listItem = $(this).parent('li.moduleScreenshot');
+                    $.post($(this).attr('data-path'), {jcrMethodToCall: 'delete'}, function() {
+                        if($('#moduleScreenshotsList li').length == 1)
+                            $('#jnt_forge').triggerHandler('forgeModuleUpdated');
+                        listItem.fadeOut('slow', function() {listItem.remove()});
+                    }, "json");
                 });
 
                 $('#moduleScreenshotsList, #moduleScreenshotsList li').disableSelection();
@@ -88,9 +98,11 @@
         <div class="row-fluid">
             <ul id="moduleScreenshotsList" class="thumbnails">
                 <c:forEach var="moduleScreenshot" items="${moduleMap.currentList}" varStatus="status">
-                    <li class="span${functions:round(12/columnsNumber)}${status.index % columnsNumber eq 0 ? '' : ''}"
+                    <li class="moduleScreenshot span${functions:round(12/columnsNumber)}${status.index % columnsNumber eq 0 ? '' : ''}"
                         data-name="${moduleScreenshot.name}" data-parent-path="${moduleScreenshot.parent.path}">
-                        <img src="${moduleScreenshot.thumbnailUrls['thumbnail2']}"/>
+                        <img class="move-screenshot" src="${moduleScreenshot.thumbnailUrls['thumbnail2']}"/>
+                        <a class="remove-screenshot" data-path="<c:url value='${url.base}${moduleScreenshot.path}'/>"
+                           href="#"><i class="icon-remove"></i>&nbsp;<fmt:message key="jnt_forgeModule.label.remove"/></a>
                     </li>
                 </c:forEach>
             </ul>
