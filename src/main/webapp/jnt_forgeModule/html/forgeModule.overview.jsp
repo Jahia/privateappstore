@@ -80,6 +80,7 @@
                     value: '${not empty authorURL ? authorURL : ''}',
                     <jsp:include page="../../commons/bootstrap-editable-options.jsp">
                         <jsp:param name="postURL" value="${postURL}"/>
+                        <jsp:param name="validate" value="url"/>
                     </jsp:include>
                 });
 
@@ -89,6 +90,7 @@
                             value: '${not empty authorEmail ? authorEmail : ''}',
                             <jsp:include page="../../commons/bootstrap-editable-options.jsp">
                                 <jsp:param name="postURL" value="${postURL}"/>
+                                <jsp:param name="validate" value="email"/>
                             </jsp:include>
                         });
                     </c:when>
