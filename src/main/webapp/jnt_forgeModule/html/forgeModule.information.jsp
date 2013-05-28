@@ -45,7 +45,7 @@
 
 
 <jcr:nodeProperty node="${activeVersion}" name="versionNumber" var="versionNumber"/>
-<jcr:nodeProperty node="${activeVersion}" name="relatedJahiaVersion" var="relatedJahiaVersion"/>
+<jcr:nodeProperty node="${activeVersion}" name="relatedJahiaVersion" var="requiredVersion"/>
 
 
 <c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')
@@ -62,15 +62,17 @@
     <fmt:message var="labelEmptyFullName" key="jnt_forgeModule.label.developer.emptyFullName"/>
     <c:url var="postURL" value="${url.base}${currentNode.path}"/>
 
-    <jcr:node var="moduleCategories" path="/sites/systemsite/categories/forge-categories/module-categories"/>
+    <jcr:node var="moduleCategories" path="${renderContext.site.path}/contents/forge-modules-categories"/>
 
     <template:addResources type="inlinejavascript">
         <script type="text/javascript">
 
             var categories = [];
-            <c:forEach items="${jcr:getNodes(moduleCategories, 'jnt:category')}" var="moduleCategory">
-                categories.push({value: '${moduleCategory.identifier}', text: '${moduleCategory.displayableName}'});
-            </c:forEach>
+            <c:if test="${jcr:hasChildrenOfType(moduleCategories, 'jnt:text')}">
+                <c:forEach items="${jcr:getNodes(moduleCategories, 'jnt:text')}" var="moduleCategory">
+                    categories.push({value: '${moduleCategory.identifier}', text: '${moduleCategory.displayableName}'});
+                </c:forEach>
+            </c:if>
 
             $(document).ready(function() {
 
@@ -88,7 +90,6 @@
 
                 $('#category-${id}').editable({
                     source: categories,
-                    <%-- TODO pre selected value --%>
                     value: '${category.node.identifier}',
                     <jsp:include page="../../commons/bootstrap-editable-options.jsp">
                         <jsp:param name="postURL" value='${postURL}'/>
@@ -146,7 +147,7 @@
         <dd itemprop="softwareVersion">${versionNumber.string}</dd>
 
         <dt><fmt:message key="jnt_forgeModule.label.relatedJahiaVersion"/></dt>
-        <dd>${relatedJahiaVersion.node.displayableName}</dd>
+        <dd>${requiredVersion.node.displayableName}</dd>
 
 
         <dt><fmt:message key="jnt_forgeModule.label.fileSize"/></dt>

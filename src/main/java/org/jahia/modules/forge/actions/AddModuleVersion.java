@@ -57,19 +57,19 @@ public class AddModuleVersion extends Action {
         }
 
         final FileUpload fu = (FileUpload) req.getAttribute(FileUpload.FILEUPLOAD_ATTRIBUTE);
-        DiskFileItem moduleBinary = fu.getFileItems().get("moduleBinary");
+        DiskFileItem moduleVersionBinary = fu.getFileItems().get("moduleVersionBinary");
 
-        String moduleBinaryName = moduleBinary.getName();
-        String moduleBinaryExtension = moduleBinaryName.substring(moduleBinaryName.lastIndexOf('.') + 1).toLowerCase();
+        String moduleVersionBinaryName = moduleVersionBinary.getName();
+        String moduleVersionBinaryExtension = moduleVersionBinaryName.substring(moduleVersionBinaryName.lastIndexOf('.') + 1).toLowerCase();
 
         Tika tika = new Tika();
-        String mediaType = tika.detect(moduleBinary.getInputStream());
+        String mediaType = tika.detect(moduleVersionBinary.getInputStream());
 
-        if ( !( (moduleBinaryExtension.equals("war") || moduleBinaryExtension.equals("jar"))
+        if ( !( (moduleVersionBinaryExtension.equals("war") || moduleVersionBinaryExtension.equals("jar"))
                 && mediaType.equals("application/zip") ))
             return ActionResult.BAD_REQUEST;
 
-        moduleVersion.uploadFile(moduleBinary.getName(), moduleBinary.getInputStream(), moduleBinary.getContentType());
+        moduleVersion.uploadFile(moduleVersionBinary.getName(), moduleVersionBinary.getInputStream(), moduleVersionBinary.getContentType());
 
         session.save();
 

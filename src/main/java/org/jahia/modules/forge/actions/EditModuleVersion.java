@@ -70,10 +70,10 @@ public class EditModuleVersion extends Action {
 
         final FileUpload fu = (FileUpload) req.getAttribute(FileUpload.FILEUPLOAD_ATTRIBUTE);
 
-        DiskFileItem moduleBinary = fu.getFileItems().get("moduleBinary");
+        DiskFileItem moduleVersionBinary = fu.getFileItems().get("moduleVersionBinary");
 
-        if (moduleBinary != null)
-            moduleVersion.uploadFile(moduleBinary.getName(), moduleBinary.getInputStream(), moduleBinary.getContentType());
+        if (moduleVersionBinary != null)
+            moduleVersion.uploadFile(moduleVersionBinary.getName(), moduleVersionBinary.getInputStream(), moduleVersionBinary.getContentType());
 
         session.save();
 

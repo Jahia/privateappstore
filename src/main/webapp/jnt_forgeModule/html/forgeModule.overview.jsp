@@ -155,7 +155,7 @@
 <article id="moduleOverview" itemtype="http://schema.org/SoftwareApplication">
 
     <jcr:nodeProperty node="${activeVersion}" name="versionNumber" var="versionNumber"/>
-    <jcr:nodeProperty node="${activeVersion}" name="relatedJahiaVersion" var="relatedJahiaVersion"/>
+    <jcr:nodeProperty node="${activeVersion}" name="relatedJahiaVersion" var="requiredVersion"/>
 
     <div class="mainContentWrapper">
 

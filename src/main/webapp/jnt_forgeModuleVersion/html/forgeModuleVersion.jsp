@@ -5,6 +5,7 @@
 <%@ taglib prefix="template" uri="http://www.jahia.org/tags/templateLib" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="query" uri="http://www.jahia.org/tags/queryLib" %>
+<%@ taglib prefix="functions" uri="http://www.jahia.org/tags/functions" %>
 <%--@elvariable id="currentNode" type="org.jahia.services.content.JCRNodeWrapper"--%>
 <%--@elvariable id="out" type="java.io.PrintWriter"--%>
 <%--@elvariable id="script" type="org.jahia.services.render.scripting.Script"--%>
@@ -15,23 +16,91 @@
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
-<div>
-    <div></div>
-    <div><fmt:message key="jnt_forgeModuleVersion.title"/>:${currentNode.properties["jcr:title"].string}</div>
-    <div><fmt:message key="jnt_forgeModuleVersion.versionNumber"/>:${currentNode.properties.versionNumber.string}</div>
-    <div><fmt:message key="jnt_forgeModuleVersion.date"/>:<fmt:formatDate value="${currentNode.properties.date.time}" type="date" dateStyle="long"/> </div>
-    <div><fmt:message key="jnt_forgeModuleVersion.moduleBinary"/>:<a href="${currentNode.properties.moduleBinary.node.url}">Download</a></div>
-    <div><fmt:message key="jnt_forgeModuleVersion.changeLog"/>:${currentNode.properties.changeLog.string}</div>
-    <c:if test="${not empty currentNode.properties.relatedJahiaVersion.node.name}">
-        <div><fmt:message key="jnt_forgeModuleVersion.relatedJahiaVersion"/>:${currentNode.properties.relatedJahiaVersion.node.name}</div>
-    </c:if>
-    <div><fmt:message key="jnt_forgeModuleVersion.releaseType"/>:${currentNode.properties.releaseType.string}</div>
-    <c:if test="${not empty currentNode.properties.status.node.name}">
-        <div><fmt:message key="jnt_forgeModuleVersion.status"/>:${currentNode.properties.status.node.name}</div>
-    </c:if>
-    <c:if test="${jcr:hasPermission(currentNode, 'editVersion')}">
-        <div class="edit"><a href="<c:url value='${url.base}${currentNode.path}.forge-module-update-version.html'/>"><fmt:message key="jnt_forgeModuleVersion.edit"/></a></div>
-    </c:if>
-    <div class="back"><a href="<c:url value='${url.base}${currentNode.parent.path}.html'/>"><fmt:message key="jnt_forgeModuleVersion.backToParentModule"/></a></div>
+<c:if test="${isDeveloper && not viewAsUser}">
 
-</div>
+    <template:addResources type="inlinejavascript">
+        <script type="text/javascript">
+
+            $(document).ready(function() {
+
+                <c:url var="postURL" value="${url.base}${currentNode.path}"/>
+                $('#changeLog-${currentNode.identifier}').editable({
+                    <jsp:include page="../../commons/bootstrap-editable-options-wysihtml5.jsp">
+                        <jsp:param name="postURL" value='${postURL}'/>
+                        <jsp:param name="fullEditor" value='false'/>
+                    </jsp:include>
+                });
+
+                $('#toggle-changeLog-${currentNode.identifier}').click(function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    $('#changeLog-${currentNode.identifier}').editable('toggle');
+                });
+            });
+        </script>
+    </template:addResources>
+
+</c:if>
+
+<jcr:nodeProperty node="${currentNode}" name="changeLog" var="changeLog"/>
+<jcr:nodeProperty node="${currentNode}" name="versionNumber" var="versionNumber"/>
+<jcr:nodeProperty node="${currentNode}" name="requiredVersion" var="requiredVersion"/>
+<jcr:node var="moduleVersionBinary" uuid="${moduleVersionBinaryUUID}"/>
+
+<c:choose>
+
+    <c:when test="${isActiveVersion}">
+        <h2><fmt:message key="jnt_forgeModule.label.whatsNew"><fmt:param value="${versionNumber.string}"/></fmt:message></h2>
+    </c:when>
+
+    <c:otherwise>
+
+        <header>
+            <h3>${versionNumber.string}</h3>
+
+            <div class="pull-right">
+
+                <a class="btn btn-small" href="${moduleVersionBinary.url}"
+                   onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')">
+                    <fmt:message key="jnt_forgeModule.label.downloadVersion">
+                        <fmt:param value="${versionNumber.string}"/>
+                    </fmt:message>
+                </a>
+
+            <c:if test="${isDeveloper && not viewAsUser}">
+                <button class="btn btn-small btn-success makeActiveVersion" data-target="<c:url value="${url.base}${currentNode.path}"/>">
+                    <fmt:message key="jnt_forgeModule.label.developer.makeActiveVersion"/>
+                </button>
+
+            </c:if>
+
+            </div>
+        </header>
+
+    </c:otherwise>
+
+</c:choose>
+
+<c:if test="${isDeveloper && not viewAsUser}">
+    <p class="editable-toggle">
+        <a id="toggle-changeLog-${currentNode.identifier}" href="#"><i class="icon-pencil"></i>&nbsp;<fmt:message key="jnt_forgeModule.label.edit"/></a>
+    </p>
+    <div data-original-title="<fmt:message key="jnt_forgeModuleVersion.label.changeLog"/>" data-toggle="manual" data-name="changeLog" data-type="wysihtml5"
+    data-pk="1" id="changeLog-${currentNode.identifier}" class="editable">
+</c:if>
+
+${changeLog.string}
+
+<c:if test="${isDeveloper && not viewAsUser}">
+    </div>
+</c:if>
+
+<footer>
+    <dl class="inline">
+        <dt><fmt:message key="jnt_forgeModule.label.relatedJahiaVersion"/></dt>
+        <dd>${requiredVersion.node.displayableName}</dd>
+        <dt><fmt:message key="jnt_forgeModule.label.updated"/></dt>
+        <dd><fmt:formatDate value="${moduleVersionBinary.contentLastModifiedAsDate}" pattern="yyyy-MM-dd" /></dd>
+    </dl>
+</footer>
+

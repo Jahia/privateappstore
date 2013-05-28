@@ -65,11 +65,11 @@
 
             <section class="whatsNew">
 
-                <c:set target="${moduleMap}" property="moduleBinary" value="${moduleMap.activeVersionBinary}"/>
-                <template:module node="${activeVersion}" view="changeLog">
+                <template:module node="${activeVersion}">
                     <template:param name="isActiveVersion" value="true"/>
                     <template:param name="isDeveloper" value="${isDeveloper}"/>
                     <template:param name="viewAsUser" value="${viewAsUser}"/>
+                    <template:param name="moduleVersionBinaryUUID" value="${moduleMap.activeVersionBinary.identifier}"/>
                 </template:module>
 
             </section>
@@ -98,18 +98,19 @@
                 <article class="previousVersion">
 
                     <jcr:sql
-                            var="moduleBinaries"
+                            var="moduleVersionBinaries"
                             sql="SELECT * FROM [jnt:file] WHERE ischildnode(['${previousVersion.path}'])
                           ORDER BY ['jcr:lastModified'] DESC" limit ='1'/>
 
-                    <c:forEach items="${moduleBinaries.nodes}" var="moduleBinaryNode">
-                        <c:set target="${moduleMap}" property="moduleBinary" value="${moduleBinaryNode}"/>
+                    <c:forEach items="${moduleVersionBinaries.nodes}" var="moduleVersionBinaryNode">
+                        <c:set var="moduleVersionBinary" value="${moduleVersionBinaryNode}"/>
                     </c:forEach>
 
-                    <template:module node="${previousVersion}" view="changeLog">
+                    <template:module node="${previousVersion}">
                         <template:param name="isActiveVersion" value="false"/>
                         <template:param name="isDeveloper" value="${isDeveloper}"/>
                         <template:param name="viewAsUser" value="${viewAsUser}"/>
+                        <template:param name="moduleVersionBinaryUUID" value="${moduleVersionBinary.identifier}"/>
                     </template:module>
 
                 </article>

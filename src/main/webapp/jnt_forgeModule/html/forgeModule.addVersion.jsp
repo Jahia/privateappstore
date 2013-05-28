@@ -16,6 +16,8 @@
 <%--@elvariable id="acl" type="java.lang.String"--%>
 
 <template:addResources type="javascript" resources="jquery.min.js,jquery.validate.js"/>
+<template:addResources type="javascript" resources="select2.js"/>
+<template:addResources type="css" resources="select2.css, select2-bootstrap.css"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="hasModuleVersions" value="${jcr:hasChildrenOfType(currentNode, 'jnt:forgeModuleVersion')}"/>
@@ -39,7 +41,7 @@
                         regexp: /^(\d+\.){3}(\d+)$/i
                     },
 
-                    'moduleBinary': {
+                    'moduleVersionBinary': {
                         required: true,
                         regexp: /(\S+?)\.(jar|war)$/i
                     },
@@ -47,6 +49,10 @@
                     'changeLog': {
                         required: true,
                         minlength: 50
+                    },
+
+                    'requiredVersion': {
+                        required: true
                     }
                 },
                 messages: {
@@ -56,14 +62,18 @@
                         regexp: "<fmt:message key='forge.label.askValidVersionNumber'/>"
                     },
 
-                    'moduleBinary': {
-                         required: "<fmt:message key='forge.label.askModuleBinary'/>",
-                         regexp:"<fmt:message key='forge.label.askValidModuleBinary'/>"
+                    'moduleVersionBinary': {
+                         required: "<fmt:message key='forge.label.askmoduleVersionBinary'/>",
+                         regexp:"<fmt:message key='forge.label.askValidmoduleVersionBinary'/>"
                      },
 
                     'changeLog': {
                         required: "<fmt:message key='forge.label.askChangeLog'/>",
                         minlength: "<fmt:message key='forge.label.changeLogSizeWarning'/>"
+                    },
+
+                    'requiredVersion': {
+                        required: "<fmt:message key='forge.label.askRequiredVersion'/>"
                     }
                 },
                 <%--submitHandler: function(form) {
@@ -80,6 +90,8 @@
                     $(element).removeClass("error").addClass(validClass).parents('.control-group').removeClass("error");
                 }
             });
+
+            $('#requiredVersion').select2();
         });
 
     </script>
@@ -99,10 +111,10 @@
             </div>
 
             <div class="control-group">
-                <label class="control-label" for="moduleBinary"><fmt:message key="jnt_forgeModuleVersion.moduleFile"/></label>
+                <label class="control-label" for="moduleVersionBinary"><fmt:message key="jnt_forgeModuleVersion.moduleFile"/></label>
                 <div class="controls">
                     <input placeholder="<fmt:message key="jnt_forgeModuleVersion.moduleFile" />" class="span16" type="file"
-                           name="moduleBinary" id="moduleBinary"/>
+                           name="moduleVersionBinary" id="moduleVersionBinary"/>
                 </div>
             </div>
 
@@ -114,8 +126,25 @@
                 </div>
             </div>
 
+            <jcr:node var="requiredVersions" path="${renderContext.site.path}/contents/forge-modules-required-versions"/>
+
             <div class="control-group">
-                <label class="control-label" for="releaseType"><fmt:message key="jnt_forgeModule.releaseType"/></label>
+                <label class="control-label" for="requiredVersion"><fmt:message key="jnt_forgeModuleVersion.requiredVersion"/></label>
+                <div class="controls">
+                    <select name="requiredVersion" id="requiredVersion" >
+                        <c:forEach items="${jcr:getNodes(requiredVersions, 'jnt:contentFolder')}" var="requiredVersionsFolder">
+                            <optgroup label="${requiredVersionsFolder.displayableName}">
+                                <c:forEach items="${jcr:getNodes(requiredVersionsFolder, 'jnt:text')}" var="requiredVersion">
+                                    <option value="${requiredVersion.identifier}">${requiredVersion.displayableName}</option>
+                                </c:forEach>
+                            </optgroup>
+                        </c:forEach>
+                    </select>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="releaseType"><fmt:message key="jnt_forgeModuleVersion.releaseType"/></label>
                 <div class="controls">
                     <select name="releaseType" id="releaseType" >
                         <option value="hotfix"> hotfix </option>
