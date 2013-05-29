@@ -154,20 +154,6 @@
                 </div>
             </div>
 
-            <jcr:node var="jahiaVersionCategory" path="/sites/systemsite/categories/forge-categories/related-jahia-version"/>
-            <c:if test="${not empty jahiaVersionCategory.node}">
-                <div class="control-group">
-                    <label class="control-label" for="relatedJahiaVersion"><fmt:message key="jnt_forgeModule.relatedJahiaVersion"/></label>
-                    <div class="controls">
-                        <input type="text" id="relatedJahiaVersion" name="relatedJahiaVersion" value=""/>
-                        <input type="text" id="categoryFieldDisplay1" name="categoryFieldDisplay1" readonly="readonly" />
-                        <uiComponents:treeItemSelector fieldId="relatedJahiaVersion" displayFieldId="categoryFieldDisplay1" nodeTypes="jnt:category"
-                            selectableNodeTypes="jnt:category" root="/sites/systemsite/categories/forge-categories/related-jahia-version"
-                            includeChildren="false" displayIncludeChildren="false" valueType="identifier" />
-                    </div>
-                </div>
-            </c:if>
-
             <jcr:node var="jahiaVersionCategory" path="/sites/systemsite/categories/forge-categories/status"/>
             <c:if test="${not empty jahiaVersionCategory.node}">
                 <div class="control-group">

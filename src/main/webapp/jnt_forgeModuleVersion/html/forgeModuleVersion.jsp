@@ -16,6 +16,12 @@
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
+<c:set var="id" value="${currentNode.identifier}"/>
+<jcr:nodeProperty node="${currentNode}" name="changeLog" var="changeLog"/>
+<jcr:nodeProperty node="${currentNode}" name="versionNumber" var="versionNumber"/>
+<jcr:nodeProperty node="${currentNode}" name="requiredVersion" var="requiredVersion"/>
+<jcr:node var="moduleVersionBinary" uuid="${moduleVersionBinaryUUID}"/>
+
 <c:if test="${isDeveloper && not viewAsUser}">
 
     <template:addResources type="inlinejavascript">
@@ -36,16 +42,32 @@
                     e.preventDefault();
                     $('#changeLog-${currentNode.identifier}').editable('toggle');
                 });
+
+                <jcr:node var="requiredVersions" path="${renderContext.site.path}/contents/forge-modules-required-versions"/>
+
+                <c:set var="requiredVersionsList" value=""/>
+                <c:forEach items="${jcr:getNodes(requiredVersions, 'jnt:contentFolder')}" var="requiredVersionsFolder" varStatus="statusFolder">
+                    <c:set var="requiredVersionsList" value="${requiredVersionsList}{text: '${requiredVersionsFolder.displayableName}', children : ["/>
+                    <c:forEach items="${jcr:getNodes(requiredVersionsFolder, 'jnt:text')}" var="requiredVersionNode" varStatus="status">
+                        <c:set var="requiredVersionsList" value="${requiredVersionsList} {id: '${requiredVersionNode.identifier}', text:'${requiredVersionNode.displayableName}'} ${status.last ? ']': ','}"/>
+                    </c:forEach>
+                    <c:set var="requiredVersionsList" value="${requiredVersionsList}}${statusFolder.last ? '' : ','}"/>
+                </c:forEach>
+
+                $('#requiredVersion-${id}').editable({
+                    inputclass: 'input-large',
+                    source: [${requiredVersionsList}],
+                    value: '${requiredVersion.node.identifier}',
+                    <jsp:include page="../../commons/bootstrap-editable-options.jsp">
+                        <jsp:param name="postURL" value="${postURL}"/>
+                    </jsp:include>
+                });
+
             });
         </script>
     </template:addResources>
 
 </c:if>
-
-<jcr:nodeProperty node="${currentNode}" name="changeLog" var="changeLog"/>
-<jcr:nodeProperty node="${currentNode}" name="versionNumber" var="versionNumber"/>
-<jcr:nodeProperty node="${currentNode}" name="requiredVersion" var="requiredVersion"/>
-<jcr:node var="moduleVersionBinary" uuid="${moduleVersionBinaryUUID}"/>
 
 <c:choose>
 
@@ -98,7 +120,16 @@ ${changeLog.string}
 <footer>
     <dl class="inline">
         <dt><fmt:message key="jnt_forgeModule.label.relatedJahiaVersion"/></dt>
-        <dd>${requiredVersion.node.displayableName}</dd>
+        <dd>
+            <c:if test="${isDeveloper && not viewAsUser}">
+                <a href="#" id="requiredVersion-${id}" class="editable editable-click" data-type="select2" data-pk="1"
+                   data-name="requiredVersion" data-original-title="<fmt:message key="jnt_forgeModuleVersion.label.requiredVersion"/>">
+            </c:if>
+            ${requiredVersion.node.displayableName}
+            <c:if test="${isDeveloper && not viewAsUser}">
+                </a>
+            </c:if>
+        </dd>
         <dt><fmt:message key="jnt_forgeModule.label.updated"/></dt>
         <dd><fmt:formatDate value="${moduleVersionBinary.contentLastModifiedAsDate}" pattern="yyyy-MM-dd" /></dd>
     </dl>
