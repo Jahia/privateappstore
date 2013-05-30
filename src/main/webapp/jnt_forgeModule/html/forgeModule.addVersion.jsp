@@ -58,22 +58,22 @@
                 messages: {
 
                     'versionNumber': {
-                        required: "<fmt:message key='forge.label.askVersionNumber'/>",
-                        regexp: "<fmt:message key='forge.label.askValidVersionNumber'/>"
+                        required: "<fmt:message key='jnt_forgeModuleVersion.label.askVersionNumber'/>",
+                        regexp: "<fmt:message key='jnt_forgeModuleVersion.label.askValidVersionNumber'/>"
                     },
 
                     'moduleVersionBinary': {
-                         required: "<fmt:message key='forge.label.askmoduleVersionBinary'/>",
-                         regexp:"<fmt:message key='forge.label.askValidmoduleVersionBinary'/>"
+                         required: "<fmt:message key='jnt_forgeModuleVersion.label.askModuleVersionBinary'/>",
+                         regexp:"<fmt:message key='jnt_forgeModuleVersion.label.askValidModuleVersionBinary'/>"
                      },
 
                     'changeLog': {
-                        required: "<fmt:message key='forge.label.askChangeLog'/>",
-                        minlength: "<fmt:message key='forge.label.changeLogSizeWarning'/>"
+                        required: "<fmt:message key='jnt_forgeModuleVersion.label.askChangeLog'/>",
+                        minlength: "<fmt:message key='jnt_forgeModuleVersion.label.changeLogSizeWarning'/>"
                     },
 
                     'requiredVersion': {
-                        required: "<fmt:message key='forge.label.askRequiredVersion'/>"
+                        required: "<fmt:message key='jnt_forgeModuleVersion.label.askRequiredVersion'/>"
                     }
                 },
                 <%--submitHandler: function(form) {
@@ -178,7 +178,7 @@
 
             <div class="control-group">
                 <div class="controls">
-                    <input type="submit" class="btn" value="<fmt:message key="forge.label.submit" />"/>
+                    <input type="submit" class="btn" value="<fmt:message key="jnt_forgeModuleVersion.label.submit" />"/>
                 </div>
             </div>
 

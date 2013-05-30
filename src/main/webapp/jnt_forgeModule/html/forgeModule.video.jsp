@@ -234,7 +234,7 @@
 
                         <div class="control-group">
                             <div class="controls">
-                                <input type="submit" class="btn btn-primary" value="<fmt:message key="forge.label.submit"/>"/>
+                                <input type="submit" class="btn btn-primary" value="<fmt:message key="jnt_forgeModule.label.submit"/>"/>
                             </div>
                         </div>
 

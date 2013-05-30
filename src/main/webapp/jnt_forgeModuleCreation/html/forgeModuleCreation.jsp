@@ -52,13 +52,13 @@
                 },
                 messages: {
                     'jcr:title': {
-                        required: "<fmt:message key='forge.label.askTitle'/>",
+                        required: "<fmt:message key='jnt_forgeModuleCreation.label.askTitle'/>",
                         regexp: "<fmt:message key="jnt_forgeModuleCreation.label.error.doubleQuote"/>",
-                        minlength: "<fmt:message key='forge.label.titleSizeWarning'/>"
+                        minlength: "<fmt:message key='jnt_forgeModuleCreation.label.titleSizeWarning'/>"
                     },
                     'description': {
-                        required: "<fmt:message key='forge.label.askDescription'/>",
-                        minlength: "<fmt:message key='forge.label.descriptionSizeWarning'/>"
+                        required: "<fmt:message key='jnt_forgeModuleCreation.label.askDescription'/>",
+                        minlength: "<fmt:message key='jnt_forgeModuleCreation.label.descriptionSizeWarning'/>"
                     }
                 },
                 submitHandler: function(form) {
@@ -88,8 +88,8 @@
 <section class="forgeModuleCreation">
 
     <header>
-        <h2><fmt:message key="jnt_forgeModule.label.forgeModuleCreationHeader"/></h2>
-        <p><fmt:message key="jnt_forgeModule.label.forgeModuleCreationSubheader"/></p>
+        <h2><fmt:message key="jnt_forgeModuleCreation.label.forgeModuleCreationHeader"/></h2>
+        <p><fmt:message key="jnt_forgeModuleCreation.label.forgeModuleCreationSubheader"/></p>
     </header>
 
     <template:tokenizedForm>
@@ -119,7 +119,7 @@
 
                 <div class="control-group">
                     <div class="controls">
-                        <input type="submit" class="btn btn-primary" onclick="CKEDITOR.instances['jahia-forge-module-description-${id}'].updateElement();" value="<fmt:message key="forge.label.submit" />"/>
+                        <input type="submit" class="btn btn-primary" onclick="CKEDITOR.instances['jahia-forge-module-description-${id}'].updateElement();" value="<fmt:message key="jnt_forgeModuleCreation.label.submit" />"/>
                     </div>
                 </div>
 
