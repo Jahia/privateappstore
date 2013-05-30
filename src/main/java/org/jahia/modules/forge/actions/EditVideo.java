@@ -53,7 +53,7 @@ public class EditVideo extends Action {
         if (height != null)
             videoNode.setProperty("height", height);
 
-        if (allowfullscreen != null)
+        if (allowfullscreen != null && allowfullscreen.equals("on"))
             videoNode.setProperty("allowfullscreen", true);
         else
             videoNode.setProperty("allowfullscreen", false);

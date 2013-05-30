@@ -36,6 +36,6 @@ public class DeleteModule extends Action {
         module.setProperty("deleted",true);
         session.save();
 
-        return new ActionResult(HttpServletResponse.SC_OK, module.getParent().getPath(), new JSONObject());
+        return new ActionResult(HttpServletResponse.SC_OK, module.getParent().getPath(), null);
     }
 }

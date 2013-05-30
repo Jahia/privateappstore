@@ -34,9 +34,7 @@ public class ReplyReview extends Action {
         JCRNodeWrapper module = review.getParent().getParent();
 
         session.checkout(review);
-
-        JCRNodeWrapper respond = createNode(req, parameters, review, "jnt:post", null, false);
-
+        createNode(req, parameters, review, "jnt:post", null, false);
         session.save();
 
         return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("moduleUrl", module.getUrl()));

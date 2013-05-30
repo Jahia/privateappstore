@@ -39,7 +39,7 @@ public class AddVideo extends Action {
         JCRNodeWrapper videoNode = createNode(req, parameters, module, "jnt:videostreaming", "video", false);
         String allowfullscreen = getParameter(parameters, "allowfullscreen");
 
-        if (allowfullscreen != null)
+        if (allowfullscreen != null && allowfullscreen.equals("on"))
             videoNode.setProperty("allowfullscreen", true);
         else
             videoNode.setProperty("allowfullscreen", false);
