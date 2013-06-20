@@ -48,7 +48,6 @@
     <template:param name="getActiveVersion" value="true"/>
 </template:include>
 <c:set value="${moduleMap.activeVersion}" var="activeVersion"/>
-<c:set value="${moduleMap.activeVersionBinary}" var="activeVersionBinary"/>
 <template:addCacheDependency node="${activeVersion}"/>
 
 <c:if test="${isDeveloper && not viewAsUser}">
@@ -138,7 +137,7 @@
 
         <c:when test="${not empty activeVersion}">
             <jcr:nodeProperty node="${activeVersion}" name="versionNumber" var="versionNumber"/>
-            <a class="btn btn-block" href="${activeVersionBinary.url}"
+            <a class="btn btn-block" href="${activeVersion.properties.url.string}"
                <c:if test="${not isDeveloper}">onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')"</c:if>>
                 <fmt:message key="jnt_forgeModule.label.downloadVersion">
                     <fmt:param value="${versionNumber.string}"/>

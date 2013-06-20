@@ -20,7 +20,6 @@
 <jcr:nodeProperty node="${currentNode}" name="changeLog" var="changeLog"/>
 <jcr:nodeProperty node="${currentNode}" name="versionNumber" var="versionNumber"/>
 <jcr:nodeProperty node="${currentNode}" name="requiredVersion" var="requiredVersion"/>
-<jcr:node var="moduleVersionBinary" uuid="${moduleVersionBinaryUUID}"/>
 
 <c:if test="${isDeveloper && not viewAsUser}">
 
@@ -82,7 +81,7 @@
 
             <div class="pull-right">
 
-                <a class="btn btn-small" href="${moduleVersionBinary.url}"
+                <a class="btn btn-small" href="${currentNode.properties.url.string}"
                    onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')">
                     <fmt:message key="jnt_forgeModule.label.downloadVersion">
                         <fmt:param value="${versionNumber.string}"/>

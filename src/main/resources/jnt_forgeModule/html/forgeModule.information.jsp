@@ -40,7 +40,6 @@
     <template:param name="getActiveVersion" value="true"/>
 </template:include>
 <c:set value="${moduleMap.activeVersion}" var="activeVersion"/>
-<c:set value="${moduleMap.activeVersionBinary}" var="activeVersionBinary"/>
 <template:addCacheDependency node="${activeVersion}"/>
 
 
@@ -130,8 +129,7 @@
 
         <span content="${title}" itemprop="name"></span>
         <span content="${icon.url}" itemprop="image"></span>
-        <span content="${activeVersionBinary.fileContent.contentType}" itemprop="fileFormat"></span>
-        <span content="${activeVersionBinary.url}" itemprop="downloadUrl"></span>
+        <span content="${activeVersion.properties.url.string}" itemprop="downloadUrl"></span>
         <c:forEach items="${assignedTags}" var="tag" varStatus="status">
             <span content="${tag.node.name}" itemprop="keywords"></span>
         </c:forEach>
@@ -139,7 +137,7 @@
         <dt><fmt:message key="jnt_forgeModule.label.updated"/></dt>
         <dd>
             <time itemprop="datePublished">
-                <fmt:formatDate value="${activeVersionBinary.contentLastModifiedAsDate}" pattern="yyyy-MM-dd" />
+                <fmt:formatDate value="${activeVersion.properties['jcr:lastModified'].date.time}" pattern="yyyy-MM-dd" />
             </time>
         </dd>
 
@@ -148,10 +146,6 @@
 
         <dt><fmt:message key="jnt_forgeModule.label.relatedJahiaVersion"/></dt>
         <dd>${requiredVersion.node.displayableName}</dd>
-
-
-        <dt><fmt:message key="jnt_forgeModule.label.fileSize"/></dt>
-        <dd itemprop="fileSize">${not empty activeVersion ? jcr:humanReadableFileLength(activeVersionBinary) : ''}</dd>
 
         <span itemtype="http://schema.org/Organization" itemscope="" itemprop="author">
 

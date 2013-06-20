@@ -20,14 +20,12 @@
     <jcr:sql
         var="query"
         sql="SELECT * FROM [jnt:forgeModuleVersion] AS moduleVersion
-            INNER JOIN [jnt:file] AS moduleVersionBinary ON ischildnode(moduleVersionBinary,moduleVersion)
             WHERE isdescendantnode(moduleVersion,['${currentNode.path}']) AND moduleVersion.activeVersion = true
             ORDER BY moduleVersion.['jcr:lastModified'] DESC"
         limit= '1' />
 
     <c:forEach items="${query.rows}" var="row">
         <c:set target="${moduleMap}" property="activeVersion" value="${row.nodes['moduleVersion']}" />
-        <c:set target="${moduleMap}" property="activeVersionBinary" value="${row.nodes['moduleVersionBinary']}"/>
     </c:forEach>
 
 </c:if>

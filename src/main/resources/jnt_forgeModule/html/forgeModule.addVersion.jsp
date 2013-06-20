@@ -41,9 +41,9 @@
                         regexp: /^(\d+\.){3}(\d+)$/i
                     },
 
-                    'moduleVersionBinary': {
+                    'url': {
                         required: true,
-                        regexp: /(\S+?)\.(jar|war)$/i
+                        regexp: /^(https?|ftp|file).*/i
                     },
 
                     'changeLog': {
@@ -62,9 +62,9 @@
                         regexp: "<fmt:message key='jnt_forgeModuleVersion.label.askValidVersionNumber'/>"
                     },
 
-                    'moduleVersionBinary': {
-                         required: "<fmt:message key='jnt_forgeModuleVersion.label.askModuleVersionBinary'/>",
-                         regexp:"<fmt:message key='jnt_forgeModuleVersion.label.askValidModuleVersionBinary'/>"
+                    'moduleArtifactUrl': {
+                         required: "<fmt:message key='jnt_forgeModuleVersion.label.askModuleArtifactUrl'/>",
+                         regexp:"<fmt:message key='jnt_forgeModuleVersion.label.askValidModuleArtifactUrl'/>"
                      },
 
                     'changeLog': {
@@ -98,7 +98,7 @@
 </template:addResources>
 
 <template:tokenizedForm>
-    <form action="<c:url value='${url.base}${currentNode.path}.addModuleVersion.do'/>" method="post" id="moduleVersionForm-${id}" enctype="multipart/form-data">
+    <form action="<c:url value='${url.base}${currentNode.path}.addModuleVersion.do'/>" method="post" id="moduleVersionForm-${id}">
         <fieldset>
             <input type="hidden" name="jcrNormalizeNodeName" value="true"/>
 
@@ -111,10 +111,10 @@
             </div>
 
             <div class="control-group">
-                <label class="control-label" for="moduleVersionBinary"><fmt:message key="jnt_forgeModuleVersion.moduleFile"/></label>
+                <label class="control-label" for="moduleArtifactUrl"><fmt:message key="jnt_forgeModuleVersion.url"/></label>
                 <div class="controls">
-                    <input placeholder="<fmt:message key="jnt_forgeModuleVersion.moduleFile" />" class="span16" type="file"
-                           name="moduleVersionBinary" id="moduleVersionBinary"/>
+                    <input placeholder="<fmt:message key="jnt_forgeModuleVersion.url" />" class="span16" type="text"
+                           name="url" id="moduleArtifactUrl"/>
                 </div>
             </div>
 

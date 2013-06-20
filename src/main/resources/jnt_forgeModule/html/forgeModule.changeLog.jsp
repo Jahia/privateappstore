@@ -69,7 +69,6 @@
                     <template:param name="isActiveVersion" value="true"/>
                     <template:param name="isDeveloper" value="${isDeveloper}"/>
                     <template:param name="viewAsUser" value="${viewAsUser}"/>
-                    <template:param name="moduleVersionBinaryUUID" value="${moduleMap.activeVersionBinary.identifier}"/>
                 </template:module>
 
             </section>
@@ -110,7 +109,6 @@
                         <template:param name="isActiveVersion" value="false"/>
                         <template:param name="isDeveloper" value="${isDeveloper}"/>
                         <template:param name="viewAsUser" value="${viewAsUser}"/>
-                        <template:param name="moduleVersionBinaryUUID" value="${moduleVersionBinary.identifier}"/>
                     </template:module>
 
                 </article>

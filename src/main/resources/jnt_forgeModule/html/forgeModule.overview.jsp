@@ -51,7 +51,6 @@
     <template:param name="getActiveVersion" value="true"/>
 </template:include>
 <c:set value="${moduleMap.activeVersion}" var="activeVersion"/>
-<c:set value="${moduleMap.activeVersionBinary}" var="activeVersionBinary"/>
 
 <c:if test="${isDeveloper && not viewAsUser}">
 

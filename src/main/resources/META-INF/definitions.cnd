@@ -65,7 +65,7 @@
  - fileDsaSignature (string)
  - changeLog (string, richtext)
  - activeVersion (boolean) = false autocreated
- + * (jnt:file)
+ - url (string)
 
 [jnt:forgeModuleScreenshotsList] > jnt:content, jmix:list orderable
  + * (jnt:file) = jnt:file

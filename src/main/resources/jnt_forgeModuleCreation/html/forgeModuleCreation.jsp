@@ -18,11 +18,9 @@
 
 <template:addResources type="javascript" resources="html5shiv.js,jquery.min.js,jquery.validate.js"/>
 <template:addResources type="css" resources="forge.css"/>
-
 <c:set var="id" value="${currentNode.identifier}"/>
 <jcr:nodeProperty node="${currentNode}" name='modulesRepository' var="modulesRepository"/>
-<c:set var="modulesRepositoryPath" value="${url.base}${modulesRepository.node.path}"/>
-
+<c:set var="modulesRepositoryPath" value="${url.base}${renderContext.mainResource.node.resolveSite.path}/contents/forge-modules-repository"/>
 <uiComponents:ckeditor selector="jahia-forge-module-description-${id}"/>
 
 <template:addResources type="inlinejavascript">

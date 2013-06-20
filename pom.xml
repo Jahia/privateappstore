@@ -74,7 +74,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Jahia-Depends>bootstrapComponent,default,facets,grid,rating,templates-system,videostreaming</Jahia-Depends>  
+                        <Jahia-Depends>bootstrapComponent,default,facets,grid,rating,videostreaming</Jahia-Depends>
                         <Jahia-Module-Type>module</Jahia-Module-Type>
                     </instructions>
                 </configuration>
