@@ -34,6 +34,8 @@ import java.util.Map;
 public class CreateModule extends Action {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(CreateModule.class);
+    private AddModuleVersion addModuleVersion;
+
 
     @Override
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource,
@@ -67,10 +69,16 @@ public class CreateModule extends Action {
             module.grantRoles("u:" + session.getUser().getUsername(), new HashSet<String>(roles));
         }
 
+        addModuleVersion.doExecute(req,renderContext,resource,session,parameters,urlResolver);
+
         session.save();
 
         logger.info("Forge Module " + title + " successfully created and added to forge repository " + repository.getPath());
 
         return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("moduleUrl", module.getUrl()));
+    }
+
+    public void setAddModuleVersion(AddModuleVersion addModuleVersion) {
+        this.addModuleVersion = addModuleVersion;
     }
 }

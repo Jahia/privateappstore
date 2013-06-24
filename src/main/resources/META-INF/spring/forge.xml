@@ -6,6 +6,9 @@
     <bean class="org.jahia.modules.forge.actions.CreateModule" >
         <property name="name" value="CreateModule"/>
         <property name="requireAuthenticatedUser" value="true"/>
+        <property name="addModuleVersion">
+            <bean class="org.jahia.modules.forge.actions.AddModuleVersion"/>
+        </property>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.DeleteModule" >
