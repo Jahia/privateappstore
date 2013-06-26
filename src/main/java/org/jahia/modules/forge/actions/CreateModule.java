@@ -16,6 +16,7 @@ import org.jahia.services.usermanager.jcr.JCRUser;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
+import javax.jcr.NodeIterator;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 import javax.servlet.http.HttpServletRequest;
@@ -96,13 +97,14 @@ public class CreateModule extends Action {
         String query = sb.toString();
         Query q = queryManager.createQuery(query, Query.JCR_SQL2);
         QueryResultWrapper queryResult = (QueryResultWrapper) q.execute();
+        JCRNodeWrapper module;
 
-        boolean isValidTitle = queryResult.getNodes().getSize() == 0;
-
-        if (!isValidTitle)
-            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", "titleAlreadyUsed"));
-
-        JCRNodeWrapper module = createNode(req, moduleParameters, repository, "jnt:forgeModule", title, false);
+        NodeIterator moduleNodes = queryResult.getNodes();
+        if (moduleNodes.getSize() == 0) {
+            module = createNode(req, moduleParameters, repository, "jnt:forgeModule", title, false);
+        }  else {
+            ;module = (JCRNodeWrapper) moduleNodes.nextNode();
+        }
 
         if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
             List<String> roles = Arrays.asList("owner");
