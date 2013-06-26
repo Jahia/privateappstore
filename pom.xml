@@ -79,6 +79,23 @@
                     </instructions>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.jahia.server</groupId>
+                <artifactId>jahia-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>package-importsite</id>
+                        <configuration>
+                            <src>${basedir}/src/main/importsite-forgesite</src>
+                            <dest>${project.build.directory}/${project.build.finalName}/META-INF</dest>
+                            <archiveName>importsite-forgesite.zip</archiveName>
+                        </configuration>
+                        <goals>
+                            <goal>package-imports</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
