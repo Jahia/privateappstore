@@ -20,16 +20,43 @@ import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Date: 2013-05-03
  *
  * @author Frédéric PIERRE
  * @version 1.0
+ * [jnt:forgeModule] > jnt:content, mix:title, jmix:editorialContent, jmix:tagged, jmix:forge, jmix:reviews, jmix:rating
+- jcr:title (string) mandatory
+- description (string, richtext) i18n mandatory
+- category (weakreference, choicelist[nodes='$currentSite/contents/forge-modules-categories;jnt:text']) facetable
+- icon (weakreference, picker[type='image'])
+- authorNameDisplayedAs (string, choicelist[resourceBundle]) = 'username' autocreated < 'username', 'fullName', 'organisation'
+- authorURL (string)
+- authorEmail (string)
+- howToInstall (string, richtext) i18n
+- FAQ (string, richtext) i18n
+- codeRepository (string)
+- license (weakreference,category[root='forge-licenses'])
+- downloadCount (long) = 0 hidden onconflict=latest autocreated
+- supportedByJahia (boolean) = false autocreated
+- reviewedByJahia (boolean) = false autocreated
+- published (boolean) = false autocreated
+- deleted (boolean) = false autocreated hidden
++ screenshots (jnt:forgeModuleScreenshotsList) = jnt:forgeModuleScreenshotsList autocreated hidden
++ video (jnt:videostreaming) = jnt:videostreaming
++ * (jnt:forgeModuleVersion)
+
+[jnt:forgeModuleVersion]> jnt:content, jmix:editorialContent, jmix:forge
+- requiredVersion (weakreference, choicelist[nodes='$currentSite/contents/forge-modules-required-versions//*;jnt:text'])
+- releaseType (string, choicelist[resourceBundle]) = 'release' < 'release', 'hotfix', 'service-pack', 'upgrade'
+- status (weakreference,category[root='forge-status'])
+- versionNumber (string)
+- fileDsaSignature (string)
+- changeLog (string, richtext)
+- activeVersion (boolean) = false autocreated
+- url (string)
  */
 public class CreateModule extends Action {
 
@@ -42,7 +69,20 @@ public class CreateModule extends Action {
                                   JCRSessionWrapper session, Map<String, List<String>> parameters,
                                   URLResolver urlResolver) throws Exception {
 
-        String title = getParameter(parameters, "jcr:title");
+        List<String> moduleParamKeys = Arrays.asList("jcr:title","description", "category", "icon", "authorNameDisplayedAs", "authorURL", "authorEmail", "FAQ", "codeRepository", "license", "downloadCount", "supportedByJahia", "reviewedByJahia", "published", "deleted", "screenshots", "video");
+        List<String> versionParamKeys = Arrays.asList("jcr:title","requiredVersion", "releaseType", "status", "versionNumber", "fileDsaSignature", "changeLog", "activeVersion", "url");
+        Map<String, List<String>> moduleParameters = new HashMap<String, List<String>>();
+        Map<String, List<String>> versionParameters = new HashMap<String, List<String>>();
+
+        for (String key : parameters.keySet()) {
+            if (moduleParamKeys.contains(key)) {
+                moduleParameters.put(key,parameters.get(key));
+            } else if (versionParamKeys.contains(key)) {
+                versionParameters.put(key,parameters.get(key));
+            }
+        }
+
+        String title = getParameter(moduleParameters, "jcr:title");
         JCRNodeWrapper repository = resource.getNode();
 
         logger.info("Start creating Forge Module " + title);
@@ -62,14 +102,14 @@ public class CreateModule extends Action {
         if (!isValidTitle)
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", "titleAlreadyUsed"));
 
-        JCRNodeWrapper module = createNode(req, parameters, repository, "jnt:forgeModule", title, false);
+        JCRNodeWrapper module = createNode(req, moduleParameters, repository, "jnt:forgeModule", title, false);
 
         if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
             List<String> roles = Arrays.asList("owner");
             module.grantRoles("u:" + session.getUser().getUsername(), new HashSet<String>(roles));
         }
 
-        addModuleVersion.doExecute(req,renderContext,resource,session,parameters,urlResolver);
+        addModuleVersion.doExecute(req,renderContext,new Resource(module,resource.getTemplateType(),resource.getTemplate(),resource.getContextConfiguration()),session,versionParameters,urlResolver);
 
         session.save();
 

@@ -84,45 +84,41 @@
 </template:addResources>
 
 <section class="forgeModuleCreation">
-
     <header>
         <h2><fmt:message key="jnt_forgeModuleCreation.label.forgeModuleCreationHeader"/></h2>
         <p><fmt:message key="jnt_forgeModuleCreation.label.forgeModuleCreationSubheader"/></p>
     </header>
 
-    <template:tokenizedForm>
-        <form id="forgeModuleCreationForm-${id}" action="<c:url value='${modulesRepositoryPath}.createModule.do'/>" method="post">
-            <fieldset>
+    <form id="forgeModuleCreationForm-${id}" action="<c:url value='${modulesRepositoryPath}.createModule.do'/>" method="post">
+        <fieldset>
 
-                <input type="hidden" name="jcrNormalizeNodeName" value="true"/>
-                <input type="hidden" name="allowsMultipleSubmits" value="true"/>
+            <input type="hidden" name="jcrNormalizeNodeName" value="true"/>
+            <input type="hidden" name="allowsMultipleSubmits" value="true"/>
 
-                <div class="control-group">
-                    <label class="control-label" for="jcr:title"><fmt:message key="jnt_forgeModule.label.title"/></label>
-                    <div class="controls">
-                        <input placeholder="<fmt:message key="jnt_forgeModule.label.title" />" type="text"
-                               name="jcr:title" id="jcr:title"/>
-                    </div>
+            <div class="control-group">
+                <label class="control-label" for="jcr:title"><fmt:message key="jnt_forgeModule.label.title"/></label>
+                <div class="controls">
+                    <input placeholder="<fmt:message key="jnt_forgeModule.label.title" />" type="text"
+                           name="jcr:title" id="jcr:title"/>
                 </div>
+            </div>
 
-                <div class="control-group">
-                    <label class="control-label" for="jahia-forge-module-description-${id}"><fmt:message key="jnt_forgeModule.label.description"/></label>
-                    <div class="controls">
-                        <textarea rows="7" cols="35"
-                                  placeholder="<fmt:message key="jnt_forgeModule.description" />" class="jahia-ckeditor"
-                                  name="description" id="jahia-forge-module-description-${id}">
-                        </textarea>
-                    </div>
+            <div class="control-group">
+                <label class="control-label" for="jahia-forge-module-description-${id}"><fmt:message key="jnt_forgeModule.label.description"/></label>
+                <div class="controls">
+                    <textarea rows="7" cols="35"
+                              placeholder="<fmt:message key="jnt_forgeModule.description" />" class="jahia-ckeditor"
+                              name="description" id="jahia-forge-module-description-${id}">
+                    </textarea>
                 </div>
+            </div>
 
-                <div class="control-group">
-                    <div class="controls">
-                        <input type="submit" class="btn btn-primary" onclick="CKEDITOR.instances['jahia-forge-module-description-${id}'].updateElement();" value="<fmt:message key="jnt_forgeModuleCreation.label.submit" />"/>
-                    </div>
+            <div class="control-group">
+                <div class="controls">
+                    <input type="submit" class="btn btn-primary" onclick="CKEDITOR.instances['jahia-forge-module-description-${id}'].updateElement();" value="<fmt:message key="jnt_forgeModuleCreation.label.submit" />"/>
                 </div>
+            </div>
 
-            </fieldset>
-        </form>
-    </template:tokenizedForm>
-
+        </fieldset>
+    </form>
 </section>

@@ -66,10 +66,14 @@ public class AddModuleVersion extends Action {
 
     private boolean hasValidVersionNumber(JCRNodeWrapper module, String versionNumber) throws RepositoryException {
 
+        if (versionNumber == null ) {
+            return false;
+        }
+
         List<JCRNodeWrapper> moduleVersions = JCRTagUtils.getChildrenOfType(module, "jnt:forgeModuleVersion");
 
         for (JCRNodeWrapper moduleVersion : moduleVersions) {
-            if (moduleVersion.getProperty("versionNumber").getString().equals(versionNumber))
+            if (moduleVersion.hasProperty("versionNumber") &&moduleVersion.getProperty("versionNumber").getString().equals(versionNumber))
                 return false;
         }
 

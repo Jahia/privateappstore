@@ -59,7 +59,7 @@
 
 [jnt:forgeModuleVersion]> jnt:content, jmix:editorialContent, jmix:forge
  - requiredVersion (weakreference, choicelist[nodes='$currentSite/contents/forge-modules-required-versions//*;jnt:text'])
- - releaseType (string, choicelist[resourceBundle]) = 'hotfix' m < 'hotfix', 'service-pack', 'upgrade'
+ - releaseType (string, choicelist[resourceBundle]) = 'release' < 'release', 'hotfix', 'service-pack', 'upgrade'
  - status (weakreference,category[root='forge-status'])
  - versionNumber (string)
  - fileDsaSignature (string)
