@@ -5,6 +5,7 @@ import org.jahia.api.Constants;
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
 import org.jahia.bin.Render;
+import org.jahia.bin.SystemAction;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.query.QueryResultWrapper;
@@ -59,16 +60,18 @@ import java.util.*;
 - activeVersion (boolean) = false autocreated
 - url (string)
  */
-public class CreateModule extends Action {
+public class CreateModule extends SystemAction {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(CreateModule.class);
     private AddModuleVersion addModuleVersion;
 
 
     @Override
-    public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource,
-                                  JCRSessionWrapper session, Map<String, List<String>> parameters,
-                                  URLResolver urlResolver) throws Exception {
+    public ActionResult doExecuteAsSystem(HttpServletRequest req, RenderContext renderContext, JCRSessionWrapper session, Resource resource, Map<String, List<String>> parameters, URLResolver urlResolver) throws Exception {
+
+        if (session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
+            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", "guestNotAllowed"));
+        }
 
         List<String> moduleParamKeys = Arrays.asList("jcr:title","description", "category", "icon", "authorNameDisplayedAs", "authorURL", "authorEmail", "FAQ", "codeRepository", "license", "downloadCount", "supportedByJahia", "reviewedByJahia", "published", "deleted", "screenshots", "video");
         List<String> versionParamKeys = Arrays.asList("jcr:title","requiredVersion", "releaseType", "status", "versionNumber", "fileDsaSignature", "changeLog", "activeVersion", "url");
@@ -111,7 +114,7 @@ public class CreateModule extends Action {
             module.grantRoles("u:" + session.getUser().getUsername(), new HashSet<String>(roles));
         }
 
-        addModuleVersion.doExecute(req,renderContext,new Resource(module,resource.getTemplateType(),resource.getTemplate(),resource.getContextConfiguration()),session,versionParameters,urlResolver);
+        addModuleVersion.doExecuteAsSystem(req,renderContext,session,new Resource(module,resource.getTemplateType(),resource.getTemplate(),resource.getContextConfiguration()),parameters,urlResolver);
 
         session.save();
 

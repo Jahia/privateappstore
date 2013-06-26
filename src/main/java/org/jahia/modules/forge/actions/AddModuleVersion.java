@@ -6,6 +6,7 @@ import org.jahia.api.Constants;
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
 import org.jahia.bin.Render;
+import org.jahia.bin.SystemAction;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.render.RenderContext;
@@ -24,14 +25,12 @@ import java.util.*;
 /**
  * @author faissah
  */
-public class AddModuleVersion extends Action {
+public class AddModuleVersion extends SystemAction {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(AddModuleVersion.class);
 
     @Override
-    public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource,
-                                  JCRSessionWrapper session, Map<String, List<String>> parameters,
-                                  URLResolver urlResolver) throws Exception {
+    public ActionResult doExecuteAsSystem(HttpServletRequest req, RenderContext renderContext, JCRSessionWrapper session, Resource resource, Map<String, List<String>> parameters, URLResolver urlResolver) throws Exception {
 
         JCRNodeWrapper module = resource.getNode();
         String moduleTitle = module.getPropertyAsString("jcr:title");
