@@ -33,9 +33,6 @@
 
 [jnt:forgeMyModulesList] > jnt:content,  jmix:list, jmix:forge, mix:title
 
-[jnt:forgeModuleCreation] > jnt:content, mix:title, jmix:forge
- - modulesRepository (weakreference)
-
 [jnt:forgeModule] > jnt:content, mix:title, jmix:editorialContent, jmix:tagged, jmix:forge, jmix:reviews, jmix:rating
  - jcr:title (string) mandatory
  - description (string, richtext) i18n mandatory

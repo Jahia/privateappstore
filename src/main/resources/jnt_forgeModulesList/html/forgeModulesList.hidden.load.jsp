@@ -17,10 +17,9 @@
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
-<jcr:nodeProperty var="startNode" node="${currentNode}" name="startNode"/>
 <c:set var="statement"
        value="SELECT * FROM [jnt:forgeModule]
-                WHERE ISDESCENDANTNODE('${startNode.node.path}') AND [published]=true
+                WHERE ISDESCENDANTNODE('${renderContext.site.path}')
                 ORDER BY [jcr:created] DESC"/>
 
 <query:definition var="listQuery" statement="${statement}"/>
