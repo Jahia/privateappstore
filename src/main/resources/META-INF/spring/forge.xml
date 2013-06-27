@@ -3,12 +3,22 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-    <bean class="org.jahia.modules.forge.actions.CreateModule" >
+    <bean id="addModuleVersion" class="org.jahia.modules.forge.actions.AddModuleVersion" >
+        <property name="name" value="AddModuleVersion"/>
+        <property name="requireAuthenticatedUser" value="true"/>
+    </bean>
+
+
+    <bean id="createForgeModule" class="org.jahia.modules.forge.actions.CreateModule" >
         <property name="name" value="CreateModule"/>
         <property name="requireAuthenticatedUser" value="true"/>
-        <property name="addModuleVersion">
-            <bean class="org.jahia.modules.forge.actions.AddModuleVersion"/>
-        </property>
+        <property name="addModuleVersion" ref="addModuleVersion"/>
+    </bean>
+
+    <bean class="org.jahia.modules.forge.actions.CreateModuleFromJar" >
+        <property name="name" value="CreateModuleFromJar"/>
+        <property name="requireAuthenticatedUser" value="true"/>
+        <property name="createModule" ref="createForgeModule"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.DeleteModule" >
@@ -21,10 +31,6 @@
         <property name="requireAuthenticatedUser" value="true"/>
     </bean>
 
-    <bean class="org.jahia.modules.forge.actions.AddModuleVersion" >
-        <property name="name" value="AddModuleVersion"/>
-        <property name="requireAuthenticatedUser" value="true"/>
-    </bean>
 
     <bean class="org.jahia.modules.forge.actions.EditModuleVersion" >
         <property name="name" value="EditModuleVersion"/>

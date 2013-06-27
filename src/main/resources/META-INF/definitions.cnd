@@ -66,3 +66,4 @@
 
 [jnt:forgeModuleScreenshotsList] > jnt:content, jmix:list orderable
  + * (jnt:file) = jnt:file
+
