@@ -89,11 +89,11 @@
                                           startNode="/modules/forge/contents/forge-modules-repository">
                   <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                 </forgeModulesList>
-                                    <simple-text jcr:primaryType="jnt:text">
-                                        <j:translation_en jcr:language="en"
-                                             jcr:primaryType="jnt:translation"
-                                             text="upload here your jar"/>
-                                    </simple-text>
+                                    <pager displayNbOfItemsPerPage="true"
+                               displayPager="false"
+                               j:bindedComponent="/modules/forge/templates/forge-home/pagecontent/bootstrap-row/bootstrap-row-col2/forgeModulesList"
+                               jcr:primaryType="jnt:pager"
+                               pageSize="3"/>
                                     <file-upload-form j:bindedComponent="/modules/forge/templates/forge-home/pagecontent/bootstrap-row/bootstrap-row-col2"
                                           j:view="jar"
                                           jcr:mixinTypes="jmix:renderable"

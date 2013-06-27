@@ -42,9 +42,12 @@ public class CreateModuleFromJar extends SystemAction {
             if (manifest != null) {
                 Attributes attributes = manifest.getMainAttributes();
                 String version = attributes.getValue("Implementation-Version");
-                String moduleName = attributes.getValue("Bundle-SymbolicName");
+                String moduleName = attributes.getValue("Jahia-Root-Folder");
+                if (uploadedJar.getName().endsWith(".war")) {
+                    moduleName = attributes.getValue("root-folder");
+                }
                 moduleParams.put("moduleName", Arrays.asList(moduleName));
-                moduleParams.put("jcr:title", Arrays.asList(attributes.getValue("Bundle-Name")));
+                moduleParams.put("jcr:title", Arrays.asList(attributes.getValue("Implementation-Title")));
                 moduleParams.put("description", Arrays.asList(attributes.getValue("Bundle-Description")));
                 //moduleParams.put("authorNameDisplayedAs", Arrays.asList(attributes.getValue("Built-By")));
                 moduleParams.put("authorURL", Arrays.asList(attributes.getValue("Implementation-URL")));
@@ -67,8 +70,16 @@ public class CreateModuleFromJar extends SystemAction {
 
         }
 
-        // At the end, create a module
-        return createModule.doExecuteAsSystem(request, renderContext, session, resource, moduleParams, urlResolver);
+        // create module
+
+
+        ActionResult result = createModule.doExecuteAsSystem(request, renderContext, session, resource, moduleParams, urlResolver);
+
+        // deploy the artifact on nexus
+
+        return result;
+
+
     }
 
     public void setCreateModule(CreateModule createModule) {

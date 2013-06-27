@@ -20,18 +20,25 @@
 <template:include view="hidden.header"/>
 
 <c:set var="columnsNumber" value="${currentNode.properties['columnsNumber'].long}"/>
+<c:set var="count" value="0"/>
 
-<c:forEach items="${moduleMap.currentList}" var="module" varStatus="status" begin="${moduleMap.begin}" end="${moduleMap.end}">
+<c:forEach items="${moduleMap.currentList}" var="module" varStatus="status">
 
-    <c:if test="${status.index % columnsNumber eq 0}">
-        <div class="row-fluid">
-    </c:if>
+    <c:choose>
+        <c:when test="${status.index % columnsNumber eq 0}">
+            <div class="row-fluid">
+        </c:when>
+        <c:otherwise>
+            <c:set var="count" value="${count + 1}"/>
+        </c:otherwise>
+    </c:choose>
 
-    <div class="span${functions:round(12 / columnsNumber)}">
+    <div class="span${functions:round(12 / columnsNumber)}">  ${status.count}
         <template:module node="${module}"/>
     </div>
 
-    <c:if test="${status.index % columnsNumber eq columnsNumber - 1}">
+    <c:if test="${count eq columnsNumber}">
+        <c:set var="count" value="0"/>
         </div>
     </c:if>
 

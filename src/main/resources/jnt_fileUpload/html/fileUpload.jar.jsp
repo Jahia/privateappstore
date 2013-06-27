@@ -19,7 +19,7 @@
 <template:addResources type="css" resources="jquery.fileupload.css"/>
 <template:addResources type="javascript" resources="jquery.min.js,jquery-ui.min.js,jquery.fileupload-with-ui.min.js"/>
 <fmt:message key="label.dropHere.ie" var="i18nDropHereIE"/>
-  aaaa
+
 <%--<template:addResources type="inlinejavascript">
     <script type="text/javascript">
         $(document).ready(function() {

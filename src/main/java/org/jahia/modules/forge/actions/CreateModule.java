@@ -80,9 +80,9 @@ public class CreateModule extends SystemAction {
         versionParameters.put("jcr:title",Arrays.asList(title));
 
         for (String key : parameters.keySet()) {
-            if (moduleParamKeys.contains(key)) {
+            if (moduleParamKeys.contains(key) && parameters.get(key).get(0) != null) {
                 moduleParameters.put(key,parameters.get(key));
-            } else if (versionParamKeys.contains(key)) {
+            } else if (versionParamKeys.contains(key) && parameters.get(key).get(0) != null) {
                 versionParameters.put(key,parameters.get(key));
             }
         }
