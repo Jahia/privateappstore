@@ -57,6 +57,7 @@ public class CreateModuleFromJar extends SystemAction {
                 moduleParams.put("versionNumber", Arrays.asList(version));
                 moduleParams.put("url", Arrays.asList("http://nexus/released/" + moduleName + "-" + version + ".jar"));
                 moduleParams.put("activeVersion", Arrays.asList("true"));
+                moduleParams.put("published", Arrays.asList("true"));
             } else {
                 return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", "cannotReadManifest"));
             }

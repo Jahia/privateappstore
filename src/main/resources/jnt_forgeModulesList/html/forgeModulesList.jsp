@@ -18,12 +18,9 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
 <template:include view="hidden.header"/>
-
 <c:set var="columnsNumber" value="${currentNode.properties['columnsNumber'].long}"/>
 <c:set var="count" value="0"/>
-
 <c:forEach items="${moduleMap.currentList}" var="module" varStatus="status">
-
     <c:choose>
         <c:when test="${status.index % columnsNumber eq 0}">
             <div class="row-fluid">
@@ -33,11 +30,11 @@
         </c:otherwise>
     </c:choose>
 
-    <div class="span${functions:round(12 / columnsNumber)}">  ${status.count}
+    <div class="span${functions:round(12 / columnsNumber)}">
         <template:module node="${module}"/>
     </div>
 
-    <c:if test="${count eq columnsNumber}">
+    <c:if test="${count eq columnsNumber || status.last}">
         <c:set var="count" value="0"/>
         </div>
     </c:if>

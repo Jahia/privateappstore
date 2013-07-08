@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+		http://www.springframework.org/schema/webflow
+		http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+    <var name="flowHandler" class="org.jahia.modules.forge.flow.ForgeSettingsHandler"/>
+
+    <on-start>
+        <evaluate expression="flowHandler.init()" />
+    </on-start>
+
+
+    <view-state id="view" model="forgeSettings">
+        <on-render>
+            <evaluate expression="flowHandler.getForgeSettingsBySite(externalContext.requestMap.renderContext.mainResource.node.resolveSite)" result="flowScope.forgeSettings"/>
+        </on-render>
+        <transition on="submit">
+            <evaluate expression="flowHandler.save(messageContext,externalContext.requestMap.renderContext.mainResource.node.resolveSite)" />
+        </transition>
+    </view-state>
+</flow>

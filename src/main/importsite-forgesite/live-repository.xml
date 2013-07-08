@@ -483,7 +483,7 @@
                j:lastPublishedBy="root"
                j:originWS="default"
                j:published="true"
-               j:templateName="home"
+               j:templateName="forge-home"
                jcr:created="2013-06-26T15:10:44.709+02:00"
                jcr:createdBy="system"
                jcr:lastModified="2013-06-26T15:10:45.835+02:00"

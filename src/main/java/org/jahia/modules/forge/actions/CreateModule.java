@@ -105,10 +105,10 @@ public class CreateModule extends SystemAction {
             List<String> roles = Arrays.asList("owner");
             module.grantRoles("u:" + session.getUser().getUsername(), new HashSet<String>(roles));
         }
+        session.save();
 
         addModuleVersion.doExecuteAsSystem(req,renderContext,session,new Resource(module,resource.getTemplateType(),resource.getTemplate(),resource.getContextConfiguration()),versionParameters,urlResolver);
 
-        session.save();
 
         logger.info("Forge Module " + moduleName + " successfully created and added to forge repository " + repository.getPath());
 
