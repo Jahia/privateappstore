@@ -2,16 +2,11 @@ package org.jahia.modules.forge.flow;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.xerces.impl.dv.util.Base64;
-import org.jahia.services.content.JCRCallback;
-import org.jahia.services.content.JCRNodeWrapper;
-import org.jahia.services.content.JCRSessionWrapper;
-import org.jahia.services.content.JCRTemplate;
 import org.jahia.services.content.decorator.JCRSiteNode;
 import org.jahia.utils.i18n.Messages;
 import org.jahia.utils.i18n.ResourceBundles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.binding.message.MessageBuilder;
 import org.springframework.binding.message.MessageContext;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -39,6 +34,7 @@ public class ForgeSettingsHandler implements Serializable {
                 }
                 forgeSettings.setUrl(site.getProperty("forgeSettingsUrl").getString());
                 forgeSettings.setUser(site.getProperty("forgeSettingsUser").getString());
+                forgeSettings.setGroupId(site.getProperty("forgeSettingsGroupID").getString());
             }
         } catch (RepositoryException e) {
             logger.warn("unable to read forge settings",e);
@@ -62,6 +58,9 @@ public class ForgeSettingsHandler implements Serializable {
                 }
                 site.setProperty("forgeSettingsUrl",forgeSettings.getUrl());
                 site.setProperty("forgeSettingsUser",forgeSettings.getUser());
+                site.setProperty("forgeSettingsGroupID",forgeSettings.getGroupId());
+                site.setProperty("forgeSettingsSnapshotRepository",forgeSettings.getSnapshotRepository());
+                site.setProperty("forgeSettingsReleaseRepository",forgeSettings.getReleaseRepository());
                 site.getSession().save();
                 messages.addMessage(new MessageBuilder()
                         .info()

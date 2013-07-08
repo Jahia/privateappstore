@@ -73,6 +73,9 @@
 - forgeSettingsUrl (string)
 - forgeSettingsUser (string)
 - forgeSettingsPassword (string)
+- forgeSettingsGroupID (string)
+- forgeSettingsSnapshotRepository (string)
+- forgeSettingsReleaseRepository (string)
 
 [jnt:forgeSettings] > jnt:content, mix:title, jmix:studioOnly, jmix:siteComponent
 

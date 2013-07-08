@@ -20,26 +20,38 @@
 </c:forEach>
 <div class="box-1">
     <form:form modelAttribute="forgeSettings" cssClass="form" autocomplete="off">
-        <h3>Forge settings</h3>
+        <h3><fmt:message key="jahiaForge.settings.title"/></h3>
         <div class="container-fluid">
             <div class="row-fluid">
                 <div class="span8">
-                    <label for="url">maven repository URL</label>
+                    <label for="url"><fmt:message key="jahiaForge.settings.url"/></label>
                     <form:input class="span12" type="text" id="url" path="url"/>
                 </div>
             </div>
             <div class="row-fluid">
                 <div class="span4">
-                    <label for="user">user</label>
+                    <label for="user"><fmt:message key="jahiaForge.settings.user"/></label>
                     <form:input class="span12" type="text" id="user" path="user"/>
                 </div>
                 <div class="span4">
-                    <label for="password">password</label>
+                    <label for="password"><fmt:message key="jahiaForge.settings.password"/></label>
                     <form:password class="span12" type="password" id="password" path="password"/>
                 </div>
                 <div class="span4">
-                    <label for="passwordConfirm">confirm password</label>
+                    <label for="passwordConfirm"><fmt:message key="jahiaForge.settings.confirm"/></label>
                     <form:password class="span12" type="password" id="passwordConfirm" path="passwordConfirm"/>
+                </div>
+                <div class="span4">
+                    <label for="groupId"><fmt:message key="jahiaForge.settings.groupId"/></label>
+                    <form:input class="span12" type="text" id="groupId" path="groupId"/>
+                </div>
+                <div class="span4">
+                    <label for="snapshotRepository"><fmt:message key="jahiaForge.settings.snapshotRepository"/></label>
+                    <form:input class="span12" type="text" id="snapshotRepository" path="snapshotRepository"/>
+                </div>
+                <div class="span4">
+                    <label for="releaseRepository"><fmt:message key="jahiaForge.settings.forgeSettingsReleaseRepository"/></label>
+                    <form:input class="span12" type="text" id="releaseRepository" path="releaseRepository"/>
                 </div>
             </div>
             <div class="row-fluid">

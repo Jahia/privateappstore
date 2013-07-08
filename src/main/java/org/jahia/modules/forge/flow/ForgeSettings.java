@@ -1,6 +1,6 @@
 package org.jahia.modules.forge.flow;
 
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.xerces.impl.dv.util.Base64;
@@ -11,8 +11,6 @@ import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Bean to handle forge settings flow.
@@ -25,6 +23,9 @@ public class ForgeSettings implements Serializable {
     private String user;
     private String passwordConfirm;
     private String originPassword;
+    private String groupId;
+    private String snapshotRepository;
+    private String releaseRepository;
 
     /**
      * default constructor
@@ -72,6 +73,30 @@ public class ForgeSettings implements Serializable {
         this.passwordConfirm = passwordConfirm;
     }
 
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    public String getSnapshotRepository() {
+        return snapshotRepository;
+    }
+
+    public void setSnapshotRepository(String snapshotRepository) {
+        this.snapshotRepository = snapshotRepository;
+    }
+
+    public String getReleaseRepository() {
+        return releaseRepository;
+    }
+
+    public void setReleaseRepository(String releaseRepository) {
+        this.releaseRepository = releaseRepository;
+    }
+
     public void validateView(ValidationContext context) {
         // verify password
         if (StringUtils.isNotBlank(password)) {
@@ -89,18 +114,18 @@ public class ForgeSettings implements Serializable {
         }
 
         // try basic http connexion
-        GetMethod httpMethod = new GetMethod(url);
+        PostMethod httpMethod = new PostMethod(url + "/service/local/artifact/maven/content");
         httpMethod.addRequestHeader("Authorization", "Basic " + Base64.encode((user + ":" + originPassword).getBytes()));
         HttpClient httpClient = new HttpClient();
         try {
             int i = httpClient.executeMethod(httpMethod);
-            if (i != 200 ) {
+            if (i != 400) {
                 context.getMessageContext().addMessage(new MessageBuilder()
                         .error()
                         .source("testUrl")
                         .defaultText(
                                 Messages.getWithArgs("resources.Jahia_Forge",
-                                        "jahiaForge.errors.url.not.working", LocaleContextHolder.getLocale(),i))
+                                        "jahiaForge.errors.url.not.working", LocaleContextHolder.getLocale(), url + "/service -> " + i))
                         .build());
             }
         } catch (IOException e) {
