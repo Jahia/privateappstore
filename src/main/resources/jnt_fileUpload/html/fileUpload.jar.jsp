@@ -29,22 +29,23 @@
         });
     </script>
 </template:addResources>--%>
-
-<c:set var="linked" value="${ui:getBindedComponent(currentNode, renderContext, 'j:bindedComponent')}"/>
-<c:set var="targetNode" value="${renderContext.mainResource.node}"/>
-<c:if test="${jcr:isNodeType(renderContext.mainResource.node, 'jnt:forgeModule')}">
-    <jcr:node var="targetNode" path="${renderContext.mainResource.node.path}/screenshots"/>
-    <c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(renderContext.mainResource.node, 'jcr:all_live')
+<c:choose>
+    <c:when test="${jcr:isNodeType(renderContext.site,'jmix:forgeSettings') and not empty renderContext.site.properties.forgeSettingsUrl.string}">
+        <c:set var="linked" value="${ui:getBindedComponent(currentNode, renderContext, 'j:bindedComponent')}"/>
+        <c:set var="targetNode" value="${renderContext.mainResource.node}"/>
+        <c:if test="${jcr:isNodeType(renderContext.mainResource.node, 'jnt:forgeModule')}">
+            <jcr:node var="targetNode" path="${renderContext.mainResource.node.path}/screenshots"/>
+            <c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(renderContext.mainResource.node, 'jcr:all_live')
     && not jcr:hasPermission(renderContext.mainResource.node.parent, 'jcr:all_live')}"/>
-    <c:if test="${isDeveloper}">
-        <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}"/>
-    </c:if>
-</c:if>
+            <c:if test="${isDeveloper}">
+                <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}"/>
+            </c:if>
+        </c:if>
 
 
-    <c:if test="${!empty currentNode.properties.target}">
-        <c:set var="targetNode" value="${currentNode.properties.target.node}"/>
-    </c:if>
+        <c:if test="${!empty currentNode.properties.target}">
+            <c:set var="targetNode" value="${currentNode.properties.target.node}"/>
+        </c:if>
         <form class="file_upload" id="file_upload_${currentNode.identifier}"
               action="<c:url value='${url.base}${renderContext.site.path}/contents/forge-modules-repository.createModuleFromJar.do'/>" method="POST" enctype="multipart/form-data"
               accept="application/json">
@@ -58,39 +59,44 @@
             </c:url>
 
         </form>
-    <table id="files${currentNode.identifier}" class="table"></table>
-    <script>
-        /*global $ */
-        $(function () {
-            $('#file_upload_${currentNode.identifier}').fileUploadUI({
-                namespace: 'file_upload_${currentNode.identifier}',
-                onComplete: function (event, files, index, xhr, handler) {
-                    <%--$('#fileList${renderContext.mainResource.node.identifier}').load('${targetNodePath}', function () {--%>
+        <table id="files${currentNode.identifier}" class="table"></table>
+        <script>
+            /*global $ */
+            $(function () {
+                $('#file_upload_${currentNode.identifier}').fileUploadUI({
+                    namespace: 'file_upload_${currentNode.identifier}',
+                    onComplete: function (event, files, index, xhr, handler) {
+                        <%--$('#fileList${renderContext.mainResource.node.identifier}').load('${targetNodePath}', function () {--%>
                         <%--$('#moduleScreenshotsList').triggerHandler('uploadCompleted');--%>
-                    <%--});--%>
-                    var boostrapTab = $('#file_upload_${currentNode.identifier}').parents('.tab-pane').attr('id');
+                        <%--});--%>
+                        var boostrapTab = $('#file_upload_${currentNode.identifier}').parents('.tab-pane').attr('id');
 
-                    window.location = "<c:url value="${url.base}${renderContext.mainResource.node.path}.html?bootstrapTab="/>" + boostrapTab;
-                },
-                acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
-                uploadTable: $('#files${currentNode.identifier}'),
-                dropZone: $('#file_upload_container'),
-                beforeSend: function (event, files, index, xhr, handler, callBack) {
-                    handler.formData = {
-                        'jcrNodeType': "jnt:file",
-                        'jcrReturnContentType': "json",
-                        'jcrReturnContentTypeOverride': 'application/json; charset=UTF-8',
-                        'jcrRedirectTo': "<c:url value='${url.base}${renderContext.mainResource.node.path}'/>",
-                        'jcrNewNodeOutputFormat': "${renderContext.mainResource.template}.html"
-                    };
-                    callBack();
-                },
-                buildUploadRow: function (files, index) {
-                    return $('<tr><td>' + files[index].name + '<\/td>' +
-                             '<td class="file_upload_progress"><div><\/div><\/td>' + '<td class="file_upload_cancel">' +
-                             '<button class="ui-state-default ui-corner-all" title="Cancel">' +
-                             '<span class="ui-icon ui-icon-cancel">Cancel<\/span>' + '<\/button><\/td><\/tr>');
-                }
+                        window.location = "<c:url value="${url.base}${renderContext.mainResource.node.path}.html?bootstrapTab="/>" + boostrapTab;
+                    },
+                    acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+                    uploadTable: $('#files${currentNode.identifier}'),
+                    dropZone: $('#file_upload_container'),
+                    beforeSend: function (event, files, index, xhr, handler, callBack) {
+                        handler.formData = {
+                            'jcrNodeType': "jnt:file",
+                            'jcrReturnContentType': "json",
+                            'jcrReturnContentTypeOverride': 'application/json; charset=UTF-8',
+                            'jcrRedirectTo': "<c:url value='${url.base}${renderContext.mainResource.node.path}'/>",
+                            'jcrNewNodeOutputFormat': "${renderContext.mainResource.template}.html"
+                        };
+                        callBack();
+                    },
+                    buildUploadRow: function (files, index) {
+                        return $('<tr><td>' + files[index].name + '<\/td>' +
+                                '<td class="file_upload_progress"><div><\/div><\/td>' + '<td class="file_upload_cancel">' +
+                                '<button class="ui-state-default ui-corner-all" title="Cancel">' +
+                                '<span class="ui-icon ui-icon-cancel">Cancel<\/span>' + '<\/button><\/td><\/tr>');
+                    }
+                });
             });
-        });
-    </script>
+        </script>
+    </c:when>
+    <c:otherwise>
+        <fmt:message key="forgeSettings.fileUpload.jar.no.settings"/>
+    </c:otherwise>
+</c:choose>
