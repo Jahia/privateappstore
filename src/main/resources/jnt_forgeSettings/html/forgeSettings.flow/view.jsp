@@ -46,10 +46,6 @@
                     <form:input class="span12" type="text" id="groupId" path="groupId"/>
                 </div>
                 <div class="span4">
-                    <label for="snapshotRepository"><fmt:message key="jahiaForge.settings.snapshotRepository"/></label>
-                    <form:input class="span12" type="text" id="snapshotRepository" path="snapshotRepository"/>
-                </div>
-                <div class="span4">
                     <label for="releaseRepository"><fmt:message key="jahiaForge.settings.forgeSettingsReleaseRepository"/></label>
                     <form:input class="span12" type="text" id="releaseRepository" path="releaseRepository"/>
                 </div>
