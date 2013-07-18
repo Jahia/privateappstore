@@ -11,6 +11,7 @@ import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
 import org.json.JSONObject;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,7 +55,7 @@ import java.util.*;
  */
 public class CreateModule extends SystemAction {
 
-    private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(CreateModule.class);
+    private transient static Logger logger = LoggerFactory.getLogger(CreateModule.class);
     private AddModuleVersion addModuleVersion;
 
 
@@ -89,7 +90,7 @@ public class CreateModule extends SystemAction {
 
         JCRNodeWrapper repository = resource.getNode();
 
-        logger.info("Start creating Forge Module " + moduleName);
+        logger.info("Start creating Forge Module {}", moduleName);
 
         JCRNodeWrapper module;
 
@@ -109,10 +110,13 @@ public class CreateModule extends SystemAction {
 
         addModuleVersion.doExecuteAsSystem(req,renderContext,session,new Resource(module,resource.getTemplateType(),resource.getTemplate(),resource.getContextConfiguration()),versionParameters,urlResolver);
 
+        logger.info("Forge Module {} successfully created and added to forge repository {}", moduleName,
+                repository.getPath());
 
-        logger.info("Forge Module " + moduleName + " successfully created and added to forge repository " + repository.getPath());
-
-        return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("moduleUrl", module.getUrl()));
+        String moduleUrl = renderContext.getResponse().encodeURL(module.getUrl());
+        String moduleAbsoluteUrl = module.getProvider().getAbsoluteContextPath(req) + moduleUrl;
+        return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("moduleUrl", moduleUrl).put(
+                "moduleAbsoluteUrl", moduleAbsoluteUrl));
     }
 
     public void setAddModuleVersion(AddModuleVersion addModuleVersion) {

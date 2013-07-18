@@ -37,7 +37,7 @@ public class AddModuleVersion extends SystemAction {
         String versionNumber = getParameter(parameters, "versionNumber");
         boolean hasModuleVersions = JCRTagUtils.hasChildrenOfType(module, "jnt:forgeModuleVersion");
 
-        logger.info("Start adding module version " + versionNumber + " of " + moduleTitle);
+        logger.info("Start adding module version {} of {}", versionNumber, moduleTitle);
 
         if (hasModuleVersions && !hasValidVersionNumber(module, versionNumber)) {
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", "versionNumber"));
@@ -57,7 +57,7 @@ public class AddModuleVersion extends SystemAction {
 
         session.save();
 
-        logger.info("Module version " + versionNumber + " of " + moduleTitle + " successfully added");
+        logger.info("Module version {} of {} successfully added", versionNumber, moduleTitle);
 
         return new ActionResult(HttpServletResponse.SC_OK, module.getPath(), Render.serializeNodeToJSON(moduleVersion));
 
