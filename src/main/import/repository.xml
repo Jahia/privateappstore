@@ -24,23 +24,6 @@
                                  jcr:primaryType="jnt:bootstrapRow">
               <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                                 <bootstrap-row-col1 jcr:primaryType="jnt:contentList">
-                                    <actions jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:linkList">
-                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                        <j:translation_en jcr:language="en"
-                                             jcr:mixinTypes="mix:title"
-                                             jcr:primaryType="jnt:translation"
-                                             jcr:title="Actions"/>
-                                        <publish-your-module j:node="/modules/forge/publish-your-module"
-                                                j:target="_self"
-                                                jcr:mixinTypes="jmix:accessControlled"
-                                                jcr:primaryType="jnt:nodeLink">
-                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                            <j:translation_en jcr:language="en"
-                                                jcr:mixinTypes="mix:title"
-                                                jcr:primaryType="jnt:translation"
-                                                jcr:title="Add your module"/>
-                  </publish-your-module>
-                </actions>
                                     <facets-list j:bindedComponent="/modules/forge/contents/forge-modules-repository"
                                      j:type="jnt:forgeModule"
                                      j:view="forge"
@@ -110,36 +93,6 @@
                                  jcr:primaryType="jnt:translation"
                                  jcr:title="Forge Home"/>
         </forge-home>
-                    <forge-module-creation j:hiddenTemplate="false"
-                                   j:invertCondition="false"
-                                   j:requireLoggedUser="false"
-                                   j:requirePrivilegedUser="false"
-                                   j:view="default"
-                                   jcr:mixinTypes="jmix:accessControlled"
-                                   jcr:primaryType="jnt:pageTemplate">
-          <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                        <j:translation_en jcr:language="en"
-                                 jcr:mixinTypes="mix:title"
-                                 jcr:primaryType="jnt:translation"
-                                 jcr:title="Forge Module Creation"/>
-                        <pagecontent jcr:primaryType="jnt:contentList">
-                            <bootstrap-row customColumn="12"
-                                 divID="jnt_forge"
-                                 fluid="true"
-                                 jcr:mixinTypes="jmix:accessControlled"
-                                 jcr:primaryType="jnt:bootstrapRow">
-              <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                <bootstrap-row-col1 jcr:primaryType="jnt:contentList">
-                                    <forgeModulesList columnsNumber="3"
-                                          jcr:mixinTypes="jmix:accessControlled"
-                                          jcr:primaryType="jnt:forgeModulesList"
-                                          nbOfModulePerPage="20">
-                      <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                  </forgeModulesList>
-              </bootstrap-row-col1>
-            </bootstrap-row>
-          </pagecontent>
-        </forge-module-creation>
                     <forge-module j:applyOn="jnt:forgeModule"
                           j:defaultTemplate="true"
                           j:hiddenTemplate="false"
@@ -319,33 +272,6 @@
             </bootstrap-row>
           </pagecontent>
         </forge-module>
-                    <forge-module-add-version j:applyOn="jnt:forgeModule"
-                                      j:defaultTemplate="false"
-                                      j:hiddenTemplate="false"
-                                      j:priority="100"
-                                      jcr:mixinTypes="jmix:accessControlled"
-                                      jcr:primaryType="jnt:contentTemplate">
-          <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                        <j:translation_en jcr:language="en"
-                                 jcr:mixinTypes="mix:title"
-                                 jcr:primaryType="jnt:translation"
-                                 jcr:title="Forge Module Add Version"/>
-                        <pagecontent jcr:primaryType="jnt:contentList">
-                            <bootstrap-row customColumn="12"
-                                 fluid="true"
-                                 jcr:mixinTypes="jmix:accessControlled"
-                                 jcr:primaryType="jnt:bootstrapRow">
-              <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                <bootstrap-row-col1 jcr:primaryType="jnt:contentList">
-                                    <main-resource-display j:mainResourceView="addVersion"
-                                               jcr:mixinTypes="jmix:accessControlled"
-                                               jcr:primaryType="jnt:mainResourceDisplay">
-                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                </main-resource-display>
-              </bootstrap-row-col1>
-            </bootstrap-row>
-          </pagecontent>
-        </forge-module-add-version>
                     <forge-module-version j:applyOn="jnt:forgeModuleVersion"
                                   j:defaultTemplate="true"
                                   j:hiddenTemplate="false"
@@ -477,15 +403,6 @@
                         </simple-text-1>
                     </forge-modules-release-type>
                 </contents>
-                <publish-your-module j:templateName="forge-module-creation"
-                              jcr:mixinTypes="jmix:accessControlled"
-                              jcr:primaryType="jnt:page">
-                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                    <j:translation_en jcr:language="en"
-                              jcr:mixinTypes="mix:title"
-                              jcr:primaryType="jnt:translation"
-                              jcr:title="Publish your module"/>
-      </publish-your-module>
                 
     </forge>
     </modules>

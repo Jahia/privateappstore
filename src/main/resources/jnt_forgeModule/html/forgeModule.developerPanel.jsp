@@ -137,7 +137,6 @@
         </div>
 
         <div class="btn-group">
-            <a class="btn btn-small" href="<c:url value="${url.base}${currentNode.path}.forge-module-add-version.html"/>"><fmt:message key="jnt_forgeModule.label.developer.addVersion"/></a>
             <a class="btn btn-small ${viewAsUser ? 'btn-primary' : ''}" id="viewAsUserBtn-${id}"
                 href="<c:url value="${url.base}${currentNode.path}.html${viewAsUser ? '' : '?viewAs=user'}"/>"
                 data-toggle="tooltip" title="<fmt:message key="jnt_forgeModule.label.developer.viewAs.tooltip"/>">
