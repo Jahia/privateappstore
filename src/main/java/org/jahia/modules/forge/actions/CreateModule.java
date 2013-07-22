@@ -22,36 +22,36 @@ import java.util.*;
  *
  * @author Frédéric PIERRE
  * @version 1.0
- * [jnt:forgeModule] > jnt:content, mix:title, jmix:editorialContent, jmix:tagged, jmix:forge, jmix:reviews, jmix:rating
-- jcr:title (string) mandatory
-- description (string, richtext) i18n mandatory
-- category (weakreference, choicelist[nodes='$currentSite/contents/forge-modules-categories;jnt:text']) facetable
-- icon (weakreference, picker[type='image'])
-- authorNameDisplayedAs (string, choicelist[resourceBundle]) = 'username' autocreated < 'username', 'fullName', 'organisation'
-- authorURL (string)
-- authorEmail (string)
-- howToInstall (string, richtext) i18n
-- FAQ (string, richtext) i18n
-- codeRepository (string)
-- license (weakreference,category[root='forge-licenses'])
-- downloadCount (long) = 0 hidden onconflict=latest autocreated
-- supportedByJahia (boolean) = false autocreated
-- reviewedByJahia (boolean) = false autocreated
-- published (boolean) = false autocreated
-- deleted (boolean) = false autocreated hidden
-+ screenshots (jnt:forgeModuleScreenshotsList) = jnt:forgeModuleScreenshotsList autocreated hidden
-+ video (jnt:videostreaming) = jnt:videostreaming
-+ * (jnt:forgeModuleVersion)
-
-[jnt:forgeModuleVersion]> jnt:content, jmix:editorialContent, jmix:forge
-- requiredVersion (weakreference, choicelist[nodes='$currentSite/contents/forge-modules-required-versions//*;jnt:text'])
-- releaseType (string, choicelist[resourceBundle]) = 'release' < 'release', 'hotfix', 'service-pack', 'upgrade'
-- status (weakreference,category[root='forge-status'])
-- versionNumber (string)
-- fileDsaSignature (string)
-- changeLog (string, richtext)
-- activeVersion (boolean) = false autocreated
-- url (string)
+ *          [jnt:forgeModule] > jnt:content, mix:title, jmix:editorialContent, jmix:tagged, jmix:forge, jmix:reviews, jmix:rating
+ *          - jcr:title (string) mandatory
+ *          - description (string, richtext) i18n mandatory
+ *          - category (weakreference, choicelist[nodes='$currentSite/contents/forge-modules-categories;jnt:text']) facetable
+ *          - icon (weakreference, picker[type='image'])
+ *          - authorNameDisplayedAs (string, choicelist[resourceBundle]) = 'username' autocreated < 'username', 'fullName', 'organisation'
+ *          - authorURL (string)
+ *          - authorEmail (string)
+ *          - howToInstall (string, richtext) i18n
+ *          - FAQ (string, richtext) i18n
+ *          - codeRepository (string)
+ *          - license (weakreference,category[root='forge-licenses'])
+ *          - downloadCount (long) = 0 hidden onconflict=latest autocreated
+ *          - supportedByJahia (boolean) = false autocreated
+ *          - reviewedByJahia (boolean) = false autocreated
+ *          - published (boolean) = false autocreated
+ *          - deleted (boolean) = false autocreated hidden
+ *          + screenshots (jnt:forgeModuleScreenshotsList) = jnt:forgeModuleScreenshotsList autocreated hidden
+ *          + video (jnt:videostreaming) = jnt:videostreaming
+ *          + * (jnt:forgeModuleVersion)
+ *          <p/>
+ *          [jnt:forgeModuleVersion]> jnt:content, jmix:editorialContent, jmix:forge
+ *          - requiredVersion (weakreference, choicelist[nodes='$currentSite/contents/forge-modules-required-versions//*;jnt:text'])
+ *          - releaseType (string, choicelist[resourceBundle]) = 'release' < 'release', 'hotfix', 'service-pack', 'upgrade'
+ *          - status (weakreference,category[root='forge-status'])
+ *          - versionNumber (string)
+ *          - fileDsaSignature (string)
+ *          - changeLog (string, richtext)
+ *          - activeVersion (boolean) = false autocreated
+ *          - url (string)
  */
 public class CreateModule extends SystemAction {
 
@@ -77,14 +77,14 @@ public class CreateModule extends SystemAction {
             title = moduleName;
         }
         // manually add jcr:title
-        moduleParameters.put("jcr:title",Arrays.asList(title));
-        versionParameters.put("jcr:title",Arrays.asList(title));
+        moduleParameters.put("jcr:title", Arrays.asList(title));
+        versionParameters.put("jcr:title", Arrays.asList(title));
 
         for (String key : parameters.keySet()) {
             if (moduleParamKeys.contains(key) && parameters.get(key).get(0) != null) {
-                moduleParameters.put(key,parameters.get(key));
+                moduleParameters.put(key, parameters.get(key));
             } else if (versionParamKeys.contains(key) && parameters.get(key).get(0) != null) {
-                versionParameters.put(key,parameters.get(key));
+                versionParameters.put(key, parameters.get(key));
             }
         }
 
@@ -98,8 +98,8 @@ public class CreateModule extends SystemAction {
 
         if (!modulesDirectory.hasNode(moduleName)) {
             module = createNode(req, moduleParameters, repository, "jnt:forgeModule", moduleName, false);
-        }  else {
-            ;module = modulesDirectory.getNode(moduleName);
+        } else {
+            module = modulesDirectory.getNode(moduleName);
         }
 
         if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
@@ -108,7 +108,7 @@ public class CreateModule extends SystemAction {
         }
         session.save();
 
-        addModuleVersion.doExecuteAsSystem(req,renderContext,session,new Resource(module,resource.getTemplateType(),resource.getTemplate(),resource.getContextConfiguration()),versionParameters,urlResolver);
+        addModuleVersion.doExecuteAsSystem(req, renderContext, session, new Resource(module, resource.getTemplateType(), resource.getTemplate(), resource.getContextConfiguration()), versionParameters, urlResolver);
 
         logger.info("Forge Module {} successfully created and added to forge repository {}", moduleName,
                 repository.getPath());
