@@ -11,24 +11,27 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.xerces.impl.dv.util.Base64;
 import org.jahia.bin.ActionResult;
 import org.jahia.bin.SystemAction;
+import org.jahia.registries.ServicesRegistry;
+import org.jahia.services.JahiaService;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.decorator.JCRSiteNode;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
+import org.jahia.settings.SettingsBean;
 import org.jahia.tools.files.FileUpload;
+import org.jahia.utils.i18n.Messages;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
@@ -47,9 +50,14 @@ public class CreateModuleFromJar extends SystemAction {
         DiskFileItem uploadedJar = fu.getFileItems().get("file");
         String filename = uploadedJar.getName();
         String extension = StringUtils.substringAfterLast(filename, ".");
-        boolean isSnapshot = StringUtils.contains(filename, "SNAPSHOT");
+        if (!(StringUtils.equals(extension,"jar") || StringUtils.equals(extension,"war"))) {
+            String error = Messages.get("resources.Jahia_Forge","forge.uploadJar.error.wrong.format",session.getLocale());
+            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
+        }
         String moduleName;
         String version;
+        OutputStream out = null;
+        File f = null;
         JarFile jar = null;
         try {
             jar = new JarFile(uploadedJar.getStoreLocation());
@@ -64,7 +72,6 @@ public class CreateModuleFromJar extends SystemAction {
 
                 JCRSiteNode site = resource.getNode().getResolveSite();
                 String forgeSettingsUrl = site.getProperty("forgeSettingsUrl").getString();
-                String groupID = site.getProperty("forgeSettingsGroupID").getString();
 
                 moduleParams.put("moduleName", Arrays.asList(moduleName));
                 moduleParams.put("jcr:title", Arrays.asList(attributes.getValue("Implementation-Title")));
@@ -76,7 +83,6 @@ public class CreateModuleFromJar extends SystemAction {
                 moduleParams.put("releaseType", Arrays.asList("hotfix"));
                 moduleParams.put("versionNumber", Arrays.asList(version));
                 String baseModuleUrl = forgeSettingsUrl + "/content/repositories/" + site.getProperty("forgeSettingsReleaseRepository").getString();
-                moduleParams.put("url", Arrays.asList(baseModuleUrl + "/" + groupID.replace('.', '/') + "/" + moduleName + "/" + version + "/" + moduleName + "-" + version + ".jar"));
                 moduleParams.put("activeVersion", Arrays.asList("true"));
                 moduleParams.put("published", Arrays.asList("true"));
 
@@ -95,21 +101,41 @@ public class CreateModuleFromJar extends SystemAction {
 
                  */
 
-                String url = forgeSettingsUrl + "/service/local/artifact/maven/content";
+                String url = StringUtils.substringBeforeLast(forgeSettingsUrl,"/content/repositories/") + "/service/local/artifact/maven/content";
                 String user = site.getProperty("forgeSettingsUser").getString();
                 String password = new String(Base64.decode(site.getProperty("forgeSettingsPassword").getString()));
-                String repo = isSnapshot ? site.getProperty("forgeSettingsSnapshotRepository").getString() : site.getProperty("forgeSettingsReleaseRepository").getString();
+                String repo = site.getProperty("forgeSettingsReleaseRepository").getString();
 
                 PostMethod postMethod = new PostMethod(url);
                 postMethod.addRequestHeader("Authorization", "Basic " + Base64.encode((user + ":" + password).getBytes()));
+
+                Enumeration<JarEntry>  jarEntries = jar.entries();
+                JarEntry jarEntry = null;
+                while (jarEntries.hasMoreElements()) {
+                    jarEntry = jarEntries.nextElement();
+                    String name = jarEntry.getName();
+                    if (StringUtils.startsWith(name,"META-INF/maven/") && StringUtils.endsWith(name,"/pom.xml")) {
+                        break;
+                    }
+                }
+                InputStream is = jar.getInputStream(jarEntry);
+                String path = StringUtils.substringBeforeLast(uploadedJar.getStoreLocation().getPath(),"/");
+                String pomFilename = StringUtils.substringAfterLast(uploadedJar.getStoreLocation().getPath(),"/") + ".xml";
+
+                f = new File(path,pomFilename);
+                out=new FileOutputStream(f);
+                byte buf[]=new byte[1024];
+                int len;
+                while((len=is.read(buf))>0)
+                    out.write(buf,0,len);
+                is.close();
+
+
                 Part[] parts = {
                         new StringPart("e", extension),
-                        new StringPart("g", groupID),
-                        new StringPart("a", moduleName),
-                        new StringPart("v", version),
-                        new StringPart("p", extension),
                         new StringPart("r", repo),
-                        new StringPart("hasPom", "false"),
+                        new StringPart("hasPom", "true"),
+                        new FilePart("pom.xml","pom.xml",f),
                         new FilePart(filename, uploadedJar.getStoreLocation())
                 };
                 postMethod.setRequestEntity(
@@ -118,16 +144,36 @@ public class CreateModuleFromJar extends SystemAction {
                 HttpClient client = new HttpClient();
                 int status = client.executeMethod(postMethod);
                 logger.info("end of upload : " + status);
+                try {
+                    JSONObject json = new JSONObject(postMethod.getResponseBodyAsString());
+                    moduleParams.put("url", Arrays.asList(baseModuleUrl + "/" + StringUtils.replace(json.getString("groupId"),".", "/") + "/" + moduleName + "/" + version + "/" + moduleName + "-" + version + ".jar"));
+                } catch (JSONException e) {
+                    logger.error("error during parsing of json : " + postMethod.getResponseBodyAsString());
+                    String error = Messages.get("resources.Jahia_Forge","forge.uploadJar.error.cannot.upload",session.getLocale());
+                    return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", error));
+                }
+
             } else {
-                return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", "cannotReadManifest"));
+                String error = Messages.get("resources.Jahia_Forge","forge.uploadJar.error.unable.read.manifest",session.getLocale());
+                return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
             }
         } catch (IOException e) {
-            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", "notJarFile"));
+            String error = Messages.get("resources.Jahia_Forge","forge.uploadJar.error.unable.read.file",session.getLocale());
+            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", error));
         } finally {
             if (jar != null) {
                 jar.close();
             }
+
             uploadedJar.delete();
+
+            if (f != null && f.exists()) {
+                f.delete();
+            }
+
+            if (out != null) {
+                out.close();
+            }
 
         }
 

@@ -37,18 +37,6 @@
                     <label for="password"><fmt:message key="jahiaForge.settings.password"/></label>
                     <form:password class="span12" type="password" id="password" path="password"/>
                 </div>
-                <div class="span4">
-                    <label for="passwordConfirm"><fmt:message key="jahiaForge.settings.confirm"/></label>
-                    <form:password class="span12" type="password" id="passwordConfirm" path="passwordConfirm"/>
-                </div>
-                <div class="span4">
-                    <label for="groupId"><fmt:message key="jahiaForge.settings.groupId"/></label>
-                    <form:input class="span12" type="text" id="groupId" path="groupId"/>
-                </div>
-                <div class="span4">
-                    <label for="releaseRepository"><fmt:message key="jahiaForge.settings.forgeSettingsReleaseRepository"/></label>
-                    <form:input class="span12" type="text" id="releaseRepository" path="releaseRepository"/>
-                </div>
             </div>
             <div class="row-fluid">
                 <div class="span4">

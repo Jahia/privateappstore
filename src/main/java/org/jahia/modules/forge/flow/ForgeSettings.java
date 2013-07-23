@@ -21,11 +21,6 @@ public class ForgeSettings implements Serializable {
     private String password;
     private String url;
     private String user;
-    private String passwordConfirm;
-    private String originPassword;
-    private String groupId;
-    private String snapshotRepository;
-    private String releaseRepository;
 
     /**
      * default constructor
@@ -34,9 +29,6 @@ public class ForgeSettings implements Serializable {
         super();
     }
 
-    public void setOriginPassword(String originPassword) {
-        this.originPassword = originPassword;
-    }
 
     public String getPassword() {
         return password;
@@ -65,57 +57,11 @@ public class ForgeSettings implements Serializable {
         this.user = user;
     }
 
-    public String getPasswordConfirm() {
-        return passwordConfirm;
-    }
-
-    public void setPasswordConfirm(String passwordConfirm) {
-        this.passwordConfirm = passwordConfirm;
-    }
-
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
-    }
-
-    public String getSnapshotRepository() {
-        return snapshotRepository;
-    }
-
-    public void setSnapshotRepository(String snapshotRepository) {
-        this.snapshotRepository = snapshotRepository;
-    }
-
-    public String getReleaseRepository() {
-        return releaseRepository;
-    }
-
-    public void setReleaseRepository(String releaseRepository) {
-        this.releaseRepository = releaseRepository;
-    }
-
     public void validateView(ValidationContext context) {
-        // verify password
-        if (StringUtils.isNotBlank(password)) {
-            if (!passwordConfirm.equals(password)) {
-                context.getMessageContext().addMessage(new MessageBuilder()
-                        .error()
-                        .source("passwordConfirm")
-                        .defaultText(
-                                Messages.get("resources.Jahia_Forge",
-                                        "jahiaForge.errors.password.not.matching", LocaleContextHolder.getLocale()))
-                        .build());
-                return;
-            }
-            originPassword = password;
-        }
 
         // try basic http connexion
-        PostMethod httpMethod = new PostMethod(url + "/service/local/artifact/maven/content");
-        httpMethod.addRequestHeader("Authorization", "Basic " + Base64.encode((user + ":" + originPassword).getBytes()));
+        PostMethod httpMethod = new PostMethod(StringUtils.substringBeforeLast(url,"/content/repositories/") + "/service/local/artifact/maven/content");
+        httpMethod.addRequestHeader("Authorization", "Basic " + Base64.encode((user + ":" + password).getBytes()));
         HttpClient httpClient = new HttpClient();
         try {
             int i = httpClient.executeMethod(httpMethod);

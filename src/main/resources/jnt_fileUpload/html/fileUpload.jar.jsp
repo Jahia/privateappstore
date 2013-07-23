@@ -59,6 +59,7 @@
             </c:url>
 
         </form>
+        <div id="error${currentNode.identifier}" class="error"></div>
         <table id="files${currentNode.identifier}" class="table"></table>
         <script>
             /*global $ */
@@ -69,9 +70,13 @@
                         <%--$('#fileList${renderContext.mainResource.node.identifier}').load('${targetNodePath}', function () {--%>
                         <%--$('#moduleScreenshotsList').triggerHandler('uploadCompleted');--%>
                         <%--});--%>
-                        var boostrapTab = $('#file_upload_${currentNode.identifier}').parents('.tab-pane').attr('id');
-
-                        window.location = "<c:url value="${url.base}${renderContext.mainResource.node.path}.html?bootstrapTab="/>" + boostrapTab;
+                        result = JSON.parse(xhr.response)
+                        if (result.error != undefined && result.error.length >0) {
+                            $("#error${currentNode.identifier}").html(result.error);
+                        } else {
+                            var boostrapTab = $('#file_upload_${currentNode.identifier}').parents('.tab-pane').attr('id');
+                            window.location = "<c:url value="${url.base}${renderContext.mainResource.node.path}.html?bootstrapTab="/>" + boostrapTab;
+                        }
                     },
                     acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
                     uploadTable: $('#files${currentNode.identifier}'),
@@ -84,6 +89,7 @@
                             'jcrRedirectTo': "<c:url value='${url.base}${renderContext.mainResource.node.path}'/>",
                             'jcrNewNodeOutputFormat': "${renderContext.mainResource.template}.html"
                         };
+                        $("#error${currentNode.identifier}").html("");
                         callBack();
                     },
                     buildUploadRow: function (files, index) {
