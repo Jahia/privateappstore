@@ -298,7 +298,9 @@
                                  jcr:primaryType="jnt:translation"
                                  jcr:title="Forge Module Version"/>
         </forge-module-version>
-                    <siteSettingsBase j:hiddenTemplate="false" jcr:primaryType="jnt:template">
+                    <siteSettingsBase j:hiddenTemplate="false"
+                              j:view="siteSettings"
+                              jcr:primaryType="jnt:template">
                         <j:translation_en jcr:language="en"
                                  jcr:mixinTypes="mix:title"
                                  jcr:primaryType="jnt:translation"
