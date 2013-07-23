@@ -46,6 +46,9 @@ public class ForgeSettings implements Serializable {
     }
 
     public void setUrl(String url) {
+        if (StringUtils.endsWith(url,"/")) {
+            url = StringUtils.substringBeforeLast(url,"/");
+        }
         this.url = url;
     }
 

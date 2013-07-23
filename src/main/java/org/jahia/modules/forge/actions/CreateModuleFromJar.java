@@ -103,7 +103,6 @@ public class CreateModuleFromJar extends SystemAction {
                 String url = StringUtils.substringBeforeLast(forgeSettingsUrl,"/content/repositories/") + "/service/local/artifact/maven/content";
                 String user = site.getProperty("forgeSettingsUser").getString();
                 String password = new String(Base64.decode(site.getProperty("forgeSettingsPassword").getString()));
-                String repo = site.getProperty("forgeSettingsReleaseRepository").getString();
 
                 PostMethod postMethod = new PostMethod(url);
                 postMethod.addRequestHeader("Authorization", "Basic " + Base64.encode((user + ":" + password).getBytes()));
@@ -132,7 +131,7 @@ public class CreateModuleFromJar extends SystemAction {
 
                 Part[] parts = {
                         new StringPart("e", extension),
-                        new StringPart("r", repo),
+                        new StringPart("r", StringUtils.substringAfterLast(forgeSettingsUrl,"/")),
                         new StringPart("hasPom", "true"),
                         new FilePart("pom.xml","pom.xml",f),
                         new FilePart(filename, uploadedJar.getStoreLocation())
@@ -145,7 +144,7 @@ public class CreateModuleFromJar extends SystemAction {
                 logger.info("end of upload : " + status);
                 try {
                     JSONObject json = new JSONObject(postMethod.getResponseBodyAsString());
-                    moduleParams.put("url", Arrays.asList(forgeSettingsUrl + "/" + StringUtils.replace(json.getString("groupId"),".", "/") + "/" + moduleName + "/" + version + "/" + moduleName + "-" + version + ".jar"));
+                    moduleParams.put("url", Arrays.asList(forgeSettingsUrl + "/" + StringUtils.replace(json.getString("groupId"),".", "/") + "/" + moduleName + "/" + version + "/" + moduleName + "-" + version + "." + extension));
                 } catch (JSONException e) {
                     logger.error("error during parsing of json : " + postMethod.getResponseBodyAsString());
                     String error = Messages.get("resources.Jahia_Forge","forge.uploadJar.error.cannot.upload",session.getLocale());
