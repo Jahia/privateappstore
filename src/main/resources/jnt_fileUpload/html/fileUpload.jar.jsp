@@ -74,8 +74,7 @@
                         if (result.error != undefined && result.error.length >0) {
                             $("#error${currentNode.identifier}").html(result.error);
                         } else {
-                            var boostrapTab = $('#file_upload_${currentNode.identifier}').parents('.tab-pane').attr('id');
-                            window.location = "<c:url value="${url.base}${renderContext.mainResource.node.path}.html?bootstrapTab="/>" + boostrapTab;
+                            window.location = result.moduleUrl;
                         }
                     },
                     acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,

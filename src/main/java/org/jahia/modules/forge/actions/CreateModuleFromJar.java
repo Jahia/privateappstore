@@ -82,7 +82,6 @@ public class CreateModuleFromJar extends SystemAction {
                 moduleParams.put("codeRepository", Arrays.asList(attributes.getValue("Jahia-Source-Control-Connection")));
                 moduleParams.put("releaseType", Arrays.asList("hotfix"));
                 moduleParams.put("versionNumber", Arrays.asList(version));
-                String baseModuleUrl = forgeSettingsUrl + "/content/repositories/" + site.getProperty("forgeSettingsReleaseRepository").getString();
                 moduleParams.put("activeVersion", Arrays.asList("true"));
                 moduleParams.put("published", Arrays.asList("true"));
 
@@ -146,7 +145,7 @@ public class CreateModuleFromJar extends SystemAction {
                 logger.info("end of upload : " + status);
                 try {
                     JSONObject json = new JSONObject(postMethod.getResponseBodyAsString());
-                    moduleParams.put("url", Arrays.asList(baseModuleUrl + "/" + StringUtils.replace(json.getString("groupId"),".", "/") + "/" + moduleName + "/" + version + "/" + moduleName + "-" + version + ".jar"));
+                    moduleParams.put("url", Arrays.asList(forgeSettingsUrl + "/" + StringUtils.replace(json.getString("groupId"),".", "/") + "/" + moduleName + "/" + version + "/" + moduleName + "-" + version + ".jar"));
                 } catch (JSONException e) {
                     logger.error("error during parsing of json : " + postMethod.getResponseBodyAsString());
                     String error = Messages.get("resources.Jahia_Forge","forge.uploadJar.error.cannot.upload",session.getLocale());
