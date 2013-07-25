@@ -83,7 +83,6 @@ public class CreateModuleFromJar extends SystemAction {
                 moduleParams.put("releaseType", Arrays.asList("hotfix"));
                 moduleParams.put("versionNumber", Arrays.asList(version));
                 moduleParams.put("activeVersion", Arrays.asList("true"));
-                moduleParams.put("published", Arrays.asList("true"));
 
                 // deploy the artifact on nexus
                 /**

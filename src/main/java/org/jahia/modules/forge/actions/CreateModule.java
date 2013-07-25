@@ -100,6 +100,7 @@ public class CreateModule extends SystemAction {
             module = createNode(req, moduleParameters, repository, "jnt:forgeModule", moduleName, false);
         } else {
             module = modulesDirectory.getNode(moduleName);
+            setProperties(module, moduleParameters);
         }
 
         if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
