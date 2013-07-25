@@ -1,27 +1,24 @@
 package org.jahia.modules.forge.actions;
 
 import org.apache.commons.fileupload.disk.DiskFileItem;
-import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.commons.httpclient.methods.multipart.StringPart;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.maven.cli.MavenCli;
+import org.apache.maven.model.Model;
 import org.apache.xerces.impl.dv.util.Base64;
+import org.codehaus.plexus.classworlds.ClassWorld;
 import org.jahia.bin.ActionResult;
+import org.jahia.bin.Jahia;
 import org.jahia.bin.SystemAction;
-import org.jahia.registries.ServicesRegistry;
-import org.jahia.services.JahiaService;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.decorator.JCRSiteNode;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
-import org.jahia.settings.SettingsBean;
 import org.jahia.tools.files.FileUpload;
+import org.jahia.utils.PomUtils;
 import org.jahia.utils.i18n.Messages;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +54,6 @@ public class CreateModuleFromJar extends SystemAction {
         String moduleName;
         String version;
         OutputStream out = null;
-        File f = null;
         JarFile jar = null;
         try {
             jar = new JarFile(uploadedJar.getStoreLocation());
@@ -84,21 +80,6 @@ public class CreateModuleFromJar extends SystemAction {
                 moduleParams.put("versionNumber", Arrays.asList(version));
                 moduleParams.put("activeVersion", Arrays.asList("true"));
 
-                // deploy the artifact on nexus
-                /**
-                 * Use rest API of nexus with arguments :
-                 * r - repository
-                 hasPom - whether you are supplying the pom or you want one generated. If generated g, a, v, p, and c are not needed
-                 e - extension
-                 g - group id
-                 a - artifact id
-                 v - version
-                 p - packaging
-                 c - classifier (optional, not shown in examples above)
-                 file - the file(s) to be uploaded. These need to come last, and if there is a pom file it should come before the artifact
-
-                 */
-
                 String url = StringUtils.substringBeforeLast(forgeSettingsUrl,"/content/repositories/") + "/service/local/artifact/maven/content";
                 String user = site.getProperty("forgeSettingsUser").getString();
                 String password = new String(Base64.decode(site.getProperty("forgeSettingsPassword").getString()));
@@ -116,38 +97,49 @@ public class CreateModuleFromJar extends SystemAction {
                     }
                 }
                 InputStream is = jar.getInputStream(jarEntry);
-                String path = StringUtils.substringBeforeLast(uploadedJar.getStoreLocation().getPath(),"/");
-                String pomFilename = StringUtils.substringAfterLast(uploadedJar.getStoreLocation().getPath(),"/") + ".xml";
+                File pomFile = File.createTempFile("pom",".xml");
+                FileUtils.copyInputStreamToFile(is,pomFile);
 
-                f = new File(path,pomFilename);
-                out=new FileOutputStream(f);
-                byte buf[]=new byte[1024];
-                int len;
-                while((len=is.read(buf))>0)
-                    out.write(buf,0,len);
-                is.close();
+                File settings = File.createTempFile("settings",".xml");
+                BufferedWriter w = new BufferedWriter(new FileWriter(settings));
+                w.write("<settings><servers><server><id>remote-repository</id><username>");
+                w.write(user);
+                w.write("</username><password>");
+                w.write(password);
+                w.write("</password></server></servers></settings>");
+                w.close();
 
+                File artifact = File.createTempFile("artifact", "." + extension);
+                FileUtils.copyFile(uploadedJar.getStoreLocation(), artifact);
 
-                Part[] parts = {
-                        new StringPart("e", extension),
-                        new StringPart("r", StringUtils.substringAfterLast(forgeSettingsUrl,"/")),
-                        new StringPart("hasPom", "true"),
-                        new FilePart("pom.xml","pom.xml",f),
-                        new FilePart(filename, uploadedJar.getStoreLocation())
-                };
-                postMethod.setRequestEntity(
-                        new MultipartRequestEntity(parts, postMethod.getParams())
-                );
-                HttpClient client = new HttpClient();
-                int status = client.executeMethod(postMethod);
-                logger.info("end of upload : " + status);
                 try {
-                    JSONObject json = new JSONObject(postMethod.getResponseBodyAsString());
-                    moduleParams.put("url", Arrays.asList(forgeSettingsUrl + "/" + StringUtils.replace(json.getString("groupId"),".", "/") + "/" + moduleName + "/" + version + "/" + moduleName + "-" + version + "." + extension));
-                } catch (JSONException e) {
-                    logger.error("error during parsing of json : " + postMethod.getResponseBodyAsString());
-                    String error = Messages.get("resources.Jahia_Forge","forge.uploadJar.error.cannot.upload",session.getLocale());
-                    return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", error));
+                    Model pom = PomUtils.read(pomFile);
+
+                    MavenCli cli = new MavenCli(new ClassWorld("plexus.core", Jahia.class.getClassLoader()));
+
+                    String[] archetypeParams = {"deploy:deploy-file",
+                            "-Dfile="+artifact.getPath(),
+                            "-DrepositoryId=remote-repository",
+                            "-Durl=" + forgeSettingsUrl,
+                            "-DpomFile=" + pomFile.getPath(),
+                            "-DgroupId=" + pom.getGroupId(),
+                            "-DartifactId=" + pom.getArtifactId(),
+                            "-Dversion=" + pom.getVersion(),
+                            "--settings",settings.getPath()};
+
+                    int ret = cli.doMain(archetypeParams, uploadedJar.getStoreLocation().getParent(),
+                            System.out, System.err);
+                    if (ret > 0) {
+                        logger.error("Maven archetype call returned " + ret);
+                        String error = Messages.get("resources.Jahia_Forge","forge.uploadJar.error.cannot.upload",session.getLocale());
+                        return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", error));
+                    }
+
+                    moduleParams.put("url", Arrays.asList(forgeSettingsUrl + "/" + pom.getGroupId().replace(".","/") + "/" + pom.getArtifactId() + "/" + pom.getVersion() + "/" + pom.getArtifactId() + "-" + pom.getVersion() + "." + extension));
+                } finally {
+                    FileUtils.deleteQuietly(pomFile);
+                    FileUtils.deleteQuietly(settings);
+                    FileUtils.deleteQuietly(artifact);
                 }
 
             } else {
@@ -163,10 +155,6 @@ public class CreateModuleFromJar extends SystemAction {
             }
 
             uploadedJar.delete();
-
-            if (f != null && f.exists()) {
-                f.delete();
-            }
 
             if (out != null) {
                 out.close();
