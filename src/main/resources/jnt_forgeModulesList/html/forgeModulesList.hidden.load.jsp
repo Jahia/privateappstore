@@ -19,8 +19,9 @@
 
 <c:set var="statement"
        value="SELECT * FROM [jnt:forgeModule]
-                WHERE ISDESCENDANTNODE('${renderContext.site.path}')
+                WHERE ISDESCENDANTNODE('${renderContext.site.path}') AND [published]=true
                 ORDER BY [jcr:created] DESC"/>
 
 <query:definition var="listQuery" statement="${statement}"/>
 <c:set target="${moduleMap}" property="listQuery" value="${listQuery}" />
+<template:addCacheDependency flushOnPathMatchingRegexp="${renderContext.site.path}/contents/forge-modules-repository/.*"/>
