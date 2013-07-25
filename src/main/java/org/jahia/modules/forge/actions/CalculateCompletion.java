@@ -53,10 +53,10 @@ public class CalculateCompletion  extends Action {
             mandatoryProperties.clear();
 
         mandatoryProperties.add(new Object[]{"jcr:title", TEXT, 20});
-        mandatoryProperties.add(new Object[]{"description", TEXT, 20});
+//        mandatoryProperties.add(new Object[]{"description", TEXT, 20});
         mandatoryProperties.add(new Object[]{"category", WEAKREFERENCE, 10});
         mandatoryProperties.add(new Object[]{"versions", VERSIONS, 10});
-        mandatoryProperties.add(new Object[]{"screenshots", SCREENSHOTS, 5});
+//        mandatoryProperties.add(new Object[]{"screenshots", SCREENSHOTS, 5});
         // TODO icon
 
         int authorEmailType;
@@ -65,7 +65,7 @@ public class CalculateCompletion  extends Action {
             authorEmailType = TEXT;
         else
             authorEmailType = SKIP;
-        mandatoryProperties.add(new Object[]{"authorEmail", authorEmailType, 5});
+//        mandatoryProperties.add(new Object[]{"authorEmail", authorEmailType, 5});
     }
 
     private static void initOtherProperties(JCRNodeWrapper module) {
