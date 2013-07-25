@@ -49,7 +49,7 @@ public class ForgeSettings implements Serializable {
         if (StringUtils.endsWith(url,"/")) {
             url = StringUtils.substringBeforeLast(url,"/");
         }
-        this.url = url;
+        this.url = StringUtils.trim(url);
     }
 
     public String getUser() {
