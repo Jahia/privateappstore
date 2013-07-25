@@ -14,6 +14,8 @@
                 <json:object>
                     <json:property name="id" value="${child.identifier}"/>
                     <json:property name="path" value="${child.path}"/>
+                    <c:url context="/" var="localUrl" value="${url.server}${child.url}"/>
+                    <json:property name="remoteUrl" value="${localUrl}"/>
                     <json:property name="name" value="${child.name}"/>
                     <json:property name="title" value="${child.displayableName}"/>
                     <c:forEach var="version" items="${jcr:getChildrenOfType(child, 'jnt:forgeModuleVersion')}">
