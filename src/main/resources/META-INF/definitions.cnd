@@ -50,6 +50,7 @@
  - reviewedByJahia (boolean) = false autocreated
  - published (boolean) = false autocreated
  - deleted (boolean) = false autocreated hidden
+ - groupId (string)
  + screenshots (jnt:forgeModuleScreenshotsList) = jnt:forgeModuleScreenshotsList autocreated hidden
  + video (jnt:videostreaming) = jnt:videostreaming
  + * (jnt:forgeModuleVersion)

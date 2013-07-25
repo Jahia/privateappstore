@@ -308,6 +308,7 @@
                         <forge j:applyOn="jnt:virtualsite"
                       j:defaultTemplate="false"
                       j:hiddenTemplate="true"
+                      j:view="siteSettings"
                       jcr:primaryType="jnt:contentTemplate">
                             <j:translation_en jcr:language="en"
                                     jcr:mixinTypes="mix:title"

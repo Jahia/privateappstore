@@ -66,7 +66,7 @@ public class CreateModule extends SystemAction {
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", "guestNotAllowed"));
         }
 
-        List<String> moduleParamKeys = Arrays.asList("description", "category", "icon", "authorNameDisplayedAs", "authorURL", "authorEmail", "FAQ", "codeRepository", "license", "downloadCount", "supportedByJahia", "reviewedByJahia", "published", "deleted", "screenshots", "video");
+        List<String> moduleParamKeys = Arrays.asList("description", "category", "icon", "authorNameDisplayedAs", "authorURL", "authorEmail", "FAQ", "codeRepository", "license", "downloadCount", "supportedByJahia", "reviewedByJahia", "published", "deleted", "screenshots", "video","groupId");
         List<String> versionParamKeys = Arrays.asList("requiredVersion", "releaseType", "status", "versionNumber", "fileDsaSignature", "changeLog", "activeVersion", "url");
         Map<String, List<String>> moduleParameters = new HashMap<String, List<String>>();
         Map<String, List<String>> versionParameters = new HashMap<String, List<String>>();
