@@ -20,6 +20,7 @@
 <jcr:nodeProperty node="${currentNode}" name="changeLog" var="changeLog"/>
 <jcr:nodeProperty node="${currentNode}" name="versionNumber" var="versionNumber"/>
 <jcr:nodeProperty node="${currentNode}" name="requiredVersion" var="requiredVersion"/>
+<jcr:nodeProperty node="${currentNode}" name="published" var="published"/>
 
 <c:if test="${isDeveloper && not viewAsUser}">
 
@@ -89,9 +90,20 @@
                 </a>
 
             <c:if test="${isDeveloper && not viewAsUser}">
-                <button class="btn btn-small btn-success makeActiveVersion" data-target="<c:url value="${url.base}${currentNode.path}"/>">
-                    <fmt:message key="jnt_forgeModule.label.developer.makeActiveVersion"/>
-                </button>
+                <c:url value="${url.base}${currentNode.path}" var="currentNodePath"/>
+                <c:if test="${published.boolean}">
+                    <button id="publishVersion-${id}" class="btn btn-small publishVersion btn-success" data-value="false" data-target="${currentNodePath}">
+                        <fmt:message key="jnt_forgeModule.label.developer.unpublish"/>
+                    </button>
+                    <button class="btn btn-small btn-success makeActiveVersion" data-target="${currentNodePath}">
+                        <fmt:message key="jnt_forgeModule.label.developer.makeActiveVersion"/>
+                    </button>
+                </c:if>
+                <c:if test="${not published.boolean}">
+                    <button id="unpublishVersion-${id}" class="btn btn-small publishVersion btn-danger" data-value="true" data-target="${currentNodePath}">
+                        <fmt:message key="jnt_forgeModule.label.developer.publish"/>
+                    </button>
+                </c:if>
 
             </c:if>
 

@@ -181,8 +181,17 @@ public class CalculateCompletion  extends Action {
 
             case VERSIONS:
 
-                if (!JCRTagUtils.hasChildrenOfType(module, "jnt:forgeModuleVersion"))
-                    completed = false;
+                completed = false;
+                for (JCRNodeWrapper nodeWrapper : JCRTagUtils.getChildrenOfType(module, "jnt:forgeModuleVersion")) {
+                    try {
+                        if (nodeWrapper.hasProperty("activeVersion") && nodeWrapper.getProperty("activeVersion").getBoolean()) {
+                            completed = true;
+                            break;
+                        }
+                    } catch (RepositoryException e) {
+                        logger.warn(e.getMessage(), e);
+                    }
+                }
                 break;
 
             case TAGS:

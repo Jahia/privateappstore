@@ -19,6 +19,7 @@
         <property name="name" value="CreateModuleFromJar"/>
         <property name="requireAuthenticatedUser" value="true"/>
         <property name="createModule" ref="createForgeModule"/>
+        <property name="templateManagerService" ref="JahiaTemplateManagerService"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.DeleteModule" >

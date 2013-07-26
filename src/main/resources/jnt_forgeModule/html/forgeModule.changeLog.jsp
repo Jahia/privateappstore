@@ -52,6 +52,19 @@
                     }, "json");
                 });
 
+                $('.publishVersion').click( function() {
+
+                    var boostrapTab = $(this).parents('.tab-pane').attr('id');
+
+                    var data = {};
+                    data['published'] = $(this).attr("data-value");
+                    data['jcrMethodToCall'] = 'put';
+
+                    $.post($(this).attr("data-target"), data, function() {
+                        window.location = '${currentNode.url}' + "?bootstrapTab=" + boostrapTab;
+                    }, "json");
+                });
+
             });
         </script>
     </template:addResources>
@@ -92,31 +105,34 @@
 
             <h2><fmt:message key="jnt_forgeModule.label.previousVersions"/></h2>
 
+            <c:if test="${isDeveloper && not viewAsUser}">
             <c:forEach items="${previousVersions.nodes}" var="previousVersion">
-
                 <article class="previousVersion">
-
-                    <jcr:sql
-                            var="moduleVersionBinaries"
-                            sql="SELECT * FROM [jnt:file] WHERE ischildnode(['${previousVersion.path}'])
-                          ORDER BY ['jcr:lastModified'] DESC" limit ='1'/>
-
-                    <c:forEach items="${moduleVersionBinaries.nodes}" var="moduleVersionBinaryNode">
-                        <c:set var="moduleVersionBinary" value="${moduleVersionBinaryNode}"/>
-                    </c:forEach>
-
                     <template:module node="${previousVersion}">
                         <template:param name="isActiveVersion" value="false"/>
                         <template:param name="isDeveloper" value="${isDeveloper}"/>
                         <template:param name="viewAsUser" value="${viewAsUser}"/>
                     </template:module>
-
                 </article>
-
             </c:forEach>
+            </c:if>
+
+            <c:if test="${not isDeveloper or viewAsUser}">
+            <c:forEach items="${previousVersions.nodes}" var="previousVersion">
+                <c:if test="${previousVersion.properties['published'].boolean}">
+                <article class="previousVersion">
+                    <template:module node="${previousVersion}">
+                        <template:param name="isActiveVersion" value="false"/>
+                        <template:param name="isDeveloper" value="${isDeveloper}"/>
+                        <template:param name="viewAsUser" value="${viewAsUser}"/>
+                    </template:module>
+                </article>
+                 </c:if>
+            </c:forEach>
+            </c:if>
 
         </section>
 
     </c:if>
-
+     <template:addCacheDependency flushOnPathMatchingRegexp="${currentNode.path}/.*"/>
 </article>

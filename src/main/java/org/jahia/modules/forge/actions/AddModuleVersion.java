@@ -47,8 +47,10 @@ public class AddModuleVersion extends SystemAction {
 
         String activeVersion = getParameter(parameters, "activeVersion");
 
-        if (!hasModuleVersions || (activeVersion != null && activeVersion.equals("on")))
+        if (!hasModuleVersions || (activeVersion != null && activeVersion.equals("on"))) {
             moduleVersion.setProperty("activeVersion", true);
+            moduleVersion.setProperty("published", true);
+        }
 
         if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
             List<String> roles = Arrays.asList("owner");
