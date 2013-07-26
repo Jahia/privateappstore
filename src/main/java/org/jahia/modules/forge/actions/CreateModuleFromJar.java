@@ -85,6 +85,8 @@ public class CreateModuleFromJar extends SystemAction {
                 moduleParams.put("codeRepository", Arrays.asList(attributes.getValue("Jahia-Source-Control-Connection")));
                 moduleParams.put("releaseType", Arrays.asList("hotfix"));
                 moduleParams.put("versionNumber", Arrays.asList(version));
+                String forgeUrl = StringUtils.substringBefore(request.getRequestURL().toString(), "/render");
+                moduleParams.put("url", Arrays.asList(forgeUrl + "/mavenproxy/" + site.getName() + "/" + pom.getGroupId().replace(".","/") + "/" + pom.getArtifactId() + "/" + pom.getVersion() + "/" + pom.getArtifactId() + "-" + pom.getVersion() + "." + extension));
 
                 final String requiredVersion = pom.getParent().getVersion();
                 JCRNodeWrapper versions = session.getNode(resource.getNode().getResolveSite().getPath() + "/contents/forge-modules-required-versions");

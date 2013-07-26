@@ -95,4 +95,15 @@
         <property name="requireAuthenticatedUser" value="true"/>
     </bean>
 
+    <bean name="mavenProxyController" class="org.jahia.modules.forge.proxy.MavenProxy">
+        <!--<property name="httpClientService" value="HttpClientService"/>-->
+    </bean>
+    <bean name="mavenProxyMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="urlMap">
+            <map>
+                <entry key="/mavenproxy/**" value-ref="mavenProxyController"/>
+            </map>
+        </property>
+    </bean>
+
 </beans>
