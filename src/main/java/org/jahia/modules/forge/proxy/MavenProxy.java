@@ -8,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.xerces.impl.dv.util.Base64;
 import org.jahia.data.templates.ModuleReleaseInfo;
 import org.jahia.services.content.JCRCallback;
+import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.JCRTemplate;
 import org.jahia.services.content.decorator.JCRSiteNode;
@@ -51,20 +52,16 @@ public class MavenProxy implements Controller {
     }
 
     private ModuleReleaseInfo getModuleReleaseInfo(final String siteName) throws RepositoryException {
-        return JCRTemplate.getInstance().doExecuteWithSystemSession(new JCRCallback<ModuleReleaseInfo>() {
-            @Override
-            public ModuleReleaseInfo doInJCR(JCRSessionWrapper session) throws RepositoryException {
-                JCRSiteNode siteNode = (JCRSiteNode) session.getNode("/sites/"+siteName);
-                String forgeSettingsUrl = siteNode.getProperty("forgeSettingsUrl").getString();
-                String user = siteNode.getProperty("forgeSettingsUser").getString();
-                String password = new String(Base64.decode(siteNode.getProperty("forgeSettingsPassword").getString()));
-                ModuleReleaseInfo info = new ModuleReleaseInfo();
-                info.setRepositoryUrl(forgeSettingsUrl);
-                info.setCatalogUsername(user);
-                info.setCatalogPassword(password);
-                return info;
-            }
-        });
+        JCRSessionWrapper session =  JCRSessionFactory.getInstance().getCurrentUserSession("live");
+        JCRSiteNode siteNode = (JCRSiteNode) session.getNode("/sites/"+siteName);
+        String forgeSettingsUrl = siteNode.getProperty("forgeSettingsUrl").getString();
+        String user = siteNode.getProperty("forgeSettingsUser").getString();
+        String password = new String(Base64.decode(siteNode.getProperty("forgeSettingsPassword").getString()));
+        ModuleReleaseInfo info = new ModuleReleaseInfo();
+        info.setRepositoryUrl(forgeSettingsUrl);
+        info.setCatalogUsername(user);
+        info.setCatalogPassword(password);
+        return info;
     }
 
 //    public void setHttpClientService(HttpClientService httpClientService) {
