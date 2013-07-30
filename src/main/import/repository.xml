@@ -4,26 +4,29 @@
          xmlns:jmix="http://www.jahia.org/jahia/mix/1.0"
          xmlns:jnt="http://www.jahia.org/jahia/nt/1.0">
     <modules jcr:primaryType="jnt:modules">
-        <forge j:dependencies="bootstrapComponent default facets grid rating siteSettings templates-system videostreaming"
+        <forge j:dependencies="bootstrap bootstrap-components default facets rating siteSettings templates-bootstrap videostreaming"
              j:installedModules="forge"
              j:moduleType="module"
              j:title="Jahia Forge"
              jcr:primaryType="jnt:module">
                 
-                <templates j:rootTemplatePath="/base" jcr:primaryType="jnt:templatesFolder">
+                <templates j:rootTemplatePath="/base"
+                    j:templateSetContext="/modules/templates-bootstrap"
+                    jcr:primaryType="jnt:templatesFolder">
                     <files jcr:primaryType="jnt:folder"/>
                     <contents jcr:primaryType="jnt:contentFolder"/>
                     <forge-home j:hiddenTemplate="false"
                         jcr:mixinTypes="jmix:accessControlled"
                         jcr:primaryType="jnt:pageTemplate">
-                        <pagecontent jcr:primaryType="jnt:contentList">
-                            <bootstrap-row customColumn="3,9"
-                                 divID="jnt_forge"
-                                 fluid="true"
-                                 jcr:mixinTypes="jmix:accessControlled"
+                        <bootstrap-container jcr:primaryType="jnt:contentList">
+                            <bootstrap-row fluid="true"
+                                 j:id="jnt_forge"
+                                 j:skin="skins.custom"
+                                 jcr:mixinTypes="jmix:accessControlled jmix:customSkin jmix:skinnable"
                                  jcr:primaryType="jnt:bootstrapRow">
               <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                <bootstrap-row-col1 jcr:primaryType="jnt:contentList">
+                                <bootstrap-row-col1 jcr:primaryType="jnt:bootstrapColumn" offset="0" span="3">
+                                    <bootstrap-row-col1 jcr:primaryType="jnt:contentList">
                                     <facets-list j:bindedComponent="/modules/forge/contents/forge-modules-repository"
                                      j:type="jnt:forgeModule"
                                      j:view="forge"
@@ -65,8 +68,10 @@
                                              jcr:primaryType="jnt:translation"
                                              jcr:title="My Modules"/>
                 </forge-my-modules-list>
+                                        </bootstrap-row-col1>
               </bootstrap-row-col1>
-                                <bootstrap-row-col2 jcr:primaryType="jnt:contentList">
+                                <bootstrap-row-col2 jcr:primaryType="jnt:bootstrapColumn" offset="1" span="8">
+                                    <bootstrap-row-col2 jcr:primaryType="jnt:contentList">
                                     <forgeModulesList columnsNumber="3"
                                           jcr:mixinTypes="jmix:accessControlled"
                                           jcr:primaryType="jnt:forgeModulesList"
@@ -76,17 +81,16 @@
                 </forgeModulesList>
                                     <pager displayNbOfItemsPerPage="true"
                                displayPager="false"
-                               j:bindedComponent="/modules/forge/templates/forge-home/pagecontent/bootstrap-row/bootstrap-row-col2/forgeModulesList"
                                jcr:primaryType="jnt:pager"
                                nbOfPages="10"
                                pageSize="3"/>
-                                    <file-upload-form j:bindedComponent="/modules/forge/templates/forge-home/pagecontent/bootstrap-row/bootstrap-row-col2"
-                                          j:view="jar"
+                                        <file-upload-form j:view="jar"
                                           jcr:mixinTypes="jmix:renderable"
                                           jcr:primaryType="jnt:fileUpload"/>
               </bootstrap-row-col2>
+                                </bootstrap-row-col2>
             </bootstrap-row>
-          </pagecontent>
+          </bootstrap-container>
           <j:acl jcr:primaryType="jnt:acl"/>
                         <j:translation_en jcr:language="en"
                                  jcr:mixinTypes="mix:title"
@@ -103,15 +107,13 @@
                                  jcr:mixinTypes="mix:title"
                                  jcr:primaryType="jnt:translation"
                                  jcr:title="Forge Module"/>
-                        <pagecontent jcr:primaryType="jnt:contentList">
-                            <bootstrap-row colNames="module-aside, module-main"
-                                 customColumn="3,9"
-                                 divID="jnt_forge"
-                                 fluid="true"
+                        <bootstrap-container jcr:primaryType="jnt:contentList">
+                            <bootstrap-row fluid="true"
                                  jcr:mixinTypes="jmix:accessControlled"
                                  jcr:primaryType="jnt:bootstrapRow">
               <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                <module-aside jcr:primaryType="jnt:contentList">
+                                <module-aside jcr:primaryType="jnt:bootstrapColumn" offset="0" span="3">
+                                    <module-aside jcr:primaryType="jnt:contentList">
                                     <main-resource-display j:mainResourceView="header"
                                                jcr:mixinTypes="jmix:accessControlled"
                                                jcr:primaryType="jnt:mainResourceDisplay">
@@ -127,8 +129,10 @@
                                            jcr:primaryType="jnt:mainResourceDisplay">
                   <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                 </forge-admin-panel>
+                                    </module-aside>
               </module-aside>
-                                <module-main jcr:primaryType="jnt:contentList">
+                                <module-main jcr:primaryType="jnt:bootstrapColumn" offset="0" span="9">
+                                    <module-main jcr:primaryType="jnt:contentList">
                                     <bootstrap-tabular-list fadeIn="true"
                                                 jcr:mixinTypes="jmix:accessControlled"
                                                 jcr:primaryType="jnt:bootstrapTabularList"
@@ -141,27 +145,28 @@
                                                 jcr:mixinTypes="mix:title"
                                                 jcr:primaryType="jnt:translation"
                                                 jcr:title="Overview"/>
-                                            <bootstrap-row colNames="overview-main,overview-aside"
-                                             customColumn="8,3"
-                                             fluid="true"
+                                            <bootstrap-row fluid="true"
                                              jcr:mixinTypes="jmix:accessControlled"
-                                             jcr:primaryType="jnt:bootstrapRow"
-                                             offset="0,1">
+                                             jcr:primaryType="jnt:bootstrapRow">
                       <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                <overview-main jcr:primaryType="jnt:contentList">
+                                                    <overview-main jcr:primaryType="jnt:bootstrapColumn" offset="0" span="4">
+                                                    <overview-main jcr:primaryType="jnt:contentList">
                                                     <main-resource-display j:mainResourceView="overview"
                                                            jcr:mixinTypes="jmix:accessControlled"
                                                            jcr:primaryType="jnt:mainResourceDisplay">
                           <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                         </main-resource-display>
+                                                    </overview-main>
                       </overview-main>
-                                                <overview-aside jcr:primaryType="jnt:contentList">
+                                                    <overview-aside jcr:primaryType="jnt:bootstrapColumn" offset="1" span="6">
+                                                    <overview-aside jcr:primaryType="jnt:contentList">
                                                     <main-resource-display j:mainResourceView="information"
                                                            jcr:mixinTypes="jmix:accessControlled"
                                                            jcr:primaryType="jnt:mainResourceDisplay">
                           <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                         </main-resource-display>
                       </overview-aside>
+                                                </overview-aside>
                     </bootstrap-row>
                   </overview>
                                         <screenshots jcr:mixinTypes="jmix:accessControlled"
@@ -269,8 +274,9 @@
                   </changelog>
                 </bootstrap-tabular-list>
               </module-main>
+                                </module-main>
             </bootstrap-row>
-          </pagecontent>
+          </bootstrap-container>
         </forge-module>
                     <forge-module-version j:applyOn="jnt:forgeModuleVersion"
                                   j:defaultTemplate="true"
@@ -279,7 +285,7 @@
                                   jcr:mixinTypes="jmix:accessControlled"
                                   jcr:primaryType="jnt:contentTemplate">
           <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                        <pagecontent jcr:primaryType="jnt:contentList">
+                        <bootstrap-container jcr:primaryType="jnt:contentList">
                             <predefined--rows-960gs column="1col16"
                                           jcr:mixinTypes="jmix:accessControlled"
                                           jcr:primaryType="jnt:row">
@@ -292,7 +298,7 @@
                 </main-resource-display>
               </predefined--rows-960gs-col1>
             </predefined--rows-960gs>
-          </pagecontent>
+          </bootstrap-container>
                         <j:translation_en jcr:language="en"
                                  jcr:mixinTypes="mix:title"
                                  jcr:primaryType="jnt:translation"

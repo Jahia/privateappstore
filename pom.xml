@@ -80,7 +80,6 @@
             </exclusions>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -89,10 +88,9 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Jahia-Depends>bootstrapComponent,default,facets,grid,rating,siteSettings,templates-system,videostreaming</Jahia-Depends>  
+            <Jahia-Depends>bootstrap,bootstrap-components,default,facets,rating,siteSettings,templates-bootstrap,videostreaming</Jahia-Depends>  
                         <Jahia-Module-Type>module</Jahia-Module-Type>
-                        <Embed-Dependency>*; scope=compile; type=!pom;
-                            inline=false</Embed-Dependency>
+            <Embed-Dependency>*; scope=compile; type=!pom; inline=false</Embed-Dependency> 
                     </instructions>
                 </configuration>
             </plugin>
