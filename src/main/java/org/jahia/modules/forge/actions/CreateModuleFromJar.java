@@ -50,6 +50,7 @@ public class CreateModuleFromJar extends SystemAction {
         final FileUpload fu = (FileUpload) request.getAttribute(FileUpload.FILEUPLOAD_ATTRIBUTE);
         DiskFileItem uploadedJar = fu.getFileItems().get("file");
         String filename = uploadedJar.getName();
+        if (!StringUtils.contains(filename,"-SNAPSHOT.")) {
         String extension = StringUtils.substringAfterLast(filename, ".");
         if (!(StringUtils.equals(extension,"jar") || StringUtils.equals(extension,"war"))) {
             String error = Messages.get("resources.Jahia_Forge","forge.uploadJar.error.wrong.format",session.getLocale());
@@ -57,6 +58,7 @@ public class CreateModuleFromJar extends SystemAction {
         }
         String moduleName;
         String version;
+        String groupId;
         OutputStream out = null;
         JarFile jar = null;
         try {
@@ -69,7 +71,8 @@ public class CreateModuleFromJar extends SystemAction {
                 if (uploadedJar.getName().endsWith(".war")) {
                     moduleName = attributes.getValue("root-folder");
                 }
-                File pomFile = templateManagerService.extractPomFromJar(jar);
+                groupId = attributes.getValue("Jahia-GroupId");
+                File pomFile = templateManagerService.extractPomFromJar(jar,groupId);
                 Model pom = PomUtils.read(pomFile);
                 FileUtils.deleteQuietly(pomFile);
 
@@ -133,6 +136,10 @@ public class CreateModuleFromJar extends SystemAction {
                 out.close();
             }
 
+        }
+        } else {
+            String error = Messages.get("resources.Jahia_Forge","forge.uploadJar.error.snapshot.not.allowed",session.getLocale());
+            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", error));
         }
 
 
