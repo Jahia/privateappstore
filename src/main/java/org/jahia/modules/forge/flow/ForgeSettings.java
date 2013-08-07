@@ -1,5 +1,6 @@
 package org.jahia.modules.forge.flow;
 
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.httpclient.HttpClient;
@@ -63,18 +64,18 @@ public class ForgeSettings implements Serializable {
     public void validateView(ValidationContext context) {
 
         // try basic http connexion
-        PostMethod httpMethod = new PostMethod(StringUtils.substringBeforeLast(url,"/content/repositories/") + "/service/local/artifact/maven/content");
+        GetMethod httpMethod = new GetMethod(url + "/jahia-catalog.properties");
         httpMethod.addRequestHeader("Authorization", "Basic " + Base64.encode((user + ":" + password).getBytes()));
         HttpClient httpClient = new HttpClient();
         try {
             int i = httpClient.executeMethod(httpMethod);
-            if (i != 400) {
+            if (i != 200) {
                 context.getMessageContext().addMessage(new MessageBuilder()
                         .error()
                         .source("testUrl")
                         .defaultText(
                                 Messages.getWithArgs("resources.Jahia_Forge",
-                                        "jahiaForge.errors.url.not.working", LocaleContextHolder.getLocale(), url + "/service -> " + i))
+                                        "jahiaForge.errors.url.not.working", LocaleContextHolder.getLocale(), url + "/jahia-catalog.properties -> " + i))
                         .build());
             }
         } catch (IOException e) {
