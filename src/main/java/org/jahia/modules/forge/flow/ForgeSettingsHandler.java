@@ -31,6 +31,7 @@ public class ForgeSettingsHandler implements Serializable {
             {
                 forgeSettings.setPassword(new String (Base64.decode(site.getProperty("forgeSettingsPassword").getString())));
                 forgeSettings.setUrl(site.getProperty("forgeSettingsUrl").getString());
+                forgeSettings.setId(site.getProperty("forgeSettingsId").getString());
                 forgeSettings.setUser(site.getProperty("forgeSettingsUser").getString());
             }
         } catch (RepositoryException e) {
@@ -54,6 +55,7 @@ public class ForgeSettingsHandler implements Serializable {
                     site.setProperty("forgeSettingsPassword", Base64.encode(forgeSettings.getPassword().getBytes()));
                 }
                 site.setProperty("forgeSettingsUrl",forgeSettings.getUrl());
+                site.setProperty("forgeSettingsId",forgeSettings.getId());
                 site.setProperty("forgeSettingsUser",forgeSettings.getUser());
                 site.getSession().save();
                 messages.addMessage(new MessageBuilder()

@@ -109,8 +109,8 @@ public class CreateModuleFromJar extends SystemAction {
                         ModuleReleaseInfo moduleReleaseInfo = new ModuleReleaseInfo();
                         moduleReleaseInfo.setRepositoryId("remote-repository");
                         moduleReleaseInfo.setRepositoryUrl(forgeSettingsUrl);
-                        moduleReleaseInfo.setCatalogUsername(user);
-                        moduleReleaseInfo.setCatalogPassword(password);
+                        moduleReleaseInfo.setUsername(user);
+                        moduleReleaseInfo.setPassword(password);
                         templateManagerService.deployToMaven(moduleReleaseInfo, artifact);
                     } catch (IOException e) {
                         String error = Messages.get("resources.Jahia_Forge","forge.uploadJar.error.cannot.upload",session.getLocale());

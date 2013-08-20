@@ -73,11 +73,9 @@
 [jmix:forgeSettings] mixin
   extends = jnt:virtualsite
 - forgeSettingsUrl (string)
+- forgeSettingsId (string)
 - forgeSettingsUser (string)
 - forgeSettingsPassword (string)
-- forgeSettingsGroupID (string)
-- forgeSettingsSnapshotRepository (string) hidden
-- forgeSettingsReleaseRepository (string)
 
 [jnt:forgeSettings] > jnt:content, mix:title, jmix:studioOnly, jmix:siteComponent
 

@@ -36,7 +36,7 @@ public class MavenProxy implements Controller {
             String url = releaseInfo.getRepositoryUrl() + path;
             HttpClient client = new HttpClient();
             GetMethod getMethod = new GetMethod(url);
-            getMethod.addRequestHeader("Authorization", "Basic " + Base64.encode((releaseInfo.getCatalogUsername() + ":" + releaseInfo.getCatalogPassword()).getBytes()));
+            getMethod.addRequestHeader("Authorization", "Basic " + Base64.encode((releaseInfo.getUsername() + ":" + releaseInfo.getPassword()).getBytes()));
 
             int res = client.executeMethod(null, getMethod);
             if (res == 200) {
@@ -59,8 +59,8 @@ public class MavenProxy implements Controller {
         String password = new String(Base64.decode(siteNode.getProperty("forgeSettingsPassword").getString()));
         ModuleReleaseInfo info = new ModuleReleaseInfo();
         info.setRepositoryUrl(forgeSettingsUrl);
-        info.setCatalogUsername(user);
-        info.setCatalogPassword(password);
+        info.setUsername(user);
+        info.setPassword(password);
         return info;
     }
 

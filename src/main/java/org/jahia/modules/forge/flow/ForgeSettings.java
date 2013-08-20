@@ -21,6 +21,7 @@ public class ForgeSettings implements Serializable {
     private static final long serialVersionUID = 33235900427979718L;
     private String password;
     private String url;
+    private String id;
     private String user;
 
     /**
@@ -51,6 +52,14 @@ public class ForgeSettings implements Serializable {
             url = StringUtils.substringBeforeLast(url,"/");
         }
         this.url = StringUtils.trim(url);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getUser() {

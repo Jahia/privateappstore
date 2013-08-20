@@ -29,6 +29,12 @@
                 </div>
             </div>
             <div class="row-fluid">
+                <div class="span8">
+                    <label for="id"><fmt:message key="jahiaForge.settings.id"/></label>
+                    <form:input class="span12" type="text" id="id" path="id"/>
+                </div>
+            </div>
+            <div class="row-fluid">
                 <div class="span4">
                     <label for="user"><fmt:message key="jahiaForge.settings.user"/></label>
                     <form:input class="span12" type="text" id="user" path="user"/>

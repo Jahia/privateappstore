@@ -3,6 +3,7 @@
     <sites jcr:primaryType="jnt:virtualsitesFolder">
         <forge forgeSettingsPassword="dGVzdDEyMzQ="
              forgeSettingsUrl="https://devtools.jahia.com/nexus/content/repositories/test"
+             forgeSettingsId="test"
              forgeSettingsUser="test"
              j:inactiveLanguages=""
              j:inactiveLiveLanguages=""
@@ -940,77 +941,6 @@
                                  jcr:primaryType="jnt:translation"
                                  jcr:title="Forge Modules Repository"
                                  jcr:uuid="3f94b7e2-9d83-4e6e-985d-1ef938a875d7"/>
-                    <bibou-badaboum authorNameDisplayedAs="username"
-                               authorURL="http://www.jahia.com"
-                               codeRepository="scm:dummy:uri"
-                               deleted="false"
-                               downloadCount="0"
-                               j:nbOfVotes="0"
-                               j:originWS="live"
-                               j:sumOfVotes="0"
-                               jcr:created="2013-07-30T11:06:46.320+02:00"
-                               jcr:createdBy="root"
-                               jcr:lastModified="2013-07-30T11:06:46.459+02:00"
-                               jcr:lastModifiedBy="root"
-                               jcr:mixinTypes="jmix:accessControlled"
-                               jcr:primaryType="jnt:forgeModule"
-                               jcr:title="bibou-badaboum"
-                               jcr:uuid="f18dea9b-4d41-4f3c-9b86-b77b65bfc471"
-                               published="false"
-                               reviewedByJahia="false"
-                               supportedByJahia="false">
-                        <j:translation_en description="This is the custom module (bibou-badaboum) for running on a Jahia xCM server."
-                                    jcr:language="en"
-                                    jcr:lastModified="2013-07-30T11:06:46.459+02:00"
-                                    jcr:lastModifiedBy="root"
-                                    jcr:primaryType="jnt:translation"
-                                    jcr:uuid="61309180-9bd1-4057-b724-cc4a45893076"/>
-                        <j:acl jcr:primaryType="jnt:acl"
-                         jcr:uuid="6ad098f8-f42c-465d-9706-15a330a45221">
-                            <GRANT_u_root j:aceType="GRANT"
-                                   j:principal="u:root"
-                                   j:protected="false"
-                                   j:roles="owner"
-                                   jcr:primaryType="jnt:ace"
-                                   jcr:uuid="fc59ecdb-e694-44c8-b71d-47e245f2fe9f"/>
-                        </j:acl>
-                        <screenshots jcr:created="2013-07-30T11:06:46.400+02:00"
-                               jcr:createdBy="root"
-                               jcr:lastModified="2013-07-30T11:06:46.401+02:00"
-                               jcr:lastModifiedBy="root"
-                               jcr:primaryType="jnt:forgeModuleScreenshotsList"
-                               jcr:uuid="7cc68a66-b30c-46e1-961c-094c2519cfc1"/>
-                        <reviews jcr:created="2013-07-30T11:06:46.401+02:00"
-                           jcr:createdBy="root"
-                           jcr:lastModified="2013-07-30T11:06:46.401+02:00"
-                           jcr:lastModifiedBy="root"
-                           jcr:primaryType="jnt:reviews"
-                           jcr:uuid="98942529-16d2-46ce-a1d9-7a9f967c411a"/>
-                        <bibou-badaboum-1.0 activeVersion="true"
-                                      j:originWS="live"
-                                      jcr:created="2013-07-30T11:06:46.524+02:00"
-                                      jcr:createdBy="root"
-                                      jcr:lastModified="2013-07-30T11:06:46.557+02:00"
-                                      jcr:lastModifiedBy="root"
-                                      jcr:mixinTypes="jmix:accessControlled"
-                                      jcr:primaryType="jnt:forgeModuleVersion"
-                                      jcr:uuid="41a4394f-d649-4edd-ba7b-d295474489bb"
-                                      published="true"
-                                      releaseType="hotfix"
-                                      requiredVersion="/sites/forge/contents/forge-modules-required-versions/6.7.0.0-SNAPSHOT"
-                                      url="http://localhost:8080/jahia/cms/mavenproxy/forge/org/jahia/modules/bibou-badaboum/1.0/bibou-badaboum-1.0.jar"
-                                      versionNumber="1.0">
-                            <j:acl jcr:primaryType="jnt:acl"
-                            jcr:uuid="12cd2653-3db1-48a8-82e9-fdbe768cf683">
-                                <GRANT_u_root j:aceType="GRANT"
-                                      j:principal="u:root"
-                                      j:protected="false"
-                                      j:roles="owner"
-                                      jcr:primaryType="jnt:ace"
-                                      jcr:uuid="b521c1ff-4409-45ad-a9fb-bcd3a25a834f"/>
-                            </j:acl>
-                        </bibou-badaboum-1.0>
-                    </bibou-badaboum>
                 </forge-modules-repository>
                 <forge-modules-categories j:lastPublished="2013-07-30T11:02:48.027+02:00"
                                       j:lastPublishedBy="root"
