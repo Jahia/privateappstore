@@ -5,6 +5,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.model.Model;
 import org.apache.xerces.impl.dv.util.Base64;
+import org.jahia.api.Constants;
 import org.jahia.bin.ActionResult;
 import org.jahia.bin.SystemAction;
 import org.jahia.data.templates.ModuleReleaseInfo;
@@ -15,6 +16,7 @@ import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
 import org.jahia.services.templates.JahiaTemplateManagerService;
+import org.jahia.taglibs.jcr.node.JCRTagUtils;
 import org.jahia.tools.files.FileUpload;
 import org.jahia.utils.PomUtils;
 import org.jahia.utils.i18n.Messages;
@@ -22,15 +24,13 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -41,7 +41,6 @@ import java.util.jar.Manifest;
 public class CreateModuleFromJar extends SystemAction {
 
     private transient static Logger logger = LoggerFactory.getLogger(CreateModuleFromJar.class);
-    private CreateModule createModule;
     private JahiaTemplateManagerService templateManagerService;
 
     @Override
@@ -118,6 +117,88 @@ public class CreateModuleFromJar extends SystemAction {
                     } finally {
                         FileUtils.deleteQuietly(artifact);
                     }
+
+                    // Create module
+
+                    List<String> moduleParamKeys = Arrays.asList("description", "category", "icon", "authorNameDisplayedAs", "authorURL", "authorEmail", "FAQ", "codeRepository", "license", "downloadCount", "supportedByJahia", "reviewedByJahia", "published", "deleted", "screenshots", "video","groupId");
+                    List<String> versionParamKeys = Arrays.asList("requiredVersion", "releaseType", "status", "versionNumber", "fileDsaSignature", "changeLog", "activeVersion", "url");
+                    Map<String, List<String>> moduleParameters = new HashMap<String, List<String>>();
+                    Map<String, List<String>> versionParameters = new HashMap<String, List<String>>();
+
+                    String title = getParameter(moduleParams, "jcr:title");
+                    if (StringUtils.isEmpty(title)) {
+                        title = moduleName;
+                    }
+                    // manually add jcr:title
+                    moduleParameters.put("jcr:title", Arrays.asList(title));
+                    versionParameters.put("jcr:title", Arrays.asList(title));
+
+                    for (String key : moduleParams.keySet()) {
+                        if (moduleParamKeys.contains(key) && moduleParams.get(key).get(0) != null) {
+                            moduleParameters.put(key, moduleParams.get(key));
+                        } else if (versionParamKeys.contains(key) && moduleParams.get(key).get(0) != null) {
+                            versionParameters.put(key, moduleParams.get(key));
+                        }
+                    }
+
+                    JCRNodeWrapper repository = resource.getNode();
+
+                    logger.info("Start creating Forge Module {}", moduleName);
+
+                    JCRNodeWrapper module;
+
+                    JCRNodeWrapper modulesDirectory = resource.getNode().getResolveSite().getNode("contents/forge-modules-repository");
+
+                    if (!modulesDirectory.hasNode(moduleName)) {
+                        module = createNode(request, moduleParameters, repository, "jnt:forgeModule", moduleName, false);
+                    } else {
+                        module = modulesDirectory.getNode(moduleName);
+                        setProperties(module, moduleParameters);
+                    }
+
+                    if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
+                        List<String> roles = Arrays.asList("owner");
+                        module.grantRoles("u:" + session.getUser().getUsername(), new HashSet<String>(roles));
+                    }
+
+                    boolean hasModuleVersions = JCRTagUtils.hasChildrenOfType(module, "jnt:forgeModuleVersion");
+
+                    // create module version
+
+                    logger.info("Start adding module version {} of {}", version, title);
+
+                    if (hasModuleVersions && !hasValidVersionNumber(module, version)) {
+                        return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", "versionNumber"));
+                    }
+
+                    JCRNodeWrapper moduleVersion = createNode(request, versionParameters, module, "jnt:forgeModuleVersion", module.getName()+"-"+version, false);
+
+                    String activeVersion = getParameter(versionParameters, "activeVersion");
+
+                    if (!hasModuleVersions || (activeVersion != null && activeVersion.equals("on"))) {
+                        moduleVersion.setProperty("activeVersion", true);
+                        moduleVersion.setProperty("published", true);
+                    }
+
+                    if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
+                        List<String> roles = Arrays.asList("owner");
+                        moduleVersion.grantRoles("u:" + session.getUser().getUsername(), new HashSet<String>(roles));
+                    }
+
+
+                    logger.info("Module version {} of {} successfully added", version, title);
+
+                    logger.info("Forge Module {} successfully created and added to forge repository {}", moduleName,
+                            repository.getPath());
+
+                    String moduleUrl = renderContext.getResponse().encodeURL(module.getUrl());
+                    String moduleAbsoluteUrl = module.getProvider().getAbsoluteContextPath(request) + moduleUrl;
+                    session.save();
+
+                    return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("moduleUrl", moduleUrl).put(
+                            "moduleAbsoluteUrl", moduleAbsoluteUrl));
+
+
                 } else {
                     String error = Messages.get("resources.Jahia_Forge","forge.uploadJar.error.unable.read.manifest",session.getLocale());
                     return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
@@ -141,18 +222,26 @@ public class CreateModuleFromJar extends SystemAction {
             String error = Messages.get("resources.Jahia_Forge","forge.uploadJar.error.snapshot.not.allowed",session.getLocale());
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", error));
         }
-
-
         // create module
-
-        return createModule.doExecuteAsSystem(request, renderContext, session, resource, moduleParams, urlResolver);
-    }
-
-    public void setCreateModule(CreateModule createModule) {
-        this.createModule = createModule;
     }
 
     public void setTemplateManagerService(JahiaTemplateManagerService templateManagerService) {
         this.templateManagerService = templateManagerService;
+    }
+
+    private boolean hasValidVersionNumber(JCRNodeWrapper module, String versionNumber) throws RepositoryException {
+
+        if (versionNumber == null ) {
+            return false;
+        }
+
+        List<JCRNodeWrapper> moduleVersions = JCRTagUtils.getChildrenOfType(module, "jnt:forgeModuleVersion");
+
+        for (JCRNodeWrapper moduleVersion : moduleVersions) {
+            if (moduleVersion.hasProperty("versionNumber") &&moduleVersion.getProperty("versionNumber").getString().equals(versionNumber))
+                return false;
+        }
+
+        return true;
     }
 }
