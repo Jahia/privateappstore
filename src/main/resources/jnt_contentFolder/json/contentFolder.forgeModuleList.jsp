@@ -19,12 +19,18 @@
                     <json:property name="remoteUrl" value="${localUrl}"/>
                     <json:property name="name" value="${child.name}"/>
                     <json:property name="title" value="${child.displayableName}"/>
-                    <c:forEach var="version" items="${jcr:getChildrenOfType(child, 'jnt:forgeModuleVersion')}">
-                        <c:if test="${version.properties.activeVersion.boolean and child.properties.published.boolean}">
-                            <json:property name="version" value="${version.properties.versionNumber.string}"/>
-                            <json:property name="downloadUrl" value="${version.properties.url.string}"/>
-                        </c:if>
-                    </c:forEach>
+                    <json:array name="versions">
+                        <c:forEach var="version" items="${jcr:getChildrenOfType(child, 'jnt:forgeModuleVersion')}">
+                            <c:if test="${version.properties.published.boolean and child.properties.published.boolean}">
+                                <json:object>
+                                    <json:property name="version" value="${version.properties.versionNumber.string}"/>
+                                    <json:property name="requiredVersion" value="${version.properties.requiredVersion.node.name}"/>
+                                    <json:property name="downloadUrl" value="${version.properties.url.string}"/>
+                                    <json:property name="activeVersion" value="${version.properties.activeVersion.boolean}"/>
+                                </json:object>
+                            </c:if>
+                        </c:forEach>
+                    </json:array>
                 </json:object>
                 </c:if>
             </c:forEach>

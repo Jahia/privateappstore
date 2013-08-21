@@ -8,6 +8,7 @@ import org.apache.xerces.impl.dv.util.Base64;
 import org.jahia.api.Constants;
 import org.jahia.bin.ActionResult;
 import org.jahia.bin.SystemAction;
+import org.jahia.commons.Version;
 import org.jahia.data.templates.ModuleReleaseInfo;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
@@ -85,15 +86,23 @@ public class CreateModuleFromJar extends SystemAction {
                     moduleParams.put("authorURL", Arrays.asList(attributes.getValue("Implementation-URL")));
                     //moduleParams.put("authorEmail", Arrays.asList(attributes.getValue("")));
                     moduleParams.put("codeRepository", Arrays.asList(attributes.getValue("Jahia-Source-Control-Connection")));
-                    moduleParams.put("releaseType", Arrays.asList("hotfix"));
                     moduleParams.put("versionNumber", Arrays.asList(version));
                     String forgeUrl = StringUtils.substringBefore(request.getRequestURL().toString(), "/render");
                     moduleParams.put("url", Arrays.asList(forgeUrl + "/mavenproxy/" + site.getName() + "/" + pom.getGroupId().replace(".","/") + "/" + pom.getArtifactId() + "/" + pom.getVersion() + "/" + pom.getArtifactId() + "-" + pom.getVersion() + "." + extension));
 
-                    final String requiredVersion = pom.getParent().getVersion();
+                    final String requiredVersion = "version-" + pom.getParent().getVersion();
                     JCRNodeWrapper versions = session.getNode(resource.getNode().getResolveSite().getPath() + "/contents/forge-modules-required-versions");
+
                     if (!versions.hasNode(requiredVersion)) {
-                        versions.addNode(requiredVersion, "jnt:text").setProperty("text",requiredVersion);
+                        Version v = new Version(requiredVersion);
+                        JCRNodeWrapper n = versions.addNode(requiredVersion, "jnt:jahiaVersion");
+                        n.setProperty("major",v.getMajorVersion());
+                        n.setProperty("minor",v.getMinorVersion());
+                        n.setProperty("servicePack",v.getServicePackVersion());
+                        n.setProperty("patch",v.getPatchVersion());
+                        n.setProperty("releaseCandidate",v.getReleaseCandidateNumber());
+                        n.setProperty("beta",v.getBetaNumber());
+                        n.setProperty("qualifier",v.getQualifiers().toArray(new String[v.getQualifiers().size()]));
                     }
                     moduleParams.put("requiredVersion", Arrays.asList(versions.getNode(requiredVersion).getIdentifier()));
 
@@ -121,7 +130,7 @@ public class CreateModuleFromJar extends SystemAction {
                     // Create module
 
                     List<String> moduleParamKeys = Arrays.asList("description", "category", "icon", "authorNameDisplayedAs", "authorURL", "authorEmail", "FAQ", "codeRepository", "license", "downloadCount", "supportedByJahia", "reviewedByJahia", "published", "deleted", "screenshots", "video","groupId");
-                    List<String> versionParamKeys = Arrays.asList("requiredVersion", "releaseType", "status", "versionNumber", "fileDsaSignature", "changeLog", "activeVersion", "url");
+                    List<String> versionParamKeys = Arrays.asList("requiredVersion", "versionNumber", "fileDsaSignature", "changeLog", "activeVersion", "url");
                     Map<String, List<String>> moduleParameters = new HashMap<String, List<String>>();
                     Map<String, List<String>> versionParameters = new HashMap<String, List<String>>();
 

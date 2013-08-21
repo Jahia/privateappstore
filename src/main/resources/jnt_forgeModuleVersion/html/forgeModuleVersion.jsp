@@ -27,31 +27,41 @@
     <template:addResources type="inlinejavascript">
         <script type="text/javascript">
 
-            $(document).ready(function() {
+            $(document).ready(function () {
 
                 <c:url var="postURL" value="${url.base}${currentNode.path}"/>
                 $('#changeLog-${currentNode.identifier}').editable({
                     <jsp:include page="../../commons/bootstrap-editable-options-wysihtml5.jsp">
-                        <jsp:param name="postURL" value='${postURL}'/>
-                        <jsp:param name="fullEditor" value='false'/>
+                    <jsp:param name="postURL" value='${postURL}'/>
+                    <jsp:param name="fullEditor" value='false'/>
                     </jsp:include>
                 });
 
-                $('#toggle-changeLog-${currentNode.identifier}').click(function(e) {
+                $('#toggle-changeLog-${currentNode.identifier}').click(function (e) {
                     e.stopPropagation();
                     e.preventDefault();
                     $('#changeLog-${currentNode.identifier}').editable('toggle');
                 });
 
-                <jcr:node var="requiredVersions" path="${renderContext.site.path}/contents/forge-modules-required-versions"/>
-
+                <jcr:sql var="requiredVersions" sql="select * from [jnt:jahiaVersion] as v where isdescendantnode(v,'${renderContext.site.path}/contents/forge-modules-required-versions')  order by major,minor,servicePack,patch"/>
+                <c:set var="requiredVersionsMajorMinor" value=""/>
                 <c:set var="requiredVersionsList" value=""/>
-                <c:forEach items="${jcr:getNodes(requiredVersions, 'jnt:contentFolder')}" var="requiredVersionsFolder" varStatus="statusFolder">
-                    <c:set var="requiredVersionsList" value="${requiredVersionsList}{text: '${requiredVersionsFolder.displayableName}', children : ["/>
-                    <c:forEach items="${jcr:getNodes(requiredVersionsFolder, 'jnt:text')}" var="requiredVersionNode" varStatus="status">
-                        <c:set var="requiredVersionsList" value="${requiredVersionsList} {id: '${requiredVersionNode.identifier}', text:'${requiredVersionNode.displayableName}'} ${status.last ? ']': ','}"/>
-                    </c:forEach>
-                    <c:set var="requiredVersionsList" value="${requiredVersionsList}}${statusFolder.last ? '' : ','}"/>
+                <c:forEach items="${requiredVersions.nodes}" var="requiredVersionNode" varStatus="status">
+                    <c:set value="${requiredVersionNode.properties['major'].string}.${requiredVersionNode.properties['minor'].string}" var="thisMajorMinor"/>
+                    <c:if test="${thisMajorMinor eq requiredVersionsMajorMinor}">
+                        <c:set var="requiredVersionsList" value="${requiredVersionsList},"/>
+                    </c:if>
+                    <c:if test="${thisMajorMinor ne requiredVersionsMajorMinor}">
+                        <c:if test="${not empty requiredVersionsMajorMinor}">
+                            <c:set var="requiredVersionsList" value="${requiredVersionsList}]},"/>
+                        </c:if>
+                        <c:set var="requiredVersionsList" value="${requiredVersionsList}{text: '${thisMajorMinor}', children : ["/>
+                        <c:set var="requiredVersionsMajorMinor" value="${thisMajorMinor}"/>
+                    </c:if>
+                    <c:set var="requiredVersionsList" value="${requiredVersionsList} {id: '${requiredVersionNode.identifier}', text:'${requiredVersionNode.name}'}"/>
+                    <c:if test="${status.last}">
+                        <c:set var="requiredVersionsList" value="${requiredVersionsList}]}"/>
+                    </c:if>
                 </c:forEach>
 
                 $('#requiredVersion-${id}').editable({
@@ -59,7 +69,7 @@
                     source: [${requiredVersionsList}],
                     value: '${requiredVersion.node.identifier}',
                     <jsp:include page="../../commons/bootstrap-editable-options.jsp">
-                        <jsp:param name="postURL" value="${postURL}"/>
+                    <jsp:param name="postURL" value="${postURL}"/>
                     </jsp:include>
                 });
 
@@ -72,7 +82,8 @@
 <c:choose>
 
     <c:when test="${isActiveVersion}">
-        <h2><fmt:message key="jnt_forgeModule.label.whatsNew"><fmt:param value="${versionNumber.string}"/></fmt:message></h2>
+        <h2><fmt:message key="jnt_forgeModule.label.whatsNew"><fmt:param
+                value="${versionNumber.string}"/></fmt:message></h2>
     </c:when>
 
     <c:otherwise>
@@ -89,23 +100,25 @@
                     </fmt:message>
                 </a>
 
-            <c:if test="${isDeveloper && not viewAsUser}">
-                <c:url value="${url.base}${currentNode.path}" var="currentNodePath"/>
-                <c:if test="${published.boolean}">
-                    <button id="publishVersion-${id}" class="btn btn-small publishVersion btn-success" data-value="false" data-target="${currentNodePath}">
-                        <fmt:message key="jnt_forgeModule.label.developer.unpublish"/>
-                    </button>
-                    <button class="btn btn-small btn-success makeActiveVersion" data-target="${currentNodePath}">
-                        <fmt:message key="jnt_forgeModule.label.developer.makeActiveVersion"/>
-                    </button>
-                </c:if>
-                <c:if test="${not published.boolean}">
-                    <button id="unpublishVersion-${id}" class="btn btn-small publishVersion btn-danger" data-value="true" data-target="${currentNodePath}">
-                        <fmt:message key="jnt_forgeModule.label.developer.publish"/>
-                    </button>
-                </c:if>
+                <c:if test="${isDeveloper && not viewAsUser}">
+                    <c:url value="${url.base}${currentNode.path}" var="currentNodePath"/>
+                    <c:if test="${published.boolean}">
+                        <button id="publishVersion-${id}" class="btn btn-small publishVersion btn-success"
+                                data-value="false" data-target="${currentNodePath}">
+                            <fmt:message key="jnt_forgeModule.label.developer.unpublish"/>
+                        </button>
+                        <button class="btn btn-small btn-success makeActiveVersion" data-target="${currentNodePath}">
+                            <fmt:message key="jnt_forgeModule.label.developer.makeActiveVersion"/>
+                        </button>
+                    </c:if>
+                    <c:if test="${not published.boolean}">
+                        <button id="unpublishVersion-${id}" class="btn btn-small publishVersion btn-danger"
+                                data-value="true" data-target="${currentNodePath}">
+                            <fmt:message key="jnt_forgeModule.label.developer.publish"/>
+                        </button>
+                    </c:if>
 
-            </c:if>
+                </c:if>
 
             </div>
         </header>
@@ -116,9 +129,11 @@
 
 <c:if test="${isDeveloper && not viewAsUser}">
     <p class="editable-toggle">
-        <a id="toggle-changeLog-${currentNode.identifier}" href="#"><i class="icon-pencil"></i>&nbsp;<fmt:message key="jnt_forgeModule.label.edit"/></a>
+        <a id="toggle-changeLog-${currentNode.identifier}" href="#"><i class="icon-pencil"></i>&nbsp;<fmt:message
+                key="jnt_forgeModule.label.edit"/></a>
     </p>
-    <div data-original-title="<fmt:message key="jnt_forgeModuleVersion.label.changeLog"/>" data-toggle="manual" data-name="changeLog" data-type="wysihtml5"
+    <div data-original-title="<fmt:message
+        key="jnt_forgeModuleVersion.label.changeLog"/>" data-toggle="manual" data-name="changeLog" data-type="wysihtml5"
     data-pk="1" id="changeLog-${currentNode.identifier}" class="editable">
 </c:if>
 
@@ -133,16 +148,17 @@ ${changeLog.string}
         <dt><fmt:message key="jnt_forgeModule.label.relatedJahiaVersion"/></dt>
         <dd>
             <c:if test="${isDeveloper && not viewAsUser}">
-                <a href="#" id="requiredVersion-${id}" class="editable editable-click" data-type="select2" data-pk="1"
-                   data-name="requiredVersion" data-original-title="<fmt:message key="jnt_forgeModuleVersion.label.requiredVersion"/>">
-            </c:if>
-            ${requiredVersion.node.displayableName}
-            <c:if test="${isDeveloper && not viewAsUser}">
-                </a>
+            <a href="#" id="requiredVersion-${id}" class="editable editable-click" data-type="select2" data-pk="1"
+               data-name="requiredVersion"
+               data-original-title="<fmt:message key="jnt_forgeModuleVersion.label.requiredVersion"/>">
+                </c:if>
+                ${requiredVersion.node.displayableName}
+                <c:if test="${isDeveloper && not viewAsUser}">
+            </a>
             </c:if>
         </dd>
         <dt><fmt:message key="jnt_forgeModule.label.updated"/></dt>
-        <dd><fmt:formatDate value="${moduleVersionBinary.contentLastModifiedAsDate}" pattern="yyyy-MM-dd" /></dd>
+        <dd><fmt:formatDate value="${moduleVersionBinary.contentLastModifiedAsDate}" pattern="yyyy-MM-dd"/></dd>
     </dl>
 </footer>
 
