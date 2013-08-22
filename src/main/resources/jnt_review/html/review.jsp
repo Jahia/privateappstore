@@ -55,7 +55,7 @@
 
     $(document).ready(function(){
 
-        <c:if test="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}">
+        <c:if test="${jcr:hasPermission(currentNode, 'jcr:write')}">
 
             $('#replyReviewToggle-${id}').click( function() {
 
@@ -142,11 +142,11 @@
                         <fmt:formatDate value="${created}" dateStyle="long" />
                     </time>
 
-                    <c:if test="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}">
+                    <c:if test="${jcr:hasPermission(currentNode, 'jcr:write')}">
 
                         <div class="pull-right">
 
-                            <c:set var="isForgeAdmin" value="${jcr:hasPermission(currentNode.parent.parent.parent, 'jcr:all_live')}"/>
+                            <c:set var="isForgeAdmin" value="${jcr:hasPermission(currentNode, 'jahiaForgeModerateModule')}"/>
 
 
                             <c:choose>
@@ -160,7 +160,7 @@
                                     <button id="replyReviewToggle-${id}" class="btn btn-small btn-primary"><fmt:message key="jnt_review.label.reply"/></button>
 
                                     <%--- check if curent user is the owner of the module ---%>
-                                    <c:if test="${jcr:hasPermission(currentNode.parent.parent, 'jcr:all_live')}">
+                                    <c:if test="${jcr:hasPermission(currentNode, 'jcr:write')}">
                                         <%@include file="../../commons/reportButton.jspf"%>
                                     </c:if>
 
@@ -203,7 +203,7 @@
             ${fn:escapeXml(content)}
         </div>
 
-        <c:if test="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}">
+        <c:if test="${jcr:hasPermission(currentNode, 'jcr:write')}">
 
             <div id="replyReview-${id}" class="replyReview box box-rounded box-tinted box-margin-top">
 

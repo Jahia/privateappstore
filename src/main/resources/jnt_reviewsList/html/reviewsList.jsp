@@ -36,7 +36,7 @@
             <c:when test="${not empty reviewsNode}">
                 <template:addCacheDependency node="${reviewsNode}"/>
 
-                <c:set var="isForgeAdmin" value="${jcr:hasPermission(boundComponent.parent, 'jcr:all_live')}"/>
+                <c:set var="isForgeAdmin" value="${jcr:hasPermission(boundComponent, 'jahiaForgeModerateModule')}"/>
 
                 <c:if test="${isForgeAdmin}">
 

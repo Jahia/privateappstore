@@ -97,11 +97,11 @@
                 </time>
 
                 <%--- check if curent user is the owner of the module ---%>
-                <c:if test="${renderContext.loggedIn && jcr:hasPermission(currentNode.parent.parent.parent, 'jcr:all_live')}">
+                <c:if test="${jcr:hasPermission(currentNode, 'jcr:write')}">
 
                     <div class="pull-right">
 
-                        <c:set var="isForgeAdmin" value="${jcr:hasPermission(currentNode.parent.parent.parent.parent, 'jcr:all_live')}"/>
+                        <c:set var="isForgeAdmin" value="${jcr:hasPermission(currentNode, 'jahiaForgeModerateModule')}"/>
 
                         <c:choose>
 

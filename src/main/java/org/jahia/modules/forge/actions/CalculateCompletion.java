@@ -60,8 +60,8 @@ public class CalculateCompletion  extends Action {
         // TODO icon
 
         int authorEmailType;
-        if (module.getPropertyAsString("authorNameDisplayedAs").equals("organisation")
-                || module.getSession().getUser().getProperty("j:email").isEmpty())
+        if (module.hasProperty("authorNameDisplayedAs") && module.getPropertyAsString("authorNameDisplayedAs").equals("organisation")
+                || (module.getSession().getUser().getProperty("j:email") != null && module.getSession().getUser().getProperty("j:email").isEmpty()))
             authorEmailType = TEXT;
         else
             authorEmailType = SKIP;

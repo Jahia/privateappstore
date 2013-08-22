@@ -30,15 +30,14 @@
         });
     </script>
 </template:addResources>--%>
-<c:if test="${jcr:hasPermission(currentNode, 'jahiaForgeUploadModule')}">
+<c:if test="${jcr:hasPermission(renderContext.mainResource.node, 'jahiaForgeUploadModule')}">
     <c:choose>
         <c:when test="${jcr:isNodeType(renderContext.site,'jmix:forgeSettings') and not empty renderContext.site.properties.forgeSettingsUrl.string}">
             <c:set var="linked" value="${ui:getBindedComponent(currentNode, renderContext, 'j:bindedComponent')}"/>
             <c:set var="targetNode" value="${renderContext.mainResource.node}"/>
             <c:if test="${jcr:isNodeType(renderContext.mainResource.node, 'jnt:forgeModule')}">
                 <jcr:node var="targetNode" path="${renderContext.mainResource.node.path}/screenshots"/>
-                <c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(renderContext.mainResource.node, 'jcr:all_live')
-    && not jcr:hasPermission(renderContext.mainResource.node.parent, 'jcr:all_live')}"/>
+                <c:set var="isDeveloper" value="${jcr:hasPermission(renderContext.mainResource.node, 'jcr:write')}"/>
                 <c:if test="${isDeveloper}">
                     <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}"/>
                 </c:if>

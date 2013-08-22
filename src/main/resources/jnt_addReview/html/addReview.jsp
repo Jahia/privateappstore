@@ -27,12 +27,11 @@
 <c:set var="boundComponent"
        value="${uiComponents:getBindedComponent(currentNode, renderContext, 'j:bindedComponent')}"/>
 
-<c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(boundComponent, 'jcr:all_live')
-    && not jcr:hasPermission(boundComponent.parent, 'jcr:all_live')}"/>
+<c:set var="isDeveloper" value="${jcr:hasPermission(boundComponent, 'jcr:write')}"/>
 <c:if test="${isDeveloper}">
     <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
 </c:if>
-<c:set var="isForgeAdmin" value="${renderContext.loggedIn && jcr:hasPermission(boundComponent.parent, 'jcr:all_live')}"/>
+<c:set var="isForgeAdmin" value="${jcr:hasPermission(boundComponent, 'jahiaForgeModerateModule')}"/>
 
 <c:set var="isFirstReview" value="true"/>
 <c:if test="${jcr:hasChildrenOfType(boundComponent, 'jnt:reviews')}">

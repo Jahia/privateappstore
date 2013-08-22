@@ -6,6 +6,7 @@
     <bean class="org.jahia.modules.forge.actions.CreateModuleFromJar" >
         <property name="name" value="CreateModuleFromJar"/>
         <property name="requireAuthenticatedUser" value="true"/>
+        <property name="requiredPermission" value="jahiaForgeUploadModule"/>
         <property name="templateManagerService" ref="JahiaTemplateManagerService"/>
     </bean>
 
