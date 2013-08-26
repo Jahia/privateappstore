@@ -44,7 +44,7 @@
 
 
 <jcr:nodeProperty node="${activeVersion}" name="versionNumber" var="versionNumber"/>
-<jcr:nodeProperty node="${activeVersion}" name="relatedJahiaVersion" var="requiredVersion"/>
+<jcr:nodeProperty node="${activeVersion}" name="requiredVersion" var="requiredVersion"/>
 
 
 <c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>
