@@ -83,7 +83,7 @@
 
                 updateCompletionStatus();
 
-                $('#jnt_forge').on('forgeModuleUpdated', function() {
+                $('#moduleDeveloperPanel').on('forgeModuleUpdated', function() {
                     updateCompletionStatus();
                 });
 

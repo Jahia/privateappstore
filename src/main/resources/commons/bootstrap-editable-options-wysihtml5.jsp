@@ -30,7 +30,7 @@ params: function(params) {
 },
 url: '${param.postURL}',
 success: function(response, newValue) {
-    $('#jnt_forge').triggerHandler('forgeModuleUpdated');
+    $('#moduleDeveloperPanel').triggerHandler('forgeModuleUpdated');
 
     ${not empty param.customSuccess ? param.customSuccess : ''}
 },

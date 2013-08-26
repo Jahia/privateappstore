@@ -70,7 +70,7 @@
                     var listItem = $(this).parent('li.moduleScreenshot');
                     $.post($(this).attr('data-path'), {jcrMethodToCall: 'delete'}, function() {
                         if($('#moduleScreenshotsList li').length == 1)
-                            $('#jnt_forge').triggerHandler('forgeModuleUpdated');
+                            $('#moduleDeveloperPanel').triggerHandler('forgeModuleUpdated');
                         listItem.fadeOut('slow', function() {listItem.remove()});
                     }, "json");
                 });
