@@ -116,10 +116,9 @@
             </c:otherwise>
 
         </c:choose>
-
+    <c:url var="iconUrl" value="${url.currentModule}/img/icon.png"/>
     </header>
-
-    <img class="moduleIcon" src="${not empty icon.url ? icon.url : '/modules/forge/img/icon.png'}"
+    <img class="moduleIcon" src="${not empty icon.url ? icon.url : iconUrl}"
          alt="<fmt:message key="jnt_forgeModule.label.moduleIcon"><fmt:param value="${title}"/></fmt:message>"/>
 
     <c:if test="${nbOfVotes gt 0}">
