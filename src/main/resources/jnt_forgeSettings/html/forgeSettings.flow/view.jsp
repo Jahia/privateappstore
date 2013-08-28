@@ -41,7 +41,7 @@
                 </div>
                 <div class="span4">
                     <label for="password"><fmt:message key="jahiaForge.settings.password"/></label>
-                    <form:password class="span12" type="password" id="password" path="password"/>
+                    <form:password class="span12" id="password" path="password"/>
                 </div>
             </div>
             <div class="row-fluid">
