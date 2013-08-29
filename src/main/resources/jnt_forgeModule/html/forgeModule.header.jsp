@@ -138,7 +138,7 @@
             <jcr:nodeProperty node="${latestVersion}" name="versionNumber" var="versionNumber"/>
             <a class="btn btn-block" href="<c:url value="${latestVersion.properties.url.string}" context="/"/>"
                <c:if test="${not isDeveloper}">onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')"</c:if>>
-                <fmt:message key="jnt_forgeModule.label.downloadVersion">
+                <fmt:message key="jnt_forgeModule.label.downloadCurrentVersion">
                     <fmt:param value="${versionNumber.string}"/>
                 </fmt:message>
             </a>
@@ -146,7 +146,7 @@
 
         <c:otherwise>
             <a class="btn btn-block disabled" href="#">
-                <fmt:message key="jnt_forgeModule.label.downloadVersion">
+                <fmt:message key="jnt_forgeModule.label.downloadCurrentVersion">
                     <fmt:param value="X.X.X.X"/>
                 </fmt:message>
             </a>

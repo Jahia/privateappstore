@@ -31,6 +31,7 @@
     </script>
 </template:addResources>--%>
 <c:if test="${jcr:hasPermission(renderContext.mainResource.node, 'jahiaForgeUploadModule')}">
+    <h3><fmt:message key="jahiaForge.upload.title"/> </h3>
     <c:choose>
         <c:when test="${jcr:isNodeType(renderContext.site,'jmix:forgeSettings') and not empty renderContext.site.properties.forgeSettingsUrl.string}">
             <c:set var="linked" value="${ui:getBindedComponent(currentNode, renderContext, 'j:bindedComponent')}"/>
@@ -50,7 +51,7 @@
             <form class="file_upload" id="file_upload_${currentNode.identifier}"
                   action="<c:url value='${url.base}${renderContext.site.path}/contents/forge-modules-repository.createModuleFromJar.do'/>" method="POST" enctype="multipart/form-data"
                   accept="application/json">
-                <div id="file_upload_container" class="btn btn-block">
+                <div id="file_upload_container${currentNode.identifier}" class="btn btn-block">
                     <input type="file" name="file" multiple>
                     <button><fmt:message key="label.upload"/></button>
                     <div id="drop-box-file-upload-${currentNode.identifier}"><fmt:message key="label.dropHere"/></div>
@@ -80,7 +81,7 @@
                         },
                         acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
                         uploadTable: $('#files${currentNode.identifier}'),
-                        dropZone: $('#file_upload_container'),
+                        dropZone: $('#file_upload_container${currentNode.identifier}'),
                         beforeSend: function (event, files, index, xhr, handler, callBack) {
                             handler.formData = {
                                 'jcrNodeType': "jnt:file",

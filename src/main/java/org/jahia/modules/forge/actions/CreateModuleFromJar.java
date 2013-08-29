@@ -177,14 +177,11 @@ public class CreateModuleFromJar extends SystemAction {
                     logger.info("Start adding module version {} of {}", version, title);
 
                     if (hasModuleVersions && !hasValidVersionNumber(module, version)) {
-                        return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", "versionNumber"));
+                        String error = Messages.getWithArgs("resources.Jahia_Forge","forge.uploadJar.error.versionNumber",session.getLocale(),moduleName,version);
+                        return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", error));
                     }
 
                     JCRNodeWrapper moduleVersion = createNode(request, versionParameters, module, "jnt:forgeModuleVersion", module.getName()+"-"+version, false);
-
-                    if (!hasModuleVersions) {
-                        moduleVersion.setProperty("published", true);
-                    }
 
                     if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
                         List<String> roles = Arrays.asList("owner");
