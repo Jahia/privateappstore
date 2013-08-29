@@ -109,7 +109,7 @@
                                        jcr:mixinTypes="jmix:accessControlled"
                                        jcr:primaryType="jnt:bootstrapRow">
                             <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                            <module-aside jcr:primaryType="jnt:bootstrapColumn" offset="0" span="3">
+                                <module-aside jcr:primaryType="jnt:bootstrapColumn" offset="0" span="4">
                                 <module-aside jcr:primaryType="jnt:contentList">
                                     <main-resource-display j:mainResourceView="header"
                                                            jcr:mixinTypes="jmix:accessControlled"
@@ -128,7 +128,7 @@
                                     </forge-admin-panel>
                                 </module-aside>
                             </module-aside>
-                            <module-main jcr:primaryType="jnt:bootstrapColumn" offset="0" span="9">
+                                <module-main jcr:primaryType="jnt:bootstrapColumn" offset="0" span="8">
                                 <module-main jcr:primaryType="jnt:contentList">
                                     <bootstrap-tabular-list fadeIn="true"
                                                             jcr:mixinTypes="jmix:accessControlled"
@@ -155,7 +155,7 @@
                                                         </main-resource-display>
                                                     </overview-main>
                                                 </overview-main>
-                                                    <overview-aside jcr:primaryType="jnt:bootstrapColumn" offset="1" span="6">
+                                                    <overview-aside jcr:primaryType="jnt:bootstrapColumn" offset="1" span="7">
                                                     <overview-aside jcr:primaryType="jnt:contentList">
                                                         <main-resource-display j:mainResourceView="information"
                                                                                jcr:mixinTypes="jmix:accessControlled"
