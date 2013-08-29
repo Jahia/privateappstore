@@ -17,9 +17,14 @@
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
+<c:set var="isForgeAdmin" value="${jcr:hasPermission(renderContext.site, 'jahiaForgeModerateModule')}"/>
+<c:set var="publishedCondition" value=""/>
+<c:if test="${!jcr:hasPermission(renderContext.site, 'jahiaForgeModerateModule')}">
+    <c:set var="publishedCondition" value=" AND [published]=true"/>
+</c:if>
 <c:set var="statement"
        value="SELECT * FROM [jnt:forgeModule]
-                WHERE ISDESCENDANTNODE('${renderContext.site.path}') AND [published]=true
+                WHERE ISDESCENDANTNODE('${renderContext.site.path}') ${publishedCondition}
                 ORDER BY [jcr:created] DESC"/>
 
 <query:definition var="listQuery" statement="${statement}"/>

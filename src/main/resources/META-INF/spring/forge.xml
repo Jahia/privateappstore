@@ -90,4 +90,9 @@
         </property>
     </bean>
 
+    <bean id="forgePublishedModule" class="org.jahia.modules.forge.filters.PublishedModuleFilter">
+        <property name="priority" value="20"/>
+        <property name="applyOnModes" value="live"/>
+        <property name="applyOnNodeTypes" value="jnt:forgeModule"/>
+    </bean>
 </beans>
