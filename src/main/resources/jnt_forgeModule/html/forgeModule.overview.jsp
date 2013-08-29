@@ -48,9 +48,9 @@
 
 <template:addCacheDependency path="${author.localPath}"/>
 <template:include view="hidden.sql">
-    <template:param name="getActiveVersion" value="true"/>
+    <template:param name="getLatestVersion" value="true"/>
 </template:include>
-<c:set value="${moduleMap.activeVersion}" var="activeVersion"/>
+<c:set value="${moduleMap.latestVersion}" var="latestVersion"/>
 
 <c:if test="${isDeveloper && not viewAsUser}">
 
@@ -153,8 +153,8 @@
 
 <article id="moduleOverview" itemtype="http://schema.org/SoftwareApplication">
 
-    <jcr:nodeProperty node="${activeVersion}" name="versionNumber" var="versionNumber"/>
-    <jcr:nodeProperty node="${activeVersion}" name="relatedJahiaVersion" var="requiredVersion"/>
+    <jcr:nodeProperty node="${latestVersion}" name="versionNumber" var="versionNumber"/>
+    <jcr:nodeProperty node="${latestVersion}" name="relatedJahiaVersion" var="requiredVersion"/>
 
     <div class="mainContentWrapper">
 

@@ -26,7 +26,6 @@
                                     <json:property name="version" value="${version.properties.versionNumber.string}"/>
                                     <json:property name="requiredVersion" value="${version.properties.requiredVersion.node.name}"/>
                                     <json:property name="downloadUrl" value="${version.properties.url.string}"/>
-                                    <json:property name="activeVersion" value="${version.properties.activeVersion.boolean}"/>
                                 </json:object>
                             </c:if>
                         </c:forEach>

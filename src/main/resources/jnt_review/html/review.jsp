@@ -146,7 +146,7 @@
 
                         <div class="pull-right">
 
-                            <c:set var="isForgeAdmin" value="${jcr:hasPermission(currentNode, 'jahiaForgeModerateModule')}"/>
+                            <c:set var="isForgeAdmin" value="${jcr:hasPermission(renderContext.site, 'jahiaForgeModerateModule')}"/>
 
 
                             <c:choose>

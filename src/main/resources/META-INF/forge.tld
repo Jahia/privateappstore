@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+        version="2.0">
+
+    <description>Forge module tag library</description>
+    <display-name>Forge</display-name>
+    <tlib-version>1.0</tlib-version>
+    <short-name>forge</short-name>
+    <uri>http://www.jahia.org/modules/forge/tags</uri>
+    <function>
+        <description>sort module list by version</description>
+        <name>sortByVersion</name>
+        <function-class>org.jahia.modules.forge.tags.ForgeFunctions</function-class>
+        <function-signature>java.util.List sortModulesByVersion(javax.jcr.NodeIterator)</function-signature>
+    </function>
+    <function>
+        <description>return the previous version of an ordered list of modules (first is the latest)</description>
+        <name>previousVersions</name>
+        <function-class>org.jahia.modules.forge.tags.ForgeFunctions</function-class>
+        <function-signature>java.util.List previousVersions(java.util.List)</function-signature>
+    </function>
+    <function>
+        <description>returns the latest published version of an ordered list of modules (first is the latest)</description>
+        <name>latestVersion</name>
+        <function-class>org.jahia.modules.forge.tags.ForgeFunctions</function-class>
+        <function-signature>org.jahia.services.content.JCRNodeWrapper latestVersion(java.util.List)</function-signature>
+    </function>
+    <function>
+        <description>returns the next versions that is not published yet of an ordered list of modules (first is the latest)</description>
+        <name>nextVersions</name>
+        <function-class>org.jahia.modules.forge.tags.ForgeFunctions</function-class>
+        <function-signature>java.util.List nextVersions(java.util.List)</function-signature>
+    </function>
+
+</taglib>

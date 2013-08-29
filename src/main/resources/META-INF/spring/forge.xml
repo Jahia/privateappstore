@@ -26,10 +26,6 @@
         <property name="requireAuthenticatedUser" value="true"/>
     </bean>
 
-    <bean class="org.jahia.modules.forge.actions.ChangeActiveVersion" >
-        <property name="name" value="ChangeActiveVersion"/>
-    </bean>
-
     <bean class="org.jahia.modules.forge.actions.AddVideo" >
         <property name="name" value="AddVideo"/>
         <property name="requireAuthenticatedUser" value="true"/>

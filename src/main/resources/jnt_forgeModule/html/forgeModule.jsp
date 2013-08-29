@@ -26,12 +26,12 @@
 <c:set var="description" value="${currentNode.properties['description'].string}"/>
 
 <%@include file="../../commons/authorName.jspf"%>
-
+<c:url var="iconUrl" value="${url.currentModule}/img/icon.png"/>
 <section class="forgeModule">
 
     <header>
         <a href="<c:url value="${currentNode.url}" context="/"/>">
-            <img class="moduleIcon media-object" src="${not empty icon.url ? icon.url : '/modules/forge/img/icon.png'}"
+            <img class="moduleIcon" src="${not empty icon.url ? icon.url : iconUrl}"
                  alt="<fmt:message key="jnt_forgeModule.label.moduleIcon"><fmt:param value="${title}"/></fmt:message>"/>
         </a>
         <a href="<c:url value="${currentNode.url}" context="/"/>"><h4>${title}</h4></a>

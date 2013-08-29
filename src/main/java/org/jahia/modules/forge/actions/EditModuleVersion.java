@@ -41,17 +41,11 @@ public class EditModuleVersion extends Action {
 
         String relatedJahiaVersionUUID = getParameter(parameters, "relatedJahiaVersion");
         String changeLog = getParameter(parameters, "changeLog");
-        String activeVersion = getParameter(parameters, "activeVersion");
 
         session.checkout(moduleVersion);
 
         if (changeLog != null)
             moduleVersion.setProperty("changeLog", changeLog);
-
-        if (activeVersion != null && activeVersion.equals("on"))
-            moduleVersion.setProperty("activeVersion", true);
-        else
-            moduleVersion.setProperty("activeVersion", false);
 
         if (relatedJahiaVersionUUID != null) {
             JCRNodeWrapper relatedJahiaVersion = session.getNodeByUUID(relatedJahiaVersionUUID);

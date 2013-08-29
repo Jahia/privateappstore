@@ -130,7 +130,7 @@ public class CreateModuleFromJar extends SystemAction {
                     // Create module
 
                     List<String> moduleParamKeys = Arrays.asList("description", "category", "icon", "authorNameDisplayedAs", "authorURL", "authorEmail", "FAQ", "codeRepository", "license", "downloadCount", "supportedByJahia", "reviewedByJahia", "published", "deleted", "screenshots", "video","groupId");
-                    List<String> versionParamKeys = Arrays.asList("requiredVersion", "versionNumber", "fileDsaSignature", "changeLog", "activeVersion", "url");
+                    List<String> versionParamKeys = Arrays.asList("requiredVersion", "versionNumber", "fileDsaSignature", "changeLog", "url");
                     Map<String, List<String>> moduleParameters = new HashMap<String, List<String>>();
                     Map<String, List<String>> versionParameters = new HashMap<String, List<String>>();
 
@@ -182,10 +182,7 @@ public class CreateModuleFromJar extends SystemAction {
 
                     JCRNodeWrapper moduleVersion = createNode(request, versionParameters, module, "jnt:forgeModuleVersion", module.getName()+"-"+version, false);
 
-                    String activeVersion = getParameter(versionParameters, "activeVersion");
-
-                    if (!hasModuleVersions || (activeVersion != null && activeVersion.equals("on"))) {
-                        moduleVersion.setProperty("activeVersion", true);
+                    if (!hasModuleVersions) {
                         moduleVersion.setProperty("published", true);
                     }
 

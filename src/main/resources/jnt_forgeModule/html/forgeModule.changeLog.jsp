@@ -26,11 +26,12 @@
 </c:if>
 
 <template:include view="hidden.sql">
-    <template:param name="getActiveVersion" value="true"/>
+    <template:param name="getLatestVersion" value="true"/>
     <template:param name="getPreviousVersions" value="true"/>
 </template:include>
-<c:set value="${moduleMap.activeVersion}" var="activeVersion"/>
+<c:set value="${moduleMap.latestVersion}" var="latestVersion"/>
 <c:set value="${moduleMap.previousVersions}" var="previousVersions"/>
+<c:set value="${moduleMap.nextVersions}" var="nextVersions"/>
 
 <c:if test="${isDeveloper && not viewAsUser}">
 
@@ -38,19 +39,6 @@
         <script type="text/javascript">
 
             $(document).ready(function () {
-
-                $('.makeActiveVersion').click(function () {
-
-                    var boostrapTab = $(this).parents('.tab-pane').attr('id');
-
-                    var data = {};
-                    data['activeVersion'] = true;
-                    data['jcrMethodToCall'] = 'put';
-
-                    $.post($(this).attr("data-target"), data, function () {
-                        window.location = '${currentNode.url}' + "?bootstrapTab=" + boostrapTab;
-                    }, "json");
-                });
 
                 $('.publishVersion').click(function () {
 
@@ -72,22 +60,20 @@
 
 <article id="moduleChangeLog">
 
-    <c:if test="${functions:length(previousVersions.nodes) > 0 && isDeveloper && not viewAsUser}">
+    <c:if test="${functions:length(nextVersions) > 0 && isDeveloper && not viewAsUser}">
         <section class="newVersions">
-            <c:forEach items="${previousVersions.nodes}" var="previousVersion" varStatus="status">
-                <c:if test="${activeVersion.properties['jcr:created'].long < previousVersion.properties['jcr:created'].long}">
+            <c:forEach items="${nextVersions}" var="nextVersion" varStatus="status">
                     <c:if test="${status.first}">
                         <h2><fmt:message key="jnt_forgeModule.label.newVersions"/></h2>
                         <c:set var="newVersionAvailable" value="true" />
                     </c:if>
                     <article class="previousVersion">
-                        <template:module node="${previousVersion}">
-                            <template:param name="isActiveVersion" value="false"/>
+                        <template:module node="${nextVersion}">
+                            <template:param name="isLatestVersion" value="false"/>
                             <template:param name="isDeveloper" value="${isDeveloper}"/>
                             <template:param name="viewAsUser" value="${viewAsUser}"/>
                         </template:module>
                     </article>
-                </c:if>
             </c:forEach>
 
         </section>
@@ -95,12 +81,11 @@
 
     <c:choose>
 
-        <c:when test="${not empty activeVersion}">
+        <c:when test="${not empty latestVersion}">
 
             <section class="whatsNew">
-
-                <template:module node="${activeVersion}">
-                    <template:param name="isActiveVersion" value="true"/>
+                <h2><fmt:message key="jnt_forgeModule.label.version"/></h2>
+                <template:module node="${latestVersion}">
                     <template:param name="isDeveloper" value="${isDeveloper}"/>
                     <template:param name="viewAsUser" value="${viewAsUser}"/>
                 </template:module>
@@ -120,36 +105,32 @@
     </c:choose>
 
 
-    <c:if test="${functions:length(previousVersions.nodes) > 0}">
+    <c:if test="${functions:length(previousVersions) > 0}">
 
         <section class="previousVersions">
 
             <c:if test="${isDeveloper && not viewAsUser}">
-                <c:forEach items="${previousVersions.nodes}" var="previousVersion" varStatus="status">
-                    <c:if test="${activeVersion.properties['jcr:created'].long > previousVersion.properties['jcr:created'].long}">
+                <c:forEach items="${previousVersions}" var="previousVersion" varStatus="status">
                         <c:if test="${status.first}">
                             <h2><fmt:message key="jnt_forgeModule.label.previousVersions"/></h2>
                         </c:if>
                         <article class="previousVersion">
                             <template:module node="${previousVersion}">
-                                <template:param name="isActiveVersion" value="false"/>
                                 <template:param name="isDeveloper" value="${isDeveloper}"/>
                                 <template:param name="viewAsUser" value="${viewAsUser}"/>
                             </template:module>
                         </article>
-                    </c:if>
                 </c:forEach>
             </c:if>
-
             <c:if test="${not isDeveloper or viewAsUser}">
-                <c:forEach items="${previousVersions.nodes}" var="previousVersion" varStatus="status">
-                    <c:if test="${previousVersion.properties['published'].boolean and activeVersion.properties['jcr:created'].long > previousVersion.properties['jcr:created'].long}">
+                <c:forEach items="${previousVersions}" var="previousVersion" varStatus="status">
+                    <c:if test="${previousVersion.properties['published'].boolean}">
                         <c:if test="${status.first}">
                             <h2><fmt:message key="jnt_forgeModule.label.previousVersions"/></h2>
                         </c:if>
                         <article class="previousVersion">
+                            ${previousVersion.path}
                             <template:module node="${previousVersion}">
-                                <template:param name="isActiveVersion" value="false"/>
                                 <template:param name="isDeveloper" value="${isDeveloper}"/>
                                 <template:param name="viewAsUser" value="${viewAsUser}"/>
                             </template:module>

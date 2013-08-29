@@ -17,7 +17,7 @@
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
-<c:set var="isForgeAdmin" value="${jcr:hasPermission(currentNode.parent, 'jahiaForgeModerateModule')}"/>
+<c:set var="isForgeAdmin" value="${jcr:hasPermission(renderContext.site, 'jahiaForgeModerateModule')}"/>
 
 <c:if test="${isForgeAdmin}">
 

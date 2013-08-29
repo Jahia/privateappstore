@@ -69,7 +69,6 @@
  - versionNumber (string)
  - fileDsaSignature (string)
  - changeLog (string, richtext)
- - activeVersion (boolean) = false autocreated
  - published (boolean) = false autocreated
  - url (string)
 

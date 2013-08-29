@@ -25,7 +25,7 @@
 <c:if test="${isDeveloper}">
     <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
 </c:if>
-<c:set var="isForgeAdmin" value="${jcr:hasPermission(currentNode.parent, 'jahiaForgeModerateModule')}"/>
+<c:set var="isForgeAdmin" value="${jcr:hasPermission(renderContext.site, 'jahiaForgeModerateModule')}"/>
 
 <c:if test="${isDeveloper || isForgeAdmin}">
     <template:addResources type="javascript" resources="jquery.js,bootstrap-transition.js,bootstrap-alert.js,bootstrap-button.js
@@ -45,10 +45,10 @@
        value="${not empty currentNode.properties['j:nbOfVotes'] ? currentNode.properties['j:nbOfVotes'].long : null}"/>
 
 <template:include view="hidden.sql">
-    <template:param name="getActiveVersion" value="true"/>
+    <template:param name="getLatestVersion" value="true"/>
 </template:include>
-<c:set value="${moduleMap.activeVersion}" var="activeVersion"/>
-<template:addCacheDependency node="${activeVersion}"/>
+<c:set value="${moduleMap.latestVersion}" var="latestVersion"/>
+<template:addCacheDependency node="${latestVersion}"/>
 
 <c:if test="${isDeveloper && not viewAsUser}">
 
@@ -116,8 +116,8 @@
             </c:otherwise>
 
         </c:choose>
-    <c:url var="iconUrl" value="${url.currentModule}/img/icon.png"/>
     </header>
+    <c:url var="iconUrl" value="${url.currentModule}/img/icon.png"/>
     <img class="moduleIcon" src="${not empty icon.url ? icon.url : iconUrl}"
          alt="<fmt:message key="jnt_forgeModule.label.moduleIcon"><fmt:param value="${title}"/></fmt:message>"/>
 
@@ -134,9 +134,9 @@
 
     <c:choose>
 
-        <c:when test="${not empty activeVersion}">
-            <jcr:nodeProperty node="${activeVersion}" name="versionNumber" var="versionNumber"/>
-            <a class="btn btn-block" href="${activeVersion.properties.url.string}"
+        <c:when test="${not empty latestVersion}">
+            <jcr:nodeProperty node="${latestVersion}" name="versionNumber" var="versionNumber"/>
+            <a class="btn btn-block" href="<c:url value="${latestVersion.properties.url.string}" context="/"/>"
                <c:if test="${not isDeveloper}">onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')"</c:if>>
                 <fmt:message key="jnt_forgeModule.label.downloadVersion">
                     <fmt:param value="${versionNumber.string}"/>

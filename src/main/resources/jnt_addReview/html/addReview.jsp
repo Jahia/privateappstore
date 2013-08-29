@@ -31,7 +31,7 @@
 <c:if test="${isDeveloper}">
     <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
 </c:if>
-<c:set var="isForgeAdmin" value="${jcr:hasPermission(boundComponent, 'jahiaForgeModerateModule')}"/>
+<c:set var="isForgeAdmin" value="${jcr:hasPermission(renderContext.site, 'jahiaForgeModerateModule')}"/>
 
 <c:set var="isFirstReview" value="true"/>
 <c:if test="${jcr:hasChildrenOfType(boundComponent, 'jnt:reviews')}">

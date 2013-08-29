@@ -37,14 +37,14 @@
 <%@include file="../../commons/authorName.jspf"%>
 
 <template:include view="hidden.sql">
-    <template:param name="getActiveVersion" value="true"/>
+    <template:param name="getLatestVersion" value="true"/>
 </template:include>
-<c:set value="${moduleMap.activeVersion}" var="activeVersion"/>
-<template:addCacheDependency node="${activeVersion}"/>
+<c:set value="${moduleMap.latestVersion}" var="latestVersion"/>
+<template:addCacheDependency node="${latestVersion}"/>
 
 
-<jcr:nodeProperty node="${activeVersion}" name="versionNumber" var="versionNumber"/>
-<jcr:nodeProperty node="${activeVersion}" name="requiredVersion" var="requiredVersion"/>
+<jcr:nodeProperty node="${latestVersion}" name="versionNumber" var="versionNumber"/>
+<jcr:nodeProperty node="${latestVersion}" name="requiredVersion" var="requiredVersion"/>
 
 
 <c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>
@@ -128,7 +128,7 @@
 
         <span content="${title}" itemprop="name"></span>
         <span content="${icon.url}" itemprop="image"></span>
-        <span content="${activeVersion.properties.url.string}" itemprop="downloadUrl"></span>
+        <span content="${latestVersion.properties.url.string}" itemprop="downloadUrl"></span>
         <c:forEach items="${assignedTags}" var="tag" varStatus="status">
             <span content="${tag.node.name}" itemprop="keywords"></span>
         </c:forEach>
@@ -136,7 +136,7 @@
         <dt><fmt:message key="jnt_forgeModule.label.updated"/></dt>
         <dd>
             <time itemprop="datePublished">
-                <fmt:formatDate value="${activeVersion.properties['jcr:lastModified'].date.time}" pattern="yyyy-MM-dd" />
+                <fmt:formatDate value="${latestVersion.properties['jcr:lastModified'].date.time}" pattern="yyyy-MM-dd" />
             </time>
         </dd>
 

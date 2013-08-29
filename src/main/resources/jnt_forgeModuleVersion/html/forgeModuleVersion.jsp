@@ -47,21 +47,21 @@
                 <c:set var="requiredVersionsMajorMinor" value=""/>
                 <c:set var="requiredVersionsList" value=""/>
                 <c:forEach items="${requiredVersions.nodes}" var="requiredVersionNode" varStatus="status">
-                    <c:set value="${requiredVersionNode.properties['major'].string}.${requiredVersionNode.properties['minor'].string}" var="thisMajorMinor"/>
-                    <c:if test="${thisMajorMinor eq requiredVersionsMajorMinor}">
-                        <c:set var="requiredVersionsList" value="${requiredVersionsList},"/>
-                    </c:if>
-                    <c:if test="${thisMajorMinor ne requiredVersionsMajorMinor}">
-                        <c:if test="${not empty requiredVersionsMajorMinor}">
-                            <c:set var="requiredVersionsList" value="${requiredVersionsList}]},"/>
-                        </c:if>
-                        <c:set var="requiredVersionsList" value="${requiredVersionsList}{text: '${thisMajorMinor}', children : ["/>
-                        <c:set var="requiredVersionsMajorMinor" value="${thisMajorMinor}"/>
-                    </c:if>
-                    <c:set var="requiredVersionsList" value="${requiredVersionsList} {id: '${requiredVersionNode.identifier}', text:'${requiredVersionNode.name}'}"/>
-                    <c:if test="${status.last}">
-                        <c:set var="requiredVersionsList" value="${requiredVersionsList}]}"/>
-                    </c:if>
+                <c:set value="${requiredVersionNode.properties['major'].string}.${requiredVersionNode.properties['minor'].string}" var="thisMajorMinor"/>
+                <c:if test="${thisMajorMinor eq requiredVersionsMajorMinor}">
+                <c:set var="requiredVersionsList" value="${requiredVersionsList},"/>
+                </c:if>
+                <c:if test="${thisMajorMinor ne requiredVersionsMajorMinor}">
+                <c:if test="${not empty requiredVersionsMajorMinor}">
+                <c:set var="requiredVersionsList" value="${requiredVersionsList}]},"/>
+                </c:if>
+                <c:set var="requiredVersionsList" value="${requiredVersionsList}{text: '${thisMajorMinor}', children : ["/>
+                <c:set var="requiredVersionsMajorMinor" value="${thisMajorMinor}"/>
+                </c:if>
+                <c:set var="requiredVersionsList" value="${requiredVersionsList} {id: '${requiredVersionNode.identifier}', text:'${requiredVersionNode.name}'}"/>
+                <c:if test="${status.last}">
+                <c:set var="requiredVersionsList" value="${requiredVersionsList}]}"/>
+                </c:if>
                 </c:forEach>
 
                 $('#requiredVersion-${id}').editable({
@@ -79,53 +79,37 @@
 
 </c:if>
 
-<c:choose>
+<header>
+    <h3>${versionNumber.string}</h3>
 
-    <c:when test="${isActiveVersion}">
-        <h2><fmt:message key="jnt_forgeModule.label.whatsNew"><fmt:param
-                value="${versionNumber.string}"/></fmt:message></h2>
-    </c:when>
+    <div class="pull-right">
 
-    <c:otherwise>
+        <a class="btn btn-small" href="${currentNode.properties.url.string}"
+           onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')">
+            <fmt:message key="jnt_forgeModule.label.downloadVersion">
+                <fmt:param value="${versionNumber.string}"/>
+            </fmt:message>
+        </a>
 
-        <header>
-            <h3>${versionNumber.string}</h3>
+        <c:if test="${isDeveloper && not viewAsUser}">
+            <c:url value="${url.base}${currentNode.path}" var="currentNodePath"/>
+            <c:if test="${published.boolean}">
+                <button id="publishVersion-${id}" class="btn btn-small publishVersion btn-success"
+                        data-value="false" data-target="${currentNodePath}">
+                    <fmt:message key="jnt_forgeModule.label.developer.unpublish"/>
+                </button>
+            </c:if>
+            <c:if test="${not published.boolean}">
+                <button id="unpublishVersion-${id}" class="btn btn-small publishVersion btn-danger"
+                        data-value="true" data-target="${currentNodePath}">
+                    <fmt:message key="jnt_forgeModule.label.developer.publish"/>
+                </button>
+            </c:if>
 
-            <div class="pull-right">
+        </c:if>
 
-                <a class="btn btn-small" href="${currentNode.properties.url.string}"
-                   onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')">
-                    <fmt:message key="jnt_forgeModule.label.downloadVersion">
-                        <fmt:param value="${versionNumber.string}"/>
-                    </fmt:message>
-                </a>
-
-                <c:if test="${isDeveloper && not viewAsUser}">
-                    <c:url value="${url.base}${currentNode.path}" var="currentNodePath"/>
-                    <c:if test="${published.boolean}">
-                        <button id="publishVersion-${id}" class="btn btn-small publishVersion btn-success"
-                                data-value="false" data-target="${currentNodePath}">
-                            <fmt:message key="jnt_forgeModule.label.developer.unpublish"/>
-                        </button>
-                        <button class="btn btn-small btn-success makeActiveVersion" data-target="${currentNodePath}">
-                            <fmt:message key="jnt_forgeModule.label.developer.makeActiveVersion"/>
-                        </button>
-                    </c:if>
-                    <c:if test="${not published.boolean}">
-                        <button id="unpublishVersion-${id}" class="btn btn-small publishVersion btn-danger"
-                                data-value="true" data-target="${currentNodePath}">
-                            <fmt:message key="jnt_forgeModule.label.developer.publish"/>
-                        </button>
-                    </c:if>
-
-                </c:if>
-
-            </div>
-        </header>
-
-    </c:otherwise>
-
-</c:choose>
+    </div>
+</header>
 
 <c:if test="${isDeveloper && not viewAsUser}">
     <p class="editable-toggle">

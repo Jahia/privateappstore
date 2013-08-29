@@ -5,6 +5,7 @@
 <%@ taglib prefix="template" uri="http://www.jahia.org/tags/templateLib" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="query" uri="http://www.jahia.org/tags/queryLib" %>
+<%@ taglib prefix="forge" uri="http://www.jahia.org/modules/forge/tags" %>
 <%--@elvariable id="currentNode" type="org.jahia.services.content.JCRNodeWrapper"--%>
 <%--@elvariable id="out" type="java.io.PrintWriter"--%>
 <%--@elvariable id="script" type="org.jahia.services.render.scripting.Script"--%>
@@ -15,35 +16,12 @@
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
-<c:if test="${getActiveVersion}">
-
-    <jcr:sql
+<jcr:sql
         var="query"
         sql="SELECT * FROM [jnt:forgeModuleVersion] AS moduleVersion
-            WHERE isdescendantnode(moduleVersion,['${currentNode.path}']) AND moduleVersion.activeVersion = true
-            ORDER BY moduleVersion.['jcr:lastModified'] DESC"
-        limit= '1' />
-
-    <c:forEach items="${query.rows}" var="row">
-        <c:set target="${moduleMap}" property="activeVersion" value="${row.nodes['moduleVersion']}" />
-    </c:forEach>
-
-</c:if>
-
-<c:if test="${getPreviousVersions}">
-
-    <%--<jcr:sql
-        var="previousVersions"
-        sql="SELECT * FROM [jnt:forgeModuleVersion] AS moduleVersion
-            INNER JOIN [jnt:file] AS moduleVersionBinary ON ischildnode(moduleVersionBinary,moduleVersion)
-            WHERE isdescendantnode(moduleVersion,['${currentNode.path}']) AND moduleVersion.activeVersion = false
-            ORDER BY moduleVersionBinary.['jcr:lastModified'] DESC" />--%>
-
-    <jcr:sql
-            var="previousVersions"
-            sql="SELECT * FROM [jnt:forgeModuleVersion] WHERE isdescendantnode(['${currentNode.path}'])
-              AND activeVersion = false ORDER BY [jcr:created] DESC" />
-
-    <c:set target="${moduleMap}" property="previousVersions" value="${previousVersions}"/>
-
-</c:if>
+            WHERE isdescendantnode(moduleVersion,['${currentNode.path}'])"
+        />
+<c:set var="sortedModules" value="${forge:sortByVersion(query.nodes)}"/>
+<c:set target="${moduleMap}" property="latestVersion" value="${forge:latestVersion(sortedModules)}" />
+<c:set target="${moduleMap}" property="previousVersions" value="${forge:previousVersions(sortedModules)}" />
+<c:set target="${moduleMap}" property="nextVersions" value="${forge:nextVersions(sortedModules)}" />
