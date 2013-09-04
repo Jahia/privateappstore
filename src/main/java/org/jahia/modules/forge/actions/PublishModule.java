@@ -2,6 +2,7 @@ package org.jahia.modules.forge.actions;
 
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
+import org.jahia.modules.forge.tags.ForgeFunctions;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.render.RenderContext;
@@ -10,6 +11,7 @@ import org.jahia.services.render.URLResolver;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
+import javax.jcr.NodeIterator;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -40,8 +42,26 @@ public class PublishModule  extends Action {
 
         boolean published = publish.equals("true");
         module.setProperty("published", published);
-
         session.save();
+
+        // if no versions is published, publish the last one
+        if (published) {
+            NodeIterator ni = module.getNodes();
+            List<JCRNodeWrapper> sortedVersions = ForgeFunctions.sortModulesByVersion(ni);
+            if (!sortedVersions.isEmpty()) {
+                boolean hasPublishedVersion = false;
+                for (JCRNodeWrapper version : sortedVersions) {
+                    if (version.isNodeType("jnt:forgeModuleVersion") && version.getProperty("published").getBoolean()) {
+                        hasPublishedVersion = true;
+                        break;
+                    }
+                }
+                if (!hasPublishedVersion) {
+                    sortedVersions.get(0).setProperty("published",true);
+                    session.save();
+                }
+            }
+        }
 
         return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("published", published));
     }

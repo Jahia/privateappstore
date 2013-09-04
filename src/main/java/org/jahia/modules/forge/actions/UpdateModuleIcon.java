@@ -21,11 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created with IntelliJ IDEA.
- * User: david
- * Date: 9/4/13
- * Time: 9:05 AM
- * To change this template use File | Settings | File Templates.
+ * Action called to update a module icon
  */
 public class UpdateModuleIcon extends Action {
 
