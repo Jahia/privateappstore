@@ -33,11 +33,13 @@
         ,bootstrap-scrollspy.js,bootstrap-tab.js,bootstrap-typehead.js,bootstrap-affix.js"/>
     <template:addResources type="javascript" resources="select2.js, bootstrap-editable.js, wysihtml5-0.3.0.js, bootstrap-wysihtml5.js, wysihtml5.js"/>
     <template:addResources type="css" resources="select2.css, select2-bootstrap.css, bootstrap-editable.css, wysiwyg-color.css, forge.edition.css"/>
+    <template:addResources type="css" resources="jquery.fileupload.css"/>
+    <template:addResources type="javascript" resources="jquery.fileupload-with-ui.min.js"/>
 </c:if>
 
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="title" value="${currentNode.properties['jcr:title'].string}"/>
-<c:set var="icon" value="${currentNode.properties['icon'].node}"/>
+<jcr:node var="icon" path="${renderContext.mainResource.node.path}/icon.png"/>
 
 <%@include file="../../commons/authorName.jspf"%>
 
@@ -118,8 +120,69 @@
         </c:choose>
     </header>
     <c:url var="iconUrl" value="${url.currentModule}/img/icon.png"/>
-    <img class="moduleIcon" src="${not empty icon.url ? icon.url : iconUrl}"
+    <img class="moduleIcon" id="moduleIcon-${currentNode.identifier}" src="${not empty icon.url ? icon.url : iconUrl}"
          alt="<fmt:message key="jnt_forgeModule.label.moduleIcon"><fmt:param value="${title}"/></fmt:message>"/>
+
+    <c:if test="${jcr:isNodeType(renderContext.mainResource.node, 'jnt:forgeModule')}">
+        <c:set var="isDeveloper" value="${jcr:hasPermission(renderContext.mainResource.node, 'jcr:write')}"/>
+        <c:if test="${isDeveloper}">
+            <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}"/>
+        </c:if>
+    </c:if>
+
+    <c:if test="${isDeveloper && not viewAsUser}">
+
+        <form class="file_upload" id="file_upload_${currentNode.identifier}"
+              action="<c:url value='${url.base}${renderContext.mainResource.node.path}.updateModuleIcon.do'/>" method="POST" enctype="multipart/form-data"
+              accept="application/json">
+            <div id="file_upload_container-${currentNode.identifier}" class="btn btn-block">
+                <input type="file" name="file" multiple>
+                <button><fmt:message key="forge.editModule.uploadIcon.label"/></button>
+                <div id="drop-box-file-upload-${currentNode.identifier}"><fmt:message key="forge.editModule.uploadIcon.label"/></div>
+            </div>
+        </form>
+        <table id="files${currentNode.identifier}" class="table"></table>
+        <script>
+            /*global $ */
+            $(function () {
+                $('#file_upload_${currentNode.identifier}').fileUploadUI({
+                    namespace: 'file_upload_${currentNode.identifier}',
+                    onComplete: function (event, files, index, xhr, handler) {
+                        <%--$('#fileList${renderContext.mainResource.node.identifier}').load('${targetNodePath}', function () {--%>
+                        <%--$('#moduleScreenshotsList').triggerHandler('uploadCompleted');--%>
+                        <%--});--%>
+                        // refresh the icon
+                        var response = JSON.parse(xhr.response);
+                        if (response.iconUpdate) {
+                            d = new Date();
+                            $("#moduleIcon-${currentNode.identifier}").attr("src", response.iconUrl+"?"+d.getTime());
+                        } else {
+                            alert(response.errorMessage);
+                        }
+
+                    },
+                    acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+                    uploadTable: $('#files${currentNode.identifier}'),
+                    dropZone: $('#file_upload_container-${currentNode.identifier}'),
+                    beforeSend: function (event, files, index, xhr, handler, callBack) {
+                        handler.formData = {
+                            'jcrNodeType': "jnt:file",
+                            'jcrReturnContentType': "json",
+                            'jcrReturnContentTypeOverride': 'application/json; charset=UTF-8'                    };
+                        callBack();
+                    },
+                    buildUploadRow: function (files, index) {
+                        return $('<tr><td>' + files[index].name + '<\/td>' +
+                                '<td class="file_upload_progress"><div><\/div><\/td>' + '<td class="file_upload_cancel">' +
+                                '<button class="ui-state-default ui-corner-all" title="Cancel">' +
+                                '<span class="ui-icon ui-icon-cancel">Cancel<\/span>' + '<\/button><\/td><\/tr>');
+                    }
+                });
+            });
+        </script>
+
+    </c:if>
+
 
     <c:if test="${nbOfVotes gt 0}">
         <div class="moduleRating">
