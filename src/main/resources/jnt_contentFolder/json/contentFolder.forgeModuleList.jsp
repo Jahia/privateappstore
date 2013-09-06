@@ -12,6 +12,7 @@
         <json:array name="modules">
             <c:forEach items="${jcr:getChildrenOfType(currentNode, 'jnt:forgeModule')}" var="child">
                 <c:if test="${child.properties.published.boolean}">
+                    <jcr:node var="icon" path="${child.path}/icon.png" />
                 <json:object>
                     <json:property name="id" value="${child.identifier}"/>
                     <json:property name="path" value="${child.path}"/>
@@ -19,6 +20,9 @@
                     <json:property name="remoteUrl" value="${localUrl}"/>
                     <json:property name="name" value="${child.name}"/>
                     <json:property name="title" value="${child.displayableName}"/>
+                    <c:if test="${not empty icon}">
+                    <json:property name="icon" value="${url.server}${icon.url}"/>
+                    </c:if>
                     <json:array name="versions">
                         <c:forEach var="version" items="${jcr:getChildrenOfType(child, 'jnt:forgeModuleVersion')}">
                             <c:if test="${version.properties.published.boolean and child.properties.published.boolean}">
