@@ -43,36 +43,6 @@
                     $('#changeLog-${currentNode.identifier}').editable('toggle');
                 });
 
-                <jcr:sql var="requiredVersions" sql="select * from [jnt:jahiaVersion] as v where isdescendantnode(v,'${renderContext.site.path}/contents/forge-modules-required-versions')  order by major,minor,servicePack,patch"/>
-                <c:set var="requiredVersionsMajorMinor" value=""/>
-                <c:set var="requiredVersionsList" value=""/>
-                <c:forEach items="${requiredVersions.nodes}" var="requiredVersionNode" varStatus="status">
-                <c:set value="${requiredVersionNode.properties['major'].string}.${requiredVersionNode.properties['minor'].string}" var="thisMajorMinor"/>
-                <c:if test="${thisMajorMinor eq requiredVersionsMajorMinor}">
-                <c:set var="requiredVersionsList" value="${requiredVersionsList},"/>
-                </c:if>
-                <c:if test="${thisMajorMinor ne requiredVersionsMajorMinor}">
-                <c:if test="${not empty requiredVersionsMajorMinor}">
-                <c:set var="requiredVersionsList" value="${requiredVersionsList}]},"/>
-                </c:if>
-                <c:set var="requiredVersionsList" value="${requiredVersionsList}{text: '${thisMajorMinor}', children : ["/>
-                <c:set var="requiredVersionsMajorMinor" value="${thisMajorMinor}"/>
-                </c:if>
-                <c:set var="requiredVersionsList" value="${requiredVersionsList} {id: '${requiredVersionNode.identifier}', text:'${requiredVersionNode.name}'}"/>
-                <c:if test="${status.last}">
-                <c:set var="requiredVersionsList" value="${requiredVersionsList}]}"/>
-                </c:if>
-                </c:forEach>
-
-                $('#requiredVersion-${id}').editable({
-                    inputclass: 'input-large',
-                    source: [${requiredVersionsList}],
-                    value: '${requiredVersion.node.identifier}',
-                    <jsp:include page="../../commons/bootstrap-editable-options.jsp">
-                    <jsp:param name="postURL" value="${postURL}"/>
-                    </jsp:include>
-                });
-
             });
         </script>
     </template:addResources>
@@ -131,15 +101,7 @@ ${changeLog.string}
     <dl class="inline">
         <dt><fmt:message key="jnt_forgeModule.label.relatedJahiaVersion"/></dt>
         <dd>
-            <c:if test="${isDeveloper && not viewAsUser}">
-            <a href="#" id="requiredVersion-${id}" class="editable editable-click" data-type="select2" data-pk="1"
-               data-name="requiredVersion"
-               data-original-title="<fmt:message key="jnt_forgeModuleVersion.label.requiredVersion"/>">
-                </c:if>
-                ${requiredVersion.node.displayableName}
-                <c:if test="${isDeveloper && not viewAsUser}">
-            </a>
-            </c:if>
+            ${requiredVersion.node.displayableName}
         </dd>
         <dt><fmt:message key="jnt_forgeModule.label.updated"/></dt>
         <dd><fmt:formatDate value="${moduleVersionBinary.contentLastModifiedAsDate}" pattern="yyyy-MM-dd"/></dd>
