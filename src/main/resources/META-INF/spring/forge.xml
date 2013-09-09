@@ -83,6 +83,7 @@
         <property name="name" value="UpdateModuleIcon"/>
         <property name="requireAuthenticatedUser" value="true"/>
         <property name="requiredPermission" value="jcr:write"/>
+        <property name="imageService" ref="imageService"/>
     </bean>
 
     <bean name="mavenProxyController" class="org.jahia.modules.forge.proxy.MavenProxy">
