@@ -81,7 +81,7 @@
 
             <c:otherwise>
 
-                $('.carousel').carousel();
+                $('#screenshotsCarousel-${id}').carousel();
 
             </c:otherwise>
 
