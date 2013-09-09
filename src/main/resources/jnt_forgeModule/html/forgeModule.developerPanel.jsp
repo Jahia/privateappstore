@@ -18,6 +18,8 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
 <template:addResources type="javascript" resources="jquery.js, html5shiv.js, forge.js"/>
+
+<template:addResources type="css" resources=",bootstrap-wysihtml5.css,bootstrap-editable.css"/>
 <template:addResources type="css" resources="forge.css"/>
 
 <c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>

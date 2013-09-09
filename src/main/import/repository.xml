@@ -146,7 +146,7 @@
                                                            jcr:mixinTypes="jmix:accessControlled"
                                                            jcr:primaryType="jnt:bootstrapRow">
                                                 <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                    <overview-main jcr:primaryType="jnt:bootstrapColumn" offset="0" span="4">
+                                                    <overview-main jcr:primaryType="jnt:bootstrapColumn" offset="0" span="9">
                                                     <overview-main jcr:primaryType="jnt:contentList">
                                                         <main-resource-display j:mainResourceView="overview"
                                                                                jcr:mixinTypes="jmix:accessControlled"
@@ -155,7 +155,7 @@
                                                         </main-resource-display>
                                                     </overview-main>
                                                 </overview-main>
-                                                    <overview-aside jcr:primaryType="jnt:bootstrapColumn" offset="1" span="7">
+                                                    <overview-aside jcr:primaryType="jnt:bootstrapColumn" offset="0" span="3">
                                                     <overview-aside jcr:primaryType="jnt:contentList">
                                                         <main-resource-display j:mainResourceView="information"
                                                                                jcr:mixinTypes="jmix:accessControlled"

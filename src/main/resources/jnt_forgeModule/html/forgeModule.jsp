@@ -18,7 +18,7 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
 <template:addResources type="javascript" resources="html5shiv.js"/>
-<template:addResources type="css" resources="forge.css"/>
+<template:addResources type="css" resources="forge.css,bootstrap-wysihtml5.css,bootstrap-editable.css"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="title" value="${currentNode.properties['jcr:title'].string}"/>

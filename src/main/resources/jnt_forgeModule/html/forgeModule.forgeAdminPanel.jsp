@@ -19,6 +19,8 @@
 
 <c:set var="isForgeAdmin" value="${jcr:hasPermission(renderContext.site, 'jahiaForgeModerateModule')}"/>
 
+<template:addResources type="css" resources=",bootstrap-wysihtml5.css,bootstrap-editable.css"/>
+
 <c:if test="${isForgeAdmin}">
 
     <c:set var="id" value="${currentNode.identifier}"/>

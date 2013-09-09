@@ -19,6 +19,8 @@
 
 <template:addResources type="javascript" resources="html5shiv.js"/>
 
+<template:addResources type="css" resources=",bootstrap-wysihtml5.css,bootstrap-editable.css"/>
+
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="FAQ" value="${currentNode.properties['FAQ'].string}"/>
 <c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>

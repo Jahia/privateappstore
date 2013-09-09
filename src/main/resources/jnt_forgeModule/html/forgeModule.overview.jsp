@@ -21,6 +21,8 @@
 <template:addResources type="css" resources="ui.stars.css"/>
 <template:addResources type="javascript" resources="jquery.min.js,jquery.validate.js,jquery-ui.min.js,ui.stars.js"/>
 
+<template:addResources type="css" resources=",bootstrap-wysihtml5.css,bootstrap-editable.css"/>
+
 <c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>
 
 <c:if test="${isDeveloper}">
@@ -167,7 +169,6 @@
             <p class="editable-toggle">
                 <a id="toggle-description-${id}" href="#"><i class="icon-pencil"></i>&nbsp;<fmt:message key="jnt_forgeModule.label.edit"/></a>
             </p>
-
             <div data-original-title="<fmt:message key="jnt_forgeModule.label.description"/>" data-toggle="manual" data-name="description" data-type="wysihtml5"
                  data-pk="1" id="description-${id}" class="editable" tabindex="-1">
 
