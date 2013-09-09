@@ -51,7 +51,7 @@
  - deleted (boolean) = false autocreated hidden
  - groupId (string)
  + screenshots (jnt:forgeModuleScreenshotsList) = jnt:forgeModuleScreenshotsList autocreated hidden
- + icon.png (jnt:file)
+ + icon (jnt:folder)
  + video (jnt:videostreaming) = jnt:videostreaming
  + * (jnt:forgeModuleVersion)
 

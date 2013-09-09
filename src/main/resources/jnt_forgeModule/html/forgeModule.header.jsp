@@ -39,7 +39,12 @@
 
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="title" value="${currentNode.properties['jcr:title'].string}"/>
-<jcr:node var="icon" path="${renderContext.mainResource.node.path}/icon.png"/>
+
+<jcr:node var="iconFolder" path="${renderContext.mainResource.node.path}/icon" />
+<c:forEach var="iconItem" items="${iconFolder.nodes}">
+    <c:set var="icon" value="${iconItem}"/>
+</c:forEach>
+
 
 <%@include file="../../commons/authorName.jspf"%>
 

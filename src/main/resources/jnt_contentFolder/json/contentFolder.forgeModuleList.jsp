@@ -12,7 +12,10 @@
         <json:array name="modules">
             <c:forEach items="${jcr:getChildrenOfType(currentNode, 'jnt:forgeModule')}" var="child">
                 <c:if test="${child.properties.published.boolean}">
-                    <jcr:node var="icon" path="${child.path}/icon.png" />
+                    <jcr:node var="iconFolder" path="${child.path}/icon" />
+                    <c:forEach var="iconItem" items="${iconFolder.nodes}">
+                        <c:set var="icon" value="${iconItem}"/>
+                    </c:forEach>
                 <json:object>
                     <json:property name="id" value="${child.identifier}"/>
                     <json:property name="path" value="${child.path}"/>
