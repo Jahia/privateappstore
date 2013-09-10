@@ -108,21 +108,9 @@
 <section id="moduleHeader" class="box box-rounded">
 
     <header>
-
         <h1>${title}</h1>
+        <p class="authorName">${authorName}</p>
 
-        <c:choose>
-
-            <c:when test="${isDeveloper && not viewAsUser}">
-                <a data-original-title="<fmt:message key="jnt_forgeModule.label.askAuthorNameDisplayedAs"/>" data-name="authorNameDisplayedAs" data-pk="1" data-type="select"
-                   id="authorName-header-${id}" href="#" class="editable editable-click">${authorName}</a>
-            </c:when>
-
-            <c:otherwise>
-                <a class="moduleAuthor">${authorName}</a>
-            </c:otherwise>
-
-        </c:choose>
     </header>
     <c:url var="iconUrl" value="${url.currentModule}/img/icon.png"/>
     <img class="moduleIcon" id="moduleIcon-${currentNode.identifier}" src="${not empty icon.url ? icon.url : iconUrl}"
