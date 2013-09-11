@@ -82,6 +82,11 @@
 - forgeSettingsId (string)
 - forgeSettingsUser (string)
 - forgeSettingsPassword (string)
+- rootCategory (weakreference)
 
 [jnt:forgeSettings] > jnt:content, mix:title, jmix:studioOnly, jmix:siteComponent
+
+[jnt:categorySettings] > jnt:content, mix:title, jmix:studioOnly, jmix:siteComponent
+
+
 

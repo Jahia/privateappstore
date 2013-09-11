@@ -274,8 +274,7 @@
                                                                            jcr:primaryType="jnt:mainResourceDisplay">
                                                         <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                                                     </main-resource-display>
-                                                        <file-upload-form j:bindedComponent="/modules/forge/templates/forge-module/bootstrap-container/bootstrap-row/module-main/module-main/bootstrap-tabular-list/changelog/main-resource-display"
-                                                           j:view="jar"
+                                                        <file-upload-form j:view="jar"
                                                      jcr:mixinTypes="jmix:renderable"
                                                      jcr:primaryType="jnt:fileUpload"/>
                                                     </changelog>
@@ -317,9 +316,7 @@
                                       jcr:primaryType="jnt:translation"
                                       jcr:title="Forge Module Version"/>
                 </forge-module-version>
-                <siteSettingsBase j:hiddenTemplate="false"
-                                  j:view="siteSettings"
-                                  jcr:primaryType="jnt:template">
+                    <siteSettingsBase j:hiddenTemplate="false" jcr:primaryType="jnt:template">
                     <j:translation_en jcr:language="en"
                                       jcr:mixinTypes="mix:title"
                                       jcr:primaryType="jnt:translation"
@@ -327,8 +324,9 @@
                     <forge j:applyOn="jnt:virtualsite"
                            j:defaultTemplate="false"
                            j:hiddenTemplate="true"
+                      j:requiredMode="preview"
+                      j:requiredPermissionNames="jahiaForgeModerateModule"
                            j:titleKey="forgeSettings.label"
-                           j:view="siteSettings"
                       jcr:mixinTypes="jmix:rbTitle"
                            jcr:primaryType="jnt:contentTemplate">
                         <j:translation_en jcr:language="en"
@@ -336,7 +334,8 @@
                                           jcr:primaryType="jnt:translation"
                                           jcr:title="forge"/>
                         <pagecontent jcr:primaryType="jnt:contentList">
-                            <forgesettings jcr:primaryType="jnt:forgeSettings"/>
+                                <forgesettings jcr:primaryType="jnt:forgeSettings"/>
+                                <categorysettings jcr:primaryType="jnt:categorySettings"/>
                         </pagecontent>
                     </forge>
                 </siteSettingsBase>
