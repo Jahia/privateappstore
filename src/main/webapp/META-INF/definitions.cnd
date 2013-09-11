@@ -38,9 +38,8 @@
 
 [jnt:forgeModule] > jnt:content, mix:title, jmix:editorialContent, jmix:tagged, jmix:forge, jmix:reviews, jmix:rating
  - jcr:title (string) mandatory
- - description (string, richtext) i18n mandatory
+ - description (string, richtext) i18n
  - category (weakreference, choicelist[nodes='$currentSite/contents/forge-modules-categories;jnt:text']) facetable
- - icon (weakreference, picker[type='image'])
  - authorNameDisplayedAs (string, choicelist[resourceBundle]) = 'username' autocreated < 'username', 'fullName', 'organisation'
  - authorURL (string)
  - authorEmail (string)
@@ -53,18 +52,19 @@
  - reviewedByJahia (boolean) = false autocreated
  - published (boolean) = false autocreated
  - deleted (boolean) = false autocreated hidden
+ - groupId (string)
  + screenshots (jnt:forgeModuleScreenshotsList) = jnt:forgeModuleScreenshotsList autocreated hidden
+ + icon (jnt:folder)
  + video (jnt:videostreaming) = jnt:videostreaming
  + * (jnt:forgeModuleVersion)
 
 [jnt:forgeModuleVersion]> jnt:content, jmix:editorialContent, jmix:forge
  - requiredVersion (weakreference, choicelist[nodes='$currentSite/contents/forge-modules-required-versions//*;jnt:text'])
- - releaseType (string, choicelist[resourceBundle]) = 'hotfix' m < 'hotfix', 'service-pack', 'upgrade'
- - status (weakreference,category[root='forge-status'])
  - versionNumber (string)
  - fileDsaSignature (string)
  - changeLog (string, richtext)
- - activeVersion (boolean) = false autocreated
+ - published (boolean) = false autocreated
+ - url (string)
  + * (jnt:file)
 
 [jnt:forgeModuleScreenshotsList] > jnt:content, jmix:list orderable

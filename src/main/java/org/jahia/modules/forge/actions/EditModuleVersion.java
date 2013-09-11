@@ -39,29 +39,13 @@ public class EditModuleVersion extends Action {
 
         logger.info("Start updating module release " + versionNumber + " of " + moduleTitle);
 
-        String statusUUID = getParameter(parameters, "jahiAppStatus");
         String relatedJahiaVersionUUID = getParameter(parameters, "relatedJahiaVersion");
-        String releaseType = getParameter(parameters, "releaseType");
         String changeLog = getParameter(parameters, "changeLog");
-        String activeVersion = getParameter(parameters, "activeVersion");
 
         session.checkout(moduleVersion);
 
         if (changeLog != null)
             moduleVersion.setProperty("changeLog", changeLog);
-
-        if (releaseType != null)
-            moduleVersion.setProperty("releaseType", releaseType);
-
-        if (statusUUID != null) {
-            JCRNodeWrapper status = session.getNodeByUUID(statusUUID);
-            moduleVersion.setProperty("status",status);
-        }
-
-        if (activeVersion != null && activeVersion.equals("on"))
-            moduleVersion.setProperty("activeVersion", true);
-        else
-            moduleVersion.setProperty("activeVersion", false);
 
         if (relatedJahiaVersionUUID != null) {
             JCRNodeWrapper relatedJahiaVersion = session.getNodeByUUID(relatedJahiaVersionUUID);

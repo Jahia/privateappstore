@@ -21,8 +21,7 @@
 <template:addResources type="css" resources="ui.stars.css"/>
 <template:addResources type="javascript" resources="jquery.min.js,jquery.validate.js,jquery-ui.min.js,ui.stars.js"/>
 
-<c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')
-    && not jcr:hasPermission(currentNode.parent, 'jcr:all_live')}"/>
+<c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>
 <c:if test="${isDeveloper}">
     <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
 </c:if>
@@ -51,7 +50,6 @@
     <template:param name="getActiveVersion" value="true"/>
 </template:include>
 <c:set value="${moduleMap.activeVersion}" var="activeVersion"/>
-<c:set value="${moduleMap.activeVersionBinary}" var="activeVersionBinary"/>
 
 <c:if test="${isDeveloper && not viewAsUser}">
 
@@ -256,9 +254,6 @@
             <section class="moduleVideo">
 
                 <h2><fmt:message key="jnt_forgeModule.label.video"/></h2>
-
-                <%-- TODO --%>
-                <template:module node="${videoNode}"/>
                 <template:module path="${videoNode.path}"/>
 
             </section>

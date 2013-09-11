@@ -20,12 +20,11 @@
 <template:addResources type="javascript" resources="jquery.js, html5shiv.js, forge.js"/>
 <template:addResources type="css" resources="forge.css"/>
 
-<c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')
-    && not jcr:hasPermission(currentNode.parent, 'jcr:all_live')}"/>
+<c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>
 <c:if test="${isDeveloper}">
     <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
 </c:if>
-<c:set var="isForgeAdmin" value="${renderContext.loggedIn && jcr:hasPermission(currentNode.parent, 'jcr:all_live')}"/>
+<c:set var="isForgeAdmin" value="${jcr:hasPermission(renderContext.site, 'jahiaForgeModerateModule')}"/>
 
 <c:if test="${isDeveloper || isForgeAdmin}">
     <template:addResources type="javascript" resources="jquery.js,bootstrap-transition.js,bootstrap-alert.js,bootstrap-button.js
@@ -37,7 +36,11 @@
 
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="title" value="${currentNode.properties['jcr:title'].string}"/>
-<c:set var="icon" value="${currentNode.properties['icon'].node}"/>
+
+<jcr:node var="iconFolder" path="${renderContext.mainResource.node.path}/icon" />
+<c:forEach var="iconItem" items="${iconFolder.nodes}">
+    <c:set var="icon" value="${iconItem}"/>
+</c:forEach>
 
 <%@include file="../../commons/authorName.jspf"%>
 
@@ -48,7 +51,6 @@
     <template:param name="getActiveVersion" value="true"/>
 </template:include>
 <c:set value="${moduleMap.activeVersion}" var="activeVersion"/>
-<c:set value="${moduleMap.activeVersionBinary}" var="activeVersionBinary"/>
 <template:addCacheDependency node="${activeVersion}"/>
 
 <c:if test="${isDeveloper && not viewAsUser}">
@@ -120,8 +122,62 @@
 
     </header>
 
-    <img class="moduleIcon" src="${not empty icon.url ? icon.url : '/modules/forge/img/icon.png'}"
+    <c:url var="iconUrl" value="${url.currentModule}/img/icon.png"/>
+    <img class="moduleIcon" id="moduleIcon-${currentNode.identifier}" src="${not empty icon.url ? icon.url : iconUrl}"
          alt="<fmt:message key="jnt_forgeModule.label.moduleIcon"><fmt:param value="${title}"/></fmt:message>"/>
+
+    <c:if test="${isDeveloper && not viewAsUser}">
+
+        <form class="file_upload" id="file_upload_${currentNode.identifier}"
+              action="<c:url value='${url.base}${renderContext.mainResource.node.path}.updateModuleIcon.do'/>" method="POST" enctype="multipart/form-data"
+              accept="application/json">
+            <div id="file_upload_container-${currentNode.identifier}" class="btn btn-block">
+                <input type="file" name="file" multiple>
+                <button><fmt:message key="forge.editModule.uploadIcon.label"/></button>
+                <div id="drop-box-file-upload-${currentNode.identifier}"><fmt:message key="forge.editModule.uploadIcon.label"/></div>
+            </div>
+        </form>
+        <table id="files${currentNode.identifier}" class="table"></table>
+        <script>
+            /*global $ */
+            $(function () {
+                $('#file_upload_${currentNode.identifier}').fileUploadUI({
+                    namespace: 'file_upload_${currentNode.identifier}',
+                    onComplete: function (event, files, index, xhr, handler) {
+                        <%--$('#fileList${renderContext.mainResource.node.identifier}').load('${targetNodePath}', function () {--%>
+                        <%--$('#moduleScreenshotsList').triggerHandler('uploadCompleted');--%>
+                        <%--});--%>
+                        // refresh the icon
+                        var response = JSON.parse(xhr.response);
+                        if (response.iconUpdate) {
+                            d = new Date();
+                            $("#moduleIcon-${currentNode.identifier}").attr("src", response.iconUrl+"?"+d.getTime());
+                        } else {
+                            alert(response.errorMessage);
+                        }
+
+                    },
+                    acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+                    uploadTable: $('#files${currentNode.identifier}'),
+                    dropZone: $('#file_upload_container-${currentNode.identifier}'),
+                    beforeSend: function (event, files, index, xhr, handler, callBack) {
+                        handler.formData = {
+                            'jcrNodeType': "jnt:file",
+                            'jcrReturnContentType': "json",
+                            'jcrReturnContentTypeOverride': 'application/json; charset=UTF-8'                    };
+                        callBack();
+                    },
+                    buildUploadRow: function (files, index) {
+                        return $('<tr><td>' + files[index].name + '<\/td>' +
+                                '<td class="file_upload_progress"><div><\/div><\/td>' + '<td class="file_upload_cancel">' +
+                                '<button class="ui-state-default ui-corner-all" title="Cancel">' +
+                                '<span class="ui-icon ui-icon-cancel">Cancel<\/span>' + '<\/button><\/td><\/tr>');
+                    }
+                });
+            });
+        </script>
+
+    </c:if>
 
     <c:if test="${nbOfVotes gt 0}">
         <div class="moduleRating">
@@ -138,7 +194,7 @@
 
         <c:when test="${not empty activeVersion}">
             <jcr:nodeProperty node="${activeVersion}" name="versionNumber" var="versionNumber"/>
-            <a class="btn btn-block" href="${activeVersionBinary.url}"
+            <a class="btn btn-block" href="${activeVersion.properties.url.string}"
                <c:if test="${not isDeveloper}">onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')"</c:if>>
                 <fmt:message key="jnt_forgeModule.label.downloadVersion">
                     <fmt:param value="${versionNumber.string}"/>

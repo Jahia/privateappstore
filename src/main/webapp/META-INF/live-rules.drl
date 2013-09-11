@@ -14,14 +14,3 @@ global Service service
 global Logger logger
 global JCRContentUtils jcrUtils
 ###############################################################################
-
-rule "Change active module version"
-    salience 25
-    when
-        A property activeVersion has been set on a node
-             - the node has the type jnt:forgeModuleVersion
-             - the value is "true"
-    then
-        Log "Changing active module version on Forge module " + node.getParent().getPath()
-        Execute the action "ChangeActiveVersion" now on the node
-end

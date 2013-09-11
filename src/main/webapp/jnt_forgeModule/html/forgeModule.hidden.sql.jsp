@@ -21,8 +21,8 @@
         var="query"
         sql="SELECT * FROM [jnt:forgeModuleVersion] AS moduleVersion
             INNER JOIN [jnt:file] AS moduleVersionBinary ON ischildnode(moduleVersionBinary,moduleVersion)
-            WHERE isdescendantnode(moduleVersion,['${currentNode.path}']) AND moduleVersion.activeVersion = true
-            ORDER BY moduleVersion.['jcr:lastModified'] DESC"
+            WHERE isdescendantnode(moduleVersion,['${currentNode.path}'])
+            ORDER BY moduleVersion.['jcr:created'] DESC"
         limit= '1' />
 
     <c:forEach items="${query.rows}" var="row">
@@ -34,17 +34,10 @@
 
 <c:if test="${getPreviousVersions}">
 
-    <%--<jcr:sql
-        var="previousVersions"
-        sql="SELECT * FROM [jnt:forgeModuleVersion] AS moduleVersion
-            INNER JOIN [jnt:file] AS moduleVersionBinary ON ischildnode(moduleVersionBinary,moduleVersion)
-            WHERE isdescendantnode(moduleVersion,['${currentNode.path}']) AND moduleVersion.activeVersion = false
-            ORDER BY moduleVersionBinary.['jcr:lastModified'] DESC" />--%>
-
     <jcr:sql
             var="previousVersions"
             sql="SELECT * FROM [jnt:forgeModuleVersion] WHERE isdescendantnode(['${currentNode.path}'])
-              AND activeVersion = false ORDER BY [jcr:created] DESC" />
+              ORDER BY [jcr:created] DESC" />
 
     <c:set target="${moduleMap}" property="previousVersions" value="${previousVersions}"/>
 

@@ -20,8 +20,7 @@
 <template:addResources type="javascript" resources="jquery.js, html5shiv.js, forge.js"/>
 <template:addResources type="css" resources="forge.css"/>
 
-<c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')
-    && not jcr:hasPermission(currentNode.parent, 'jcr:all_live')}"/>
+<c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>
 
 <c:if test="${isDeveloper}">
 
@@ -37,7 +36,7 @@
 
                 function updateCompletionStatus() {
 
-                    $.post('<c:url value='${url.base}${currentNode.path}.calculateCompletion.do'/>', function(data) {
+                    $.get('<c:url value='${url.base}${currentNode.path}.calculateCompletion.do'/>', function(data) {
 
                         var completion = data['completion'];
                         var canBePublished = data['canBePublished'];

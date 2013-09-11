@@ -17,14 +17,13 @@
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
-<template:addResources type="javascript" resources="jquery.min.js,jquery-ui.min.js"/>
+<template:addResources type="javascript" resources="jquery.min.js,jquery-ui.min.js,bootstrap-carousel.js"/>
 <template:addResources type="css" resources="jquery-ui.smoothness.css"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
-<c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(currentNode.parent, 'jcr:all_live')
-    && not jcr:hasPermission(currentNode.parent.parent, 'jcr:all_live')}"/>
+<c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>
 <c:if test="${isDeveloper}">
-    <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}"/>
+    <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
 </c:if>
 
 <template:include view="hidden.header"/>
@@ -81,7 +80,7 @@
 
             <c:otherwise>
 
-                $('screenshotsCarousel-${id}').carousel();
+                $('#screenshotsCarousel-${id}').carousel();
 
             </c:otherwise>
 

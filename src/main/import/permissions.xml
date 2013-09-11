@@ -4,13 +4,9 @@
              xmlns:j="http://www.jahia.org/jahia/1.0"
              xmlns:jnt="http://www.jahia.org/jahia/nt/1.0">
     <actions jcr:primaryType="jnt:permission">
-        <forge jcr:primaryType="jnt:permission">
-            <reviewModule jcr:primaryType="jnt:permission"/>
-            <createModule jcr:primaryType="jnt:permission"/>
-            <editModule jcr:primaryType="jnt:permission"/>
-            <createVersion jcr:primaryType="jnt:permission"/>
-            <editVersion jcr:primaryType="jnt:permission"/>
-            <deleteModule jcr:primaryType="jnt:permission"/>
-        </forge>
+        <jahiaForge jcr:primaryType="jnt:permission">
+            <jahiaForgeUploadModule jcr:primaryType="jnt:permission"/>
+            <jahiaForgeModerateModule jcr:primaryType="jnt:permission"/>
+        </jahiaForge>
     </actions>
 </permissions>

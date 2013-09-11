@@ -20,7 +20,6 @@
 <template:addResources type="css" resources="select2.css, select2-bootstrap.css"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
-<c:set var="hasModuleVersions" value="${jcr:hasChildrenOfType(currentNode, 'jnt:forgeModuleVersion')}"/>
 
 <uiComponents:ckeditor selector="jahia-moduleVersion-changeLog-${id}"/>
 
@@ -35,11 +34,6 @@
 
             var validator = $("#moduleVersionForm-${id}").validate({
                 rules: {
-
-                    'versionNumber': {
-                        required: true,
-                        regexp: /^(\d+\.){3}(\d+)$/i
-                    },
 
                     'moduleVersionBinary': {
                         required: true,
@@ -56,11 +50,6 @@
                     }
                 },
                 messages: {
-
-                    'versionNumber': {
-                        required: "<fmt:message key='jnt_forgeModuleVersion.label.askVersionNumber'/>",
-                        regexp: "<fmt:message key='jnt_forgeModuleVersion.label.askValidVersionNumber'/>"
-                    },
 
                     'moduleVersionBinary': {
                          required: "<fmt:message key='jnt_forgeModuleVersion.label.askModuleVersionBinary'/>",
@@ -103,14 +92,6 @@
             <input type="hidden" name="jcrNormalizeNodeName" value="true"/>
 
             <div class="control-group">
-                <label class="control-label" for="versionNumber"><fmt:message key="jnt_forgeModuleVersion.versionNumber"/></label>
-                <div class="controls">
-                    <input placeholder="<fmt:message key="jnt_forgeModuleVersion.versionNumber" />" class="span16" type="text"
-                           name="versionNumber" id="versionNumber"/>
-                </div>
-            </div>
-
-            <div class="control-group">
                 <label class="control-label" for="moduleVersionBinary"><fmt:message key="jnt_forgeModuleVersion.moduleFile"/></label>
                 <div class="controls">
                     <input placeholder="<fmt:message key="jnt_forgeModuleVersion.moduleFile" />" class="span16" type="file"
@@ -142,39 +123,6 @@
                     </select>
                 </div>
             </div>
-
-            <div class="control-group">
-                <label class="control-label" for="releaseType"><fmt:message key="jnt_forgeModuleVersion.releaseType"/></label>
-                <div class="controls">
-                    <select name="releaseType" id="releaseType" >
-                        <option value="hotfix"> hotfix </option>
-                        <option value="service-pack"> service-pack </option>
-                        <option value="upgrade"> upgrade </option>
-                    </select>
-                </div>
-            </div>
-
-            <jcr:node var="jahiaVersionCategory" path="/sites/systemsite/categories/forge-categories/status"/>
-            <c:if test="${not empty jahiaVersionCategory.node}">
-                <div class="control-group">
-                    <label class="control-label" for="status"><fmt:message key="jnt_forgeModule.status"/></label>
-                    <div class="controls">
-                        <input type="text" id="status" name="jahiAppStatus" value=""/>
-                        <input type="text" id="categoryFieldDisplay2" name="categoryFieldDisplay2" readonly="readonly" />
-                        <uiComponents:treeItemSelector fieldId="jahiAppStatus" displayFieldId="categoryFieldDisplay2" nodeTypes="jnt:category"
-                            selectableNodeTypes="jnt:category" root="/sites/systemsite/categories/forge-categories/status"
-                            includeChildren="false" displayIncludeChildren="false" valueType="identifier" />
-                    </div>
-                </div>
-            </c:if>
-
-            <div class="control-group">
-                <label class="control-label" for="activeVersion"><fmt:message key="jnt_forgeModuleVersion.activeVersion"/></label>
-                <div class="controls">
-                    <input type="checkbox" id="activeVersion" name="activeVersion" checked="true" ${hasModuleVersions ? '' : 'disabled'}/>
-                </div>
-            </div>
-
 
             <div class="control-group">
                 <div class="controls">

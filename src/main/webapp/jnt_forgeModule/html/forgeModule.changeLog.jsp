@@ -19,8 +19,7 @@
 <template:addResources type="javascript" resources="html5shiv.js, forge.js"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
-<c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')
-    && not jcr:hasPermission(currentNode.parent, 'jcr:all_live')}"/>
+<c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>
 <c:if test="${isDeveloper}">
     <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
 </c:if>
@@ -93,27 +92,31 @@
 
             <h2><fmt:message key="jnt_forgeModule.label.previousVersions"/></h2>
 
-            <c:forEach items="${previousVersions.nodes}" var="previousVersion">
+            <c:forEach items="${previousVersions.nodes}" var="previousVersion" varStatus="status">
 
-                <article class="previousVersion">
+                <c:if test="${not status.first}">
 
-                    <jcr:sql
-                            var="moduleVersionBinaries"
-                            sql="SELECT * FROM [jnt:file] WHERE ischildnode(['${previousVersion.path}'])
-                          ORDER BY ['jcr:lastModified'] DESC" limit ='1'/>
+                    <article class="previousVersion">
 
-                    <c:forEach items="${moduleVersionBinaries.nodes}" var="moduleVersionBinaryNode">
-                        <c:set var="moduleVersionBinary" value="${moduleVersionBinaryNode}"/>
-                    </c:forEach>
+                        <jcr:sql
+                                var="moduleVersionBinaries"
+                                sql="SELECT * FROM [jnt:file] WHERE ischildnode(['${previousVersion.path}'])
+                              ORDER BY ['jcr:lastModified'] DESC" limit ='1'/>
 
-                    <template:module node="${previousVersion}">
-                        <template:param name="isActiveVersion" value="false"/>
-                        <template:param name="isDeveloper" value="${isDeveloper}"/>
-                        <template:param name="viewAsUser" value="${viewAsUser}"/>
-                        <template:param name="moduleVersionBinaryUUID" value="${moduleVersionBinary.identifier}"/>
-                    </template:module>
+                        <c:forEach items="${moduleVersionBinaries.nodes}" var="moduleVersionBinaryNode">
+                            <c:set var="moduleVersionBinary" value="${moduleVersionBinaryNode}"/>
+                        </c:forEach>
 
-                </article>
+                        <template:module node="${previousVersion}">
+                            <template:param name="isActiveVersion" value="false"/>
+                            <template:param name="isDeveloper" value="${isDeveloper}"/>
+                            <template:param name="viewAsUser" value="${viewAsUser}"/>
+                            <template:param name="moduleVersionBinaryUUID" value="${moduleVersionBinary.identifier}"/>
+                        </template:module>
+
+                    </article>
+
+                </c:if>
 
             </c:forEach>
 

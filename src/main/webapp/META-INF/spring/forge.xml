@@ -28,10 +28,6 @@
         <property name="requireAuthenticatedUser" value="true"/>
     </bean>
 
-    <bean class="org.jahia.modules.forge.actions.ChangeActiveVersion" >
-        <property name="name" value="ChangeActiveVersion"/>
-    </bean>
-
     <bean class="org.jahia.modules.forge.actions.AddVideo" >
         <property name="name" value="AddVideo"/>
         <property name="requireAuthenticatedUser" value="true"/>
@@ -83,6 +79,13 @@
     <bean class="org.jahia.modules.forge.actions.DeleteReview" >
         <property name="name" value="DeleteReview"/>
         <property name="requireAuthenticatedUser" value="true"/>
+    </bean>
+
+    <bean class="org.jahia.modules.forge.actions.UpdateModuleIcon" >
+        <property name="name" value="UpdateModuleIcon"/>
+        <property name="requireAuthenticatedUser" value="true"/>
+        <property name="requiredPermission" value="jcr:write"/>
+        <property name="imageService" ref="imageService"/>
     </bean>
 
 </beans>

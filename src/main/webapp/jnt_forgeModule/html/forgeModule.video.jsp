@@ -20,8 +20,7 @@
 <template:addResources type="javascript" resources="html5shiv.js"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
-<c:set var="isDeveloper" value="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')
-    && not jcr:hasPermission(currentNode.parent, 'jcr:all_live')}"/>
+<c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>
 <c:if test="${isDeveloper}">
     <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
 </c:if>
@@ -39,8 +38,8 @@
 
 <c:if test="${(not isDeveloper || viewAsUser)
                     && (not hasVideoNode
-                        || (empty videoProvider || fn:trim(videoProvider) eq 0)
-                        || (empty videoIdentifier || fn:trim(videoIdentifier) eq 0))}">
+                        || (empty videoProvider || fn:trim(videoProvider) eq '')
+                        || (empty videoIdentifier || fn:trim(videoIdentifier) eq ''))}">
 
     <c:set var="isEmptyTab" value="true"/>
     <template:addResources type="inlinejavascript">
@@ -247,11 +246,6 @@
         <c:if test="${hasVideoNode}">
 
             <div id="forgeModuleVideoWrapper-${id}">
-                    <%-- TODO --%>
-                <template:module node="${videoNode}"/>
-                <template:module node="${videoNode}" view="default" nodeTypes="jnt:videostreaming"/>
-                <template:module node="${videoNode}" view="default"/>
-
                 <template:module path="${videoNode.path}"/>
             </div>
 

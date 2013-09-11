@@ -9,7 +9,6 @@ import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
-import org.jahia.taglibs.functions.Functions;
 import org.jahia.taglibs.jcr.node.JCRTagUtils;
 import org.jahia.utils.i18n.JahiaResourceBundle;
 import org.json.JSONObject;
@@ -56,12 +55,10 @@ public class CalculateCompletion  extends Action {
         mandatoryProperties.add(new Object[]{"description", TEXT, 20});
         mandatoryProperties.add(new Object[]{"category", WEAKREFERENCE, 10});
         mandatoryProperties.add(new Object[]{"versions", VERSIONS, 10});
-        mandatoryProperties.add(new Object[]{"screenshots", SCREENSHOTS, 5});
-        // TODO icon
 
         int authorEmailType;
-        if (module.getPropertyAsString("authorNameDisplayedAs").equals("organisation")
-                || module.getSession().getUser().getProperty("j:email").isEmpty())
+        if (module.hasProperty("authorNameDisplayedAs") && module.getPropertyAsString("authorNameDisplayedAs").equals("organisation")
+                || (module.getSession().getUser().getProperty("j:email") != null && module.getSession().getUser().getProperty("j:email").isEmpty()))
             authorEmailType = TEXT;
         else
             authorEmailType = SKIP;
@@ -72,6 +69,8 @@ public class CalculateCompletion  extends Action {
 
         otherProperties = new ArrayList<Object[]>();
 
+        otherProperties.add(new Object[]{"icon", NODE, 5});
+        otherProperties.add(new Object[]{"screenshots", SCREENSHOTS, 5});
         otherProperties.add(new Object[]{"howToInstall", TEXT, 5});
         otherProperties.add(new Object[]{"authorURL", TEXT, 5});
         otherProperties.add(new Object[]{"video", NODE, 5});

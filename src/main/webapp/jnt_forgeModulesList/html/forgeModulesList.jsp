@@ -21,18 +21,25 @@
 
 <c:set var="columnsNumber" value="${currentNode.properties['columnsNumber'].long}"/>
 
-<c:forEach items="${moduleMap.currentList}" var="module" varStatus="status" begin="${moduleMap.begin}" end="${moduleMap.end}">
+<c:choose>
+    <c:when test="${renderContext.editMode}}">
+        <fmt:message key="jnt_forgeModulesList.label.liveOnly"/>
+    </c:when>
+    <c:otherwise>
+        <c:forEach items="${moduleMap.currentList}" var="module" varStatus="status" begin="${moduleMap.begin}" end="${moduleMap.end}">
 
-    <c:if test="${status.index % columnsNumber eq 0}">
-        <div class="row-fluid">
-    </c:if>
+            <c:if test="${status.index % columnsNumber eq 0}">
+                <div class="row-fluid">
+            </c:if>
 
-    <div class="span${functions:round(12 / columnsNumber)}">
-        <template:module node="${module}"/>
-    </div>
+            <div class="span${functions:round(12 / columnsNumber)}">
+                <template:module node="${module}"/>
+            </div>
 
-    <c:if test="${status.index % columnsNumber eq columnsNumber - 1}">
-        </div>
-    </c:if>
+            <c:if test="${status.index % columnsNumber eq columnsNumber - 1}">
+                </div>
+            </c:if>
 
-</c:forEach>
+        </c:forEach>
+    </c:otherwise>
+</c:choose>
