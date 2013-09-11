@@ -27,7 +27,9 @@
 <c:set var="authorURL" value="${currentNode.properties['authorURL'].string}"/>
 <c:set var="authorEmail" value="${currentNode.properties['authorEmail'].string}"/>
 <c:set var="description" value="${currentNode.properties['description'].string}"/>
-<c:set var="category" value="${currentNode.properties['category']}"/>
+    <c:forEach items="${currentNode.properties['j:defaultCategory']}" var="cat" varStatus="vs">
+        <c:set var="category" value="${cat}"/>
+    </c:forEach>
 <c:set var="nbOfVotes"
        value="${not empty currentNode.properties['j:nbOfVotes'] ? currentNode.properties['j:nbOfVotes'].long : null}"/>
 <c:set var="avgRating"
@@ -62,14 +64,14 @@
     <fmt:message var="labelEmptyFullName" key="jnt_forgeModule.label.developer.emptyFullName"/>
     <c:url var="postURL" value="${url.base}${currentNode.path}"/>
 
-    <jcr:node var="moduleCategories" path="${renderContext.site.path}/contents/forge-modules-categories"/>
+    <c:set var="moduleCategories" value="${renderContext.site.properties['rootCategory'].node}"/>
 
     <template:addResources type="inlinejavascript">
         <script type="text/javascript">
 
             var categories = [];
-            <c:if test="${jcr:hasChildrenOfType(moduleCategories, 'jnt:text')}">
-                <c:forEach items="${jcr:getNodes(moduleCategories, 'jnt:text')}" var="moduleCategory">
+            <c:if test="${! empty moduleCategories && jcr:hasChildrenOfType(moduleCategories, 'jnt:category')}">
+                <c:forEach items="${jcr:getNodes(moduleCategories, 'jnt:category')}" var="moduleCategory">
                     categories.push({value: '${moduleCategory.identifier}', text: '${moduleCategory.displayableName}'});
                 </c:forEach>
             </c:if>
@@ -183,7 +185,7 @@
         <dt><h4><fmt:message key="jnt_forgeModule.label.category"/></h4></dt>
         <dd itemprop="applicationCategory">
             <c:if test="${isDeveloper && not viewAsUser}">
-                <a data-original-title="<fmt:message key="jnt_forgeModule.label.askCategory"/>" data-name="category" data-pk="1" data-type="select"
+                <a data-original-title="<fmt:message key="jnt_forgeModule.label.askCategory"/>" data-name="j:defaultCategory" data-pk="1" data-type="select"
                    id="category-${id}" href="#" class="editable editable-click">
             </c:if>
             ${not empty category ? category.node.displayableName : labelNotSelected}
