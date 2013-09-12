@@ -33,61 +33,61 @@
 <template:addResources type="inlinejavascript">
     <script type="text/javascript">
 
-    $(document).ready(function() {
+        $(document).ready(function() {
 
-        <c:choose>
+            <c:choose>
 
             <c:when test="${isDeveloper && not viewAsUser}">
 
-                $('#moduleScreenshotsList').sortable({
-                   revert: true
-                });
+            $('#moduleScreenshotsList').sortable({
+                revert: true
+            });
 
-                $('#moduleScreenshotsList').on('sortstop', function(event, ui) {
+            $('#moduleScreenshotsList').on('sortstop', function(event, ui) {
 
-                    var movedScreenshot = $(ui.item[0]);
-                    var folder = movedScreenshot.attr("data-parent-path");
+                var movedScreenshot = $(ui.item[0]);
+                var folder = movedScreenshot.attr("data-parent-path");
 
-                    var data = {};
-                    data['source'] = folder + "/" + movedScreenshot.attr("data-name");
+                var data = {};
+                data['source'] = folder + "/" + movedScreenshot.attr("data-name");
 
-                    if (movedScreenshot.is(':last-child')) {
-                        data['target'] = folder;
-                        data['action'] = "moveAfter";
-                    }
-                    else {
-                        data['target'] = folder + "/" + movedScreenshot.next().attr("data-name");
-                        data['action'] = "moveBefore";
-                    }
+                if (movedScreenshot.is(':last-child')) {
+                    data['target'] = folder;
+                    data['action'] = "moveAfter";
+                }
+                else {
+                    data['target'] = folder + "/" + movedScreenshot.next().attr("data-name");
+                    data['action'] = "moveBefore";
+                }
 
-                    $.post('<c:url value="${url.base}${currentNode.path}.move.do"/>', data, function () {
+                $.post('<c:url value="${url.base}${currentNode.path}.move.do"/>', data, function () {
 
-                    }, "json");
+                }, "json");
 
-                });
+            });
 
-                $('.remove-screenshot').click(function() {
-                    var listItem = $(this).parent('li.moduleScreenshot');
-                    $.post($(this).attr('data-path'), {jcrMethodToCall: 'delete'}, function() {
-                        if($('#moduleScreenshotsList li').length == 1)
-                            $('#moduleDeveloperPanel').triggerHandler('forgeModuleUpdated');
-                        listItem.fadeOut('slow', function() {listItem.remove()});
-                    }, "json");
-                });
+            $('.remove-screenshot').click(function() {
+                var listItem = $(this).parent('li.moduleScreenshot');
+                $.post($(this).attr('data-path'), {jcrMethodToCall: 'delete'}, function() {
+                    if($('#moduleScreenshotsList li').length == 1)
+                        $('#moduleDeveloperPanel').triggerHandler('forgeModuleUpdated');
+                    listItem.fadeOut('slow', function() {listItem.remove()});
+                }, "json");
+            });
 
-                $('#moduleScreenshotsList, #moduleScreenshotsList li').disableSelection();
+            $('#moduleScreenshotsList, #moduleScreenshotsList li').disableSelection();
 
             </c:when>
 
             <c:otherwise>
 
-                $('#screenshotsCarousel-${id}').carousel();
+            $('#screenshotsCarousel-${id}').carousel();
 
             </c:otherwise>
 
-        </c:choose>
+            </c:choose>
 
-    });
+        });
 
     </script>
 </template:addResources>
@@ -110,28 +110,28 @@
     </c:when>
 
     <c:otherwise>
+        <c:if test="${!empty moduleMap.currentList}">
+            <div id="screenshotsCarousel-${id}" class="carousel slide">
 
-        <div id="screenshotsCarousel-${id}" class="carousel slide">
+                <ol class="carousel-indicators">
+                    <c:forEach var="moduleScreenshot" items="${moduleMap.currentList}" varStatus="status">
+                        <li data-target="#screenshotsCarousel-${id}" data-slide-to="${status.index}" class="${status.first ? 'active' : ''}"></li>
+                    </c:forEach>
+                </ol>
 
-            <ol class="carousel-indicators">
-                <c:forEach var="moduleScreenshot" items="${moduleMap.currentList}" varStatus="status">
-                    <li data-target="#screenshotsCarousel-${id}" data-slide-to="${status.index}" class="${status.first ? 'active' : ''}"></li>
-                </c:forEach>
-            </ol>
+                <div class="carousel-inner">
+                    <c:forEach var="moduleScreenshot" items="${moduleMap.currentList}" varStatus="status">
+                        <div class="${status.first ? 'active ' : ''}item">
+                            <template:module node="${moduleScreenshot}" view="${moduleMap.subNodesView}" editable="${moduleMap.editable}"/>
+                        </div>
+                    </c:forEach>
+                </div>
 
-            <div class="carousel-inner">
-                <c:forEach var="moduleScreenshot" items="${moduleMap.currentList}" varStatus="status">
-                    <div class="${status.first ? 'active ' : ''}item">
-                        <template:module node="${moduleScreenshot}" view="${moduleMap.subNodesView}" editable="${moduleMap.editable}"/>
-                    </div>
-                </c:forEach>
+                <a class="carousel-control left" href="#screenshotsCarousel-${id}" data-slide="prev">&lsaquo;</a>
+                <a class="carousel-control right" href="#screenshotsCarousel-${id}" data-slide="next">&rsaquo;</a>
+
             </div>
-
-            <a class="carousel-control left" href="#screenshotsCarousel-${id}" data-slide="prev">&lsaquo;</a>
-            <a class="carousel-control right" href="#screenshotsCarousel-${id}" data-slide="next">&rsaquo;</a>
-
-        </div>
-
+        </c:if>
     </c:otherwise>
 
 </c:choose>
