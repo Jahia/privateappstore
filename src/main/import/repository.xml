@@ -32,8 +32,8 @@
                                                          jcr:mixinTypes="jmix:accessControlled jmix:renderable"
                                                          jcr:primaryType="jnt:facets">
                                                 <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                <field-facet facet="Category"
-                                                             field="jnt:forgeModule;category"
+                                                    <field-facet facet="j:defaultCategory"
+                                                 field="jmix:categorized;j:defaultCategory"
                                                              jcr:mixinTypes="jmix:accessControlled"
                                                              jcr:primaryType="jnt:fieldFacet"
                                                              limit="100"
@@ -337,7 +337,7 @@
                                 <forgesettings jcr:primaryType="jnt:forgeSettings"/>
                                 <categorysettings jcr:primaryType="jnt:categorySettings"/>
                                 <manage-site-roles jcr:primaryType="jnt:siteSettingsManageSiteRoles"
-                                        roles="reader jahiapp-user owner"/>
+                                        roles="jahiapp-user owner reader"/>
                         </pagecontent>
                     </forge>
                 </siteSettingsBase>
