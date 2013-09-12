@@ -54,7 +54,7 @@ public class CalculateCompletion  extends Action {
 
         mandatoryProperties.add(new Object[]{"jcr:title", TEXT, 20});
 //        mandatoryProperties.add(new Object[]{"description", TEXT, 20});
-        mandatoryProperties.add(new Object[]{"category", WEAKREFERENCE, 10});
+        mandatoryProperties.add(new Object[]{"j:defaultCategory", WEAKREFERENCE, 10});
         mandatoryProperties.add(new Object[]{"versions", VERSIONS, 10});
 //        mandatoryProperties.add(new Object[]{"screenshots", SCREENSHOTS, 5});
         // TODO icon
