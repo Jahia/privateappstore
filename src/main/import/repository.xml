@@ -6,7 +6,7 @@
                j:moduleType="module"
                j:title="Jahia Forge"
                jcr:primaryType="jnt:module">
-                
+
             <templates j:rootTemplatePath="/base"
                        j:templateSetContext="/modules/templates-bootstrap"
                        jcr:primaryType="jnt:templatesFolder">
@@ -336,6 +336,8 @@
                         <pagecontent jcr:primaryType="jnt:contentList">
                                 <forgesettings jcr:primaryType="jnt:forgeSettings"/>
                                 <categorysettings jcr:primaryType="jnt:categorySettings"/>
+                                <manage-site-roles jcr:primaryType="jnt:siteSettingsManageSiteRoles"
+                                        roles="reader jahiapp-user owner"/>
                         </pagecontent>
                     </forge>
                 </siteSettingsBase>
