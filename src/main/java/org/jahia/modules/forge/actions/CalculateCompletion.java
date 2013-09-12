@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import javax.jcr.ItemNotFoundException;
 import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
+import javax.jcr.Value;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -156,7 +157,13 @@ public class CalculateCompletion  extends Action {
             case WEAKREFERENCE:
 
                 try {
-                    session.getNodeByUUID(module.getProperty(name).getString());
+                    if (module.getProperty(name).isMultiple()) {
+                        for (Value uuid : module.getProperty(name).getValues()) {
+                            session.getNodeByUUID(uuid.getString());
+                        }
+                    } else {
+                        session.getNodeByUUID(module.getProperty(name).getString());
+                    }
                 } catch (ItemNotFoundException e) {
                     completed = false;
                 } catch (PathNotFoundException e) {
