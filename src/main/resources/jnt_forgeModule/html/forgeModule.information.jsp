@@ -105,13 +105,7 @@
                     value: '${authorNameDisplayedAs}',
                     <jsp:include page="../../commons/bootstrap-editable-options.jsp">
                         <jsp:param name="postURL" value="${postURL}"/>
-                        <jsp:param name="customSuccess" value="
-                            if (${authorNameDisplayedAs eq 'organisation'} || newValue == 'organisation')
-                                document.location = '${currentNode.url}';
-                            else {
-                                var newAuthorName = $(this).next('.editable-container').find('option[value='+newValue+']').html();
-                                $('#authorName-header-${id}').html(newAuthorName).editable('setValue', newValue);
-                            }"/>
+                        <jsp:param name="customSuccess" value="document.location = '${currentNode.url}';"/>
                     </jsp:include>
                 });
 
