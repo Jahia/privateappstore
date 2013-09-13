@@ -31,11 +31,11 @@ public class DeleteModule extends Action {
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource, JCRSessionWrapper session, Map<String, List<String>> parameters, URLResolver urlResolver) throws Exception {
 
         JCRNodeWrapper module = resource.getNode();
-
         session.checkout(module);
-        module.setProperty("deleted",true);
+        logger.info("Module "+module.getDisplayableName()+" has been deleted by user "+renderContext.getUser().getUsername());
+        module.remove();
         session.save();
 
-        return new ActionResult(HttpServletResponse.SC_OK, module.getParent().getPath(), null);
+        return ActionResult.OK_JSON;
     }
 }
