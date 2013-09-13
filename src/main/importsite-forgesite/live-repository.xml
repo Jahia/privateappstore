@@ -81,7 +81,7 @@
                jcr:lastModifiedBy=""
                jcr:primaryType="jnt:tagList"
                jcr:uuid="39732961-8b85-415f-bfbb-7d71fea34e8d"/>
-            <j:acl jcr:primaryType="jnt:acl"
+            <j:acl j:inherit="false" jcr:primaryType="jnt:acl"
                 jcr:uuid="baf26eed-c79e-45a2-823f-af0bcc7d2683">
                 <GRANT_g_site-privileged j:aceType="GRANT"
                                      j:principal="g:site-privileged"
@@ -101,6 +101,16 @@
                                          j:roles="site-administrator"
                                          jcr:primaryType="jnt:ace"
                                          jcr:uuid="f363a612-3de4-47bd-bf27-b1ca3b5ba237"/>
+                <GRANT_u_guest j:aceType="GRANT"
+                               j:principal="u:guest"
+                               j:protected="false"
+                               j:roles="reader"
+                               jcr:primaryType="jnt:ace"/>
+                <GRANT_g_users j:aceType="GRANT"
+                               j:principal="g:users"
+                               j:protected="false"
+                               j:roles="reader"
+                               jcr:primaryType="jnt:ace"/>
             </j:acl>
             <files j:lastPublished="2013-07-30T11:02:48.027+02:00"
                 j:lastPublishedBy="root"
