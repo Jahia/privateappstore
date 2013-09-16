@@ -426,10 +426,29 @@
                                           jcr:primaryType="jnt:translation"
                                           jcr:title="forge"/>
                         <pagecontent jcr:primaryType="jnt:contentList">
-                                <forgesettings jcr:primaryType="jnt:forgeSettings"/>
-                                <categorysettings jcr:primaryType="jnt:categorySettings"/>
-                                <manage-site-roles jcr:primaryType="jnt:siteSettingsManageSiteRoles"
-                                        roles="jahiapp-user owner reader"/>
+                                <bootstrap-tabular-list fadeIn="true"
+                                             jcr:primaryType="jnt:bootstrapTabularList"
+                                             tabsPosition="top">
+                                    <settings jcr:primaryType="jnt:contentList">
+                                        <j:translation_en jcr:language="en"
+                                             jcr:primaryType="jnt:translation"
+                                             jcr:title="settings"/>
+                                        <forgesettings jcr:primaryType="jnt:forgeSettings"/>
+                                    </settings>
+                                    <permissions jcr:primaryType="jnt:contentList">
+                                        <j:translation_en jcr:language="en"
+                                             jcr:primaryType="jnt:translation"
+                                             jcr:title="permissions"/>
+                                        <manage-site-roles jcr:primaryType="jnt:siteSettingsManageSiteRoles"
+                                              roles="jahiapp-user owner reader"/>
+                                    </permissions>
+                                    <categories jcr:primaryType="jnt:contentList">
+                                        <j:translation_en jcr:language="en"
+                                             jcr:primaryType="jnt:translation"
+                                             jcr:title="categories"/>
+                                        <categorysettings jcr:primaryType="jnt:categorySettings"/>
+                                    </categories>
+                                </bootstrap-tabular-list>
                         </pagecontent>
                     </forge>
                 </siteSettingsBase>
