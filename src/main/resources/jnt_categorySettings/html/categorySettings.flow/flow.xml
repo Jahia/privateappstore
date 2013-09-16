@@ -7,17 +7,36 @@
     <var name="flowHandler" class="org.jahia.modules.forge.flow.CategorySettingsHandler"/>
 
     <on-start>
-        <evaluate expression="flowHandler.init()" />
+        <evaluate expression="flowHandler.init(externalContext.requestMap.renderContext.mainResource.node.resolveSite)" />
     </on-start>
 
 
-    <view-state id="view" model="categorySettings">
-        <on-render>
-            <evaluate expression="flowHandler.getCategorySettings()" result="flowScope.categorySettings"/>
-        </on-render>
+    <view-state id="view">
         <transition on="submit">
-            <evaluate expression="flowHandler.save(externalContext.requestMap.renderContext.mainResource.node.resolveSite)" />
+            <evaluate expression="flowHandler.save(externalContext.requestMap.renderContext.mainResource.node.resolveSite,requestParameters.rootCategoryIdentifier)" />
         </transition>
-
+        <transition on="edit" to="editCategory">
+            <evaluate expression="flowHandler.setCurrentCategory(externalContext.requestMap.renderContext.mainResource.node.resolveSite,requestParameters.categoryIdentifier)" />
+        </transition>
+        <transition on="delete" to="deleteCategory">
+            <evaluate expression="flowHandler.setCurrentCategory(externalContext.requestMap.renderContext.mainResource.node.resolveSite,requestParameters.categoryIdentifier)" />
+        </transition>
+        <transition on="add" to="editCategory">
+            <evaluate expression="flowHandler.addCategory(externalContext.requestMap.renderContext.mainResource.node.resolveSite,requestParameters.newCategoryName)" />
+        </transition>
     </view-state>
+
+    <view-state id="editCategory">
+        <transition on="submit" to="view">
+            <evaluate expression="flowHandler.saveCategory(requestParameters)"/>
+        </transition>
+        <transition on="cancel" to="view"/>
+    </view-state>
+    <view-state id="deleteCategory">
+        <transition on="submit" to="view">
+            <evaluate expression="flowHandler.deleteCategory()"/>
+        </transition>
+        <transition on="cancel" to="view"/>
+    </view-state>
+
 </flow>
