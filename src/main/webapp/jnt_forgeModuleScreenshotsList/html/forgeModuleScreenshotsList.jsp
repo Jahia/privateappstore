@@ -17,7 +17,7 @@
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
-<template:addResources type="javascript" resources="jquery.min.js,jquery-ui.min.js,bootstrap-carousel.js"/>
+<template:addResources type="javascript" resources="jquery.min.js,jquery-ui.min.js,bootstrap.js"/>
 <template:addResources type="css" resources="jquery-ui.smoothness.css"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>

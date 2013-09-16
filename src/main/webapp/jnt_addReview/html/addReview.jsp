@@ -127,7 +127,7 @@
         </c:otherwise>
     </c:choose>
 
-    <section id="writeReview" class="box box-rounded box-tinted box-margin-top">
+    <section id="writeReview" class="box box-tinted box-margin-top">
 
         <template:tokenizedForm>
             <form action="<c:if test="${not isDeveloper || viewAsUser}"><c:url value='${url.base}${boundComponent.path}.chain.do'/></c:if>" method="post" id="writeReviewForm" class="form-horizontal">

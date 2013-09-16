@@ -71,7 +71,7 @@
 
             <c:set var="averageRating" value="${bindedComponent.properties['j:sumOfVotes'].long/bindedComponent.properties['j:nbOfVotes'].long}"/>
 
-            <div class="averageRating span4 offset1 box box-rounded box-tinted text-center">
+            <div class="averageRating span4 offset1 box box-tinted text-center">
 
                 <h4><fmt:message key="jnt_reviewsList.label.ratingsSplit.average"/></h4>
                 <span class="averageRatingValue lead"><fmt:formatNumber value="${averageRating}" maxFractionDigits="1"/></span>

@@ -205,7 +205,7 @@
 
         <c:if test="${renderContext.loggedIn && jcr:hasPermission(currentNode, 'jcr:all_live')}">
 
-            <div id="replyReview-${id}" class="replyReview box box-rounded box-tinted box-margin-top">
+            <div id="replyReview-${id}" class="replyReview box box-tinted box-margin-top">
 
                 <template:tokenizedForm>
 

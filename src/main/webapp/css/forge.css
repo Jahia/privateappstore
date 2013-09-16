@@ -6,7 +6,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Designed and built with all the love in the world @twitter by @mdo and @fat.
- */
+ *//*
 .clearfix {
   *zoom: 1;
 }
@@ -35,7 +35,7 @@
   box-sizing: border-box;
 }
 .bodywrapper #jnt_forge {
-  /* move down carets for tabs */
+  *//* move down carets for tabs *//*
 
 }
 .bodywrapper #jnt_forge .row {
@@ -472,7 +472,7 @@
 .bodywrapper #jnt_forge ol.inline > li {
   display: inline-block;
   *display: inline;
-  /* IE7 inline-block hack */
+  *//* IE7 inline-block hack *//*
 
   *zoom: 1;
   padding-left: 5px;
@@ -628,7 +628,7 @@
 .bodywrapper #jnt_forge .btn {
   display: inline-block;
   *display: inline;
-  /* IE7 inline-block hack */
+  *//* IE7 inline-block hack *//*
 
   *zoom: 1;
   padding: 4px 12px;
@@ -651,7 +651,7 @@
   border-color: #e6e6e6 #e6e6e6 #bfbfbf;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   *background-color: #e6e6e6;
-  /* Darken IE7 buttons by default so they stand out more given they won't have borders */
+  *//* Darken IE7 buttons by default so they stand out more given they won't have borders *//*
 
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
   border: 1px solid #cccccc;
@@ -787,7 +787,7 @@
   border-color: #51a351 #51a351 #387038;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   *background-color: #51a351;
-  /* Darken IE7 buttons by default so they stand out more given they won't have borders */
+  *//* Darken IE7 buttons by default so they stand out more given they won't have borders *//*
 
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
@@ -819,7 +819,7 @@
   border-color: #f89406 #f89406 #ad6704;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   *background-color: #f89406;
-  /* Darken IE7 buttons by default so they stand out more given they won't have borders */
+  *//* Darken IE7 buttons by default so they stand out more given they won't have borders *//*
 
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
@@ -851,7 +851,7 @@
   border-color: #bd362f #bd362f #802420;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   *background-color: #bd362f;
-  /* Darken IE7 buttons by default so they stand out more given they won't have borders */
+  *//* Darken IE7 buttons by default so they stand out more given they won't have borders *//*
 
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
@@ -883,7 +883,7 @@
   border-color: #51a351 #51a351 #387038;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   *background-color: #51a351;
-  /* Darken IE7 buttons by default so they stand out more given they won't have borders */
+  *//* Darken IE7 buttons by default so they stand out more given they won't have borders *//*
 
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
@@ -915,7 +915,7 @@
   border-color: #2f96b4 #2f96b4 #1f6377;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   *background-color: #2f96b4;
-  /* Darken IE7 buttons by default so they stand out more given they won't have borders */
+  *//* Darken IE7 buttons by default so they stand out more given they won't have borders *//*
 
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
@@ -947,7 +947,7 @@
   border-color: #222222 #222222 #000000;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   *background-color: #222222;
-  /* Darken IE7 buttons by default so they stand out more given they won't have borders */
+  *//* Darken IE7 buttons by default so they stand out more given they won't have borders *//*
 
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
@@ -1721,7 +1721,7 @@
 .bodywrapper #jnt_forge a.text-primary:hover,
 .bodywrapper #jnt_forge a.text-primary:focus {
   color: #428627;
-}
+}*/
 .bodywrapper #jnt_forge .box {
   display: block;
   padding: 20px;
