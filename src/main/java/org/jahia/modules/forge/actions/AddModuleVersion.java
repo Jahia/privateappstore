@@ -69,10 +69,12 @@ public class AddModuleVersion extends Action {
             moduleVersion.grantRoles("u:" + session.getUser().getUsername(), new HashSet<String>(roles));
         }
 
-        String groupId = manifest.getMainAttributes().getValue("Jahia-GroupId");
-        if (groupId != null) {
-            session.checkout(module);
-            module.setProperty("groupId", groupId);
+        if (!module.hasProperty("groupId")) {
+            String groupId = manifest.getMainAttributes().getValue("Jahia-GroupId");
+            if (groupId != null) {
+                session.checkout(module);
+                module.setProperty("groupId", groupId);
+            }
         }
 
         String moduleVersionBinaryName = moduleVersionBinary.getName();
