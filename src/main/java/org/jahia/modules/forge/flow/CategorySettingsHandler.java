@@ -6,6 +6,14 @@ import org.jahia.services.content.JCRContentUtils;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.content.decorator.JCRSiteNode;
+import org.jahia.utils.i18n.Messages;
+import org.jahia.utils.i18n.ResourceBundles;
+import org.springframework.binding.message.Message;
+import org.springframework.binding.message.MessageBuilder;
+import org.springframework.binding.message.MessageContext;
+import org.springframework.binding.message.MessageResolver;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.webflow.context.servlet.HttpServletRequestParameterMap;
 import org.springframework.webflow.core.collection.LocalParameterMap;
 import org.springframework.webflow.mvc.servlet.AbstractFlowHandler;
@@ -27,13 +35,15 @@ public class CategorySettingsHandler implements Serializable{
     private Set<String> categoryUsages;
     public void init(JCRSiteNode site) {
         try {
-            rootCategoryIdentifier = site.getProperty("rootCategory").getNode().getIdentifier();
+            if (site.hasProperty("rootCategory")) {
+                rootCategoryIdentifier = site.getProperty("rootCategory").getNode().getIdentifier();
+            }
         } catch (RepositoryException e) {
             e.printStackTrace();
         }
     }
 
-    public void save(JCRNodeWrapper site, String rootCategoryIdentifier) {
+    public void save(MessageContext messages,JCRNodeWrapper site, String rootCategoryIdentifier) {
 
         try {
             Node category = site.getSession().getNodeByIdentifier(rootCategoryIdentifier);
@@ -41,14 +51,19 @@ public class CategorySettingsHandler implements Serializable{
             site.getSession().save();
             this.rootCategoryIdentifier = rootCategoryIdentifier;
         } catch (RepositoryException e) {
-            // save failed
+            messages.addMessage(new MessageBuilder()
+                    .error()
+                    .source("rootCategory")
+                    .defaultText(
+                            Messages.getWithArgs("resources.Jahia_Forge",
+                                    "jahiaForge.settings.rootCategory.error", LocaleContextHolder.getLocale(),e.getMessage())).build());
             e.printStackTrace();
         }
 
 
     }
 
-    public void saveCategory(LocalParameterMap params) {
+    public void saveCategory(MessageContext messages,LocalParameterMap params) {
         for (String key :(Set<String>) params.asMap().keySet()) {
             if (StringUtils.startsWith(key, "lang_")) {
                 String language = StringUtils.substringAfter(key,"lang_");
@@ -61,6 +76,12 @@ public class CategorySettingsHandler implements Serializable{
                     }
                     localizedSession.save();
                 } catch (RepositoryException e) {
+                    messages.addMessage(new MessageBuilder()
+                            .error()
+                            .source("editCategory")
+                            .defaultText(
+                                    Messages.getWithArgs("resources.Jahia_Forge",
+                                            "jahiaForge.settings.editCategory.error", LocaleContextHolder.getLocale(),e.getMessage())).build());
                     e.printStackTrace();
                 }
 
@@ -100,24 +121,37 @@ public class CategorySettingsHandler implements Serializable{
         }
     }
 
-    public void addCategory(JCRSiteNode site, String category) {
+    public boolean addCategory(MessageContext messages,JCRSiteNode site, String category) {
         try {
-            Session session =JCRSessionFactory.getInstance().getCurrentUserSession("default");
-            Node rootCategory = session.getNodeByIdentifier(rootCategoryIdentifier);
-            category = JCRContentUtils.findAvailableNodeName(rootCategory,category) ;
-            this.currentCategory = session.getNodeByIdentifier(rootCategoryIdentifier).addNode(category,"jnt:category").getIdentifier();
-            session.save();
-            availableLanguages = new LinkedList<String>();
-            for (Locale locale : site.getLanguagesAsLocales()) {
-                availableLanguages.add(locale.getLanguage());
+            if (StringUtils.isNotEmpty(category)) {
+                Session session =JCRSessionFactory.getInstance().getCurrentUserSession("default");
+                Node rootCategory = session.getNodeByIdentifier(rootCategoryIdentifier);
+                category = JCRContentUtils.findAvailableNodeName(rootCategory,category) ;
+                String uuid = session.getNodeByIdentifier(rootCategoryIdentifier).addNode(category,"jnt:category").getIdentifier();
+                session.save();
+                setCurrentCategory(site,uuid);
+                availableLanguages = new LinkedList<String>();
+                for (Locale locale : site.getLanguagesAsLocales()) {
+                    availableLanguages.add(locale.getLanguage());
+                }
+                return true;
+            } else {
+                return false;
             }
         } catch (RepositoryException e) {
+            messages.addMessage(new MessageBuilder()
+                    .error()
+                    .source("addCategory")
+                    .defaultText(
+                            Messages.getWithArgs("resources.Jahia_Forge",
+                                    "jahiaForge.settings.addCategory.error", LocaleContextHolder.getLocale(),e.getMessage())).build());
             e.printStackTrace();
+            return false;
         }
 
     }
 
-    public void deleteCategory() {
+    public void deleteCategory(MessageContext messages) {
         try {
             Session session =JCRSessionFactory.getInstance().getCurrentUserSession("default");
             session.getNodeByIdentifier(currentCategory).remove();
@@ -127,6 +161,12 @@ public class CategorySettingsHandler implements Serializable{
             currentCategory = null;
             session.save();
         } catch (RepositoryException e) {
+            messages.addMessage(new MessageBuilder()
+                    .error()
+                    .source("deleteCategory")
+                    .defaultText(
+                            Messages.getWithArgs("resources.Jahia_Forge",
+                                    "jahiaForge.settings.deleteCategory.error", LocaleContextHolder.getLocale(),e.getMessage())).build());
             e.printStackTrace();
         }
     }

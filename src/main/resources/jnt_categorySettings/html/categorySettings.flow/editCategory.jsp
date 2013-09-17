@@ -25,7 +25,7 @@
             var $selectedOption = $("#newLanguage option[value='" + languageCode + "']");
             var languageName = $selectedOption.text();
             $('#roleI18nPropsTable > tbody:last').append("<tr><td>" + languageName +
-                    "</td><td><input type=\"text\" name=\"lang_" + languageName + "\" onchange=\"$('.submitButton').addClass('btn-danger')\" /></td></tr>");
+                    "</td><td><input type=\"text\" name=\"lang_" + languageCode + "\" onchange=\"$('.submitButton').addClass('btn-danger')\" /></td></tr>");
             $selectedOption.remove();
         }
     }

@@ -13,7 +13,7 @@
 
     <view-state id="view">
         <transition on="submit">
-            <evaluate expression="flowHandler.save(externalContext.requestMap.renderContext.mainResource.node.resolveSite,requestParameters.rootCategoryIdentifier)" />
+            <evaluate expression="flowHandler.save(messageContext,externalContext.requestMap.renderContext.mainResource.node.resolveSite,requestParameters.rootCategoryIdentifier)" />
         </transition>
         <transition on="edit" to="editCategory">
             <evaluate expression="flowHandler.setCurrentCategory(externalContext.requestMap.renderContext.mainResource.node.resolveSite,requestParameters.categoryIdentifier)" />
@@ -21,20 +21,22 @@
         <transition on="delete" to="deleteCategory">
             <evaluate expression="flowHandler.setCurrentCategory(externalContext.requestMap.renderContext.mainResource.node.resolveSite,requestParameters.categoryIdentifier)" />
         </transition>
-        <transition on="add" to="editCategory">
-            <evaluate expression="flowHandler.addCategory(externalContext.requestMap.renderContext.mainResource.node.resolveSite,requestParameters.newCategoryName)" />
+        <transition on="add" to="isNamedFilled">
+            <evaluate expression="flowHandler.addCategory(messageContext,externalContext.requestMap.renderContext.mainResource.node.resolveSite,requestParameters.newCategoryName)" result="flashScope.newName"/>
         </transition>
     </view-state>
-
+    <decision-state id="isNamedFilled">
+        <if test="flashScope.newName" then="editCategory" else="view"/>
+    </decision-state>
     <view-state id="editCategory">
         <transition on="submit" to="view">
-            <evaluate expression="flowHandler.saveCategory(requestParameters)"/>
+            <evaluate expression="flowHandler.saveCategory(messageContext,requestParameters)"/>
         </transition>
         <transition on="cancel" to="view"/>
     </view-state>
     <view-state id="deleteCategory">
         <transition on="submit" to="view">
-            <evaluate expression="flowHandler.deleteCategory()"/>
+            <evaluate expression="flowHandler.deleteCategory(messageContext)"/>
         </transition>
         <transition on="cancel" to="view"/>
     </view-state>
