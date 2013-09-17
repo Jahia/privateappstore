@@ -32,7 +32,7 @@
                 <div class="row-fluid">
             </c:if>
 
-            <div class="span${functions:round(12 / columnsNumber)}">
+            <div class="span${functions:round(16 / columnsNumber)}">
                 <template:module node="${module}"/>
             </div>
 

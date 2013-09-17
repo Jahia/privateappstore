@@ -22,7 +22,10 @@
 
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="title" value="${currentNode.properties['jcr:title'].string}"/>
-<c:set var="icon" value="${currentNode.properties['icon'].node}"/>
+<jcr:node var="iconFolder" path="${renderContext.mainResource.node.path}/icon" />
+<c:forEach var="iconItem" items="${iconFolder.nodes}">
+    <c:set var="icon" value="${iconItem}"/>
+</c:forEach>
 <c:set var="description" value="${currentNode.properties['description'].string}"/>
 
 <%@include file="../../commons/authorName.jspf"%>
@@ -31,7 +34,8 @@
 
     <header>
         <a href="<c:url value="${currentNode.url}"/>">
-            <img class="moduleIcon media-object" src="${not empty icon.url ? icon.url : '/modules/forge/img/icon.png'}"
+            <c:url var="iconUrl" value="${url.currentModule}/img/icon.png"/>
+            <img class="moduleIcon media-object" src="${not empty icon.url ? icon.url : iconUrl}"
                  alt="<fmt:message key="jnt_forgeModule.label.moduleIcon"><fmt:param value="${title}"/></fmt:message>"/>
         </a>
         <a href="<c:url value="${currentNode.url}"/>"><h4>${title}</h4></a>
