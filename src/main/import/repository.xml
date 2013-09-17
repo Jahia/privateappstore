@@ -6,92 +6,7 @@
                j:moduleType="module"
                j:title="Jahia Forge"
                jcr:primaryType="jnt:module">
-                <portlets jcr:primaryType="jnt:portletFolder"/>
-                <files jcr:primaryType="jnt:folder"/>
-                <contents jcr:primaryType="jnt:contentFolder">
-                    <forge-modules-repository jcr:mixinTypes="jmix:accessControlled"
-                                      jcr:primaryType="jnt:contentFolder">
-                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                        <j:translation_en jcr:language="en"
-                                 jcr:mixinTypes="mix:title"
-                                 jcr:primaryType="jnt:translation"
-                                 jcr:title="Forge Modules Repository"/>
-                    </forge-modules-repository>
-                    <forge-modules-categories jcr:mixinTypes="jmix:accessControlled"
-                                      jcr:primaryType="jnt:contentFolder">
-                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                        <j:translation_en jcr:language="en"
-                                 jcr:mixinTypes="mix:title"
-                                 jcr:primaryType="jnt:translation"
-                                 jcr:title="Forge Modules Categories"/>
-                        <games jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Games"/>
-                        </games>
-                        <social jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Social"/>
-                        </social>
-                    </forge-modules-categories>
-                    <forge-modules-required-versions jcr:mixinTypes="jmix:accessControlled"
-                                             jcr:primaryType="jnt:contentFolder">
-                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                        <j:translation_en jcr:language="en"
-                                 jcr:mixinTypes="mix:title"
-                                 jcr:primaryType="jnt:translation"
-                                 jcr:title="Forge Modules-Required Versions"/>
-                        <version-6_6 jcr:mixinTypes="jmix:accessControlled"
-                            jcr:primaryType="jnt:contentFolder">
-                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                            <j:translation_en jcr:language="en"
-                                    jcr:mixinTypes="mix:title"
-                                    jcr:primaryType="jnt:translation"
-                                    jcr:title="Jahia 6.6"/>
-                            <version-6_6_0_0 jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-                                <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.6.0.0"/>
-                            </version-6_6_0_0>
-                            <version-6_6_0_1 jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-                                <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.6.0.1"/>
-                            </version-6_6_0_1>
-                        </version-6_6>
-                        <version-6_5 jcr:mixinTypes="jmix:accessControlled"
-                            jcr:primaryType="jnt:contentFolder">
-                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                            <j:translation_en jcr:language="en"
-                                    jcr:mixinTypes="mix:title"
-                                    jcr:primaryType="jnt:translation"
-                                    jcr:title="Jahia 6.5"/>
-                            <version-6_5_0_0 jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-                                <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.5.0.0"/>
-                            </version-6_5_0_0>
-                            <version-6_5_0_1 jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-                                <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.5.0.1"/>
-                            </version-6_5_0_1>
-                        </version-6_5>
-                    </forge-modules-required-versions>
-                    <forge-modules-release-type jcr:mixinTypes="jmix:accessControlled"
-                                        jcr:primaryType="jnt:contentFolder">
-                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                        <j:translation_en jcr:language="en"
-                                 jcr:mixinTypes="mix:title"
-                                 jcr:primaryType="jnt:translation"
-                                 jcr:title="forge-modules-release-type"/>
-                        <simple-text jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Hotfix"/>
-                        </simple-text>
-                        <simple-text-1 jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                            <j:translation_en jcr:language="en"
-                                    jcr:primaryType="jnt:translation"
-                                    text="Service Pack"/>
-                        </simple-text-1>
-                    </forge-modules-release-type>
-                </contents>
+                
             <templates j:rootTemplatePath="/base"
                        j:templateSetContext="/modules/templates-bootstrap"
                        jcr:primaryType="jnt:templatesFolder">
@@ -383,6 +298,24 @@
                                                      jcr:mixinTypes="jmix:renderable"
                                                      jcr:primaryType="jnt:fileUpload"/>
                                                     </changelog>
+                                                    <permissions j:expiration="0"
+                                                 j:invertCondition="false"
+                                                 j:perUser="false"
+                                                 j:requireLoggedUser="false"
+                                                 j:requirePrivilegedUser="false"
+                                                 j:requiredPermissionNames="jcr:write_live"
+                                                 jcr:mixinTypes="jmix:cache jmix:requiredPermissions"
+                                                 jcr:primaryType="jnt:contentList">
+                                                        <j:translation_en jcr:language="en"
+                                                         jcr:mixinTypes="mix:title"
+                                                         jcr:primaryType="jnt:translation"
+                                                         jcr:title="Permissions"/>
+                                                        <manage-roles jcr:primaryType="jnt:manageRoles" roles="reader">
+                                                            <j:translation_en jcr:language="en"
+                                                            jcr:primaryType="jnt:translation"
+                                                            jcr:title="Module permissions"/>
+                                                        </manage-roles>
+                                                    </permissions>
                                                 </bootstrap-tabular-list>
                                         </module-main>
                                     </module-main>
@@ -462,7 +395,7 @@
                                              jcr:mixinTypes="mix:title"
                                              jcr:primaryType="jnt:translation"
                                              jcr:title="permissions"/>
-                                        <manage-site-roles jcr:primaryType="jnt:siteSettingsManageSiteRoles"
+                                        <manage-roles jcr:primaryType="jnt:manageRoles"
                                               roles="jahiapp-user owner reader"/>
                                     </permissions>
                                     <categories jcr:primaryType="jnt:contentList">
@@ -479,7 +412,92 @@
                 </siteSettingsBase>
             </templates>
 
-
+                <portlets jcr:primaryType="jnt:portletFolder"/>
+                <files jcr:primaryType="jnt:folder"/>
+                <contents jcr:primaryType="jnt:contentFolder">
+                    <forge-modules-repository jcr:mixinTypes="jmix:accessControlled"
+                                      jcr:primaryType="jnt:contentFolder">
+                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                        <j:translation_en jcr:language="en"
+                                 jcr:mixinTypes="mix:title"
+                                 jcr:primaryType="jnt:translation"
+                                 jcr:title="Forge Modules Repository"/>
+                    </forge-modules-repository>
+                    <forge-modules-categories jcr:mixinTypes="jmix:accessControlled"
+                                      jcr:primaryType="jnt:contentFolder">
+                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                        <j:translation_en jcr:language="en"
+                                 jcr:mixinTypes="mix:title"
+                                 jcr:primaryType="jnt:translation"
+                                 jcr:title="Forge Modules Categories"/>
+                        <games jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Games"/>
+                        </games>
+                        <social jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Social"/>
+                        </social>
+                    </forge-modules-categories>
+                    <forge-modules-required-versions jcr:mixinTypes="jmix:accessControlled"
+                                             jcr:primaryType="jnt:contentFolder">
+                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                        <j:translation_en jcr:language="en"
+                                 jcr:mixinTypes="mix:title"
+                                 jcr:primaryType="jnt:translation"
+                                 jcr:title="Forge Modules-Required Versions"/>
+                        <version-6_6 jcr:mixinTypes="jmix:accessControlled"
+                            jcr:primaryType="jnt:contentFolder">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <j:translation_en jcr:language="en"
+                                    jcr:mixinTypes="mix:title"
+                                    jcr:primaryType="jnt:translation"
+                                    jcr:title="Jahia 6.6"/>
+                            <version-6_6_0_0 jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                                <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.6.0.0"/>
+                            </version-6_6_0_0>
+                            <version-6_6_0_1 jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                                <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.6.0.1"/>
+                            </version-6_6_0_1>
+                        </version-6_6>
+                        <version-6_5 jcr:mixinTypes="jmix:accessControlled"
+                            jcr:primaryType="jnt:contentFolder">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <j:translation_en jcr:language="en"
+                                    jcr:mixinTypes="mix:title"
+                                    jcr:primaryType="jnt:translation"
+                                    jcr:title="Jahia 6.5"/>
+                            <version-6_5_0_0 jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                                <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.5.0.0"/>
+                            </version-6_5_0_0>
+                            <version-6_5_0_1 jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                                <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.5.0.1"/>
+                            </version-6_5_0_1>
+                        </version-6_5>
+                    </forge-modules-required-versions>
+                    <forge-modules-release-type jcr:mixinTypes="jmix:accessControlled"
+                                        jcr:primaryType="jnt:contentFolder">
+                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                        <j:translation_en jcr:language="en"
+                                 jcr:mixinTypes="mix:title"
+                                 jcr:primaryType="jnt:translation"
+                                 jcr:title="forge-modules-release-type"/>
+                        <simple-text jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Hotfix"/>
+                        </simple-text>
+                        <simple-text-1 jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <j:translation_en jcr:language="en"
+                                    jcr:primaryType="jnt:translation"
+                                    text="Service Pack"/>
+                        </simple-text-1>
+                    </forge-modules-release-type>
+                </contents>
         </forge>
     </modules>
 
