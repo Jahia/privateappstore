@@ -231,7 +231,7 @@
                             <section class="moduleTags">
 
                                 <h5><fmt:message key="jnt_forgeModule.label.tags"/></h5>
-                                <ul class="inline">
+                                <ul class="inline unstyled">
                                     <c:forEach items="${assignedTags}" var="tag" varStatus="status">
                                         <li class="tag">${tag.node.name}</li>
                                     </c:forEach>

@@ -44,7 +44,7 @@
 
 
 <jcr:nodeProperty node="${activeVersion}" name="versionNumber" var="versionNumber"/>
-<jcr:nodeProperty node="${activeVersion}" name="relatedJahiaVersion" var="requiredVersion"/>
+<jcr:nodeProperty node="${activeVersion}" name="requiredVersion" var="requiredVersion"/>
 
 
 <c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>
@@ -68,7 +68,7 @@
             var categories = [];
             <c:if test="${jcr:hasChildrenOfType(moduleCategories, 'jnt:text')}">
                 <c:forEach items="${jcr:getNodes(moduleCategories, 'jnt:text')}" var="moduleCategory">
-                    categories.push({value: '${moduleCategory.identifier}', text: '${moduleCategory.displayableName}'});
+                    categories.push({value: '${moduleCategory.identifier}', text: '${moduleCategory.properties['text'].string}'});
                 </c:forEach>
             </c:if>
 
@@ -143,8 +143,10 @@
         <dt><fmt:message key="jnt_forgeModule.label.version"/></dt>
         <dd itemprop="softwareVersion">${versionNumber.string}</dd>
 
-        <dt><fmt:message key="jnt_forgeModule.label.relatedJahiaVersion"/></dt>
-        <dd>${requiredVersion.node.displayableName}</dd>
+        <c:if test="${not empty requiredVersion}">
+            <dt><fmt:message key="jnt_forgeModule.label.relatedJahiaVersion"/></dt>
+            <dd>${requiredVersion.node.properties['text'].string}</dd>
+        </c:if>
 
         <span itemtype="http://schema.org/Organization" itemscope="" itemprop="author">
 
@@ -170,7 +172,7 @@
             <dd itemtype="http://schema.org/AggregateRating" itemscope="" itemprop="aggregateRating">
                 <span itemprop="worstRating" content="1"></span>
                 <span itemprop="bestRating" content="5"></span>
-                <div itemprop="ratingValue" content="${avgRating}">
+                <div class="ratingValue" itemprop="ratingValue" content="${avgRating}">
                     <template:include view="hidden.average.readonly" />
                 </div>
                 <span itemprop="ratingCount" content="${nbOfVotes}">(${nbOfVotes})</span>
@@ -184,7 +186,7 @@
                 <a data-original-title="<fmt:message key="jnt_forgeModule.label.askCategory"/>" data-name="category" data-pk="1" data-type="select"
                    id="category-${id}" href="#" class="editable editable-click">
             </c:if>
-            ${not empty category ? category.node.displayableName : labelNotSelected}
+            ${not empty category ? category.node.properties['text'].string : labelNotSelected}
             <c:if test="${isDeveloper && not viewAsUser}">
                 </a>
             </c:if>

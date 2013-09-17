@@ -1,253 +1,268 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <content xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:jnt="http://www.jahia.org/jahia/nt/1.0" xmlns:test="http://www.apache.org/jackrabbit/test" xmlns:docmix="http://www.jahia.org/jahia/docspace/mix/1.0" xmlns:jmix="http://www.jahia.org/jahia/mix/1.0" xmlns:j="http://www.jahia.org/jahia/1.0" xmlns:comnt="http://www.jahia.com/jahia/nt/1.0" xmlns:mix="http://www.jcp.org/jcr/mix/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:test_templates="http://www.jahia.org/jahia/test_templates/nt/1.0" xmlns:docnt="http://www.jahia.org/jahia/docspace/nt/1.0" xmlns:sv="http://www.jcp.org/jcr/sv/1.0" xmlns:commix="http://www.jahia.com/jahia/mix/1.0" xmlns:rep="internal">
-  <templateSets jcr:primaryType="jnt:templateSets">
-    <forge j:dependencies="bootstrapComponent default facets grid rating videostreaming" j:installedModules="forge" j:originWS="default" j:siteType="module" j:title="Jahia Forge" j:wcagCompliance="true" jcr:primaryType="jnt:virtualsite">
-      <portlets j:originWS="default" jcr:primaryType="jnt:portletFolder" />
-      <files j:originWS="default" jcr:primaryType="jnt:folder" />
-      <contents j:originWS="default" jcr:primaryType="jnt:contentFolder">
-        <forge-modules-repository j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentFolder">
-          <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-          <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Modules Repository" />
-        </forge-modules-repository>
-        <forge-modules-categories j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentFolder">
-          <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-          <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Modules Categories" />
-          <games j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-            <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Games" />
-          </games>
-          <social j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-            <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Social" />
-          </social>
-        </forge-modules-categories>
-        <forge-modules-required-versions j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentFolder">
-          <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-          <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Modules-Required Versions" />
-          <version-6_6 j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentFolder">
-            <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-            <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Jahia 6.6" />
-            <version-6_6_0_0 j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-              <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-              <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.6.0.0" />
-            </version-6_6_0_0>
-            <version-6_6_0_1 j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-              <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-              <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.6.0.1" />
-            </version-6_6_0_1>
-          </version-6_6>
-          <version-6_5 j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentFolder">
-            <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-            <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Jahia 6.5" />
-            <version-6_5_0_0 j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-              <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-              <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.5.0.0" />
-            </version-6_5_0_0>
-            <version-6_5_0_1 j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-              <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-              <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.5.0.1" />
-            </version-6_5_0_1>
-          </version-6_5>
-        </forge-modules-required-versions>
-        <forge-modules-release-type j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentFolder">
-          <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-          <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="forge-modules-release-type" />
-          <simple-text j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-            <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Hotfix" />
-          </simple-text>
-          <simple-text-1 j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-            <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Service Pack" />
-          </simple-text-1>
-        </forge-modules-release-type>
-      </contents>
-      <templates j:originWS="default" j:rootTemplatePath="/base/forge-template" jcr:primaryType="jnt:templatesFolder">
-          <forge-home j:hiddenTemplate="false" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:pageTemplate">
-              <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Home"/>
-              <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
-                  <bootstrap-row customColumn="4,12" divID="jnt_forge" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow">
-                      <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                      <bootstrap-row-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
-                          <facets-list j:bindedComponent="/templateSets/forge/contents/forge-modules-repository" j:originWS="default" j:type="jnt:forgeModule" j:view="forge" jcr:mixinTypes="jmix:accessControlled jmix:renderable" jcr:primaryType="jnt:facets">
-                              <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                              <field-facet facet="Category" field="jnt:forgeModule;category" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:fieldFacet" limit="100" mincount="1" missing="false" offset="0">
-                                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                  <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" label="Category"/>
-                              </field-facet>
-                              <field-facet-1 facet="Tags" field="jmix:tagged;j:tags" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:fieldFacet" limit="100" mincount="1" missing="false" offset="0">
-                                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                  <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" label="Tags"/>
-                              </field-facet-1>
-                          </facets-list>
-                          <actions j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:linkList">
-                              <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                              <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Actions"/>
-                              <publish-your-module j:node="/templateSets/forge/publish-your-module" j:originWS="default" j:target="_self" j:view="forge" jcr:mixinTypes="jmix:accessControlled jmix:renderable" jcr:primaryType="jnt:nodeLink">
-                                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                  <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Add your module"/>
-                              </publish-your-module>
-                          </actions>
-                          <forge-my-modules-list j:originWS="default" j:skin="skins.bootstrap-rounded-title" j:style="grey" jcr:mixinTypes="jmix:accessControlled jmix:skinnable jmix:style" jcr:primaryType="jnt:forgeMyModulesList">
-                              <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                              <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="My Modules"/>
-                          </forge-my-modules-list>
-                      </bootstrap-row-col1>
-                      <bootstrap-row-col2 j:originWS="default" jcr:primaryType="jnt:contentList">
-                          <forgeModulesList columnsNumber="4" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:forgeModulesList" nbOfModulePerPage="20" startNode="/templateSets/forge/contents/forge-modules-repository">
-                              <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                          </forgeModulesList>
-                      </bootstrap-row-col2>
-                  </bootstrap-row>
-              </pagecontent>
-              <j:acl jcr:primaryType="jnt:acl"/>
-          </forge-home>
-        <forge-module-creation j:hiddenTemplate="false" j:invertCondition="false" j:originWS="default" j:requireLoggedUser="false" j:requirePrivilegedUser="false" j:view="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:pageTemplate">
-          <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-          <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Module Creation" />
-          <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
-            <bootstrap-row customColumn="16" divID="jnt_forge" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow">
-              <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-              <bootstrap-row-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
-                <publish-your-module j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:forgeModuleCreation" modulesRepository="/templateSets/forge/contents/forge-modules-repository">
-                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                  <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Publish your module" />
-                </publish-your-module>
-              </bootstrap-row-col1>
-            </bootstrap-row>
-          </pagecontent>
-        </forge-module-creation>
-        <forge-module j:applyOn="jnt:forgeModule" j:defaultTemplate="true" j:hiddenTemplate="false" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentTemplate">
-          <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-          <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Module" />
-          <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
-            <bootstrap-row colNames="module-aside, module-main" customColumn="4,12" divID="jnt_forge" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow">
-              <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-              <module-aside j:originWS="default" jcr:primaryType="jnt:contentList">
-                <main-resource-display j:mainResourceView="header" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
-                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                </main-resource-display>
-                <developer-panel j:mainResourceView="developerPanel" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
-                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                </developer-panel>
-                <forge-admin-panel j:mainResourceView="forgeAdminPanel" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
-                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                </forge-admin-panel>
-              </module-aside>
-              <module-main j:originWS="default" jcr:primaryType="jnt:contentList">
-                <bootstrap-tabular-list fadeIn="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapTabularList" tabsPosition="top">
-                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                  <overview j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentList">
-                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Overview" />
-                    <bootstrap-row colNames="overview-main,overview-aside" customColumn="11,4" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow" offset="0,1">
-                      <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                      <overview-main j:originWS="default" jcr:primaryType="jnt:contentList">
-                        <main-resource-display j:mainResourceView="overview" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
-                          <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                        </main-resource-display>
-                      </overview-main>
-                      <overview-aside j:originWS="default" jcr:primaryType="jnt:contentList">
-                        <main-resource-display j:mainResourceView="information" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
-                          <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                        </main-resource-display>
-                      </overview-aside>
-                    </bootstrap-row>
-                  </overview>
-                  <screenshots j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentList">
-                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Screenshots" />
-                    <main-resource-display j:mainResourceView="screenshots" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
-                      <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                    </main-resource-display>
-                    <file-upload-form j:invertCondition="false" j:originWS="default" j:requireLoggedUser="true" j:requirePrivilegedUser="false" j:requiredPermissions="#/permissions/repository-permissions/jcr:all_live" j:view="forge" jcr:mixinTypes="jmix:accessControlled jmix:renderable jmix:requiredPermissions" jcr:primaryType="jnt:fileUpload">
-                      <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                    </file-upload-form>
-                  </screenshots>
-                  <video j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentList">
-                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Video" />
-                    <main-resource-display j:mainResourceView="video" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
-                      <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                    </main-resource-display>
-                  </video>
-                  <reviews j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentList">
-                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Reviews" />
-                    <rich-text j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bigText">
-                      <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                      <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="&lt;h2 class='reviewsHeader'&gt;  User reviews&lt;/h2&gt; " />
-                    </rich-text>
-                    <addreview commentMandatory="false" commentMinLength="50" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:addReview">
-                      <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                    </addreview>
-                    <rating-split j:originWS="default" j:view="ratingsSplit" jcr:mixinTypes="jmix:accessControlled jmix:renderable" jcr:primaryType="jnt:reviewsList">
-                      <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                    </rating-split>
-                    <reviews-list j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:reviewsList">
-                      <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                    </reviews-list>
-                  </reviews>
-                  <installation j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentList">
-                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Installation" />
-                    <main-resource-display j:mainResourceView="howToInstall" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
-                      <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                    </main-resource-display>
-                  </installation>
-                  <faq j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentList">
-                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="FAQ" />
-                    <main-resource-display j:mainResourceView="FAQ" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
-                      <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                    </main-resource-display>
-                  </faq>
-                  <changelog j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentList">
-                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Changelog" />
-                    <main-resource-display j:mainResourceView="changeLog" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
-                      <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                    </main-resource-display>
-                  </changelog>
-                </bootstrap-tabular-list>
-              </module-main>
-            </bootstrap-row>
-          </pagecontent>
-        </forge-module>
-        <forge-module-add-version j:applyOn="jnt:forgeModule" j:defaultTemplate="false" j:hiddenTemplate="false" j:originWS="default" j:priority="100" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentTemplate">
-          <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-          <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Module Add Version" />
-          <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
-            <bootstrap-row customColumn="16" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow">
-              <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-              <bootstrap-row-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
-                <main-resource-display j:mainResourceView="addVersion" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
-                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                </main-resource-display>
-              </bootstrap-row-col1>
-            </bootstrap-row>
-          </pagecontent>
-        </forge-module-add-version>
-        <forge-module-version j:applyOn="jnt:forgeModuleVersion" j:defaultTemplate="true" j:hiddenTemplate="false" j:originWS="default" j:priority="100" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentTemplate">
-          <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-          <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
-            <predefined--rows-960gs column="1col16" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:row">
-              <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-              <predefined--rows-960gs-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
-                <main-resource-display j:mainResourceView="default" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
-                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                </main-resource-display>
-              </predefined--rows-960gs-col1>
-            </predefined--rows-960gs>
-          </pagecontent>
-          <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Module Version" />
-        </forge-module-version>
-      </templates>
-      <publish-your-module j:originWS="default" j:templateNode="/templateSets/forge/templates/forge-module-creation" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:page">
-        <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-        <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Publish your module" />
-      </publish-your-module>
-    </forge>
-  </templateSets>
+    <templateSets jcr:primaryType="jnt:templateSets">
+        <forge j:dependencies="bootstrapComponent default facets grid rating videostreaming" j:installedModules="forge" j:originWS="default" j:siteType="module" j:title="Jahia Forge" j:wcagCompliance="true" jcr:primaryType="jnt:virtualsite">
+            <portlets j:originWS="default" jcr:primaryType="jnt:portletFolder"/>
+            <files j:originWS="default" jcr:primaryType="jnt:folder"/>
+            <contents j:originWS="default" jcr:primaryType="jnt:contentFolder">
+                <forge-modules-repository j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentFolder">
+                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Modules Repository"/>
+                </forge-modules-repository>
+                <forge-modules-categories j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentFolder">
+                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Modules Categories"/>
+                    <games j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                        <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Games"/>
+                    </games>
+                    <social j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                        <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Social"/>
+                    </social>
+                </forge-modules-categories>
+                <forge-modules-required-versions j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentFolder">
+                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Modules-Required Versions"/>
+                    <version-6_6 j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentFolder">
+                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                        <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Jahia 6.6"/>
+                        <version-6_6_0_0 j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.6.0.0"/>
+                        </version-6_6_0_0>
+                        <version-6_6_0_1 j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.6.0.1"/>
+                        </version-6_6_0_1>
+                    </version-6_6>
+                    <version-6_5 j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentFolder">
+                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                        <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Jahia 6.5"/>
+                        <version-6_5_0_0 j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.5.0.0"/>
+                        </version-6_5_0_0>
+                        <version-6_5_0_1 j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.5.0.1"/>
+                        </version-6_5_0_1>
+                    </version-6_5>
+                </forge-modules-required-versions>
+                <forge-modules-release-type j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentFolder">
+                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="forge-modules-release-type"/>
+                    <simple-text j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                        <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Hotfix"/>
+                    </simple-text>
+                    <simple-text-1 j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                        <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Service Pack"/>
+                    </simple-text-1>
+                </forge-modules-release-type>
+            </contents>
+            <templates j:originWS="default" j:rootTemplatePath="/base/forge-template" jcr:primaryType="jnt:templatesFolder">
+                <forge-home j:hiddenTemplate="false" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:pageTemplate">
+                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Home"/>
+                    <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
+                        <bootstrap-row customColumn="4,12" divID="jnt_forge" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <bootstrap-row-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
+                                <facets-list j:bindedComponent="/templateSets/forge/contents/forge-modules-repository" j:originWS="default" j:type="jnt:forgeModule" j:view="forge" jcr:mixinTypes="jmix:accessControlled jmix:renderable" jcr:primaryType="jnt:facets">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                    <field-facet facet="Category" field="jnt:forgeModule;category" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:fieldFacet" limit="100" mincount="1" missing="false" offset="0">
+                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" label="Category"/>
+                                    </field-facet>
+                                    <field-facet-1 facet="Tags" field="jmix:tagged;j:tags" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:fieldFacet" limit="100" mincount="1" missing="false" offset="0">
+                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" label="Tags"/>
+                                    </field-facet-1>
+                                </facets-list>
+                                <actions j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:linkList">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Actions"/>
+                                    <publish-your-module j:node="/templateSets/forge/publish-your-module" j:originWS="default" j:target="_self" j:view="forgeAdd" jcr:mixinTypes="jmix:accessControlled jmix:renderable" jcr:primaryType="jnt:nodeLink">
+                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Add your module"/>
+                                    </publish-your-module>
+                                </actions>
+                                <forge-my-modules-list j:originWS="default" j:skin="skins.bootstrap-rounded-title" j:style="grey" jcr:mixinTypes="jmix:accessControlled jmix:skinnable jmix:style" jcr:primaryType="jnt:forgeMyModulesList">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="My Modules"/>
+                                </forge-my-modules-list>
+                            </bootstrap-row-col1>
+                            <bootstrap-row-col2 j:originWS="default" jcr:primaryType="jnt:contentList">
+                                <forgeModulesList columnsNumber="4" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:forgeModulesList" nbOfModulePerPage="20" startNode="/templateSets/forge/contents/forge-modules-repository">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                </forgeModulesList>
+                            </bootstrap-row-col2>
+                        </bootstrap-row>
+                    </pagecontent>
+                    <j:acl jcr:primaryType="jnt:acl"/>
+                </forge-home>
+                <forge-module-creation j:hiddenTemplate="false" j:invertCondition="false" j:originWS="default" j:requireLoggedUser="false" j:requirePrivilegedUser="false" j:view="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:pageTemplate">
+                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Module Creation"/>
+                    <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
+                        <bootstrap-row customColumn="16" divID="jnt_forge" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <bootstrap-row-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
+                                <publish-your-module j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:forgeModuleCreation" modulesRepository="/templateSets/forge/contents/forge-modules-repository">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Publish your module"/>
+                                </publish-your-module>
+                            </bootstrap-row-col1>
+                        </bootstrap-row>
+                    </pagecontent>
+                </forge-module-creation>
+                <forge-module j:applyOn="jnt:forgeModule" j:defaultTemplate="true" j:hiddenTemplate="false" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentTemplate">
+                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Module"/>
+                    <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
+                        <bootstrap-row-1 customColumn="16" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <bootstrap-row-1-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
+                                <links-list j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:linkList">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                    <forge-home j:node="/templateSets/forge/forge-home" j:originWS="default" j:target="_self" j:view="forgeBack" jcr:mixinTypes="jmix:accessControlled jmix:renderable" jcr:primaryType="jnt:nodeLink">
+                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Home"/>
+                                    </forge-home>
+                                </links-list>
+                            </bootstrap-row-1-col1>
+                        </bootstrap-row-1>
+                        <bootstrap-row colNames="module-aside, module-main" customColumn="4,12" divID="jnt_forge" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <module-aside j:originWS="default" jcr:primaryType="jnt:contentList">
+                                <main-resource-display j:mainResourceView="header" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                </main-resource-display>
+                                <developer-panel j:mainResourceView="developerPanel" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                </developer-panel>
+                                <forge-admin-panel j:mainResourceView="forgeAdminPanel" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                </forge-admin-panel>
+                            </module-aside>
+                            <module-main j:originWS="default" jcr:primaryType="jnt:contentList">
+                                <bootstrap-tabular-list fadeIn="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapTabularList" tabsPosition="top">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                    <overview j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentList">
+                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Overview"/>
+                                        <bootstrap-row colNames="overview-main,overview-aside" customColumn="11,4" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow" offset="0,1">
+                                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                            <overview-main j:originWS="default" jcr:primaryType="jnt:contentList">
+                                                <main-resource-display j:mainResourceView="overview" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
+                                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                                </main-resource-display>
+                                            </overview-main>
+                                            <overview-aside j:originWS="default" jcr:primaryType="jnt:contentList">
+                                                <main-resource-display j:mainResourceView="information" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
+                                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                                </main-resource-display>
+                                            </overview-aside>
+                                        </bootstrap-row>
+                                    </overview>
+                                    <screenshots j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentList">
+                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Screenshots"/>
+                                        <main-resource-display j:mainResourceView="screenshots" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
+                                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        </main-resource-display>
+                                        <file-upload-form j:invertCondition="false" j:originWS="default" j:requireLoggedUser="true" j:requirePrivilegedUser="false" j:requiredPermissions="#/permissions/repository-permissions/jcr:all_live" j:view="forge" jcr:mixinTypes="jmix:accessControlled jmix:renderable jmix:requiredPermissions" jcr:primaryType="jnt:fileUpload">
+                                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        </file-upload-form>
+                                    </screenshots>
+                                    <video j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentList">
+                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Video"/>
+                                        <main-resource-display j:mainResourceView="video" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
+                                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        </main-resource-display>
+                                    </video>
+                                    <reviews j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentList">
+                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Reviews"/>
+                                        <rich-text j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bigText">
+                                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="&lt;h2 class='reviewsHeader'&gt;  User reviews&lt;/h2&gt; "/>
+                                        </rich-text>
+                                        <addreview commentMandatory="false" commentMinLength="50" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:addReview">
+                                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        </addreview>
+                                        <rating-split j:originWS="default" j:view="ratingsSplit" jcr:mixinTypes="jmix:accessControlled jmix:renderable" jcr:primaryType="jnt:reviewsList">
+                                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        </rating-split>
+                                        <reviews-list j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:reviewsList">
+                                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        </reviews-list>
+                                    </reviews>
+                                    <installation j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentList">
+                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Installation"/>
+                                        <main-resource-display j:mainResourceView="howToInstall" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
+                                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        </main-resource-display>
+                                    </installation>
+                                    <faq j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentList">
+                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="FAQ"/>
+                                        <main-resource-display j:mainResourceView="FAQ" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
+                                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        </main-resource-display>
+                                    </faq>
+                                    <changelog j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentList">
+                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Changelog"/>
+                                        <main-resource-display j:mainResourceView="changeLog" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
+                                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                        </main-resource-display>
+                                    </changelog>
+                                </bootstrap-tabular-list>
+                            </module-main>
+                        </bootstrap-row>
+                    </pagecontent>
+                </forge-module>
+                <forge-module-add-version j:applyOn="jnt:forgeModule" j:defaultTemplate="false" j:hiddenTemplate="false" j:originWS="default" j:priority="100" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentTemplate">
+                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Module Add Version"/>
+                    <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
+                        <bootstrap-row customColumn="16" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <bootstrap-row-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
+                                <main-resource-display j:mainResourceView="addVersion" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                </main-resource-display>
+                            </bootstrap-row-col1>
+                        </bootstrap-row>
+                    </pagecontent>
+                </forge-module-add-version>
+                <forge-module-version j:applyOn="jnt:forgeModuleVersion" j:defaultTemplate="true" j:hiddenTemplate="false" j:originWS="default" j:priority="100" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentTemplate">
+                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                    <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
+                        <predefined--rows-960gs column="1col16" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:row">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <predefined--rows-960gs-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
+                                <main-resource-display j:mainResourceView="default" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                </main-resource-display>
+                            </predefined--rows-960gs-col1>
+                        </predefined--rows-960gs>
+                    </pagecontent>
+                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Module Version"/>
+                </forge-module-version>
+            </templates>
+            <publish-your-module j:originWS="default" j:templateNode="/templateSets/forge/templates/forge-module-creation" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:page">
+                <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Publish your module"/>
+            </publish-your-module>
+            <forge-home j:originWS="default" j:templateNode="/templateSets/forge/templates/forge-home" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:page">
+                <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Home"/>
+            </forge-home>
+        </forge>
+    </templateSets>
 </content>
-

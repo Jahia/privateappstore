@@ -18,7 +18,7 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
 <template:addResources type="javascript" resources="html5shiv.js"/>
-<template:addResources type="javascript" resources="jquery.min.js, bootstrap-modal.js, forge.js"/>
+<template:addResources type="javascript" resources="jquery.min.js, bootstrap.js, forge.js"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="createdBy" value="${currentNode.properties['jcr:createdBy'].string}"/>

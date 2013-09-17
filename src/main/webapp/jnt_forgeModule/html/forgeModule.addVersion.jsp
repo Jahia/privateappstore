@@ -116,7 +116,7 @@
                         <c:forEach items="${jcr:getNodes(requiredVersions, 'jnt:contentFolder')}" var="requiredVersionsFolder">
                             <optgroup label="${requiredVersionsFolder.displayableName}">
                                 <c:forEach items="${jcr:getNodes(requiredVersionsFolder, 'jnt:text')}" var="requiredVersion">
-                                    <option value="${requiredVersion.identifier}">${requiredVersion.displayableName}</option>
+                                    <option value="${requiredVersion.identifier}">${requiredVersion.properties['text'].string}</option>
                                 </c:forEach>
                             </optgroup>
                         </c:forEach>
@@ -127,6 +127,9 @@
             <div class="control-group">
                 <div class="controls">
                     <input type="submit" class="btn" value="<fmt:message key="jnt_forgeModuleVersion.label.submit" />"/>
+                    <a class="btn btnBack" href="${currentNode.url}" target="_self">
+                        <fmt:message key="jnt_forgeModule.label.developer.cancel"/>
+                    </a>
                 </div>
             </div>
 

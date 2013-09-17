@@ -27,112 +27,134 @@
 </c:if>
 
 <template:include view="hidden.header"/>
-<c:set var="columnsNumber" value="4"/>
 
-<template:addResources type="inlinejavascript">
-    <script type="text/javascript">
+<c:if test="${empty moduleMap.currentList && (not isDeveloper || viewAsUser)}">
 
-    $(document).ready(function() {
+    <c:set var="isEmptyTab" value="true"/>
+    <template:addResources type="inlinejavascript">
+        <script type="text/javascript">
 
-        <c:choose>
+            $(document).ready(function() {
 
-            <c:when test="${isDeveloper && not viewAsUser}">
+                var tabID = $('#moduleScreenshots').parents('.tab-pane').attr("id");
+                var navTabSelector = "a[href='#" + tabID + "']";
 
-                $('#moduleScreenshotsList').sortable({
-                   revert: true
-                });
+                $(".jnt_bootstrapTabularList").find(navTabSelector).parent().remove();
+            });
+        </script>
+    </template:addResources>
+</c:if>
 
-                $('#moduleScreenshotsList').on('sortstop', function(event, ui) {
+<c:if test="${not isEmptyTab}">
 
-                    var movedScreenshot = $(ui.item[0]);
-                    var folder = movedScreenshot.attr("data-parent-path");
+    <c:set var="columnsNumber" value="4"/>
 
-                    var data = {};
-                    data['source'] = folder + "/" + movedScreenshot.attr("data-name");
+    <template:addResources type="inlinejavascript">
+        <script type="text/javascript">
 
-                    if (movedScreenshot.is(':last-child')) {
-                        data['target'] = folder;
-                        data['action'] = "moveAfter";
-                    }
-                    else {
-                        data['target'] = folder + "/" + movedScreenshot.next().attr("data-name");
-                        data['action'] = "moveBefore";
-                    }
+        $(document).ready(function() {
 
-                    $.post('<c:url value="${url.base}${currentNode.path}.move.do"/>', data, function () {
+            <c:choose>
 
-                    }, "json");
+                <c:when test="${isDeveloper && not viewAsUser}">
 
-                });
+                    $('#moduleScreenshotsList').sortable({
+                       revert: true
+                    });
 
-                $('.remove-screenshot').click(function() {
-                    var listItem = $(this).parent('li.moduleScreenshot');
-                    $.post($(this).attr('data-path'), {jcrMethodToCall: 'delete'}, function() {
-                        if($('#moduleScreenshotsList li').length == 1)
-                            $('#jnt_forge').triggerHandler('forgeModuleUpdated');
-                        listItem.fadeOut('slow', function() {listItem.remove()});
-                    }, "json");
-                });
+                    $('#moduleScreenshotsList').on('sortstop', function(event, ui) {
 
-                $('#moduleScreenshotsList, #moduleScreenshotsList li').disableSelection();
+                        var movedScreenshot = $(ui.item[0]);
+                        var folder = movedScreenshot.attr("data-parent-path");
 
-            </c:when>
+                        var data = {};
+                        data['source'] = folder + "/" + movedScreenshot.attr("data-name");
 
-            <c:otherwise>
+                        if (movedScreenshot.is(':last-child')) {
+                            data['target'] = folder;
+                            data['action'] = "moveAfter";
+                        }
+                        else {
+                            data['target'] = folder + "/" + movedScreenshot.next().attr("data-name");
+                            data['action'] = "moveBefore";
+                        }
 
-                $('#screenshotsCarousel-${id}').carousel();
+                        $.post('<c:url value="${url.base}${currentNode.path}.move.do"/>', data, function () {
 
-            </c:otherwise>
+                        }, "json");
 
-        </c:choose>
+                    });
 
-    });
+                    $('.remove-screenshot').click(function() {
+                        var listItem = $(this).parent('li.moduleScreenshot');
+                        $.post($(this).attr('data-path'), {jcrMethodToCall: 'delete'}, function() {
+                            if($('#moduleScreenshotsList li').length == 1)
+                                $('#jnt_forge').triggerHandler('forgeModuleUpdated');
+                            listItem.fadeOut('slow', function() {listItem.remove()});
+                        }, "json");
+                    });
 
-    </script>
-</template:addResources>
+                    $('#moduleScreenshotsList, #moduleScreenshotsList li').disableSelection();
 
-<c:choose>
+                </c:when>
 
-    <c:when test="${isDeveloper && not viewAsUser}">
-        <div class="row-fluid">
-            <ul id="moduleScreenshotsList" class="thumbnails">
-                <c:forEach var="moduleScreenshot" items="${moduleMap.currentList}" varStatus="status">
-                    <li class="moduleScreenshot span${functions:round(12/columnsNumber)}${status.index % columnsNumber eq 0 ? '' : ''}"
-                        data-name="${moduleScreenshot.name}" data-parent-path="${moduleScreenshot.parent.path}">
-                        <img class="move-screenshot" src="${moduleScreenshot.thumbnailUrls['thumbnail2']}"/>
-                        <a class="remove-screenshot" data-path="<c:url value='${url.base}${moduleScreenshot.path}'/>"
-                           href="#"><i class="icon-remove"></i>&nbsp;<fmt:message key="jnt_forgeModule.label.remove"/></a>
-                    </li>
-                </c:forEach>
-            </ul>
-        </div>
-    </c:when>
+                <c:otherwise>
 
-    <c:otherwise>
+                    $('#screenshotsCarousel-${id}').carousel();
 
-        <div id="screenshotsCarousel-${id}" class="carousel slide">
+                </c:otherwise>
 
-            <ol class="carousel-indicators">
-                <c:forEach var="moduleScreenshot" items="${moduleMap.currentList}" varStatus="status">
-                    <li data-target="#screenshotsCarousel-${id}" data-slide-to="${status.index}" class="${status.first ? 'active' : ''}"></li>
-                </c:forEach>
-            </ol>
+            </c:choose>
 
-            <div class="carousel-inner">
-                <c:forEach var="moduleScreenshot" items="${moduleMap.currentList}" varStatus="status">
-                    <div class="${status.first ? 'active ' : ''}item">
-                        <template:module node="${moduleScreenshot}" view="${moduleMap.subNodesView}" editable="${moduleMap.editable}"/>
-                    </div>
-                </c:forEach>
+        });
+
+        </script>
+    </template:addResources>
+
+    <c:choose>
+
+        <c:when test="${isDeveloper && not viewAsUser}">
+            <div class="row-fluid">
+                <ul id="moduleScreenshotsList" class="thumbnails">
+                    <c:forEach var="moduleScreenshot" items="${moduleMap.currentList}" varStatus="status">
+                        <li class="moduleScreenshot span${functions:round(12/columnsNumber)}${status.index % columnsNumber eq 0 ? '' : ''}"
+                            data-name="${moduleScreenshot.name}" data-parent-path="${moduleScreenshot.parent.path}">
+                            <img class="move-screenshot" src="${moduleScreenshot.thumbnailUrls['thumbnail2']}"/>
+                            <a class="remove-screenshot" data-path="<c:url value='${url.base}${moduleScreenshot.path}'/>"
+                               href="#"><i class="icon-remove"></i>&nbsp;<fmt:message key="jnt_forgeModule.label.remove"/></a>
+                        </li>
+                    </c:forEach>
+                </ul>
             </div>
+        </c:when>
 
-            <a class="carousel-control left" href="#screenshotsCarousel-${id}" data-slide="prev">&lsaquo;</a>
-            <a class="carousel-control right" href="#screenshotsCarousel-${id}" data-slide="next">&rsaquo;</a>
+        <c:otherwise>
+            <c:if test="${not empty moduleMap.currentList}">
+                <div id="screenshotsCarousel-${id}" class="carousel slide">
 
-        </div>
+                    <ol class="carousel-indicators">
+                        <c:forEach var="moduleScreenshot" items="${moduleMap.currentList}" varStatus="status">
+                            <li data-target="#screenshotsCarousel-${id}" data-slide-to="${status.index}" class="${status.first ? 'active' : ''}"></li>
+                        </c:forEach>
+                    </ol>
 
-    </c:otherwise>
+                    <div class="carousel-inner">
+                        <c:forEach var="moduleScreenshot" items="${moduleMap.currentList}" varStatus="status">
+                            <div class="${status.first ? 'active ' : ''}item">
+                                <template:module node="${moduleScreenshot}" view="${moduleMap.subNodesView}" editable="${moduleMap.editable}"/>
+                            </div>
+                        </c:forEach>
+                    </div>
 
-</c:choose>
+                    <a class="carousel-control left" href="#screenshotsCarousel-${id}" data-slide="prev"></a>
+                    <a class="carousel-control right" href="#screenshotsCarousel-${id}" data-slide="next"></a>
 
-<template:include view="hidden.footer"/>
+                </div>
+            </c:if>
+        </c:otherwise>
+
+    </c:choose>
+
+    <template:include view="hidden.footer"/>
+
+</c:if>

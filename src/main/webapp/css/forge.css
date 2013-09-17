@@ -1864,6 +1864,7 @@
 }
 .bodywrapper #jnt_forge .averageRating.box {
   margin-top: 20px;
+  text-align: center;
 }
 .bodywrapper #jnt_forge .reviewsHeader {
   display: inline-block;
@@ -1900,6 +1901,18 @@
   margin-bottom: 20px;
   margin-top: 20px;
 }
+.bodywrapper #jnt_forge #moduleHeader .moduleRating {
+    margin-bottom: 16px;
+}
+.bodywrapper #jnt_forge #moduleHeader .moduleRating form {
+    margin: 0;
+}
+.bodywrapper #jnt_forge #moduleHeader .moduleRating span {
+    margin-left: 5px;
+}
+.bodywrapper .btn.btnBack {
+    margin-bottom: 20px;
+}
 .bodywrapper #jnt_forge .viewAs {
   opacity: 0.4;
   -webkit-transition: opacity 0.35s ease;
@@ -1927,6 +1940,12 @@
 }
 .bodywrapper #jnt_forge #moduleScreenshotsList .moduleScreenshot img.move-screenshot {
   cursor: move;
+}
+.bodywrapper #jnt_forge .ratingValue {
+    display: inline;
+}
+.bodywrapper #jnt_forge .ratingValue form {
+    display: inline;
 }
 .bodywrapper .fade {
   opacity: 0;

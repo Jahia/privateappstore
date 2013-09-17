@@ -65,9 +65,20 @@
                         }
                         else {
                             var items = [];
+                            var hasMandatoryLeft = false;
                             $.each(data['todoList'], function(key, val) {
+                                if (!hasMandatoryLeft && val['mandatory']) {
+                                    hasMandatoryLeft = true;
+                                }
                                 items.push('<li'+ (val['mandatory'] ? ' class="text-error"' : '' ) + '>' + val['name'] + '</li>');
                             });
+
+                            if (!hasMandatoryLeft) {
+                                $('span#mandatoryTodoList').hide();
+                            }
+                            else {
+                                $('span#mandatoryTodoList').show();
+                            }
 
                             todoList.empty().append(items.join(''));
 
@@ -130,14 +141,17 @@
         </div>
 
         <div id="todoListWrapper-${id}">
-            <h6><fmt:message key="jnt_forgeModule.label.developer.todoList"/></h6>
+            <h6>
+                <fmt:message key="jnt_forgeModule.label.developer.todoList"/>&nbsp;
+                <span id="mandatoryTodoList"><fmt:message key="jnt_forgeModule.label.developer.todoListMandatory"/></span>
+            </h6>
             <ul id="todoList-${id}">
             </ul>
         </div>
 
         <div class="btn-group">
             <a class="btn btn-small" href="<c:url value="${url.base}${currentNode.path}.forge-module-add-version.html"/>"><fmt:message key="jnt_forgeModule.label.developer.addVersion"/></a>
-            <a class="btn btn-small ${viewAsUser ? 'btn-primary' : ''}" id="viewAsUserBtn-${id}"
+            <a class="btn btn-small ${viewAsUser ? 'btn-warning' : ''}" id="viewAsUserBtn-${id}"
                 href="<c:url value="${url.base}${currentNode.path}.html${viewAsUser ? '' : '?viewAs=user'}"/>"
                 data-toggle="tooltip" title="<fmt:message key="jnt_forgeModule.label.developer.viewAs.tooltip"/>">
                 <fmt:message key="jnt_forgeModule.label.developer.viewAs"/>
@@ -148,23 +162,6 @@
                     <c:otherwise><fmt:message key="jnt_forgeModule.label.developer.publish"/></c:otherwise>
                 </c:choose>
             </button>
-            <button id="deleteModule-${id}" class="btn btn-small" data-toggle="modal" data-target="#deleteModuleModal-${id}">
-                <fmt:message key="jnt_forgeModule.label.developer.delete"/>
-            </button>
-        </div>
-
-        <div id="deleteModuleModal-${id}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="deleteModuleModal-${id}" aria-hidden="true">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h3 id="deleteModuleModal-${id}"><fmt:message key="jnt_forgeModule.label.developer.modal.delete.header"/></h3>
-            </div>
-            <div class="modal-body">
-                <p><fmt:message key="jnt_forgeModule.label.developer.modal.delete.body"/></p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn" data-dismiss="modal" aria-hidden="true"><fmt:message key="jnt_review.label.admin.modal.delete.cancel"/></button>
-                <button class="btn btn-primary" onclick=""><fmt:message key="jnt_review.label.admin.modal.delete.confirm"/></button>
-            </div>
         </div>
 
     </section>

@@ -48,7 +48,7 @@
                 <c:forEach items="${jcr:getNodes(requiredVersions, 'jnt:contentFolder')}" var="requiredVersionsFolder" varStatus="statusFolder">
                     <c:set var="requiredVersionsList" value="${requiredVersionsList}{text: '${requiredVersionsFolder.displayableName}', children : ["/>
                     <c:forEach items="${jcr:getNodes(requiredVersionsFolder, 'jnt:text')}" var="requiredVersionNode" varStatus="status">
-                        <c:set var="requiredVersionsList" value="${requiredVersionsList} {id: '${requiredVersionNode.identifier}', text:'${requiredVersionNode.displayableName}'} ${status.last ? ']': ','}"/>
+                        <c:set var="requiredVersionsList" value="${requiredVersionsList} {id: '${requiredVersionNode.identifier}', text:'${requiredVersionNode.properties['text'].string}'} ${status.last ? ']': ','}"/>
                     </c:forEach>
                     <c:set var="requiredVersionsList" value="${requiredVersionsList}}${statusFolder.last ? '' : ','}"/>
                 </c:forEach>
@@ -117,13 +117,13 @@ ${changeLog.string}
                 <a href="#" id="requiredVersion-${id}" class="editable editable-click" data-type="select2" data-pk="1"
                    data-name="requiredVersion" data-original-title="<fmt:message key="jnt_forgeModuleVersion.label.requiredVersion"/>">
             </c:if>
-            ${requiredVersion.node.displayableName}
+            ${requiredVersion.node.properties['text'].string}
             <c:if test="${isDeveloper && not viewAsUser}">
                 </a>
             </c:if>
         </dd>
         <dt><fmt:message key="jnt_forgeModule.label.updated"/></dt>
-        <dd><fmt:formatDate value="${moduleVersionBinary.contentLastModifiedAsDate}" pattern="yyyy-MM-dd" /></dd>
+        <dd><fmt:formatDate value="${currentNode.properties['jcr:lastModified'].date.time}" pattern="yyyy-MM-dd" /></dd>
     </dl>
 </footer>
 

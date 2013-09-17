@@ -19,7 +19,7 @@
 
 <template:addResources type="javascript" resources="html5shiv.js"/>
 <template:addResources type="css" resources="ui.stars.css, ui.stars.review.css"/>
-<template:addResources type="javascript" resources="jquery.min.js, bootstrap-modal.js, forge.js"/>
+<template:addResources type="javascript" resources="jquery.min.js, bootstrap.js, forge.js"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="createdBy" value="${currentNode.properties['jcr:createdBy'].string}"/>
@@ -148,25 +148,16 @@
 
                             <c:set var="isForgeAdmin" value="${jcr:hasPermission(currentNode.parent.parent.parent, 'jcr:all_live')}"/>
 
+                                <button id="replyReviewToggle-${id}" class="btn btn-small btn-primary"><fmt:message key="jnt_review.label.reply"/></button>
 
-                            <c:choose>
+                                <%--- check if curent user is the owner of the module ---%>
+                                <c:if test="${jcr:hasPermission(currentNode.parent.parent, 'jcr:all_live')}">
+                                    <%@include file="../../commons/reportButton.jspf"%>
+                                </c:if>
 
-                                <c:when test="${isForgeAdmin}">
+                                <c:if test="${isForgeAdmin}">
                                     <%@include file="../../commons/adminButtons.jspf"%>
-                                </c:when>
-
-                                <c:otherwise>
-
-                                    <button id="replyReviewToggle-${id}" class="btn btn-small btn-primary"><fmt:message key="jnt_review.label.reply"/></button>
-
-                                    <%--- check if curent user is the owner of the module ---%>
-                                    <c:if test="${jcr:hasPermission(currentNode.parent.parent, 'jcr:all_live')}">
-                                        <%@include file="../../commons/reportButton.jspf"%>
-                                    </c:if>
-
-                                </c:otherwise>
-
-                            </c:choose>
+                                </c:if>
 
                         </div>
 

@@ -112,7 +112,7 @@
             </c:when>
 
             <c:otherwise>
-                <a class="moduleAuthor">${authorName}</a>
+                <p class="moduleAuthor">${authorName}</p>
             </c:otherwise>
 
         </c:choose>
@@ -193,6 +193,7 @@
             <jcr:nodeProperty node="${activeVersion}" name="versionNumber" var="versionNumber"/>
             <a class="btn btn-block" href="${activeVersion.properties.url.string}"
                <c:if test="${not isDeveloper}">onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')"</c:if>>
+                <i class="icon-download icon-white"></i>
                 <fmt:message key="jnt_forgeModule.label.downloadVersion">
                     <fmt:param value="${versionNumber.string}"/>
                 </fmt:message>
@@ -201,6 +202,7 @@
 
         <c:otherwise>
             <a class="btn btn-block disabled" href="#">
+                <i class="icon-download icon-white"></i>
                 <fmt:message key="jnt_forgeModule.label.downloadVersion">
                     <fmt:param value="X.X.X.X"/>
                 </fmt:message>

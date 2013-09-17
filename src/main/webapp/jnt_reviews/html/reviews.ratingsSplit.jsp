@@ -25,7 +25,7 @@
 <c:if test="${ratingNbr gt 0}">
     <div class ="row-fluid">
 
-        <dl class="dl-horizontal span5">
+        <dl class="dl-horizontal span7">
 
             <c:forEach var="i" begin="${worstRating}" end="${bestRating}" step="1">
 
