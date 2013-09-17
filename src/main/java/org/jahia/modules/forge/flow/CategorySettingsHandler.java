@@ -53,7 +53,7 @@ public class CategorySettingsHandler implements Serializable{
             if (StringUtils.startsWith(key, "lang_")) {
                 String language = StringUtils.substringAfter(key,"lang_");
                 try {
-                    Session localizedSession = JCRSessionFactory.getInstance().getCurrentUserSession("default", Locale.forLanguageTag(language));
+                    Session localizedSession = JCRSessionFactory.getInstance().getCurrentUserSession("default", new Locale(language));
                     if (StringUtils.isEmpty(params.get(key))) {
                         localizedSession.getNodeByIdentifier(currentCategory).getProperty("jcr:title").remove();
                     } else {
