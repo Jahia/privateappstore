@@ -63,45 +63,45 @@
         </forge-modules-release-type>
       </contents>
       <templates j:originWS="default" j:rootTemplatePath="/base/forge-template" jcr:primaryType="jnt:templatesFolder">
-        <forge-home j:hiddenTemplate="false" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:pageTemplate">
-          <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Home" />
-          <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
-            <bootstrap-row customColumn="4,12" divID="jnt_forge" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow">
-              <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-              <bootstrap-row-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
-                <actions j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:linkList">
-                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                  <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Actions" />
-                  <publish-your-module j:node="/templateSets/forge/publish-your-module" j:originWS="default" j:target="_self" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:nodeLink">
-                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Add your module" />
-                  </publish-your-module>
-                </actions>
-                <facets-list j:bindedComponent="/templateSets/forge/contents/forge-modules-repository" j:originWS="default" j:type="jnt:forgeModule" j:view="forge" jcr:mixinTypes="jmix:accessControlled jmix:renderable" jcr:primaryType="jnt:facets">
-                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                  <field-facet facet="Category" field="jnt:forgeModule;category" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:fieldFacet" limit="100" mincount="1" missing="false" offset="0">
-                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                    <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" label="Category" />
-                  </field-facet>
-                  <field-facet-1 facet="Tags" field="jmix:tagged;j:tags" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:fieldFacet" limit="100" mincount="1" missing="false" offset="0">
-                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                    <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" label="Tags" />
-                  </field-facet-1>
-                </facets-list>
-                <forge-my-modules-list j:originWS="default" j:skin="skins.bootstrap-rounded-title" j:style="grey" jcr:mixinTypes="jmix:accessControlled jmix:skinnable jmix:style" jcr:primaryType="jnt:forgeMyModulesList">
-                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                  <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="My Modules" />
-                </forge-my-modules-list>
-              </bootstrap-row-col1>
-              <bootstrap-row-col2 j:originWS="default" jcr:primaryType="jnt:contentList">
-                <forgeModulesList columnsNumber="4" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:forgeModulesList" nbOfModulePerPage="20" startNode="/templateSets/forge/contents/forge-modules-repository">
-                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
-                </forgeModulesList>
-              </bootstrap-row-col2>
-            </bootstrap-row>
-          </pagecontent>
-          <j:acl jcr:primaryType="jnt:acl" />
-        </forge-home>
+          <forge-home j:hiddenTemplate="false" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:pageTemplate">
+              <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Home"/>
+              <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
+                  <bootstrap-row customColumn="4,12" divID="jnt_forge" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow">
+                      <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                      <bootstrap-row-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
+                          <facets-list j:bindedComponent="/templateSets/forge/contents/forge-modules-repository" j:originWS="default" j:type="jnt:forgeModule" j:view="forge" jcr:mixinTypes="jmix:accessControlled jmix:renderable" jcr:primaryType="jnt:facets">
+                              <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                              <field-facet facet="Category" field="jnt:forgeModule;category" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:fieldFacet" limit="100" mincount="1" missing="false" offset="0">
+                                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                  <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" label="Category"/>
+                              </field-facet>
+                              <field-facet-1 facet="Tags" field="jmix:tagged;j:tags" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:fieldFacet" limit="100" mincount="1" missing="false" offset="0">
+                                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                  <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" label="Tags"/>
+                              </field-facet-1>
+                          </facets-list>
+                          <forge-my-modules-list j:originWS="default" j:skin="skins.bootstrap-rounded-title" j:style="grey" jcr:mixinTypes="jmix:accessControlled jmix:skinnable jmix:style" jcr:primaryType="jnt:forgeMyModulesList">
+                              <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                              <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="My Modules"/>
+                          </forge-my-modules-list>
+                          <actions j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:linkList">
+                              <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                              <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Actions"/>
+                              <publish-your-module j:node="/templateSets/forge/publish-your-module" j:originWS="default" j:target="_self" j:view="forge" jcr:mixinTypes="jmix:accessControlled jmix:renderable" jcr:primaryType="jnt:nodeLink">
+                                  <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                  <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Add your module"/>
+                              </publish-your-module>
+                          </actions>
+                      </bootstrap-row-col1>
+                      <bootstrap-row-col2 j:originWS="default" jcr:primaryType="jnt:contentList">
+                          <forgeModulesList columnsNumber="4" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:forgeModulesList" nbOfModulePerPage="20" startNode="/templateSets/forge/contents/forge-modules-repository">
+                              <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                          </forgeModulesList>
+                      </bootstrap-row-col2>
+                  </bootstrap-row>
+              </pagecontent>
+              <j:acl jcr:primaryType="jnt:acl"/>
+          </forge-home>
         <forge-module-creation j:hiddenTemplate="false" j:invertCondition="false" j:originWS="default" j:requireLoggedUser="false" j:requirePrivilegedUser="false" j:view="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:pageTemplate">
           <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
           <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Module Creation" />
