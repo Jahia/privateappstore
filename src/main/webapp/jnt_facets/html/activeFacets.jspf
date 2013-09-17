@@ -15,7 +15,7 @@
 <%--@elvariable id="acl" type="java.lang.String"--%>
 <c:if test="${!empty activeFacetsVars[activeFacetMapVarName]}">
     <h4><fmt:message key="facets.activeFacets"/></h4>
-    <ul class="inline">
+    <ul class="inline unstyled">
 </c:if>
 <c:forEach items="${activeFacetsVars[activeFacetMapVarName]}" var="facet" varStatus="activeFacetStat">
     <c:forEach items="${facet.value}" var="facetValue">
