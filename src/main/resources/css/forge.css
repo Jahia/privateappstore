@@ -2054,3 +2054,53 @@
 .modal-footer .btn-block + .btn-block {
   margin-left: 0;
 }
+div.file_upload {
+    position: relative;
+}
+
+div.file_upload_small {
+}
+
+div.file_upload_large {
+}
+
+div.file_upload_highlight {
+    color: #ffffff !important;
+    background-color: #da4f49 !important;
+    background-image: linear-gradient(to bottom, #ee5f5b, #bd362f) !important
+}
+
+div.file_upload input {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    border: 300px solid transparent;
+    opacity: 0;
+    -ms-filter: 'alpha(opacity=0)';
+    filter: alpha(opacity=0);
+    -o-transform: translate(-300px, -300px) scale(10);
+    -moz-transform: translate(-800px, 0) scale(10);
+    cursor: pointer;
+}
+
+.file_upload iframe, .file_upload button {
+    display: none;
+}
+
+.file_upload_preview img {
+    width: 80px;
+}
+
+.file_upload_progress .ui-progressbar-value {
+    background: url(images/pbar-ani.gif);
+}
+
+.file_upload_progress div {
+    width: 50px;
+    height: 10px;
+}
+
+.file_upload_cancel button {
+    cursor: pointer;
+}

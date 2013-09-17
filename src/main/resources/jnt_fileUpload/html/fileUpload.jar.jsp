@@ -17,7 +17,7 @@
 <%--@elvariable id="currentResource" type="org.jahia.services.render.Resource"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
-<template:addResources type="css" resources="jquery.fileupload.css"/>
+<template:addResources type="css" resources="forge.css"/>
 <template:addResources type="javascript" resources="jquery.min.js,jquery-ui.min.js,jquery.fileupload-with-ui.min.js"/>
 <fmt:message key="label.dropHere.ie" var="i18nDropHereIE"/>
 
@@ -31,7 +31,6 @@
     </script>
 </template:addResources>--%>
 <c:if test="${jcr:hasPermission(renderContext.mainResource.node, 'jahiaForgeUploadModule')}">
-    <h3><fmt:message key="jahiaForge.upload.title"/> </h3>
     <c:choose>
         <c:when test="${jcr:isNodeType(renderContext.site,'jmix:forgeSettings') and not empty renderContext.site.properties.forgeSettingsUrl.string}">
             <c:set var="linked" value="${ui:getBindedComponent(currentNode, renderContext, 'j:bindedComponent')}"/>

@@ -33,7 +33,6 @@
         ,bootstrap-scrollspy.js,bootstrap-tab.js,bootstrap-typehead.js,bootstrap-affix.js"/>
     <template:addResources type="javascript" resources="select2.js, bootstrap-editable.js, wysihtml5-0.3.0.js, bootstrap-wysihtml5.js, wysihtml5.js"/>
     <template:addResources type="css" resources="select2.css, select2-bootstrap.css, bootstrap-editable.css, wysiwyg-color.css, forge.edition.css"/>
-    <template:addResources type="css" resources="jquery.fileupload.css"/>
     <template:addResources type="javascript" resources="jquery.fileupload-with-ui.min.js"/>
 </c:if>
 

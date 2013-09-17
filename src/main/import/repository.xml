@@ -208,7 +208,7 @@
                                                                       j:requireLoggedUser="true"
                                                                       j:requirePrivilegedUser="false"
                                                                       j:requiredPermissions="#/permissions/repository-permissions/jcr:all_live"
-                                                                      j:view="forge"
+                                                                      j:view="screenshot"
                                                                       jcr:mixinTypes="jmix:accessControlled jmix:renderable jmix:requiredPermissions"
                                                                       jcr:primaryType="jnt:fileUpload">
                                                         <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
@@ -295,7 +295,7 @@
                                                         <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                                                     </main-resource-display>
                                                         <file-upload-form j:view="jar"
-                                                     jcr:mixinTypes="jmix:renderable"
+                                                         jcr:mixinTypes="jmix:renderable"
                                                      jcr:primaryType="jnt:fileUpload"/>
                                                     </changelog>
                                                     <permissions j:expiration="0"
@@ -312,6 +312,7 @@
                                                          jcr:title="Permissions"/>
                                                         <manage-roles jcr:primaryType="jnt:manageRoles" roles="reader">
                                                             <j:translation_en jcr:language="en"
+                                                            jcr:mixinTypes="mix:title"
                                                             jcr:primaryType="jnt:translation"
                                                             jcr:title="Module permissions"/>
                                                         </manage-roles>
@@ -383,26 +384,30 @@
                                 <bootstrap-tabular-list fadeIn="true"
                                              jcr:primaryType="jnt:bootstrapTabularList"
                                              tabsPosition="top">
-                                    <settings jcr:primaryType="jnt:contentList">
+                                        <forge-settings jcr:primaryType="jnt:contentList">
                                         <j:translation_en jcr:language="en"
                                              jcr:mixinTypes="mix:title"
                                              jcr:primaryType="jnt:translation"
-                                             jcr:title="settings"/>
+                                                jcr:title="Forge settings"/>
                                         <forgesettings jcr:primaryType="jnt:forgeSettings"/>
-                                    </settings>
-                                    <permissions jcr:primaryType="jnt:contentList">
+                                        </forge-settings>
+                                        <forge-roles jcr:primaryType="jnt:contentList">
                                         <j:translation_en jcr:language="en"
                                              jcr:mixinTypes="mix:title"
                                              jcr:primaryType="jnt:translation"
-                                             jcr:title="permissions"/>
-                                        <manage-roles jcr:primaryType="jnt:manageRoles"
-                                              roles="jahiapp-user owner reader"/>
-                                    </permissions>
+                                                jcr:title="Forge roles"/>
+                                            <manage-roles jcr:primaryType="jnt:manageRoles" roles="jahiapp-user owner reader">
+                                                <j:translation_en jcr:language="en"
+                                                   jcr:mixinTypes="mix:title"
+                                                   jcr:primaryType="jnt:translation"
+                                                   jcr:title="Forge roles"/>
+                                            </manage-roles>
+                                        </forge-roles>
                                     <categories jcr:primaryType="jnt:contentList">
                                         <j:translation_en jcr:language="en"
                                              jcr:mixinTypes="mix:title"
                                              jcr:primaryType="jnt:translation"
-                                             jcr:title="categories"/>
+                                                jcr:title="Categories"/>
                                         <categorysettings jcr:primaryType="jnt:categorySettings"/>
                                     </categories>
                                 </bootstrap-tabular-list>
