@@ -174,7 +174,11 @@
                 <h3 id="deleteModuleModal-${id}"><fmt:message key="jnt_forgeModule.label.developer.modal.delete.header"/></h3>
             </div>
             <div class="modal-body">
-                <p><fmt:message key="jnt_forgeModule.label.developer.modal.delete.body"/></p>
+                <p>
+                    <fmt:message key="jnt_forgeModule.label.developer.modal.delete.body">
+                        <fmt:param value="${currentNode.displayableName}"/>
+                    </fmt:message>
+                </p>
             </div>
             <div class="modal-footer">
                 <button class="btn" data-dismiss="modal" aria-hidden="true"><fmt:message key="jnt_review.label.admin.modal.delete.cancel"/></button>
