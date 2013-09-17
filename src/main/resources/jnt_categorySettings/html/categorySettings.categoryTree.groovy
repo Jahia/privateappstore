@@ -7,12 +7,7 @@ if (renderContext.editMode) {
 } else {
     def base = renderContext.site.getSession().getNode("/sites/systemsite/categories");
     def displayTree;
-    def currentCategory = "";
-    try {
-        currentCategory = renderContext.mainResource.node.getProperty("categoryRoot").getNode();
-    } catch (javax.jcr.RepositoryException e) {
-        currentCategory = null;
-    }
+
     displayTree = {parent ->
         def childs = JCRTagUtils.getChildrenOfType(parent, "jnt:category");
         if (childs.size() > 0) {
@@ -28,10 +23,10 @@ if (renderContext.editMode) {
         };
     }
 //    println "<label>" + (currentCategory!=null?currentCategory.getDisplayableName() :JahiaResourceBundle.getString("DefaultJahiaTemplates", "label.categories", renderContext.UILocale, "Default Jahia Templates")) + "</label>";
-    if (JCRTagUtils.hasChildrenOfType(base, "jnt:category")) {
+    //if (JCRTagUtils.hasChildrenOfType(base, "jnt:category")) {
         println "var data = ["
         println "{label: '"+ StringEscapeUtils.escapeXml(base.displayableName) + "', id: '"+base.identifier+"'";
         displayTree(base);
         println "}];";
-    }
+    //}
 }
