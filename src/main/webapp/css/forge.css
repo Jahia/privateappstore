@@ -2073,23 +2073,3 @@
 .bodywrapper .modal-footer .btn-block + .btn-block {
   margin-left: 0;
 }
-
-.bodywrapper #jnt_forge ul.unstyled,
-.bodywrapper #jnt_forge ol.unstyled {
-    margin-left: 0;
-    list-style: none;
-}
-.bodywrapper #jnt_forge ul.inline,
-.bodywrapper #jnt_forge ol.inline {
-    margin-left: 0;
-    list-style: none;
-}
-.bodywrapper #jnt_forge ul.inline > li,
-.bodywrapper #jnt_forge ol.inline > li {
-    display: inline-block;
-    *display: inline;
-
-  *zoom: 1;
-  padding-left: 5px;
-  padding-right: 5px;
-}
