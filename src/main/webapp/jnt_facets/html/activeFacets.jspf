@@ -14,7 +14,7 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 <%--@elvariable id="acl" type="java.lang.String"--%>
 <c:if test="${!empty activeFacetsVars[activeFacetMapVarName]}">
-    <h3><fmt:message key="facets.activeFacets"/></h3>
+    <h4><fmt:message key="facets.activeFacets"/></h4>
     <ul class="inline unstyled">
 </c:if>
 <c:forEach items="${activeFacetsVars[activeFacetMapVarName]}" var="facet" varStatus="activeFacetStat">
