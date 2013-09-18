@@ -17,7 +17,13 @@
 
 <template:addResources type="javascript" resources="jquery.min.js,jquery.validate.js"/>
 <template:addResources type="javascript" resources="select2.js"/>
+<template:addResources type="javascript" resources="html5shiv.js"/>
+
 <template:addResources type="css" resources="select2.css, select2-bootstrap.css"/>
+
+<c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>
+<c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
+
 
 <c:set var="id" value="${currentNode.identifier}"/>
 
@@ -31,10 +37,7 @@
 
                 <c:url var="postURL" value="${url.base}${currentNode.path}"/>
                 $('#changeLog-${currentNode.identifier}').editable({
-                    <jsp:include page="../../commons/bootstrap-editable-options-wysihtml5.jsp">
-                    <jsp:param name="postURL" value='${postURL}'/>
-                    <jsp:param name="fullEditor" value='false'/>
-                    </jsp:include>
+
                 });
 
             });
@@ -106,9 +109,7 @@
     </script>
 </template:addResources>
 <c:if test="${isDeveloper && not viewAsUser}">
-    <p class="editable-toggle">
-        <a id="toggle-changeLog-${currentNode.identifier}" href="#"><i class="icon-pencil"></i>&nbsp;<fmt:message key="jnt_forgeModule.label.edit"/></a>
-    </p>
+
     <div data-original-title="<fmt:message key="jnt_forgeModuleVersion.label.changeLog"/>" data-toggle="manual" data-name="changeLog" data-type="wysihtml5"
     data-pk="1" id="changeLog-${currentNode.identifier}" class="editable">
 </c:if>
