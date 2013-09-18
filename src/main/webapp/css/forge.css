@@ -170,6 +170,16 @@
 .bodywrapper #jnt_forge .review time:before {
   content: "- ";
 }
+.bodywrapper #jnt_forge #moduleHeader,.bodywrapper #jnt_forge .forgeModule  {
+    text-align: center;
+}
+.bodywrapper #jnt_forge .forgeModule  {
+    margin-bottom: 15px;
+}
+.bodywrapper #jnt_forge .forgeModule h4  {
+    margin-bottom:0;
+}
+
 .bodywrapper #jnt_forge #moduleHeader header > h1 {
   margin-bottom: 0;
 }
@@ -222,5 +232,8 @@
 }
 .bodywrapper #jnt_forge .ratingValue form {
     display: inline;
+}
+.bodywrapper #jnt_forge .btn-file-upload  {
+    margin-bottom: 15px;
 }
 
