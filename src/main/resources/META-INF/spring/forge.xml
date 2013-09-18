@@ -102,4 +102,12 @@
         <property name="applyOnModes" value="live"/>
         <property name="applyOnNodeTypes" value="jnt:forgeModule"/>
     </bean>
+
+    <bean id="forgeRedirectFilter" class="org.jahia.modules.forge.filters.RedirectFilter">
+        <property name="priority" value="-4"/>
+        <property name="skipOnModes" value="live"/>
+        <property name="applyOnSiteTemplateSets" value="forge"/>
+        <property name="applyOnConfigurations" value="page"/>
+    </bean>
+
 </beans>
