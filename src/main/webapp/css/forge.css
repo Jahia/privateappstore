@@ -132,6 +132,7 @@
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffd83a2e', endColorstr='#ff9d261d', GradientType=0);
 }
 .bodywrapper #jnt_forge .control-group.reviewRating .ui-stars-star,
+.bodywrapper #jnt_forge .control-group.newReviewRating .ui-stars-star,
 .bodywrapper #jnt_forge .averageRating .ui-stars-star,
 .bodywrapper #jnt_forge .moduleMetaData .ui-stars-star {
   float: none;
@@ -250,6 +251,6 @@
     display: inline-block;
     float: none;
 }
-.bodywrapper #jnt_forge .reviewRating .ui-stars-star {
+.bodywrapper #jnt_forge .newReviewRating .ui-stars-star {
     background: none;
 }

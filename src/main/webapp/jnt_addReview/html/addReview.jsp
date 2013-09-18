@@ -87,7 +87,7 @@
                             $('#reviewTitle-088857c6-3257-435e-89db-68faf7f57039').val("");
                             $('#reviewComment-088857c6-3257-435e-89db-68faf7f57039').val("");
                         }
-                        $('#reviewRating-${boundComponent.identifier}').find('input[name="j:lastVote"]').removeAttr("disabled");
+                        $('#newReviewRating-${boundComponent.identifier}').find('input[name="j:lastVote"]').removeAttr("disabled");
                         moduleDoAddReview("<c:url value='${url.base}${boundComponent.path}'/>", $(form), $(form).parents('.tab-pane').attr('id'));
                     },
                     highlight: function(element, errorClass, validClass) {
@@ -98,7 +98,7 @@
                     }
                 });
 
-                $("#reviewRating-${boundComponent.identifier}").find(".controls").stars({
+                $("#newReviewRating-${boundComponent.identifier}").find(".controls").stars({
                     inputType: "select",
                     cancelShow: false,
                     disableValue: false
@@ -145,7 +145,7 @@
                             </div>
                         </div>
                     </c:if>
-                    <div class="control-group reviewRating" id="reviewRating-${boundComponent.identifier}">
+                    <div class="control-group newReviewRating" id="newReviewRating-${boundComponent.identifier}">
                         <span class="control-label"><fmt:message key="jnt_review.label.rating"/></span>
                         <div class="controls">
                             <select name="j:lastVote">
