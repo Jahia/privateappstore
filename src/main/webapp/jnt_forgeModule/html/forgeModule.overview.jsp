@@ -213,7 +213,7 @@
 
                     <c:otherwise>
                         <c:if test="${not empty authorURL}">
-                            <a class="btn btn-small btn-primary" href="${authorURL}"><fmt:message key="jnt_forgeModule.label.authorURL"/></a>
+                            <a class="btn btn-small btn-primary" target="_blank" href="${authorURL}"><fmt:message key="jnt_forgeModule.label.authorURL"/></a>
                         </c:if>
                         <c:choose>
                             <c:when test="${authorIsOrganisation && not empty authorEmail}">

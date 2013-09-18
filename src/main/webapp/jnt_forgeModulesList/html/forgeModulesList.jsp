@@ -21,6 +21,17 @@
 
 <c:set var="columnsNumber" value="${currentNode.properties['columnsNumber'].long}"/>
 
+<template:addResources type="javascript" resources="bootstrap.js"/>
+
+<template:addResources type="inlinejavascript">
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('.badge-reviewedByJahia').tooltip();
+            $('.badge-supportedByJahia').tooltip();
+        });
+    </script>
+</template:addResources>
+
 <c:choose>
     <c:when test="${renderContext.editMode}}">
         <fmt:message key="jnt_forgeModulesList.label.liveOnly"/>

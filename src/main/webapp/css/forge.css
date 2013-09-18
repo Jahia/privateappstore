@@ -254,3 +254,14 @@
 .bodywrapper #jnt_forge .newReviewRating .ui-stars-star {
     background: none;
 }
+.bodywrapper #jnt_forge .moduleInformation .labels .label {
+    display: inline-block;
+    margin-bottom: 5px;
+    padding: 2px 6px 3px 5px;
+}
+.bodywrapper #jnt_forge .moduleInformation .labels span:first-of-type {
+    margin-bottom: 8px;
+}
+.bodywrapper #jnt_forge .forgeModule .badges {
+    margin-bottom: 8px;
+}

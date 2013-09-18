@@ -17,7 +17,7 @@
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
-<template:addResources type="javascript" resources="html5shiv.js"/>
+<template:addResources type="javascript" resources="html5shiv.js, bootstrap.js"/>
 <template:addResources type="css" resources="forge.css"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
@@ -43,5 +43,14 @@
     </header>
 
     <p>${functions:abbreviate(functions:removeHtmlTags(description), 100,120,'...')}</p>
+
+    <footer class="badges">
+        <c:if test="${currentNode.properties['reviewedByJahia'].boolean}">
+            <span class="badge badge-success badge-reviewedByJahia" data-toggle="tooltip" title="<fmt:message key="jnt_forgeModule.label.admin.reviewedByJahia"/>"><i class="icon-ok icon-white"></i></span>
+        </c:if>
+        <c:if test="${currentNode.properties['supportedByJahia'].boolean}">
+            <span class="badge badge-warning badge-supportedByJahia" data-toggle="tooltip" title="<fmt:message key="jnt_forgeModule.label.admin.supportedByJahia"/>"><i class="icon-wrench icon-white"></i></span>
+        </c:if>
+    </footer>
 
 </section>

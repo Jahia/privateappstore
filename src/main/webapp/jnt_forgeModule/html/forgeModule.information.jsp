@@ -124,6 +124,21 @@
 
     <dl class="moduleMetaData dl-small">
 
+        <div class="labels">
+            <c:if test="${currentNode.properties['reviewedByJahia'].boolean}">
+                <span class="label label-success">
+                    <i class="icon-ok icon-white"></i>
+                    <fmt:message key="jnt_forgeModule.label.admin.reviewedByJahia"/>
+                </span>
+            </c:if>
+            <c:if test="${currentNode.properties['supportedByJahia'].boolean}">
+                <span class="label label-warning">
+                    <i class="icon-wrench icon-white"></i>
+                    <fmt:message key="jnt_forgeModule.label.admin.supportedByJahia"/>
+                </span>
+            </c:if>
+        </div>
+
         <h4><fmt:message key="jnt_forgeModule.label.information"/></h4>
 
         <span content="${title}" itemprop="name"></span>
