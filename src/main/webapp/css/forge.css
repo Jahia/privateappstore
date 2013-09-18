@@ -236,4 +236,10 @@
 .bodywrapper #jnt_forge .btn-file-upload  {
     margin-bottom: 15px;
 }
+.label-Category, .badge-category {
+    background-color: #5C5CB8;
+}
+.label-Tags, .badge-tags {
+    background-color: #ffcc00;
+}
 
