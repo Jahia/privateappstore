@@ -10,43 +10,43 @@
 
     <bean class="org.jahia.modules.forge.actions.DeleteModule" >
         <property name="name" value="DeleteModule"/>
-        <property name="requireAuthenticatedUser" value="true"/>
+        <property name="requiredPermission" value="jcr:write"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.PublishModule" >
         <property name="name" value="PublishModule"/>
-        <property name="requireAuthenticatedUser" value="true"/>
+        <property name="requiredPermission" value="jcr:write"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.AddModuleVersion" >
         <property name="name" value="AddModuleVersion"/>
-        <property name="requireAuthenticatedUser" value="true"/>
+        <property name="requiredPermission" value="jcr:write"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.EditModuleVersion" >
         <property name="name" value="EditModuleVersion"/>
-        <property name="requireAuthenticatedUser" value="true"/>
+        <property name="requiredPermission" value="jcr:write"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.AddVideo" >
         <property name="name" value="AddVideo"/>
-        <property name="requireAuthenticatedUser" value="true"/>
+        <property name="requiredPermission" value="jcr:write"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.EditVideo" >
         <property name="name" value="EditVideo"/>
-        <property name="requireAuthenticatedUser" value="true"/>
+        <property name="requiredPermission" value="jcr:write"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.EditTags" >
         <property name="name" value="EditTags"/>
         <property name="taggingService" ref="org.jahia.services.tags.TaggingService"/>
-        <property name="requireAuthenticatedUser" value="true"/>
+        <property name="requiredPermission" value="jcr:write"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.CalculateCompletion" >
         <property name="name" value="CalculateCompletion"/>
-        <property name="requireAuthenticatedUser" value="true"/>
+        <property name="requiredPermission" value="jcr:write"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.DownloadCount" >
@@ -61,12 +61,12 @@
 
     <bean class="org.jahia.modules.forge.actions.ReplyReview" >
         <property name="name" value="ReplyReview"/>
-        <property name="requireAuthenticatedUser" value="true"/>
+        <property name="requiredPermission" value="jcr:write"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.ReportReview" >
         <property name="name" value="ReportReview"/>
-        <property name="requireAuthenticatedUser" value="true"/>
+        <property name="requiredPermission" value="jcr:write"/>
         <property name="templatePath" value="/mails/templates/reportedReviewNotification.vm"/>
         <property name="mailService" ref="MailService"/>
     </bean>
@@ -83,7 +83,6 @@
 
     <bean class="org.jahia.modules.forge.actions.UpdateModuleIcon" >
         <property name="name" value="UpdateModuleIcon"/>
-        <property name="requireAuthenticatedUser" value="true"/>
         <property name="requiredPermission" value="jcr:write"/>
         <property name="imageService" ref="imageService"/>
     </bean>

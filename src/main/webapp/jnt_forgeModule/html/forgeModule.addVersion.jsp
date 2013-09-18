@@ -21,7 +21,27 @@
 
 <c:set var="id" value="${currentNode.identifier}"/>
 
-<uiComponents:ckeditor selector="jahia-moduleVersion-changeLog-${id}"/>
+
+<c:if test="${isDeveloper && not viewAsUser}">
+
+    <template:addResources type="inlinejavascript">
+        <script type="text/javascript">
+
+            $(document).ready(function() {
+
+                <c:url var="postURL" value="${url.base}${currentNode.path}"/>
+                $('#changeLog-${currentNode.identifier}').editable({
+                    <jsp:include page="../../commons/bootstrap-editable-options-wysihtml5.jsp">
+                    <jsp:param name="postURL" value='${postURL}'/>
+                    <jsp:param name="fullEditor" value='false'/>
+                    </jsp:include>
+                });
+
+            });
+        </script>
+    </template:addResources>
+
+</c:if>
 
 <template:addResources type="inlinejavascript">
     <script type="text/javascript">
@@ -85,7 +105,13 @@
 
     </script>
 </template:addResources>
-
+<c:if test="${isDeveloper && not viewAsUser}">
+    <p class="editable-toggle">
+        <a id="toggle-changeLog-${currentNode.identifier}" href="#"><i class="icon-pencil"></i>&nbsp;<fmt:message key="jnt_forgeModule.label.edit"/></a>
+    </p>
+    <div data-original-title="<fmt:message key="jnt_forgeModuleVersion.label.changeLog"/>" data-toggle="manual" data-name="changeLog" data-type="wysihtml5"
+    data-pk="1" id="changeLog-${currentNode.identifier}" class="editable">
+</c:if>
 <template:tokenizedForm>
     <form action="<c:url value='${url.base}${currentNode.path}.addModuleVersion.do'/>" method="post" id="moduleVersionForm-${id}" enctype="multipart/form-data">
         <fieldset>
