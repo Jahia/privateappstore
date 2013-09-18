@@ -18,15 +18,27 @@
 
 <template:addResources type="javascript" resources="html5shiv.js,jquery.min.js,jquery.validate.js"/>
 <template:addResources type="css" resources="forge.css"/>
+<template:addResources type="javascript" resources="bootstrap-editable.js, wysihtml5-0.3.0.js, bootstrap-wysihtml5.js, wysihtml5.js"/>
+<template:addResources type="css" resources="bootstrap-editable.css, forge.edition.css, wysiwyg-color.css"/>
 <c:set var="id" value="${currentNode.identifier}"/>
 <jcr:nodeProperty node="${currentNode}" name='modulesRepository' var="modulesRepository"/>
 <c:set var="modulesRepositoryPath" value="${url.base}${renderContext.mainResource.node.resolveSite.path}/contents/forge-modules-repository"/>
-<uiComponents:ckeditor selector="jahia-forge-module-description-${id}"/>
+<%--<uiComponents:ckeditor selector="jahia-forge-module-description-${id}"/>--%>
 
 <template:addResources type="inlinejavascript">
     <script type="text/javascript">
 
         $(document).ready(function() {
+
+            $('#description-${id}').wysihtml5({
+                "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
+                "emphasis": true, //Italics, bold, etc. Default true
+                "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
+                "html": false, //Button which allows you to edit the generated HTML. Default false
+                "link": true, //Button to insert a link. Default true
+                "image": false, //Button to insert an image. Default true,
+                "color": false //Button to change color of font
+            });
 
             // Set JQuery to traditional
             $.ajaxSetup({traditional: true, cache:false});
@@ -85,10 +97,7 @@
 
 <section class="forgeModuleCreation">
 
-    <header>
-        <h2><fmt:message key="jnt_forgeModuleCreation.label.forgeModuleCreationHeader"/></h2>
-        <p><fmt:message key="jnt_forgeModuleCreation.label.forgeModuleCreationSubheader"/></p>
-    </header>
+    <p><fmt:message key="jnt_forgeModuleCreation.label.forgeModuleCreationSubheader"/></p>
 
     <template:tokenizedForm>
         <form id="forgeModuleCreationForm-${id}" action="<c:url value='${modulesRepositoryPath}.createModule.do'/>" method="post">
@@ -106,18 +115,15 @@
                 </div>
 
                 <div class="control-group">
-                    <label class="control-label" for="jahia-forge-module-description-${id}"><fmt:message key="jnt_forgeModule.label.description"/></label>
+                    <label class="control-label" for="description-${id}"><fmt:message key="jnt_forgeModule.label.description"/></label>
                     <div class="controls">
-                        <textarea rows="7" cols="35"
-                                  placeholder="<fmt:message key="jnt_forgeModule.description" />" class="jahia-ckeditor"
-                                  name="description" id="jahia-forge-module-description-${id}">
-                        </textarea>
+                        <textarea id="description-${id}" name="description" rows="7" cols="35" class="span16"></textarea>
                     </div>
                 </div>
 
                 <div class="control-group">
                     <div class="controls">
-                        <input type="submit" class="btn btn-primary" onclick="CKEDITOR.instances['jahia-forge-module-description-${id}'].updateElement();" value="<fmt:message key="jnt_forgeModuleCreation.label.submit" />"/>
+                        <input type="submit" class="btn btn-primary" value="<fmt:message key="jnt_forgeModuleCreation.label.submit" />"/>
                     </div>
                 </div>
 

@@ -132,11 +132,11 @@
             <c:if test="${not empty moduleMap.currentList}">
                 <div id="screenshotsCarousel-${id}" class="carousel slide">
 
-                    <ol class="carousel-indicators">
-                        <c:forEach var="moduleScreenshot" items="${moduleMap.currentList}" varStatus="status">
-                            <li data-target="#screenshotsCarousel-${id}" data-slide-to="${status.index}" class="${status.first ? 'active' : ''}"></li>
-                        </c:forEach>
-                    </ol>
+                    <%--<ol class="carousel-indicators">--%>
+                        <%--<c:forEach var="moduleScreenshot" items="${moduleMap.currentList}" varStatus="status">--%>
+                            <%--<li data-target="#screenshotsCarousel-${id}" data-slide-to="${status.index}" class="${status.first ? 'active' : ''}"></li>--%>
+                        <%--</c:forEach>--%>
+                    <%--</ol>--%>
 
                     <div class="carousel-inner">
                         <c:forEach var="moduleScreenshot" items="${moduleMap.currentList}" varStatus="status">

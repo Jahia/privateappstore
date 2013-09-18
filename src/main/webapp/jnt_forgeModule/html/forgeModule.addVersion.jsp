@@ -28,23 +28,23 @@
 <c:set var="id" value="${currentNode.identifier}"/>
 
 
-<c:if test="${isDeveloper && not viewAsUser}">
+<%--<c:if test="${isDeveloper && not viewAsUser}">--%>
 
-    <template:addResources type="inlinejavascript">
-        <script type="text/javascript">
+    <%--<template:addResources type="inlinejavascript">--%>
+        <%--<script type="text/javascript">--%>
 
-            $(document).ready(function() {
+            <%--$(document).ready(function() {--%>
 
-                <c:url var="postURL" value="${url.base}${currentNode.path}"/>
-                $('#changeLog-${currentNode.identifier}').editable({
+                <%--<c:url var="postURL" value="${url.base}${currentNode.path}"/>--%>
+                <%--$('#changeLog-${currentNode.identifier}').editable({--%>
 
-                });
+                <%--});--%>
 
-            });
-        </script>
-    </template:addResources>
+            <%--});--%>
+        <%--</script>--%>
+    <%--</template:addResources>--%>
 
-</c:if>
+<%--</c:if>--%>
 
 <template:addResources type="inlinejavascript">
     <script type="text/javascript">
@@ -108,6 +108,16 @@
 
     </script>
 </template:addResources>
+
+<div class="page-header ">
+    <h1>
+        <fmt:message key="jnt_forgeModuleVersion.label.addVersion">
+            <fmt:param value="${currentNode.properties['jcr:title'].string}"/>
+        </fmt:message>
+    </h1>
+    <div class="clear"></div>
+</div>
+
 <c:if test="${isDeveloper && not viewAsUser}">
 
     <div data-original-title="<fmt:message key="jnt_forgeModuleVersion.label.changeLog"/>" data-toggle="manual" data-name="changeLog" data-type="wysihtml5"
@@ -129,7 +139,7 @@
             <div class="control-group">
                 <label class="control-label" for="jahia-moduleVersion-changeLog-${id}"><fmt:message key="jnt_forgeModuleVersion.changeLog"/></label>
                 <div class="controls">
-                    <textarea rows="7" cols="35" id="jahia-moduleVersion-changeLog-${id}" class="jahia-ckeditor span16"
+                    <textarea rows="7" cols="35" id="jahia-moduleVersion-changeLog-${id}" class="span16"
                         placeholder="<fmt:message key="jnt_forgeModuleVersion.changeLog" />" name="changeLog"></textarea>
                 </div>
             </div>
