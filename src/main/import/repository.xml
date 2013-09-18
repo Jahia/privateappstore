@@ -89,7 +89,7 @@
                                           j:bindedComponent="/modules/forge/templates/forge-home/pagecontent/bootstrap-container/bootstrap-container/bootstrap-row/bootstrap-row-col2/bootstrap-row-col2/forgeModulesList"
                                           jcr:primaryType="jnt:pager"
                                           nbOfPages="10"
-                                          pageSize="3"/>
+                                          pageSize="5"/>
                                             <forgeModulesList columnsNumber="3"
                                                               jcr:mixinTypes="jmix:accessControlled"
                                                               jcr:primaryType="jnt:forgeModulesList"
@@ -102,7 +102,7 @@
                                         j:bindedComponent="/modules/forge/templates/forge-home/pagecontent/bootstrap-container/bootstrap-container/bootstrap-row/bootstrap-row-col2/bootstrap-row-col2/forgeModulesList"
                                                    jcr:primaryType="jnt:pager"
                                                    nbOfPages="10"
-                                                   pageSize="3"/>
+                                                   pageSize="5"/>
                                             <file-upload-form j:view="jar"
                                                               jcr:mixinTypes="jmix:renderable"
                                                               jcr:primaryType="jnt:fileUpload"/>
