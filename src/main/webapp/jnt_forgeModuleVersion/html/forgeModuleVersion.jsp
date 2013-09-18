@@ -78,7 +78,6 @@
 
         <header>
             <h3>${versionNumber.string}</h3>
-
             <div class="pull-right">
 
                 <a class="btn btn-small" href="${currentNode.properties.url.string}"
@@ -94,6 +93,7 @@
     </c:otherwise>
 
 </c:choose>
+<p><fmt:message key="label.filename"/> : <c:forEach items="${fn:split(currentNode.properties.url.string,'/')}" var="file"><c:set var="filename" value="${file}"/></c:forEach>${filename}</p>
 
 <c:if test="${isDeveloper && not viewAsUser}">
     <p class="editable-toggle">
