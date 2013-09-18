@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<roles jcr:primaryType="jnt:permission"
+             xmlns:jcr="http://www.jcp.org/jcr/1.0"
+             xmlns:j="http://www.jahia.org/jahia/1.0"
+             xmlns:jnt="http://www.jahia.org/jahia/nt/1.0">
+    <forge-administrator j:hidden="false"
+           j:permissionNames="jahiaForgeModerateModule jcr:all_live jcr:all_default"
+           j:privilegedAccess="true"
+           j:roleGroup="site-role"
+           jcr:primaryType="jnt:role">
+        <j:translation_en jcr:description=""
+                          jcr:language="en"
+                          jcr:primaryType="jnt:translation"
+                          jcr:title="Forge administrator"/>
+        <categories-access j:path="/sites/systemsite/categories"
+                        j:permissionNames="jcr:all_default"
+                        jcr:primaryType="jnt:externalPermissions"/>
+    </forge-administrator>
+
+    <forge-developer j:hidden="false"
+                         j:permissionNames="jahiaForgeUploadModule"
+                         j:privilegedAccess="false"
+                         j:roleGroup="site-role"
+                         jcr:primaryType="jnt:role">
+        <j:translation_en jcr:description=""
+                          jcr:language="en"
+                          jcr:primaryType="jnt:translation"
+                          jcr:title="Forge developer"/>
+    </forge-developer>
+
+</roles>
