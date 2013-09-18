@@ -32,11 +32,11 @@
 
     <div class="span${functions:round(12 / columnsNumber)}">
         <template:module node="${module}"/>
-    </div>
+    </div>  <!-- end span -->
 
-    <c:if test="${count eq columnsNumber || status.last}">
+    <c:if test="${(count + 1) eq columnsNumber || status.last}">
         <c:set var="count" value="0"/>
-        </div>
+        </div> <!-- end row fluid -->
     </c:if>
 
 </c:forEach>
