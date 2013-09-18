@@ -20,7 +20,7 @@
 <template:include view="hidden.header"/>
 <c:set var="columnsNumber" value="${currentNode.properties['columnsNumber'].long}"/>
 <c:set var="count" value="0"/>
-<c:forEach items="${moduleMap.currentList}" var="module" varStatus="status">
+<c:forEach items="${moduleMap.currentList}" var="module" varStatus="status" begin="${moduleMap.begin}" end="${moduleMap.end}">
     <c:choose>
         <c:when test="${status.index % columnsNumber eq 0}">
             <div class="row-fluid">
