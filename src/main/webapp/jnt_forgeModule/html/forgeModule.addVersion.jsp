@@ -17,11 +17,34 @@
 
 <template:addResources type="javascript" resources="jquery.min.js,jquery.validate.js"/>
 <template:addResources type="javascript" resources="select2.js"/>
+<template:addResources type="javascript" resources="html5shiv.js"/>
+
 <template:addResources type="css" resources="select2.css, select2-bootstrap.css"/>
+
+<c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>
+<c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
+
 
 <c:set var="id" value="${currentNode.identifier}"/>
 
-<uiComponents:ckeditor selector="jahia-moduleVersion-changeLog-${id}"/>
+
+<c:if test="${isDeveloper && not viewAsUser}">
+
+    <template:addResources type="inlinejavascript">
+        <script type="text/javascript">
+
+            $(document).ready(function() {
+
+                <c:url var="postURL" value="${url.base}${currentNode.path}"/>
+                $('#changeLog-${currentNode.identifier}').editable({
+
+                });
+
+            });
+        </script>
+    </template:addResources>
+
+</c:if>
 
 <template:addResources type="inlinejavascript">
     <script type="text/javascript">
@@ -85,7 +108,11 @@
 
     </script>
 </template:addResources>
+<c:if test="${isDeveloper && not viewAsUser}">
 
+    <div data-original-title="<fmt:message key="jnt_forgeModuleVersion.label.changeLog"/>" data-toggle="manual" data-name="changeLog" data-type="wysihtml5"
+    data-pk="1" id="changeLog-${currentNode.identifier}" class="editable">
+</c:if>
 <template:tokenizedForm>
     <form action="<c:url value='${url.base}${currentNode.path}.addModuleVersion.do'/>" method="post" id="moduleVersionForm-${id}" enctype="multipart/form-data">
         <fieldset>

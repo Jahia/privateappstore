@@ -25,7 +25,7 @@
 
 <section>
 
-    <a href="<c:url value="${currentNode.url}"/>"><h4>${title}</h4></a>
+    <a href="<c:url value="${currentNode.url}" context="/"/>"><h4>${title}</h4></a>
 
     <c:if test="${not published}">
         <span class="label label-important"><fmt:message key="jnt_forgeModule.label.notPublished"/></span>

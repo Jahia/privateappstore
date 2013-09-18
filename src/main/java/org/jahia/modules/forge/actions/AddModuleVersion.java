@@ -51,7 +51,7 @@ public class AddModuleVersion extends Action {
         if (StringUtils.contains(moduleVersionBinary.getName(), "-SNAPSHOT.")) {
             String error = new JahiaResourceBundle(session.getLocale(), "Jahia Forge")
                     .get("forge.uploadJar.error.snapshot.not.allowed", "SNAPSHOT versions not allowed");
-            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", error));
+            return new ActionResult(HttpServletResponse.SC_OK, module.getPath(), new JSONObject().put("error", error));
         }
 
         Manifest manifest = new JarFile(moduleVersionBinary.getStoreLocation()).getManifest();
@@ -59,7 +59,7 @@ public class AddModuleVersion extends Action {
         String versionNumber = manifest.getMainAttributes().getValue("Implementation-Version");
         boolean hasModuleVersions = JCRTagUtils.hasChildrenOfType(module, "jnt:forgeModuleVersion");
         if (hasModuleVersions && !hasValidVersionNumber(module, versionNumber)) {
-            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", "versionNumber"));
+            return new ActionResult(HttpServletResponse.SC_OK, module.getPath(), new JSONObject().put("error", "versionNumber"));
         }
         JCRNodeWrapper moduleVersion = createNode(req, parameters, module, "jnt:forgeModuleVersion", module.getName()+"-"+versionNumber, false);
         moduleVersion.setProperty("versionNumber", versionNumber);
