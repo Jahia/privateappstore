@@ -192,6 +192,7 @@
 }
 .bodywrapper #jnt_forge #moduleHeader .moduleRating form {
     margin: 0;
+    display: inline;
 }
 .bodywrapper #jnt_forge #moduleHeader .moduleRating span {
     margin-left: 5px;
@@ -236,10 +237,19 @@
 .bodywrapper #jnt_forge .btn-file-upload  {
     margin-bottom: 15px;
 }
-.label-Category, .badge-category {
+.bodywrapper #jnt_forge .label.label-category, .bodywrapper #jnt_forge .badge.badge-category {
     background-color: #5C5CB8;
 }
-.label-Tags, .badge-tags {
-    background-color: #ffcc00;
+.bodywrapper #jnt_forge .label.label-tags, .bodywrapper #jnt_forge .badge.badge-tags {
+    background-color: #ffbc00;
 }
-
+.bodywrapper #jnt_forge .forgeModule.thumbnail header a img {
+    margin-top: 20px;
+}
+.bodywrapper #jnt_forge .moduleRating .ui-stars-star {
+    display: inline-block;
+    float: none;
+}
+.bodywrapper #jnt_forge .reviewRating .ui-stars-star {
+    background: none;
+}

@@ -13,7 +13,7 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 <%--@elvariable id="acl" type="java.lang.String"--%>
 <c:if test="${facet:isUnappliedFacetValueExisting(currentFacet, activeFacetsVars[activeFacetMapVarName])}">
-    <h4><facet:facetLabel currentFacetField="${currentFacet}" facetLabels="${facetLabels}"/></h4>
+        <h4><facet:facetLabel currentFacetField="${currentFacet}" facetLabels="${facetLabels}" var="facetLabel"/></h4>
 </c:if>
 <ul class="inline unstyled">
     <c:forEach items="${currentFacet.values}" var="facetValue">
@@ -24,7 +24,7 @@
                 <c:param name="N-forgeModulesList"
                          value="${functions:encodeUrlParam(facet:getFacetDrillDownUrl(facetValue, activeFacetsVars[facetParamVarName]))}"/>
             </c:url>
-            <li><a href="${facetUrl}" rel="nofollow"><span class="label label-info">
+            <li><a href="${facetUrl}" rel="nofollow"><span class="label label-info label-${fn:toLowerCase(fn:trim(facetLabel))}">
                 <facet:facetValueLabel currentFacetField="${currentFacet}" facetValueCount="${facetValue}"
                                        facetValueLabels="${facetValueLabels}" facetValueFormats="${facetValueFormats}"
                                        facetValueRenderers="${facetValueRenderers}"

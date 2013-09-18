@@ -80,7 +80,11 @@
                                         <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" label="Tags"/>
                                     </field-facet-1>
                                 </facets-list>
-                                <actions j:invertCondition="false" j:originWS="default" j:requireLoggedUser="true" j:requirePrivilegedUser="false" j:requiredPermissions="" jcr:mixinTypes="jmix:accessControlled jmix:requiredPermissions" jcr:primaryType="jnt:linkList">
+                                <forge-my-modules-list j:invertCondition="false" j:originWS="default" j:requireLoggedUser="true" j:requirePrivilegedUser="false" j:skin="skins.bootstrap-rounded-title" j:style="grey" jcr:mixinTypes="jmix:accessControlled jmix:requiredPermissions jmix:skinnable jmix:style" jcr:primaryType="jnt:forgeMyModulesList">
+                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="My Modules"/>
+                                </forge-my-modules-list>
+                                <actions j:invertCondition="false" j:originWS="default" j:requireLoggedUser="true" j:requirePrivilegedUser="false" jcr:mixinTypes="jmix:accessControlled jmix:requiredPermissions" jcr:primaryType="jnt:linkList">
                                     <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                                     <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Actions"/>
                                     <publish-your-module j:node="/templateSets/forge/publish-your-module" j:originWS="default" j:target="_self" j:view="forgeAdd" jcr:mixinTypes="jmix:accessControlled jmix:renderable" jcr:primaryType="jnt:nodeLink">
@@ -88,10 +92,6 @@
                                         <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Add your module"/>
                                     </publish-your-module>
                                 </actions>
-                                <forge-my-modules-list j:invertCondition="false" j:originWS="default" j:requireLoggedUser="true" j:requirePrivilegedUser="false" j:requiredPermissions="" j:skin="skins.bootstrap-rounded-title" j:style="grey" jcr:mixinTypes="jmix:accessControlled jmix:requiredPermissions jmix:skinnable jmix:style" jcr:primaryType="jnt:forgeMyModulesList">
-                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="My Modules"/>
-                                </forge-my-modules-list>
                             </bootstrap-row-col1>
                             <bootstrap-row-col2 j:originWS="default" jcr:primaryType="jnt:contentList">
                                 <forgeModulesList columnsNumber="4" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:forgeModulesList" nbOfModulePerPage="20" startNode="/templateSets/forge/contents/forge-modules-repository">
@@ -102,7 +102,7 @@
                     </pagecontent>
                     <j:acl jcr:primaryType="jnt:acl"/>
                 </forge-home>
-                <forge-module-creation j:hiddenTemplate="false" j:invertCondition="false" j:originWS="default" j:requireLoggedUser="true" j:requirePrivilegedUser="false" j:requiredPermissions="" j:view="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:pageTemplate">
+                <forge-module-creation j:hiddenTemplate="false" j:invertCondition="false" j:originWS="default" j:requireLoggedUser="true" j:requirePrivilegedUser="false" j:view="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:pageTemplate">
                     <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                     <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Module Creation"/>
                     <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
@@ -113,7 +113,7 @@
                                     <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                                     <go-back j:node="/templateSets/forge/forge-home" j:originWS="default" j:view="forgeBack" jcr:mixinTypes="jmix:accessControlled jmix:renderable" jcr:primaryType="jnt:nodeLink">
                                         <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                        <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" jcr:title="Go back"/>
+                                        <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Go back"/>
                                     </go-back>
                                 </links-list>
                                 <publish-your-module j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:forgeModuleCreation" modulesRepository="/templateSets/forge/contents/forge-modules-repository">

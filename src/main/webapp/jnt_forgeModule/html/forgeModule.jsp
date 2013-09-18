@@ -39,7 +39,7 @@
                  alt="<fmt:message key="jnt_forgeModule.label.moduleIcon"><fmt:param value="${title}"/></fmt:message>"/>
         </a>
         <a href="<c:url value="${currentNode.url}" context="/"/>"><h4>${title}</h4></a>
-        <a class="moduleAuthor">${authorName}</a>
+        <p class="moduleAuthor">${authorName}</p>
     </header>
 
     <p>${functions:abbreviate(functions:removeHtmlTags(description), 100,120,'...')}</p>

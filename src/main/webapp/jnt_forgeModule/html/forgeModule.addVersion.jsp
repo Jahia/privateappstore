@@ -20,6 +20,8 @@
 <template:addResources type="javascript" resources="html5shiv.js"/>
 
 <template:addResources type="css" resources="select2.css, select2-bootstrap.css"/>
+<template:addResources type="javascript" resources="bootstrap-editable.js, wysihtml5-0.3.0.js, bootstrap-wysihtml5.js, wysihtml5.js"/>
+<template:addResources type="css" resources="bootstrap-editable.css, forge.edition.css, wysiwyg-color.css"/>
 
 <c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>
 <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
@@ -27,29 +29,20 @@
 
 <c:set var="id" value="${currentNode.identifier}"/>
 
-
-<%--<c:if test="${isDeveloper && not viewAsUser}">--%>
-
-    <%--<template:addResources type="inlinejavascript">--%>
-        <%--<script type="text/javascript">--%>
-
-            <%--$(document).ready(function() {--%>
-
-                <%--<c:url var="postURL" value="${url.base}${currentNode.path}"/>--%>
-                <%--$('#changeLog-${currentNode.identifier}').editable({--%>
-
-                <%--});--%>
-
-            <%--});--%>
-        <%--</script>--%>
-    <%--</template:addResources>--%>
-
-<%--</c:if>--%>
-
 <template:addResources type="inlinejavascript">
     <script type="text/javascript">
 
         $(document).ready(function() {
+
+            $('#jahia-moduleVersion-changeLog-${id}').wysihtml5({
+                "font-styles": false, //Font styling, e.g. h1, h2, etc. Default true
+                "emphasis": true, //Italics, bold, etc. Default true
+                "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
+                "html": false, //Button which allows you to edit the generated HTML. Default false
+                "link": false, //Button to insert a link. Default true
+                "image": false, //Button to insert an image. Default true,
+                "color": false //Button to change color of font
+            });
 
             jQuery.validator.addMethod("regexp", function(value, element, param) {
                 return this.optional(element) || param.test(value);

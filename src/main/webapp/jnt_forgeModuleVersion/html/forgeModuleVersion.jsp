@@ -93,7 +93,7 @@
     </c:otherwise>
 
 </c:choose>
-<p><fmt:message key="label.filename"/> : <c:forEach items="${fn:split(currentNode.properties.url.string,'/')}" var="file"><c:set var="filename" value="${file}"/></c:forEach>${filename}</p>
+<p><fmt:message key="jnt_forgeModuleVersion.label.fileName"/>&nbsp;<c:forEach items="${fn:split(currentNode.properties.url.string,'/')}" var="file"><c:set var="filename" value="${file}"/></c:forEach>${filename}</p>
 
 <c:if test="${isDeveloper && not viewAsUser}">
     <p class="editable-toggle">
