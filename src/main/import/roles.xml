@@ -19,7 +19,7 @@
 
     <forge-developer j:hidden="false"
                          j:permissionNames="jahiaForgeUploadModule"
-                         j:privilegedAccess="false"
+                         j:privilegedAccess="true"
                          j:roleGroup="site-role"
                          jcr:primaryType="jnt:role">
         <j:translation_en jcr:description=""
