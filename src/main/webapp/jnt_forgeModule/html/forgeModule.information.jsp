@@ -40,7 +40,6 @@
     <template:param name="getActiveVersion" value="true"/>
 </template:include>
 <c:set value="${moduleMap.activeVersion}" var="activeVersion"/>
-<template:addCacheDependency node="${activeVersion}"/>
 
 
 <jcr:nodeProperty node="${activeVersion}" name="versionNumber" var="versionNumber"/>

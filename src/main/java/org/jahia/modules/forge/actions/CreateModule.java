@@ -58,7 +58,7 @@ public class CreateModule extends Action {
         boolean isValidTitle = queryResult.getNodes().getSize() == 0;
 
         if (!isValidTitle)
-            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", "titleAlreadyUsed"));
+            return new ActionResult(HttpServletResponse.SC_OK, renderContext.getMainResource().getNode().getPath(), new JSONObject().put("error", "titleAlreadyUsed"));
 
         JCRNodeWrapper module = createNode(req, parameters, repository, "jnt:forgeModule", title, false);
 
@@ -71,6 +71,6 @@ public class CreateModule extends Action {
 
         logger.info("Forge Module " + title + " successfully created and added to forge repository " + repository.getPath());
 
-        return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("moduleUrl", module.getUrl()));
+        return new ActionResult(HttpServletResponse.SC_OK, module.getPath(), new JSONObject().put("moduleUrl", module.getUrl()));
     }
 }

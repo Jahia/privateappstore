@@ -51,7 +51,7 @@ public class AddModuleVersion extends Action {
         if (StringUtils.contains(moduleVersionBinary.getName(), "-SNAPSHOT.")) {
             String error = new JahiaResourceBundle(session.getLocale(), "Jahia Forge")
                     .get("forge.uploadJar.error.snapshot.not.allowed", "SNAPSHOT versions not allowed");
-            return new ActionResult(HttpServletResponse.SC_OK, module.getPath(), new JSONObject().put("error", error));
+            return new ActionResult(HttpServletResponse.SC_OK, module.getPath() + ".forge-module-add-version", new JSONObject().put("error", error));
         }
 
         Manifest manifest = new JarFile(moduleVersionBinary.getStoreLocation()).getManifest();

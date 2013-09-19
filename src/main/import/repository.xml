@@ -80,7 +80,7 @@
                                         <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" label="Tags"/>
                                     </field-facet-1>
                                 </facets-list>
-                                <forge-my-modules-list j:invertCondition="false" j:originWS="default" j:requireLoggedUser="true" j:requirePrivilegedUser="false" j:skin="skins.bootstrap-rounded-title" j:style="grey" jcr:mixinTypes="jmix:accessControlled jmix:requiredPermissions jmix:skinnable jmix:style" jcr:primaryType="jnt:forgeMyModulesList">
+                                <forge-my-modules-list j:expiration="0" j:invertCondition="false" j:originWS="default" j:requireLoggedUser="true" j:requirePrivilegedUser="false" j:skin="skins.bootstrap-rounded-title" j:style="grey" jcr:mixinTypes="jmix:accessControlled  jmix:cache jmix:requiredPermissions jmix:skinnable jmix:style" jcr:primaryType="jnt:forgeMyModulesList">
                                     <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                                     <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="My Modules"/>
                                 </forge-my-modules-list>
