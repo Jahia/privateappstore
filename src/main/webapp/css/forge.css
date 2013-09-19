@@ -267,3 +267,9 @@
     display: block;
     height:20px;
 }
+.bodywrapper #jnt_forge #moduleOverview .moduleDescription footer {
+    margin-top: 1em;
+}
+.bodywrapper #jnt_forge #forgeFacets ul li a {
+    text-decoration: none;
+}
