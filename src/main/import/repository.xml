@@ -39,10 +39,10 @@
                                                       jcr:primaryType="jnt:translation"
                                                       jcr:title="Forge administration"/>
                                                 </forge-administration>
-                                            <facets-list j:bindedComponent="/modules/forge/contents/forge-modules-repository"
-                                                         j:type="jnt:forgeModule"
-                                                         j:view="forge"
-                                                         jcr:mixinTypes="jmix:accessControlled jmix:renderable"
+                                                <facets-list j:bindedComponent="/modules/forge/templates/forge-home/pagecontent/bootstrap-container/bootstrap-container/bootstrap-row/bootstrap-row-col2/bootstrap-row-col2/forgeModulesList"
+                                              j:type="jnt:forgeModule"
+                                              j:view="forge"
+                                              jcr:mixinTypes="jmix:accessControlled jmix:renderable"
                                                          jcr:primaryType="jnt:facets">
                                                 <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                                                     <field-facet facet="j:defaultCategory"
@@ -70,9 +70,13 @@
                                                         <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" label="Tags"/>
                                                 </field-facet-1>
                                             </facets-list>
-                                            <forge-my-modules-list j:skin="skins.bootstrap-rounded-title"
+                                                <forge-my-modules-list j:invertCondition="false"
+                                                        j:requireLoggedUser="false"
+                                                        j:requirePrivilegedUser="false"
+                                                        j:requiredPermissionNames="jahiaForgeUploadModule"
+                                                        j:skin="skins.bootstrap-rounded-title"
                                                                    j:style="grey"
-                                                                   jcr:mixinTypes="jmix:accessControlled jmix:skinnable jmix:style"
+                                                        jcr:mixinTypes="jmix:accessControlled jmix:requiredPermissions jmix:skinnable jmix:style"
                                                                    jcr:primaryType="jnt:forgeMyModulesList">
                                                 <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                                                 <j:translation_en jcr:language="en"
@@ -84,12 +88,15 @@
                                     </bootstrap-row-col1>
                                     <bootstrap-row-col2 jcr:primaryType="jnt:bootstrapColumn" offset="1" span="8">
                                         <bootstrap-row-col2 jcr:primaryType="jnt:contentList">
-                                                <pager-1 displayNbOfItemsPerPage="true"
-                                          displayPager="true"
-                                          j:bindedComponent="/modules/forge/templates/forge-home/pagecontent/bootstrap-container/bootstrap-container/bootstrap-row/bootstrap-row-col2/bootstrap-row-col2/forgeModulesList"
-                                          jcr:primaryType="jnt:pager"
-                                          nbOfPages="10"
-                                          pageSize="5"/>
+                                                <bootstrap-pagination displayNbOfItemsPerPage="true"
+                                                       displayNbOfItemsPerPageValues="6"
+                                                       displayPager="true"
+                                                       j:bindedComponent="/modules/forge/templates/forge-home/pagecontent/bootstrap-container/bootstrap-container/bootstrap-row/bootstrap-row-col2/bootstrap-row-col2/forgeModulesList"
+                                                       jcr:primaryType="jnt:bootstrapPager"
+                                                       nbOfPages="10"
+                                                       pageSize="6"
+                                                       paginationAlignment="pagination-centered"
+                                                       paginationSize=""/>
                                             <forgeModulesList columnsNumber="3"
                                                               jcr:mixinTypes="jmix:accessControlled"
                                                               jcr:primaryType="jnt:forgeModulesList"
@@ -97,12 +104,6 @@
                                                               startNode="/modules/forge/contents/forge-modules-repository">
                                                 <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                                             </forgeModulesList>
-                                            <pager displayNbOfItemsPerPage="true"
-                                                   displayPager="false"
-                                        j:bindedComponent="/modules/forge/templates/forge-home/pagecontent/bootstrap-container/bootstrap-container/bootstrap-row/bootstrap-row-col2/bootstrap-row-col2/forgeModulesList"
-                                                   jcr:primaryType="jnt:pager"
-                                                   nbOfPages="10"
-                                                   pageSize="5"/>
                                             <file-upload-form j:view="jar"
                                                               jcr:mixinTypes="jmix:renderable"
                                                               jcr:primaryType="jnt:fileUpload"/>
@@ -294,8 +295,12 @@
                                                                            jcr:primaryType="jnt:mainResourceDisplay">
                                                         <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                                                     </main-resource-display>
-                                                        <file-upload-form j:view="jar"
-                                                         jcr:mixinTypes="jmix:renderable"
+                                                        <file-upload-form j:invertCondition="false"
+                                                         j:requireLoggedUser="false"
+                                                         j:requirePrivilegedUser="false"
+                                                         j:requiredPermissionNames="jcr:write_live"
+                                                         j:view="jar"
+                                                         jcr:mixinTypes="jmix:renderable jmix:requiredPermissions"
                                                      jcr:primaryType="jnt:fileUpload"/>
                                                     </changelog>
                                                     <permissions j:expiration="0"
@@ -325,36 +330,6 @@
                         </bootstrap-container>
                     </pagecontent>
                 </forge-module>
-                <forge-module-version j:applyOn="jnt:forgeModuleVersion"
-                                      j:defaultTemplate="true"
-                                      j:hiddenTemplate="false"
-                                      j:priority="100"
-                                      jcr:mixinTypes="jmix:accessControlled"
-                                      jcr:primaryType="jnt:contentTemplate">
-                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                    <pagecontent jcr:primaryType="jnt:contentList">
-                        <bootstrap-container fluid="false" jcr:primaryType="jnt:bootstrapContainer">
-                            <bootstrap-container jcr:primaryType="jnt:contentList">
-                                <predefined--rows-960gs column="1col16"
-                                                        jcr:mixinTypes="jmix:accessControlled"
-                                                        jcr:primaryType="jnt:row">
-                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                    <predefined--rows-960gs-col1 jcr:primaryType="jnt:contentList">
-                                        <main-resource-display j:mainResourceView="default"
-                                                               jcr:mixinTypes="jmix:accessControlled"
-                                                               jcr:primaryType="jnt:mainResourceDisplay">
-                                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                        </main-resource-display>
-                                    </predefined--rows-960gs-col1>
-                                </predefined--rows-960gs>
-                            </bootstrap-container>
-                        </bootstrap-container>
-                    </pagecontent>
-                    <j:translation_en jcr:language="en"
-                                      jcr:mixinTypes="mix:title"
-                                      jcr:primaryType="jnt:translation"
-                                      jcr:title="Forge Module Version"/>
-                </forge-module-version>
                     <siteSettingsBase j:hiddenTemplate="false" jcr:primaryType="jnt:template">
                     <j:translation_en jcr:language="en"
                                       jcr:mixinTypes="mix:title"
