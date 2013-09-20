@@ -97,7 +97,7 @@
 
 <section class="forgeModuleCreation">
 
-    <p><fmt:message key="jnt_forgeModuleCreation.label.forgeModuleCreationSubheader"/></p>
+    <%--<p><fmt:message key="jnt_forgeModuleCreation.label.forgeModuleCreationSubheader"/></p>--%>
 
     <template:tokenizedForm>
         <form id="forgeModuleCreationForm-${id}" action="<c:url value='${modulesRepositoryPath}.createModule.do'/>" method="post">
