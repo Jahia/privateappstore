@@ -128,9 +128,9 @@
                                         <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" label="Tags"/>
                                     </field-facet-1>
                                 </facets-list>
-                                <my-modules j:originWS="default" j:skin="skins.bootstrap-rounded-title" j:style="grey" jcr:mixinTypes="jmix:accessControlled jmix:skinnable jmix:style" jcr:primaryType="jnt:forgeMyModulesList">
+                                <my-modules j:expiration="0" j:invertCondition="false" j:originWS="default" j:perUser="false" j:requireLoggedUser="true" j:requirePrivilegedUser="false" j:requiredPermissions="" j:skin="skins.bootstrap-rounded-title" j:style="grey" jcr:mixinTypes="jmix:accessControlled jmix:cache jmix:requiredPermissions jmix:skinnable jmix:style" jcr:primaryType="jnt:forgeMyModulesList">
                                     <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                    <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" jcr:title="My modules"/>
+                                    <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="My modules"/>
                                 </my-modules>
                                 <actions j:invertCondition="false" j:originWS="default" j:requireLoggedUser="true" j:requirePrivilegedUser="false" jcr:mixinTypes="jmix:accessControlled jmix:requiredPermissions" jcr:primaryType="jnt:linkList">
                                     <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
