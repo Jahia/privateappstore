@@ -254,7 +254,7 @@
             <section class="moduleVideo">
 
                 <h2><fmt:message key="jnt_forgeModule.label.video"/></h2>
-                <template:module path="${videoNode.path}"/>
+                <template:module path="${videoNode.path}" view="forge"/>
 
             </section>
 

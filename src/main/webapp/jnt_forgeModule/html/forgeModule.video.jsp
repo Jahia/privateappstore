@@ -192,7 +192,6 @@
                                     <option value="youtube" ${videoProvider eq 'youtube' ? 'selected' : ''}>youtube</option>
                                     <option value="dailymotion" ${videoProvider eq 'dailymotion' ? 'selected' : ''}>dailymotion</option>
                                     <option value="vimeo" ${videoProvider eq 'vimeo' ? 'selected' : ''}>vimeo</option>
-                                    <option value="watt" ${videoProvider eq 'watt' ? 'selected' : ''}>watt</option>
                                 </select>
                             </div>
                         </div>
@@ -246,7 +245,7 @@
         <c:if test="${hasVideoNode}">
 
             <div id="forgeModuleVideoWrapper-${id}">
-                <template:module path="${videoNode.path}"/>
+                <template:module path="${videoNode.path}" view="forge"/>
             </div>
 
         </c:if>
