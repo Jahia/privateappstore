@@ -21,15 +21,7 @@
 <template:addResources type="javascript" resources="jquery.min.js,jquery-ui.min.js,jquery.fileupload-with-ui.min.js"/>
 <fmt:message key="label.dropHere.ie" var="i18nDropHereIE"/>
 
-<%--<template:addResources type="inlinejavascript">
-    <script type="text/javascript">
-        $(document).ready(function() {
-            if ($.browser.msie) {
-                $("#drop-box-file-upload-${currentNode.identifier}").empty().append("${functions:escapeJavaScript(i18nDropHereIE)}");
-            }
-        });
-    </script>
-</template:addResources>--%>
+
 <c:if test="${jcr:hasPermission(renderContext.mainResource.node, 'jahiaForgeUploadModule')}">
     <c:choose>
         <c:when test="${jcr:isNodeType(renderContext.site,'jmix:forgeSettings') and not empty renderContext.site.properties.forgeSettingsUrl.string}">
@@ -47,6 +39,7 @@
             <c:if test="${!empty currentNode.properties.target}">
                 <c:set var="targetNode" value="${currentNode.properties.target.node}"/>
             </c:if>
+            <template:tokenizedForm allowsMultipleSubmits="true">
             <form class="file_upload" id="file_upload_${currentNode.identifier}"
                   action="<c:url value='${url.base}${renderContext.site.path}/contents/forge-modules-repository.createModuleFromJar.do'/>" method="POST" enctype="multipart/form-data"
                   accept="application/json">
@@ -60,6 +53,7 @@
                 </c:url>
 
             </form>
+            </template:tokenizedForm>
             <div id="error${currentNode.identifier}" class="error"></div>
             <table id="files${currentNode.identifier}" class="table"></table>
             <script>
@@ -87,7 +81,8 @@
                                 'jcrReturnContentType': "json",
                                 'jcrReturnContentTypeOverride': 'application/json; charset=UTF-8',
                                 'jcrRedirectTo': "<c:url value='${url.base}${renderContext.mainResource.node.path}'/>",
-                                'jcrNewNodeOutputFormat': "${renderContext.mainResource.template}.html"
+                                'jcrNewNodeOutputFormat': "${renderContext.mainResource.template}.html",
+                                 'form-token': $('#file_upload_${currentNode.identifier} input[name=form-token]').val()
                             };
                             $("#error${currentNode.identifier}").html("");
                             callBack();

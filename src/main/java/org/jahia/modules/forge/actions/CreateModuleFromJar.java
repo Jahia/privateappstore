@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.maven.model.Model;
 import org.apache.xerces.impl.dv.util.Base64;
 import org.jahia.api.Constants;
+import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
 import org.jahia.bin.SystemAction;
 import org.jahia.commons.Version;
@@ -39,13 +40,13 @@ import java.util.jar.Manifest;
 /**
  * Action to par a jar and produce an entry in module list
  */
-public class CreateModuleFromJar extends SystemAction {
+public class CreateModuleFromJar extends Action {
 
     private transient static Logger logger = LoggerFactory.getLogger(CreateModuleFromJar.class);
     private JahiaTemplateManagerService templateManagerService;
 
     @Override
-    public ActionResult doExecuteAsSystem(HttpServletRequest request, RenderContext renderContext, JCRSessionWrapper session, Resource resource, Map<String, List<String>> parameters, URLResolver urlResolver) throws Exception {
+    public ActionResult doExecute(HttpServletRequest request, RenderContext renderContext, Resource resource, JCRSessionWrapper session, Map<String, List<String>> parameters, URLResolver urlResolver) throws Exception {
         Map<String, List<String>> moduleParams = new HashMap<String, List<String>>();
         final FileUpload fu = (FileUpload) request.getAttribute(FileUpload.FILEUPLOAD_ATTRIBUTE);
         DiskFileItem uploadedJar = fu.getFileItems().get("file");
