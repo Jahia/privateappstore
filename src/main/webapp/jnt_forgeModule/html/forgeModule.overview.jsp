@@ -150,7 +150,7 @@
     </template:addResources>
 </c:if>
 
-<article id="moduleOverview" itemtype="http://schema.org/SoftwareApplication">
+<article id="moduleOverview">
 
     <jcr:nodeProperty node="${activeVersion}" name="versionNumber" var="versionNumber"/>
     <jcr:nodeProperty node="${activeVersion}" name="relatedJahiaVersion" var="requiredVersion"/>

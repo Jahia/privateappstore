@@ -28,12 +28,8 @@
 .bodywrapper #jnt_forge .moduleTags .tag:before {
   content: "#";
 }
-.bodywrapper #jnt_forge dl.dl-small dt,
-.bodywrapper #jnt_forge dl.dl-small dl {
+.bodywrapper #jnt_forge .dl-small .term {
   font-size: 11.9px;
-}
-.bodywrapper #jnt_forge dl.dl-uppercase dt {
-  text-transform: uppercase;
 }
 .bodywrapper #jnt_forge .progress .ratingCount {
   padding-left: 6px;
@@ -261,6 +257,16 @@
 }
 .bodywrapper #jnt_forge .moduleInformation .labels span:first-of-type {
     margin-bottom: 8px;
+}
+.bodywrapper #jnt_forge .moduleInformation .term,
+.bodywrapper #jnt_forge .moduleInformation .description {
+    line-height: 20px;
+}
+.bodywrapper #jnt_forge .moduleInformation .term {
+    font-weight: bold;
+}
+.bodywrapper #jnt_forge .moduleInformation .description {
+    margin-left: 10px;
 }
 .bodywrapper #jnt_forge .forgeModule .badges {
     margin-bottom: 8px;
