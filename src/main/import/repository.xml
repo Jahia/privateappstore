@@ -20,10 +20,10 @@
                         <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                         <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Business"/>
                     </business>
-                    <code j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                    <utility j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
                         <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                        <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Code"/>
-                    </code>
+                        <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Utility"/>
+                    </utility>
                     <productivity j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
                         <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                         <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Productivity"/>
