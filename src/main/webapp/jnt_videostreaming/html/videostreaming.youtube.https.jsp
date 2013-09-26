@@ -7,8 +7,8 @@
 
 
 <object width="${currentNode.properties.width.long}" height="${currentNode.properties.height.long}">
-	<param name="allowFullScreen" value="${currentNode.properties.allowfullscreen.boolean}"></param>
-	<param name="allowscriptaccess" value="always"></param>
-	<param name="movie" value="https://www.youtube.com/v/${currentNode.properties.identifier.string}&amp;hl=fr_FR&amp;fs=1"></param>
+	<param name="allowFullScreen" value="${currentNode.properties.allowfullscreen.boolean}"/>
+	<param name="allowscriptaccess" value="always"/>
+	<param name="movie" value="https://www.youtube.com/v/${currentNode.properties.identifier.string}&amp;hl=fr_FR&amp;fs=1"/>
 	<embed src="https://www.youtube.com/v/${currentNode.properties.identifier.string}&amp;hl=fr_FR&amp;fs=1" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="${currentNode.properties.allowfullscreen.boolean}" width="${currentNode.properties.width.long}" height="${currentNode.properties.height.long}"></embed>
 </object>

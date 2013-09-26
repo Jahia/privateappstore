@@ -7,8 +7,8 @@
 
 
 <object width="${currentNode.properties.width.long}" height="${currentNode.properties.height.long}">
-		<param name="allowFullScreen" value="${currentNode.properties.allowfullscreen.boolean}"></param>
-		<param name="allowScriptAccess" value="always"></param>
-		<param name="movie" value="https://www.dailymotion.com/swf/video/${currentNode.properties.identifier.string}?additionalInfos=0"></param>
+		<param name="allowFullScreen" value="${currentNode.properties.allowfullscreen.boolean}"/>
+		<param name="allowScriptAccess" value="always"/>
+		<param name="movie" value="https://www.dailymotion.com/swf/video/${currentNode.properties.identifier.string}?additionalInfos=0"/>
 		<embed type="application/x-shockwave-flash" src="https://www.dailymotion.com/swf/video/${currentNode.properties.identifier.string}?additionalInfos=0" width="${currentNode.properties.width.long}" height="${currentNode.properties.height.long}" allowfullscreen="${currentNode.properties.allowfullscreen.boolean}" allowscriptaccess="always"></embed>
 </object>
