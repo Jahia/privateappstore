@@ -40,55 +40,59 @@
                 "color": false //Button to change color of font
             });
 
-            // Set JQuery to traditional
-            $.ajaxSetup({traditional: true, cache:false});
+            <c:if test="${renderContext.liveMode}">
 
-            jQuery.validator.addMethod("regexp", function(value, element, param) {
-                return this.optional(element) || param.test(value);
-            });
+                // Set JQuery to traditional
+                $.ajaxSetup({traditional: true, cache:false});
 
-            var validator = $("#forgeModuleCreationForm-${id}").validate({
+                jQuery.validator.addMethod("regexp", function(value, element, param) {
+                    return this.optional(element) || param.test(value);
+                });
 
-                rules: {
-                    'jcr:title': {
-                        required: true,
-                        regexp: /^[^"]*$/i,
-                        minlength: 2
-                    },
-                    'description': {
-                        required: true,
-                        minlength: 100
-                    }
-                },
-                messages: {
-                    'jcr:title': {
-                        required: "<fmt:message key='jnt_forgeModuleCreation.label.askTitle'/>",
-                        regexp: "<fmt:message key="jnt_forgeModuleCreation.label.error.doubleQuote"/>",
-                        minlength: "<fmt:message key='jnt_forgeModuleCreation.label.titleSizeWarning'/>"
-                    },
-                    'description': {
-                        required: "<fmt:message key='jnt_forgeModuleCreation.label.askDescription'/>",
-                        minlength: "<fmt:message key='jnt_forgeModuleCreation.label.descriptionSizeWarning'/>"
-                    }
-                },
-                submitHandler: function(form) {
-                    $.post('<c:url value='${modulesRepositoryPath}.createModule.do'/>',$(form).serialize(), function(result) {
-                        if(result['error'] == "titleAlreadyUsed") {
-                            validator.showErrors({'jcr:title':"<fmt:message key="jnt_forgeModuleCreation.label.error.titleAlreadyUse"/>"});
+                var validator = $("#forgeModuleCreationForm-${id}").validate({
+
+                    rules: {
+                        'jcr:title': {
+                            required: true,
+                            regexp: /^[^"]*$/i,
+                            minlength: 2
+                        },
+                        'description': {
+                            required: true,
+                            minlength: 100
                         }
-                        else {
-                            if (result['moduleUrl'] != "")
-                                window.location = result['moduleUrl'];
+                    },
+                    messages: {
+                        'jcr:title': {
+                            required: "<fmt:message key='jnt_forgeModuleCreation.label.askTitle'/>",
+                            regexp: "<fmt:message key="jnt_forgeModuleCreation.label.error.doubleQuote"/>",
+                            minlength: "<fmt:message key='jnt_forgeModuleCreation.label.titleSizeWarning'/>"
+                        },
+                        'description': {
+                            required: "<fmt:message key='jnt_forgeModuleCreation.label.askDescription'/>",
+                            minlength: "<fmt:message key='jnt_forgeModuleCreation.label.descriptionSizeWarning'/>"
                         }
-                    }, "json");
-                },
-                highlight: function(element, errorClass, validClass) {
-                    $(element).addClass("error").removeClass(validClass).parents('.control-group').addClass("error");
-                },
-                unhighlight: function(element, errorClass, validClass) {
-                    $(element).removeClass("error").addClass(validClass).parents('.control-group').removeClass("error");
-                }
-            });
+                    },
+                    submitHandler: function(form) {
+                        $.post('<c:url value='${modulesRepositoryPath}.createModule.do'/>',$(form).serialize(), function(result) {
+                            if(result['error'] == "titleAlreadyUsed") {
+                                validator.showErrors({'jcr:title':"<fmt:message key="jnt_forgeModuleCreation.label.error.titleAlreadyUse"/>"});
+                            }
+                            else {
+                                if (result['moduleUrl'] != "")
+                                    window.location = result['moduleUrl'];
+                            }
+                        }, "json");
+                    },
+                    highlight: function(element, errorClass, validClass) {
+                        $(element).addClass("error").removeClass(validClass).parents('.control-group').addClass("error");
+                    },
+                    unhighlight: function(element, errorClass, validClass) {
+                        $(element).removeClass("error").addClass(validClass).parents('.control-group').removeClass("error");
+                    }
+                });
+
+            </c:if>
 
         });
 
@@ -123,7 +127,8 @@
 
                 <div class="control-group">
                     <div class="controls">
-                        <input type="submit" class="btn btn-primary" value="<fmt:message key="jnt_forgeModuleCreation.label.submit" />"/>
+                        <input type="submit" class="btn btn-primary" value="<fmt:message key="jnt_forgeModuleCreation.label.submit" />"
+                               <c:if test="${not renderContext.liveMode}">disabled</c:if>/>
                     </div>
                 </div>
 

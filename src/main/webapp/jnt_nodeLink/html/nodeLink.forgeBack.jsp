@@ -2,6 +2,9 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="template" uri="http://www.jahia.org/tags/templateLib" %>
 <%@ taglib prefix="jcr" uri="http://www.jahia.org/tags/jcr" %>
+<%--@elvariable id="currentNode" type="org.jahia.services.content.JCRNodeWrapper"--%>
+<%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
+
 <jcr:nodeProperty node="${currentNode}" name="j:node" var="reference"/>
 <jcr:nodeProperty node="${currentNode}" name="jcr:title" var="title"/>
 <jcr:nodeProperty node="${currentNode}" name="jcr:description" var="description"/>
@@ -13,4 +16,4 @@
 </c:if>
 <c:if test="${not empty target.string}"><c:set var="target"> target="${target.string}"</c:set></c:if>
 <c:if test="${not empty description.string}"><c:set var="linkTitle"> title="${fn:escapeXml(description.string)}"</c:set></c:if>
-<a class="btn btnBack" href="${link}" ${target} ${linkTitle}><i class="icon-arrow-left icon-white"></i>&nbsp;${fn:escapeXml(not empty title.string ? title.string : currentNode.name)}</a>
+<a class="btn btn-primary btnBack" href="${link}" ${target} ${linkTitle}><i class="icon-arrow-left"></i>&nbsp;${fn:escapeXml(not empty title.string ? title.string : currentNode.name)}</a>

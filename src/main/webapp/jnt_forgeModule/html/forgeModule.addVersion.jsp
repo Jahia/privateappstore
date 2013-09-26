@@ -111,6 +111,10 @@
     <div class="clear"></div>
 </div>
 
+<div class="alert alert-block">
+    <p><fmt:message key="forge.uploadJar.info.snapshot.not.allowed"/></p>
+</div>
+
 <c:if test="${isDeveloper && not viewAsUser}">
 
     <div data-original-title="<fmt:message key="jnt_forgeModuleVersion.label.changeLog"/>" data-toggle="manual" data-name="changeLog" data-type="wysihtml5"

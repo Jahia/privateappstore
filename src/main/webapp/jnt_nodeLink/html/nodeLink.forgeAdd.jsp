@@ -13,4 +13,4 @@
 </c:if>
 <c:if test="${not empty target.string}"><c:set var="target"> target="${target.string}"</c:set></c:if>
 <c:if test="${not empty description.string}"><c:set var="linkTitle"> title="${fn:escapeXml(description.string)}"</c:set></c:if>
-<a class="btn btn-block btn-file-upload" href="${link}" ${target} ${linkTitle}><i class="icon-plus-sign icon-white"></i>&nbsp;${fn:escapeXml(not empty title.string ? title.string : currentNode.name)}</a>
+<a class="btn btn-primary btn-block btn-file-upload" href="${link}" ${target} ${linkTitle}><i class="icon-plus-sign"></i>&nbsp;${fn:escapeXml(not empty title.string ? title.string : currentNode.name)}</a>
