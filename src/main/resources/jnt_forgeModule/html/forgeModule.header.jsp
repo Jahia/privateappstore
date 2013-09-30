@@ -53,8 +53,7 @@
 <template:include view="hidden.sql">
     <template:param name="getLatestVersion" value="true"/>
 </template:include>
-<c:set value="${moduleMap.latestVersion}" var="latestVersion"/>
-<template:addCacheDependency node="${latestVersion}"/>
+<template:addCacheDependency flushOnPathMatchingRegexp="${currentNode.path}/.*"/>
 
 <c:if test="${isDeveloper && not viewAsUser}">
 
@@ -186,12 +185,11 @@
 
         </div>
     </c:if>
-
     <c:choose>
 
-        <c:when test="${not empty latestVersion}">
-            <jcr:nodeProperty node="${latestVersion}" name="versionNumber" var="versionNumber"/>
-            <a class="btn btn-block" href="<c:url value="${latestVersion.properties.url.string}" context="/"/>"
+        <c:when test="${not empty moduleMap.latestVersion}">
+            <jcr:nodeProperty node="${moduleMap.latestVersion}" name="versionNumber" var="versionNumber"/>
+            <a class="btn btn-block" href="<c:url value="${moduleMap.latestVersion.properties.url.string}" context="/"/>"
                <c:if test="${not isDeveloper}">onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')"</c:if>>
                 <fmt:message key="jnt_forgeModule.label.downloadCurrentVersion">
                     <fmt:param value="${versionNumber.string}"/>

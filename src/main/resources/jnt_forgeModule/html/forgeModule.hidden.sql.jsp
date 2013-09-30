@@ -16,6 +16,7 @@
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
+<template:addCacheDependency flushOnPathMatchingRegexp="${currentNode.path}/.*"/>
 <jcr:sql
         var="query"
         sql="SELECT * FROM [jnt:forgeModuleVersion] AS moduleVersion
