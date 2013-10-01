@@ -2075,7 +2075,8 @@ div.file_upload input {
     top: 0;
     right: 0;
     margin: 0;
-    border: 20px solid transparent;
+    left: 0;
+    bottom: 0;
     opacity: 0;
     -ms-filter: 'alpha(opacity=0)';
     filter: alpha(opacity=0);

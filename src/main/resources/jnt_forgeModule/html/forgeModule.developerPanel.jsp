@@ -168,7 +168,7 @@
             </button>
         </div>
 
-        <div id="deleteModuleModal-${id}" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="deleteModuleModal-${id}" aria-hidden="true">
+        <div id="deleteModuleModal-${id}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="deleteModuleModal-${id}" aria-hidden="true">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h3 id="deleteModuleModal-${id}"><fmt:message key="jnt_forgeModule.label.developer.modal.delete.header"/></h3>
