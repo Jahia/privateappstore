@@ -135,7 +135,7 @@
                                 <actions j:invertCondition="false" j:originWS="default" j:requireLoggedUser="true" j:requirePrivilegedUser="false" jcr:mixinTypes="jmix:accessControlled jmix:requiredPermissions" jcr:primaryType="jnt:linkList">
                                     <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
                                     <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Actions" />
-                                    <publish-your-module j:node="/templateSets/forge/publish-your-module" j:originWS="default" j:target="_self" j:view="forgeAdd" jcr:mixinTypes="jmix:accessControlled jmix:renderable" jcr:primaryType="jnt:nodeLink">
+                                    <publish-your-module j:invertCondition="false" j:node="/templateSets/forge/publish-your-module" j:originWS="default" j:requireLoggedUser="true" j:requirePrivilegedUser="false" j:requiredMode="live" j:requiredPermissions="" j:target="_self" j:view="forgeAdd" jcr:mixinTypes="jmix:accessControlled jmix:renderable jmix:requiredPermissions" jcr:primaryType="jnt:nodeLink">
                                         <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
                                         <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Add your module" />
                                     </publish-your-module>
