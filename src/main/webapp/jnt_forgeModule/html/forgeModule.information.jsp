@@ -122,7 +122,7 @@
 
 
 
-<aside class="moduleInformation moduleMetaData dl-small" itemscope itemtype="http://schema.org/SoftwareApplication">
+<aside class="moduleInformation moduleMetaData dl-small">
 
     <c:if test="${currentNode.properties['reviewedByJahia'].boolean || currentNode.properties['supportedByJahia'].boolean}">
         <div class="labels">
@@ -143,62 +143,64 @@
 
     <h4><fmt:message key="jnt_forgeModule.label.information"/></h4>
 
-    <span content="${title}" itemprop="name"></span>
-    <c:if test="${not empty icon}"><span content="${icon.url}" itemprop="image"></span></c:if>
-    <span content="${activeVersion.properties.url.string}" itemprop="downloadUrl"></span>
-    <c:forEach items="${assignedTags}" var="tag" varStatus="status">
-        <span content="${tag.node.name}" itemprop="keywords"></span>
-    </c:forEach>
+        <div itemscope="" itemtype="http://schema.org/SoftwareApplication">
+            <span content="${title}" itemprop="name"></span>
+            <c:if test="${not empty icon}"><span content="${icon.url}" itemprop="image"></span></c:if>
+            <span content="${activeVersion.properties.url.string}" itemprop="downloadUrl"></span>
+            <c:forEach items="${assignedTags}" var="tag" varStatus="status">
+                <span content="${tag.node.name}" itemprop="keywords"></span>
+            </c:forEach>
 
-    <div class="term"><fmt:message key="jnt_forgeModule.label.updated"/></div>
-    <div class="description">
-        <time itemprop="datePublished">
-            <fmt:formatDate value="${activeVersion.properties['jcr:lastModified'].date.time}" pattern="yyyy-MM-dd" />
-        </time>
-    </div>
-
-    <div class="term"><fmt:message key="jnt_forgeModule.label.version"/></div>
-    <div class="description" itemprop="softwareVersion">${versionNumber.string}</div>
-
-    <c:if test="${not empty requiredVersion}">
-        <div class="term"><fmt:message key="jnt_forgeModule.label.relatedJahiaVersion"/></div>
-        <div class="description">${requiredVersion.node.properties['text'].string}</div>
-    </c:if>
-
-    <div itemtype="http://schema.org/Organization" itemscope="" itemprop="author">
-
-        <div class="term"><fmt:message key="jnt_forgeModule.label.authorName"/></div>
-        <div class="description" itemprop="name">
-            <c:if test="${isDeveloper && not viewAsUser}">
-                <a data-original-title="<fmt:message key="jnt_forgeModule.label.askAuthorNameDisplayedAs"/>" data-name="authorNameDisplayedAs" data-pk="1" data-type="select"
-                   id="authorName-information-${id}" href="#" class="editable editable-click">
-            </c:if>
-            ${authorName}
-            <c:if test="${isDeveloper && not viewAsUser}">
-                </a>
-            </c:if>
-        </div>
-
-        <span content="${authorURL}" itemprop="url"></span>
-        <span content="${authorEmail}" itemprop="email"></span>
-
-    </div>
-
-    <c:if test="${jcr:isNodeType(currentNode, 'jmix:rating') && nbOfVotes gt 0}">
-        <div class="term"><fmt:message key="jnt_forgeModule.label.rating"/></div>
-        <div class="description" itemtype="http://schema.org/AggregateRating" itemscope="" itemprop="aggregateRating">
-            <span itemprop="worstRating" content="1"></span>
-            <span itemprop="bestRating" content="5"></span>
-            <div class="ratingValue" itemprop="ratingValue" content="${avgRating}">
-                <template:include view="hidden.average.readonly" />
+            <div class="term"><fmt:message key="jnt_forgeModule.label.updated"/></div>
+            <div class="description">
+                <time itemprop="datePublished">
+                    <fmt:formatDate value="${activeVersion.properties['jcr:lastModified'].date.time}" pattern="yyyy-MM-dd" />
+                </time>
             </div>
-            <span itemprop="ratingCount" content="${nbOfVotes}">(${nbOfVotes})</span>
+
+            <div class="term"><fmt:message key="jnt_forgeModule.label.version"/></div>
+            <div class="description" itemprop="softwareVersion">${versionNumber.string}</div>
+
+            <c:if test="${not empty requiredVersion}">
+                <div class="term"><fmt:message key="jnt_forgeModule.label.relatedJahiaVersion"/></div>
+                <div class="description">${requiredVersion.node.properties['text'].string}</div>
+            </c:if>
+        </div>
+
+        <div itemscope="" itemtype="http://schema.org/Organization">
+
+            <div class="term"><fmt:message key="jnt_forgeModule.label.authorName"/></div>
+            <div class="description" itemprop="name">
+                <c:if test="${isDeveloper && not viewAsUser}">
+                    <a data-original-title="<fmt:message key="jnt_forgeModule.label.askAuthorNameDisplayedAs"/>" data-name="authorNameDisplayedAs" data-pk="1" data-type="select"
+                       id="authorName-information-${id}" href="#" class="editable editable-click">
+                </c:if>
+                ${authorName}
+                <c:if test="${isDeveloper && not viewAsUser}">
+                    </a>
+                </c:if>
+            </div>
+
+            <span content="${authorURL}" itemprop="url"></span>
+            <span content="${authorEmail}" itemprop="email"></span>
 
         </div>
-    </c:if>
 
-    <div class="term"><h4><fmt:message key="jnt_forgeModule.label.category"/></h4></div>
-    <div class="description" itemprop="applicationCategory">
+        <c:if test="${jcr:isNodeType(currentNode, 'jmix:rating') && nbOfVotes gt 0}">
+            <div class="term"><fmt:message key="jnt_forgeModule.label.rating"/></div>
+            <div class="description" itemtype="http://schema.org/AggregateRating" itemscope="" >
+                <span itemprop="worstRating" content="1"></span>
+                <span itemprop="bestRating" content="5"></span>
+                <div class="ratingValue" itemprop="ratingValue" content="${avgRating}">
+                    <template:include view="hidden.average.readonly" />
+                </div>
+                <span itemprop="ratingCount" content="${nbOfVotes}">(${nbOfVotes})</span>
+
+            </div>
+        </c:if>
+
+        <div class="term"><h4><fmt:message key="jnt_forgeModule.label.category"/></h4></div>
+        <div class="description">
         <c:if test="${isDeveloper && not viewAsUser}">
             <a data-original-title="<fmt:message key="jnt_forgeModule.label.askCategory"/>" data-name="category" data-pk="1" data-type="select"
                id="category-${id}" href="#" class="editable editable-click">
