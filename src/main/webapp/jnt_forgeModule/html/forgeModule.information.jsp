@@ -69,12 +69,35 @@
 
             var categories = [];
             <c:if test="${jcr:hasChildrenOfType(moduleCategories, 'jnt:text')}">
-                <c:forEach items="${jcr:getNodes(moduleCategories, 'jnt:text')}" var="moduleCategory">
-                    categories.push({value: '${moduleCategory.identifier}', text: '${moduleCategory.properties['text'].string}'});
-                </c:forEach>
+            <c:forEach items="${jcr:getNodes(moduleCategories, 'jnt:text')}" var="moduleCategory">
+            categories.push({value: '${moduleCategory.identifier}', text: '${moduleCategory.properties['text'].string}'});
+            </c:forEach>
             </c:if>
 
             $(document).ready(function() {
+
+
+                $('#forgeContestBtnInformation').click(function() {
+
+                    var btn = $(this);
+                    var dataName = btn.attr('data-name');
+                    var dataValue = !(btn.attr('data-value') === 'true');
+                    var data = {};
+
+                    data[dataName] = dataValue;
+                    data['jcrMethodToCall'] = 'put';
+
+                    $.post('<c:url value='${url.base}${currentNode.path}'/>', data, function(result) {
+                        btn.toggleClass('btn-success btn-danger');
+                        btn.attr('data-value', result[dataName]);
+                        var text=btn.attr('data-value') == "true"?"<fmt:message key="jnt_forgeModule.label.contestModule.button.yes"/>":"<fmt:message key="jnt_forgeModule.label.contestModule.button.no"/>";
+                        $("#forgeContestBtnInformation").html(text);
+
+
+
+                    },"json")
+
+                });
 
                 <c:if test="${empty authorOrganisation}">
                 $('#authorName-information-${id}').on('shown', function(e, editable) {
@@ -92,7 +115,7 @@
                     source: categories,
                     value: '${category.node.identifier}',
                     <jsp:include page="../../commons/bootstrap-editable-options.jsp">
-                        <jsp:param name="postURL" value='${postURL}'/>
+                    <jsp:param name="postURL" value='${postURL}'/>
                     </jsp:include>
                 });
 
@@ -102,14 +125,14 @@
                         {value:'organisation', text: '${not empty authorOrganisation ? authorOrganisation : labelEmptyOrganisation}'}],
                     value: '${authorNameDisplayedAs}',
                     <jsp:include page="../../commons/bootstrap-editable-options.jsp">
-                        <jsp:param name="postURL" value="${postURL}"/>
-                        <jsp:param name="customSuccess" value="
-                            if (${authorNameDisplayedAs eq 'organisation'} || newValue == 'organisation')
-                                document.location = '${currentNode.url}';
-                            else {
-                                var newAuthorName = $(this).next('.editable-container').find('option[value='+newValue+']').html();
-                                $('#authorName-header-${id}').html(newAuthorName).editable('setValue', newValue);
-                            }"/>
+                    <jsp:param name="postURL" value="${postURL}"/>
+                    <jsp:param name="customSuccess" value="
+                        if (${authorNameDisplayedAs eq 'organisation'} || newValue == 'organisation')
+                            document.location = '${currentNode.url}';
+                        else {
+                            var newAuthorName = $(this).next('.editable-container').find('option[value='+newValue+']').html();
+                            $('#authorName-header-${id}').html(newAuthorName).editable('setValue', newValue);
+                        }"/>
                     </jsp:include>
                 });
 
@@ -143,72 +166,83 @@
 
     <h4><fmt:message key="jnt_forgeModule.label.information"/></h4>
 
-        <div itemscope="" itemtype="http://schema.org/SoftwareApplication">
-            <span content="${title}" itemprop="name"></span>
-            <c:if test="${not empty icon}"><span content="${icon.url}" itemprop="image"></span></c:if>
-            <span content="${activeVersion.properties.url.string}" itemprop="downloadUrl"></span>
-            <c:forEach items="${assignedTags}" var="tag" varStatus="status">
-                <span content="${tag.node.name}" itemprop="keywords"></span>
-            </c:forEach>
+    <div itemscope="" itemtype="http://schema.org/SoftwareApplication">
+        <span content="${title}" itemprop="name"></span>
+        <c:if test="${not empty icon}"><span content="${icon.url}" itemprop="image"></span></c:if>
+        <span content="${activeVersion.properties.url.string}" itemprop="downloadUrl"></span>
+        <c:forEach items="${assignedTags}" var="tag" varStatus="status">
+            <span content="${tag.node.name}" itemprop="keywords"></span>
+        </c:forEach>
 
-            <div class="term"><fmt:message key="jnt_forgeModule.label.updated"/></div>
-            <div class="description">
-                <time itemprop="datePublished">
-                    <fmt:formatDate value="${activeVersion.properties['jcr:lastModified'].date.time}" pattern="yyyy-MM-dd" />
-                </time>
-            </div>
-
-            <div class="term"><fmt:message key="jnt_forgeModule.label.version"/></div>
-            <div class="description" itemprop="softwareVersion">${versionNumber.string}</div>
-
-            <c:if test="${not empty requiredVersion}">
-                <div class="term"><fmt:message key="jnt_forgeModule.label.relatedJahiaVersion"/></div>
-                <div class="description">${requiredVersion.node.properties['text'].string}</div>
-            </c:if>
+        <div class="term"><fmt:message key="jnt_forgeModule.label.updated"/></div>
+        <div class="description">
+            <time itemprop="datePublished">
+                <fmt:formatDate value="${activeVersion.properties['jcr:lastModified'].date.time}" pattern="yyyy-MM-dd" />
+            </time>
         </div>
 
-        <div itemscope="" itemtype="http://schema.org/Organization">
+        <div class="term"><fmt:message key="jnt_forgeModule.label.version"/></div>
+        <div class="description" itemprop="softwareVersion">${versionNumber.string}</div>
 
-            <div class="term"><fmt:message key="jnt_forgeModule.label.authorName"/></div>
-            <div class="description" itemprop="name">
-                <c:if test="${isDeveloper && not viewAsUser}">
-                    <a data-original-title="<fmt:message key="jnt_forgeModule.label.askAuthorNameDisplayedAs"/>" data-name="authorNameDisplayedAs" data-pk="1" data-type="select"
-                       id="authorName-information-${id}" href="#" class="editable editable-click">
+        <c:if test="${not empty requiredVersion}">
+            <div class="term"><fmt:message key="jnt_forgeModule.label.relatedJahiaVersion"/></div>
+            <div class="description">${requiredVersion.node.properties['text'].string}</div>
+        </c:if>
+    </div>
+
+    <div itemscope="" itemtype="http://schema.org/Organization">
+
+        <div class="term"><fmt:message key="jnt_forgeModule.label.authorName"/></div>
+        <div class="description" itemprop="name">
+            <c:if test="${isDeveloper && not viewAsUser}">
+            <a data-original-title="<fmt:message key="jnt_forgeModule.label.askAuthorNameDisplayedAs"/>" data-name="authorNameDisplayedAs" data-pk="1" data-type="select"
+               id="authorName-information-${id}" href="#" class="editable editable-click">
                 </c:if>
                 ${authorName}
                 <c:if test="${isDeveloper && not viewAsUser}">
-                    </a>
-                </c:if>
-            </div>
-
-            <span content="${authorURL}" itemprop="url"></span>
-            <span content="${authorEmail}" itemprop="email"></span>
-
+            </a>
+            </c:if>
         </div>
 
-        <c:if test="${jcr:isNodeType(currentNode, 'jmix:rating') && nbOfVotes gt 0}">
-            <div class="term"><fmt:message key="jnt_forgeModule.label.rating"/></div>
-            <div class="description" itemtype="http://schema.org/AggregateRating" itemscope="" >
-                <span itemprop="worstRating" content="1"></span>
-                <span itemprop="bestRating" content="5"></span>
-                <div class="ratingValue" itemprop="ratingValue" content="${avgRating}">
-                    <template:include view="hidden.average.readonly" />
-                </div>
-                <span itemprop="ratingCount" content="${nbOfVotes}">(${nbOfVotes})</span>
+        <span content="${authorURL}" itemprop="url"></span>
+        <span content="${authorEmail}" itemprop="email"></span>
 
+    </div>
+
+    <c:if test="${jcr:isNodeType(currentNode, 'jmix:rating') && nbOfVotes gt 0}">
+        <div class="term"><fmt:message key="jnt_forgeModule.label.rating"/></div>
+        <div class="description" itemtype="http://schema.org/AggregateRating" itemscope="" >
+            <span itemprop="worstRating" content="1"></span>
+            <span itemprop="bestRating" content="5"></span>
+            <div class="ratingValue" itemprop="ratingValue" content="${avgRating}">
+                <template:include view="hidden.average.readonly" />
             </div>
-        </c:if>
+            <span itemprop="ratingCount" content="${nbOfVotes}">(${nbOfVotes})</span>
 
-        <div class="term"><h4><fmt:message key="jnt_forgeModule.label.category"/></h4></div>
-        <div class="description">
+        </div>
+    </c:if>
+
+    <div class="term"><h4><fmt:message key="jnt_forgeModule.label.category"/></h4></div>
+    <div class="description">
         <c:if test="${isDeveloper && not viewAsUser}">
-            <a data-original-title="<fmt:message key="jnt_forgeModule.label.askCategory"/>" data-name="category" data-pk="1" data-type="select"
-               id="category-${id}" href="#" class="editable editable-click">
-        </c:if>
-        ${not empty category ? category.node.properties['text'].string : labelNotSelected}
-        <c:if test="${isDeveloper && not viewAsUser}">
-            </a>
+        <a data-original-title="<fmt:message key="jnt_forgeModule.label.askCategory"/>" data-name="category" data-pk="1" data-type="select"
+           id="category-${id}" href="#" class="editable editable-click">
+            </c:if>
+            ${not empty category ? category.node.properties['text'].string : labelNotSelected}
+            <c:if test="${isDeveloper && not viewAsUser}">
+        </a>
         </c:if>
     </div>
+    <c:if test="${isDeveloper && not viewAsUser}">
+        <div class="term"><h4><fmt:message key="jnt_forgeModule.label.contestModule"/></h4></div>
+        <div class="description">
+            <c:set var="isContestModule" value="${currentNode.properties['isContestModule'].boolean}"/>
+            <button id="forgeContestBtnInformation" class="forgeContestBtn btn btn-small ${isContestModule ? 'btn-success' : 'btn-danger'}"
+                    data-value="${isContestModule}" data-name="isContestModule">
+                <fmt:message key="jnt_forgeModule.label.contestModule.button.${isContestModule ? 'yes' : 'no'}"/>
+            </button>
+        </div>
+    </c:if>
+
 
 </aside>

@@ -46,7 +46,7 @@
     <groupId>org.jahia.modules</groupId>
     <artifactId>forge</artifactId>
     <name>Jahia Forge</name>
-    <version>1.1</version>
+    <version>1.2-SNAPSHOT</version>
     <packaging>war</packaging>
     <description>This is the custom module (Forge) for running on a Jahia server.</description>
     <scm>
