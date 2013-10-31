@@ -236,7 +236,7 @@
                           <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Overview"/>
                           <container containerType="fluid" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="genericnt:bootstrapContainer">
                             <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                            <row columns="span7, span4" j:originWS="default" jcr:mixinTypes="genericmix:bootstrapRowCustom jmix:accessControlled" jcr:primaryType="genericnt:bootstrapRow" rowType="custom">
+                            <row columns="span8, span4" j:originWS="default" jcr:mixinTypes="genericmix:bootstrapRowCustom jmix:accessControlled" jcr:primaryType="genericnt:bootstrapRow" rowType="custom">
                               <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                               <row-0 j:originWS="default" jcr:primaryType="jnt:contentList">
                                 <main-resource-display j:mainResourceView="overview" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
