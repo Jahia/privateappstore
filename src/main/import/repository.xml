@@ -110,7 +110,7 @@
                     </simple-text-1>
                 </forge-modules-release-type>
             </contents>
-            <templates j:originWS="default" j:rootTemplatePath="/base/forge-template" jcr:primaryType="jnt:templatesFolder">
+            <templates j:originWS="default" j:rootTemplatePath="/base" jcr:primaryType="jnt:templatesFolder">
                 <forge-home j:hiddenTemplate="false" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:pageTemplate">
                     <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Home" />
                     <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
@@ -157,7 +157,7 @@
                     <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
                     <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Module Creation" />
                     <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
-                        <bootstrap-row customColumn="16" divID="jnt_forge" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow">
+                        <bootstrap-row customColumn="12" divID="jnt_forge" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow">
                             <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
                             <bootstrap-row-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
                                 <links-list j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:linkList">
@@ -179,7 +179,7 @@
                     <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
                     <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Module" />
                     <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
-                        <bootstrap-row-1 customColumn="16" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow">
+                        <bootstrap-row-1 customColumn="12" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow">
                             <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
                             <bootstrap-row-1-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
                                 <links-list j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:linkList">
@@ -191,7 +191,7 @@
                                 </links-list>
                             </bootstrap-row-1-col1>
                         </bootstrap-row-1>
-                        <bootstrap-row colNames="module-aside, module-main" customColumn="4,12" divID="jnt_forge" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow">
+                        <bootstrap-row colNames="module-aside, module-main" customColumn="4,8" divID="jnt_forge" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow">
                             <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
                             <module-aside j:originWS="default" jcr:primaryType="jnt:contentList">
                                 <main-resource-display j:mainResourceView="header" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
@@ -210,7 +210,7 @@
                                     <overview j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:contentList">
                                         <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
                                         <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Overview" />
-                                        <bootstrap-row colNames="overview-main,overview-aside" customColumn="11,4" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow" offset="0,1">
+                                        <bootstrap-row colNames="overview-main,overview-aside" customColumn="7,4" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow" offset="0,1">
                                             <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
                                             <overview-main j:originWS="default" jcr:primaryType="jnt:contentList">
                                                 <main-resource-display j:mainResourceView="overview" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
@@ -288,7 +288,7 @@
                     <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
                     <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Module Add Version" />
                     <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
-                        <bootstrap-row customColumn="16" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow">
+                        <bootstrap-row customColumn="12" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow">
                             <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
                             <bootstrap-row-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
                                 <main-resource-display j:mainResourceView="addVersion" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:mainResourceDisplay">
