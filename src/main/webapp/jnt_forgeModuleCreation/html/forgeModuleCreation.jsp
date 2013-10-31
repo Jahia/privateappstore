@@ -103,12 +103,11 @@
 
     <%--<p><fmt:message key="jnt_forgeModuleCreation.label.forgeModuleCreationSubheader"/></p>--%>
 
-    <template:tokenizedForm>
+    <template:tokenizedForm allowsMultipleSubmits="true">
         <form id="forgeModuleCreationForm-${id}" action="<c:url value='${modulesRepositoryPath}.createModule.do'/>" method="post">
             <fieldset>
 
                 <input type="hidden" name="jcrNormalizeNodeName" value="true"/>
-                <input type="hidden" name="allowsMultipleSubmits" value="true"/>
 
                 <div class="control-group">
                     <label class="control-label" for="jcr:title"><fmt:message key="jnt_forgeModule.label.title"/></label>
