@@ -91,7 +91,7 @@
 		                    <Specification-Version>${project.version}</Specification-Version>
 		                    <Specification-Vendor />
                             <package-name>${project.name}</package-name>
-                            <depends>default,bootstrapComponent,grid,videostreaming,rating,facets,skins,default-skins</depends>
+                            <depends>default,generic-templates,grid,videostreaming,rating,facets,skins,default-skins</depends>
                             <root-folder>${project.artifactId}</root-folder>
                             <module-type>module</module-type>
                         </manifestEntries>
