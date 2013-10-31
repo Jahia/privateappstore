@@ -114,7 +114,7 @@
                 <forge-home j:hiddenTemplate="false" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:pageTemplate">
                     <j:translation_en jcr:language="en" jcr:mixinTypes="mix:title" jcr:primaryType="jnt:translation" jcr:title="Forge Home" />
                     <pagecontent j:originWS="default" jcr:primaryType="jnt:contentList">
-                        <bootstrap-row customColumn="4,12" divID="jnt_forge" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow">
+                        <bootstrap-row customColumn="4,8" divID="jnt_forge" fluid="true" j:originWS="default" jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bootstrapRow">
                             <j:acl j:inherit="true" jcr:primaryType="jnt:acl" />
                             <bootstrap-row-col1 j:originWS="default" jcr:primaryType="jnt:contentList">
                                 <facets-list j:bindedComponent="/templateSets/forge/contents/forge-modules-repository" j:expiration="0" j:originWS="default" j:perUser="false" j:type="jnt:forgeModule" j:view="forge" jcr:mixinTypes="jmix:accessControlled jmix:cache jmix:renderable" jcr:primaryType="jnt:facets">
