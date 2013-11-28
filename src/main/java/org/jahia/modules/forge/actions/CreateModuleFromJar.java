@@ -76,11 +76,41 @@ public class CreateModuleFromJar extends Action {
                     JCRSiteNode site = resource.getNode().getResolveSite();
                     String forgeSettingsUrl = site.getProperty("forgeSettingsUrl").getString();
 
+                    moduleParams.put("moduleName", Arrays.asList(moduleName));
+                    moduleParams.put("jcr:title", Arrays.asList(attributes.getValue("Implementation-Title")));
+                    moduleParams.put("description", Arrays.asList(attributes.getValue("Bundle-Description")));
+                    //moduleParams.put("authorNameDisplayedAs", Arrays.asList(attributes.getValue("Built-By")));
+                    moduleParams.put("authorURL", Arrays.asList(attributes.getValue("Implementation-URL")));
+                    //moduleParams.put("authorEmail", Arrays.asList(attributes.getValue("")));
+                    moduleParams.put("codeRepository", Arrays.asList(attributes.getValue("Jahia-Source-Control-Connection")));
+                    moduleParams.put("versionNumber", Arrays.asList(version));
+                    String forgeUrl = StringUtils.substringBefore(request.getRequestURL().toString(), "/render");
+                    String reqVersionAttribute = attributes.getValue("Jahia-Required-Version");
+                    final String requiredVersion = "version-" + reqVersionAttribute;
+                    if (moduleName == null || groupId == null || requiredVersion == null) {
+                        String error = Messages.get("resources.Jahia_Forge","forge.uploadJar.error.missing.manifest.attribute",session.getLocale());
+                        return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
+                    }
+                    moduleParams.put("url", Arrays.asList(forgeUrl + "/mavenproxy/" + site.getName() + "/" + groupId.replace(".","/") + "/" + moduleName + "/" + version + "/" + moduleName + "-" + version + "." + extension));
+                    JCRNodeWrapper versions = session.getNode(resource.getNode().getResolveSite().getPath() + "/contents/forge-modules-required-versions");
+
+                    if (!versions.hasNode(requiredVersion)) {
+                        Version v = new Version(requiredVersion);
+                        JCRNodeWrapper n = versions.addNode(requiredVersion, "jnt:jahiaVersion");
+                        n.setProperty("major",v.getMajorVersion());
+                        n.setProperty("minor",v.getMinorVersion());
+                        n.setProperty("servicePack",v.getServicePackVersion());
+                        n.setProperty("patch",v.getPatchVersion());
+                        n.setProperty("releaseCandidate",v.getReleaseCandidateNumber());
+                        n.setProperty("beta",v.getBetaNumber());
+                        n.setProperty("qualifier",v.getQualifiers().toArray(new String[v.getQualifiers().size()]));
+                    }
+                    moduleParams.put("requiredVersion", Arrays.asList(versions.getNode(requiredVersion).getIdentifier()));
+
                     String user = site.getProperty("forgeSettingsUser").getString();
                     String password = new String(Base64.decode(site.getProperty("forgeSettingsPassword").getString()));
 
                     File artifact = null;
-
                     try {
                         artifact = File.createTempFile("artifact", "." + extension);
                         FileUtils.copyFile(uploadedJar.getStoreLocation(), artifact);
@@ -90,7 +120,7 @@ public class CreateModuleFromJar extends Action {
                         moduleReleaseInfo.setRepositoryUrl(forgeSettingsUrl);
                         moduleReleaseInfo.setUsername(user);
                         moduleReleaseInfo.setPassword(password);
-                        templateManagerService.deployToMaven(groupId,moduleName, moduleReleaseInfo, artifact);
+                        templateManagerService.deployToMaven(groupId,moduleName,moduleReleaseInfo, artifact);
                     } catch (IOException e) {
                         String error = Messages.get("resources.Jahia_Forge","forge.uploadJar.error.cannot.upload",session.getLocale());
                         return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", error));
