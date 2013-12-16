@@ -68,7 +68,7 @@ public class CreateModuleFromJar extends Action {
                 if (manifest != null) {
                     Attributes attributes = manifest.getMainAttributes();
                     version = attributes.getValue("Implementation-Version");
-                    moduleName = attributes.getValue("Jahia-Root-Folder");
+                    moduleName = attributes.getValue("Bundle-SymbolicName");
                     if (uploadedJar.getName().endsWith(".war")) {
                         moduleName = attributes.getValue("root-folder");
                     }
