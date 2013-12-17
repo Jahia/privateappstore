@@ -21,10 +21,7 @@
 <template:addResources type="css" resources="ui.stars.css"/>
 <template:addResources type="javascript" resources="jquery.min.js,jquery.validate.js,jquery-ui.min.js,ui.stars.js"/>
 
-<template:addResources type="css" resources=",bootstrap-wysihtml5.css,bootstrap-editable.css"/>
-
 <c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>
-
 <c:if test="${isDeveloper}">
     <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
 </c:if>
@@ -153,7 +150,7 @@
     </template:addResources>
 </c:if>
 
-<article id="moduleOverview" itemtype="http://schema.org/SoftwareApplication">
+<article id="moduleOverview">
 
     <jcr:nodeProperty node="${latestVersion}" name="versionNumber" var="versionNumber"/>
     <jcr:nodeProperty node="${latestVersion}" name="relatedJahiaVersion" var="requiredVersion"/>
@@ -169,6 +166,7 @@
             <p class="editable-toggle">
                 <a id="toggle-description-${id}" href="#"><i class="icon-pencil"></i>&nbsp;<fmt:message key="jnt_forgeModule.label.edit"/></a>
             </p>
+
             <div data-original-title="<fmt:message key="jnt_forgeModule.label.description"/>" data-toggle="manual" data-name="description" data-type="wysihtml5"
                  data-pk="1" id="description-${id}" class="editable" tabindex="-1">
 
@@ -215,14 +213,14 @@
 
                     <c:otherwise>
                         <c:if test="${not empty authorURL}">
-                            <a class="btn btn-small btn-primary" href="${authorURL}"><fmt:message key="jnt_forgeModule.label.authorURL"/></a>
+                            <a class="btn btn-small btn-primary" target="_blank" href="${authorURL}"><fmt:message key="jnt_forgeModule.label.authorURL"/></a>
                         </c:if>
                         <c:choose>
                             <c:when test="${authorIsOrganisation && not empty authorEmail}">
-                                <a class="btn btn-small btn-primary" href="mailto:${authorEmail}?Subject=${title}%20-%20Version:%20${versionNumber.string}"><fmt:message key="jnt_forgeModule.label.authorEmail"/></a>
+                                <a class="btn btn-small btn-primary" href="mailto:${authorEmail}?Subject=${fn:replace(title, " ","%20")}%20-%20Version:%20${versionNumber.string}"><fmt:message key="jnt_forgeModule.label.authorEmail"/></a>
                             </c:when>
                             <c:when test="${not authorIsOrganisation && not empty userEmail}">
-                                <a class="btn btn-small btn-primary" href="mailto:${userEmail}?Subject=${title}%20-%20Version:%20${versionNumber.string}"><fmt:message key="jnt_forgeModule.label.authorEmail"/></a>
+                                <a class="btn btn-small btn-primary" href="mailto:${userEmail}?Subject=${fn:replace(title, " ","%20")}%20-%20Version:%20${versionNumber.string}"><fmt:message key="jnt_forgeModule.label.authorEmail"/></a>
                             </c:when>
                         </c:choose>
                         <c:if test="${not empty authorEmail}">
@@ -233,7 +231,7 @@
                             <section class="moduleTags">
 
                                 <h5><fmt:message key="jnt_forgeModule.label.tags"/></h5>
-                                <ul class="inline">
+                                <ul class="inline unstyled">
                                     <c:forEach items="${assignedTags}" var="tag" varStatus="status">
                                         <li class="tag">${tag.node.name}</li>
                                     </c:forEach>
@@ -256,10 +254,7 @@
             <section class="moduleVideo">
 
                 <h2><fmt:message key="jnt_forgeModule.label.video"/></h2>
-
-                <%-- TODO --%>
-                <template:module node="${videoNode}"/>
-                <template:module path="${videoNode.path}"/>
+                <template:module path="${videoNode.path}" view="forge"/>
 
             </section>
 

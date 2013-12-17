@@ -49,8 +49,11 @@
 
 </c:if>
 
-<header>
-    <h3>${versionNumber.string}</h3>
+<header class="clearfix moduleVersionHeader">
+
+    <div class="pull-left">
+        <h3>${versionNumber.string}</h3>
+    </div>
 
     <div class="pull-right">
 
@@ -104,7 +107,7 @@ ${changeLog.string}
             ${requiredVersion.node.displayableName}
         </dd>
         <dt><fmt:message key="jnt_forgeModule.label.updated"/></dt>
-        <dd><fmt:formatDate value="${moduleVersionBinary.contentLastModifiedAsDate}" pattern="yyyy-MM-dd"/></dd>
+        <dd><fmt:formatDate value="${currentNode.properties['jcr:lastModified'].date.time}" pattern="yyyy-MM-dd" /></dd>
     </dl>
 </footer>
 

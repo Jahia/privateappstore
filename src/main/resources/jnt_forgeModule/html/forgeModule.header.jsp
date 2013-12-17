@@ -21,7 +21,6 @@
 <template:addResources type="css" resources="forge.css"/>
 
 <c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>
-
 <c:if test="${isDeveloper}">
     <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
 </c:if>
@@ -32,8 +31,7 @@
         ,bootstrap-carousel.js,bootstrap-collapse.js,bootstrap-dropdown.js,bootstrap-modal.js,bootstrap-tooltip.js,bootstrap-popover.js
         ,bootstrap-scrollspy.js,bootstrap-tab.js,bootstrap-typehead.js,bootstrap-affix.js"/>
     <template:addResources type="javascript" resources="select2.js, bootstrap-editable.js, wysihtml5-0.3.0.js, bootstrap-wysihtml5.js, wysihtml5.js"/>
-    <template:addResources type="css" resources="select2.css, select2-bootstrap.css, bootstrap-editable.css, wysiwyg-color.css, forge.edition.css"/>
-    <template:addResources type="javascript" resources="jquery.fileupload-with-ui.min.js"/>
+    <template:addResources type="css" resources="select2.css, select2-bootstrap.css, bootstrap-editable.css, forge.edition.css, wysiwyg-color.css"/>
 </c:if>
 
 <c:set var="id" value="${currentNode.identifier}"/>
@@ -43,7 +41,6 @@
 <c:forEach var="iconItem" items="${iconFolder.nodes}">
     <c:set var="icon" value="${iconItem}"/>
 </c:forEach>
-
 
 <%@include file="../../commons/authorName.jspf"%>
 
@@ -103,23 +100,30 @@
     </template:addResources>
 </c:if>
 
-<section id="moduleHeader" class="box box-rounded">
+<section id="moduleHeader" class="box">
 
     <header>
+
         <h1>${title}</h1>
-        <p class="authorName">${authorName}</p>
+
+        <c:choose>
+
+            <c:when test="${isDeveloper && not viewAsUser}">
+                <a data-original-title="<fmt:message key="jnt_forgeModule.label.askAuthorNameDisplayedAs"/>" data-name="authorNameDisplayedAs" data-pk="1" data-type="select"
+                   id="authorName-header-${id}" href="#" class="editable editable-click">${authorName}</a>
+            </c:when>
+
+            <c:otherwise>
+                <p class="moduleAuthor">${authorName}</p>
+            </c:otherwise>
+
+        </c:choose>
 
     </header>
+
     <c:url var="iconUrl" value="${url.currentModule}/img/icon.png"/>
     <img class="moduleIcon" id="moduleIcon-${currentNode.identifier}" src="${not empty icon.url ? icon.url : iconUrl}"
          alt="<fmt:message key="jnt_forgeModule.label.moduleIcon"><fmt:param value="${title}"/></fmt:message>"/>
-
-    <c:if test="${jcr:isNodeType(renderContext.mainResource.node, 'jnt:forgeModule')}">
-        <c:set var="isDeveloper" value="${jcr:hasPermission(renderContext.mainResource.node, 'jcr:write')}"/>
-        <c:if test="${isDeveloper}">
-            <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}"/>
-        </c:if>
-    </c:if>
 
     <c:if test="${isDeveloper && not viewAsUser}">
 
@@ -174,7 +178,6 @@
 
     </c:if>
 
-
     <c:if test="${nbOfVotes gt 0}">
         <div class="moduleRating">
 
@@ -185,12 +188,14 @@
 
         </div>
     </c:if>
+
     <c:choose>
 
         <c:when test="${not empty moduleMap.latestVersion}">
             <jcr:nodeProperty node="${moduleMap.latestVersion}" name="versionNumber" var="versionNumber"/>
             <a class="btn btn-block" href="<c:url value="${moduleMap.latestVersion.properties.url.string}" context="/"/>"
                <c:if test="${not isDeveloper}">onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')"</c:if>>
+                <i class="icon-download"></i>
                 <fmt:message key="jnt_forgeModule.label.downloadCurrentVersion">
                     <fmt:param value="${versionNumber.string}"/>
                 </fmt:message>
@@ -199,6 +204,7 @@
 
         <c:otherwise>
             <a class="btn btn-block disabled" href="#">
+                <i class="icon-download"></i>
                 <fmt:message key="jnt_forgeModule.label.downloadCurrentVersion">
                     <fmt:param value="X.X.X.X"/>
                 </fmt:message>

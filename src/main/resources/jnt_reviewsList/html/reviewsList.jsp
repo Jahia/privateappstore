@@ -72,16 +72,16 @@
                     </c:when>
                     <c:otherwise>
 
-                        <c:if test="${isForgeAdmin}">
+                        <jcr:sql
+                                var="reviews"
+                                sql="SELECT * FROM [jnt:review] WHERE isdescendantnode(['${reviewsNode.path}']) AND content IS NOT null ORDER BY [jcr:created] DESC" />
+
+                        <c:if test="${isForgeAdmin && functions:length(reviews.nodes) > 0}">
                             <div class="alert alert-success">
                                 <button type="button" class="close" data-dismiss="alert">&times;</button>
                                 <fmt:message key="jnt_review.label.admin.alert.reportedReviewsEmpty"/>
                             </div>
                         </c:if>
-
-                        <jcr:sql
-                                var="reviews"
-                                sql="SELECT * FROM [jnt:review] WHERE isdescendantnode(['${reviewsNode.path}']) AND content IS NOT null ORDER BY [jcr:created] DESC" />
 
                     </c:otherwise>
                 </c:choose>

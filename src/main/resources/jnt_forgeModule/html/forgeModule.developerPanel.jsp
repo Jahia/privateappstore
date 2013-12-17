@@ -18,12 +18,9 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
 <template:addResources type="javascript" resources="jquery.js, html5shiv.js, forge.js"/>
-
-<template:addResources type="css" resources=",bootstrap-wysihtml5.css,bootstrap-editable.css"/>
-<template:addResources type="css" resources="forge.css"/>
+<template:addResources type="css" resources="forge.css,bootstrap-wysihtml5.css,bootstrap-editable.css"/>
 
 <c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>
-
 
 <c:if test="${isDeveloper}">
 
@@ -39,7 +36,7 @@
 
                 function updateCompletionStatus() {
 
-                    $.post('<c:url value='${url.base}${currentNode.path}.calculateCompletion.do'/>', function(data) {
+                    $.get('<c:url value='${url.base}${currentNode.path}.calculateCompletion.do'/>', function(data) {
 
                         var completion = data['completion'];
                         var canBePublished = data['canBePublished'];
@@ -68,9 +65,20 @@
                         }
                         else {
                             var items = [];
+                            var hasMandatoryLeft = false;
                             $.each(data['todoList'], function(key, val) {
+                                if (!hasMandatoryLeft && val['mandatory']) {
+                                    hasMandatoryLeft = true;
+                                }
                                 items.push('<li'+ (val['mandatory'] ? ' class="text-error"' : '' ) + '>' + val['name'] + '</li>');
                             });
+
+                            if (!hasMandatoryLeft) {
+                                $('span#mandatoryTodoList').hide();
+                            }
+                            else {
+                                $('span#mandatoryTodoList').show();
+                            }
 
                             todoList.empty().append(items.join(''));
 
@@ -115,19 +123,6 @@
                     }
                 });
 
-                $('#confirmDeleteModule-${id}').click(function() {
-
-                    var btn = $(this);
-
-                    if (!btn.hasClass('disabled')) {
-
-                        $.post('<c:url value='${url.base}${currentNode.path}.deleteModule.do'/>', null, function(result) {
-                            $('#deleteModuleModal-${id}').modal('hide');
-                            window.location = '<c:url value='${url.base}${currentNode.resolveSite.path}/home.html'/>';
-                        }, "json");
-                    }
-                });
-
                 $('#viewAsUserBtn-${id}').tooltip();
 
             });
@@ -146,7 +141,10 @@
         </div>
 
         <div id="todoListWrapper-${id}">
-            <h6><fmt:message key="jnt_forgeModule.label.developer.todoList"/></h6>
+            <h6>
+                <fmt:message key="jnt_forgeModule.label.developer.todoList"/>&nbsp;
+                <span id="mandatoryTodoList"><fmt:message key="jnt_forgeModule.label.developer.todoListMandatory"/></span>
+            </h6>
             <ul id="todoList-${id}">
             </ul>
         </div>
@@ -163,27 +161,6 @@
                     <c:otherwise><fmt:message key="jnt_forgeModule.label.developer.publish"/></c:otherwise>
                 </c:choose>
             </button>
-            <button id="deleteModule-${id}" class="btn btn-small" data-toggle="modal" data-target="#deleteModuleModal-${id}">
-                <fmt:message key="jnt_forgeModule.label.developer.delete"/>
-            </button>
-        </div>
-
-        <div id="deleteModuleModal-${id}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="deleteModuleModal-${id}" aria-hidden="true">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h3 id="deleteModuleModal-${id}"><fmt:message key="jnt_forgeModule.label.developer.modal.delete.header"/></h3>
-            </div>
-            <div class="modal-body">
-                <p>
-                    <fmt:message key="jnt_forgeModule.label.developer.modal.delete.body">
-                        <fmt:param value="${currentNode.displayableName}"/>
-                    </fmt:message>
-                </p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn" data-dismiss="modal" aria-hidden="true"><fmt:message key="jnt_review.label.admin.modal.delete.cancel"/></button>
-                <button class="btn btn-primary" id="confirmDeleteModule-${id}"><fmt:message key="jnt_review.label.admin.modal.delete.confirm"/></button>
-            </div>
         </div>
 
     </section>

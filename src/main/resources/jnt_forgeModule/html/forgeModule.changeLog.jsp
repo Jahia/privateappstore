@@ -18,11 +18,8 @@
 
 <template:addResources type="javascript" resources="html5shiv.js, forge.js"/>
 
-<template:addResources type="css" resources="bootstrap-wysihtml5.css,bootstrap-editable.css"/>
-
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>
-
 <c:if test="${isDeveloper}">
     <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}"/>
 </c:if>
@@ -105,7 +102,6 @@
         </c:otherwise>
 
     </c:choose>
-
 
     <c:if test="${functions:length(previousVersions) > 0}">
 

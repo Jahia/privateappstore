@@ -18,17 +18,31 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
 <template:addResources type="javascript" resources="html5shiv.js"/>
-
-<template:addResources type="css" resources=",bootstrap-wysihtml5.css,bootstrap-editable.css"/>
+<template:addResources type="css" resources="bootstrap-wysihtml5.css,bootstrap-editable.css"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="FAQ" value="${currentNode.properties['FAQ'].string}"/>
 <c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>
-
 <c:if test="${isDeveloper}">
     <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
 </c:if>
 <c:set var="isEmptyTab" value="false"/>
+
+<c:if test="${fn:length( fn:trim( functions:removeHtmlTags( fn:replace(FAQ, '&nbsp;', ' ') ))) eq 0
+                && (not isDeveloper || viewAsUser)}">
+
+    <c:set var="isEmptyTab" value="true"/>
+    <template:addResources type="inlinejavascript">
+        <script type="text/javascript">
+
+            $(document).ready(function() {
+                var wrapper = $('#moduleFAQ');
+                var tabID = wrapper.parent('.tab-pane').attr("id");
+                wrapper.parents(".jnt_bootstrapTabularList").find("a[href='#" + tabID + "']").parent().remove();
+            });
+        </script>
+    </template:addResources>
+</c:if>
 
 <c:if test="${isDeveloper && not viewAsUser}">
 
@@ -57,29 +71,6 @@
 
     </template:addResources>
 
-</c:if>
-
-<%--<jsp:include page="../../commons/checkEmptyTab.jsp">
-    <jsp:param name="propertyName" value="FAQ"/>
-    <jsp:param name="wrapperSelector" value="#moduleFAQ"/>
-</jsp:include>--%>
-
-<c:if test="${fn:length( fn:trim( functions:removeHtmlTags( fn:replace(FAQ, '&nbsp;', ' ') ))) eq 0
-                && (not isDeveloper || viewAsUser)}">
-
-    <c:set var="isEmptyTab" value="true"/>
-    <template:addResources type="inlinejavascript">
-        <script type="text/javascript">
-
-            $(document).ready(function() {
-
-                var tabID = $('#moduleFAQ').parent('.tab-pane').attr("id");
-                var navTabSelector = "a[href='#" + tabID + "']";
-
-                $(".jnt_bootstrapTabularList").find(navTabSelector).parent().remove();
-            });
-        </script>
-    </template:addResources>
 </c:if>
 
 <section id="moduleFAQ">

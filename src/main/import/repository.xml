@@ -16,7 +16,7 @@
                             jcr:mixinTypes="jmix:accessControlled"
                             jcr:primaryType="jnt:pageTemplate">
                     <pagecontent jcr:primaryType="jnt:contentList">
-                        <bootstrap-container fluid="false" jcr:primaryType="jnt:bootstrapContainer">
+                            <bootstrap-container fluid="true" jcr:primaryType="jnt:bootstrapContainer">
                             <bootstrap-container jcr:primaryType="jnt:contentList">
                                 <bootstrap-row fluid="true"
                                                j:id="jnt_forge"
@@ -130,13 +130,17 @@
                                       jcr:primaryType="jnt:translation"
                                       jcr:title="Forge Module"/>
                     <pagecontent jcr:primaryType="jnt:contentList">
-                        <bootstrap-container fluid="false" jcr:primaryType="jnt:bootstrapContainer">
+                            <bootstrap-container fluid="true"
+                                       j:id="jnt_forge"
+                                       j:skin="skins.custom"
+                                       jcr:mixinTypes="jmix:customSkin jmix:skinnable"
+                                       jcr:primaryType="jnt:bootstrapContainer">
                             <bootstrap-container jcr:primaryType="jnt:contentList">
                                 <bootstrap-row fluid="true"
                                                jcr:mixinTypes="jmix:accessControlled"
                                                jcr:primaryType="jnt:bootstrapRow">
                                     <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                        <module-aside jcr:primaryType="jnt:bootstrapColumn" offset="0" span="4">
+                                        <module-aside jcr:primaryType="jnt:bootstrapColumn" offset="0" span="3">
                                         <module-aside jcr:primaryType="jnt:contentList">
                                             <main-resource-display j:mainResourceView="header"
                                                                    jcr:mixinTypes="jmix:accessControlled"
@@ -155,7 +159,7 @@
                                             </forge-admin-panel>
                                         </module-aside>
                                     </module-aside>
-                                        <module-main jcr:primaryType="jnt:bootstrapColumn" offset="0" span="8">
+                                        <module-main jcr:primaryType="jnt:bootstrapColumn" offset="0" span="9">
                                         <module-main jcr:primaryType="jnt:contentList">
                                             <bootstrap-tabular-list fadeIn="true"
                                                                     jcr:mixinTypes="jmix:accessControlled"
@@ -303,9 +307,7 @@
                                                          jcr:mixinTypes="jmix:renderable jmix:requiredPermissions"
                                                      jcr:primaryType="jnt:fileUpload"/>
                                                     </changelog>
-                                                    <permissions
-                                                 j:invertCondition="false"
-                                                 j:perUser="false"
+                                                    <permissions j:invertCondition="false"
                                                  j:requireLoggedUser="false"
                                                  j:requirePrivilegedUser="false"
                                                  j:requiredPermissionNames="jcr:write_live"
@@ -347,10 +349,9 @@
                                           jcr:primaryType="jnt:translation"
                                           jcr:title="forge"/>
                         <pagecontent jcr:primaryType="jnt:contentList">
-                                <workspace-default
-                          j:perUser="false"
-                          jcr:primaryType="jnt:workspaceSwitch"
-                          workspace="default">
+                                <bootstrap-container fluid="true" jcr:primaryType="jnt:bootstrapContainer">
+                                    <bootstrap-container jcr:primaryType="jnt:contentList">
+                                <workspace-default jcr:primaryType="jnt:workspaceSwitch" workspace="default">
                                     <j:translation_en jcr:language="en"
                                           jcr:mixinTypes="mix:title"
                                           jcr:primaryType="jnt:translation"
@@ -387,6 +388,8 @@
                                     </categories>
                                 </bootstrap-tabular-list>
                                 </workspace-default>
+                                </bootstrap-container>
+                                </bootstrap-container>
                         </pagecontent>
                     </forge>
                 </siteSettingsBase>

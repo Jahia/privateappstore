@@ -21,7 +21,6 @@
 
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>
-
 <c:if test="${isDeveloper}">
     <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
 </c:if>
@@ -39,19 +38,17 @@
 
 <c:if test="${(not isDeveloper || viewAsUser)
                     && (not hasVideoNode
-                        || (empty videoProvider || fn:trim(videoProvider) eq 0)
-                        || (empty videoIdentifier || fn:trim(videoIdentifier) eq 0))}">
+                        || (empty videoProvider || fn:trim(videoProvider) eq '')
+                        || (empty videoIdentifier || fn:trim(videoIdentifier) eq ''))}">
 
     <c:set var="isEmptyTab" value="true"/>
     <template:addResources type="inlinejavascript">
         <script type="text/javascript">
 
             $(document).ready(function() {
-
-                var tabID = $('#moduleVideo').parent('.tab-pane').attr("id");
-                var navTabSelector = "a[href='#" + tabID + "']";
-
-                $(".jnt_bootstrapTabularList").find(navTabSelector).parent().remove();
+                var wrapper = $('#moduleVideo');
+                var tabID = wrapper.parent('.tab-pane').attr("id");
+                wrapper.parents(".jnt_bootstrapTabularList").find("a[href='#" + tabID + "']").parent().remove();
             });
         </script>
     </template:addResources>
@@ -193,7 +190,6 @@
                                     <option value="youtube" ${videoProvider eq 'youtube' ? 'selected' : ''}>youtube</option>
                                     <option value="dailymotion" ${videoProvider eq 'dailymotion' ? 'selected' : ''}>dailymotion</option>
                                     <option value="vimeo" ${videoProvider eq 'vimeo' ? 'selected' : ''}>vimeo</option>
-                                    <option value="watt" ${videoProvider eq 'watt' ? 'selected' : ''}>watt</option>
                                 </select>
                             </div>
                         </div>
@@ -247,12 +243,7 @@
         <c:if test="${hasVideoNode}">
 
             <div id="forgeModuleVideoWrapper-${id}">
-                    <%-- TODO --%>
-                <template:module node="${videoNode}"/>
-                <template:module node="${videoNode}" view="default" nodeTypes="jnt:videostreaming"/>
-                <template:module node="${videoNode}" view="default"/>
-
-                <template:module path="${videoNode.path}"/>
+                <template:module path="${videoNode.path}" view="forge"/>
             </div>
 
         </c:if>

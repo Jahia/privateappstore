@@ -22,28 +22,35 @@
 
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="title" value="${currentNode.properties['jcr:title'].string}"/>
-
-
 <jcr:node var="iconFolder" path="${currentNode.path}/icon" />
 <c:forEach var="iconItem" items="${iconFolder.nodes}">
     <c:set var="icon" value="${iconItem}"/>
 </c:forEach>
-
 <c:set var="description" value="${currentNode.properties['description'].string}"/>
 
 <%@include file="../../commons/authorName.jspf"%>
-<c:url var="iconUrl" value="${url.currentModule}/img/icon.png"/>
-<section class="forgeModule">
+
+<section class="forgeModule thumbnail">
 
     <header>
         <a href="<c:url value="${currentNode.url}" context="/"/>">
+            <c:url var="iconUrl" value="${url.currentModule}/img/icon.png"/>
             <img class="moduleIcon" src="${not empty icon.url ? icon.url : iconUrl}"
                  alt="<fmt:message key="jnt_forgeModule.label.moduleIcon"><fmt:param value="${title}"/></fmt:message>"/>
         </a>
         <a href="<c:url value="${currentNode.url}" context="/"/>"><h4>${title}</h4></a>
-        <a class="moduleAuthor">${authorName}</a>
+        <p class="moduleAuthor">${authorName}</p>
     </header>
 
     <p>${functions:abbreviate(functions:removeHtmlTags(description), 100,120,'...')}</p>
+
+    <footer class="badges">
+        <c:if test="${currentNode.properties['reviewedByJahia'].boolean}">
+            <span class="badge badge-success badge-reviewedByJahia" data-toggle="tooltip" title="<fmt:message key="jnt_forgeModule.label.admin.reviewedByJahia"/>"><i class="icon-ok icon-white"></i></span>
+        </c:if>
+        <c:if test="${currentNode.properties['supportedByJahia'].boolean}">
+            <span class="badge badge-warning badge-supportedByJahia" data-toggle="tooltip" title="<fmt:message key="jnt_forgeModule.label.admin.supportedByJahia"/>"><i class="icon-wrench icon-white"></i></span>
+        </c:if>
+    </footer>
 
 </section>

@@ -21,11 +21,25 @@
 
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>
-
 <c:if test="${isDeveloper}">
     <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}"/>
 </c:if>
+<jcr:node var="screenshots" path="${currentNode.path}/screenshots"/>
+<c:set var="isEmptyTab" value="false"/>
 
+<c:if test="${(not isDeveloper || viewAsUser) && empty jcr:getChildrenOfType(screenshots, 'jnt:file')}">
+    <c:set var="isEmptyTab" value="true"/>
+    <template:addResources type="inlinejavascript">
+        <script type="text/javascript">
+
+            $(document).ready(function() {
+                var wrapper = $('#moduleScreenshots');
+                var tabID = wrapper.parents('.tab-pane').attr("id");
+                wrapper.parents(".jnt_bootstrapTabularList").find("a[href='#" + tabID + "']").parent().remove();
+            });
+        </script>
+    </template:addResources>
+</c:if>
 
 <div id="fileList${renderContext.mainResource.node.identifier}">
 
@@ -34,7 +48,7 @@
         <h2><fmt:message key="jnt_forgeModule.label.screenshots"/></h2>
 
         <template:addCacheDependency path="${currentNode.path}/screenshots"/>
-        <template:module path="${currentNode.path}/screenshots"/>
+        <template:module node="${screenshots}"/>
 
     </section>
 </div>
