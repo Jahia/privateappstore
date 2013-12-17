@@ -10,7 +10,7 @@
         <json:property name="name" value="${currentNode.name}"/>
         <json:property name="title" value="${currentNode.displayableName}"/>
         <json:array name="modules">
-            <c:forEach items="${jcr:getChildrenOfType(currentNode, 'jnt:forgeModule')}" var="child">
+            <c:forEach items="${jcr:getDescendantNodes(currentNode, 'jnt:forgeModule')}" var="child">
                 <c:if test="${child.properties.published.boolean}">
                     <jcr:node var="iconFolder" path="${child.path}/icon" />
                     <c:forEach var="iconItem" items="${iconFolder.nodes}">
@@ -21,6 +21,7 @@
                     <json:property name="path" value="${child.path}"/>
                     <c:url context="/" var="localUrl" value="${url.server}${child.url}"/>
                     <json:property name="remoteUrl" value="${localUrl}"/>
+                    <json:property name="groupId" value="${child.properties['groupId'].string}"/>
                     <json:property name="name" value="${child.name}"/>
                     <json:property name="title" value="${child.displayableName}"/>
                     <c:if test="${not empty icon}">

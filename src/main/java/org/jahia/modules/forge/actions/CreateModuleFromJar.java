@@ -77,6 +77,7 @@ public class CreateModuleFromJar extends Action {
                     String forgeSettingsUrl = site.getProperty("forgeSettingsUrl").getString();
 
                     moduleParams.put("moduleName", Arrays.asList(moduleName));
+                    moduleParams.put("groupId", Arrays.asList(groupId));
                     moduleParams.put("jcr:title", Arrays.asList(attributes.getValue("Implementation-Title")));
                     moduleParams.put("description", Arrays.asList(attributes.getValue("Bundle-Description")));
                     //moduleParams.put("authorNameDisplayedAs", Arrays.asList(attributes.getValue("Built-By")));
@@ -91,7 +92,8 @@ public class CreateModuleFromJar extends Action {
                         String error = Messages.get("resources.Jahia_Forge","forge.uploadJar.error.missing.manifest.attribute",session.getLocale());
                         return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
                     }
-                    moduleParams.put("url", Arrays.asList(forgeUrl + "/mavenproxy/" + site.getName() + "/" + groupId.replace(".","/") + "/" + moduleName + "/" + version + "/" + moduleName + "-" + version + "." + extension));
+                    String moduleRelPath = groupId.replace(".", "/") + "/" + moduleName;
+                    moduleParams.put("url", Arrays.asList(forgeUrl + "/mavenproxy/" + site.getName() + "/" + moduleRelPath + "/" + version + "/" + moduleName + "-" + version + "." + extension));
                     JCRNodeWrapper versions = session.getNode(resource.getNode().getResolveSite().getPath() + "/contents/forge-modules-required-versions");
 
                     if (!versions.hasNode(requiredVersion)) {
@@ -157,12 +159,17 @@ public class CreateModuleFromJar extends Action {
 
                     JCRNodeWrapper module;
 
-                    JCRNodeWrapper modulesDirectory = resource.getNode().getResolveSite().getNode("contents/forge-modules-repository");
-
-                    if (!modulesDirectory.hasNode(moduleName)) {
+                    if (!repository.hasNode(moduleRelPath)) {
+                        for (String segment : groupId.split("\\.")) {
+                             if (repository.hasNode(segment)) {
+                                 repository = repository.getNode(segment);
+                             } else {
+                                 repository = repository.addNode(segment, "jnt:contentFolder");
+                             }
+                        }
                         module = createNode(request, moduleParameters, repository, "jnt:forgeModule", moduleName, false);
                     } else {
-                        module = modulesDirectory.getNode(moduleName);
+                        module = repository.getNode(moduleRelPath);
                         setProperties(module, moduleParameters);
                     }
 
