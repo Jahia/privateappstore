@@ -84,10 +84,20 @@
                                                                   jcr:primaryType="jnt:translation"
                                                                   jcr:title="My Modules"/>
                                             </forge-my-modules-list>
+                                                <file-upload-form j:view="jar"
+                                                   jcr:mixinTypes="jmix:renderable"
+                                                   jcr:primaryType="jnt:fileUpload"/>
                                         </bootstrap-row-col1>
                                     </bootstrap-row-col1>
                                     <bootstrap-row-col2 jcr:primaryType="jnt:bootstrapColumn" offset="1" span="8">
                                         <bootstrap-row-col2 jcr:primaryType="jnt:contentList">
+                                                <forgeModulesList columnsNumber="3"
+                                                   jcr:mixinTypes="jmix:accessControlled"
+                                                   jcr:primaryType="jnt:forgeModulesList"
+                                                   nbOfModulePerPage="20"
+                                                   startNode="/modules/forge/contents/forge-modules-repository">
+                                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                                </forgeModulesList>
                                                 <bootstrap-pagination displayNbOfItemsPerPage="true"
                                                        displayNbOfItemsPerPageValues="6"
                                                        displayPager="true"
@@ -97,16 +107,6 @@
                                                        pageSize="6"
                                                        paginationAlignment="pagination-centered"
                                                        paginationSize=""/>
-                                            <forgeModulesList columnsNumber="3"
-                                                              jcr:mixinTypes="jmix:accessControlled"
-                                                              jcr:primaryType="jnt:forgeModulesList"
-                                                              nbOfModulePerPage="20"
-                                                              startNode="/modules/forge/contents/forge-modules-repository">
-                                                <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                            </forgeModulesList>
-                                            <file-upload-form j:view="jar"
-                                                              jcr:mixinTypes="jmix:renderable"
-                                                              jcr:primaryType="jnt:fileUpload"/>
                                         </bootstrap-row-col2>
                                     </bootstrap-row-col2>
                                 </bootstrap-row>

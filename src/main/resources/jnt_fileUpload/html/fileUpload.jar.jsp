@@ -17,7 +17,7 @@
 <%--@elvariable id="currentResource" type="org.jahia.services.render.Resource"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
-<template:addResources type="css" resources="forge.css"/>
+<template:addResources type="css" resources="forge.css, forge.edition.css, jquery.fileupload.css"/>
 <template:addResources type="javascript" resources="jquery.min.js,jquery-ui.min.js,jquery.fileupload-with-ui.min.js"/>
 <fmt:message key="label.dropHere.ie" var="i18nDropHereIE"/>
 
@@ -45,8 +45,8 @@
                   accept="application/json">
                 <div id="file_upload_container${currentNode.identifier}" class="btn btn-block">
                     <input type="file" name="file" multiple>
-                    <button><fmt:message key="label.upload"/></button>
-                    <div id="drop-box-file-upload-${currentNode.identifier}"><fmt:message key="label.dropHere"/></div>
+                    <button><fmt:message key="forge.uploadJar.label"/></button>
+                    <div id="drop-box-file-upload-${currentNode.identifier}"><fmt:message key="forge.uploadJar.label"/></div>
                 </div>
                 <c:url var="targetNodePath" value="${url.base}${renderContext.mainResource.node.path}.screenshots.html.ajax">
                     <c:param name="targetNodePath" value="${targetNode.path}"/>
