@@ -288,3 +288,7 @@
     margin: 0;
     line-height: normal;
 }
+
+#jnt_forge .file_upload {
+    position:relative;
+}
