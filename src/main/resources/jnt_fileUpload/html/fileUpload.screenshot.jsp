@@ -50,8 +50,8 @@
               accept="application/json">
             <div id="file_upload_container" class="btn btn-block">
                 <input type="file" name="file" multiple>
-                <button><fmt:message key="label.upload"/></button>
-                <div id="drop-box-file-upload-${currentNode.identifier}"><fmt:message key="label.dropHere"/></div>
+                <button><fmt:message key="forge.uploadScreenshots.label"/></button>
+                <div id="drop-box-file-upload-${currentNode.identifier}"><fmt:message key="forge.uploadScreenshots.label"/></div>
             </div>
             <c:url var="targetNodePath" value="${url.base}${renderContext.mainResource.node.path}.screenshots.html.ajax">
                 <c:param name="targetNodePath" value="${targetNode.path}"/>

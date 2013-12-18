@@ -18,7 +18,6 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
 <c:set var="isForgeAdmin" value="${jcr:hasPermission(renderContext.site, 'jahiaForgeModerateModule')}"/>
-<template:addResources type="css" resources="bootstrap-wysihtml5.css,bootstrap-editable.css"/>
 
 <c:if test="${isForgeAdmin}">
 

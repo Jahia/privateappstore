@@ -30,13 +30,13 @@
             <%--hack to avoid url rewriting from filters--%>
             <c:when test="${empty facetParam}">
                 <li>
-                    <span class="label label-success"><facet:facetValueLabel currentActiveFacet="${facet}" currentActiveFacetValue="${facetValue}" facetValueLabels="${facetValueLabels}"/>&nbsp;<a onclick="window.location='${facetUrl}'">&times;</a></span>
+                    <span class="label label-success"><facet:facetValueLabel currentActiveFacet="${facet}" currentActiveFacetValue="${facetValue}" facetValueLabels="${facetValueLabels}"/>&nbsp;<a class="removeFacet" onclick="window.location='${facetUrl}'">&times;</a></span>
                 </li>
             </c:when>
             <c:otherwise>
                 <li>
                     <span class="label label-success"><facet:facetValueLabel currentActiveFacet="${facet}" currentActiveFacetValue="${facetValue}"
-                                           facetValueLabels="${facetValueLabels}"/>&nbsp;<a href="${facetUrl}">&times;</a></span>
+                                           facetValueLabels="${facetValueLabels}"/>&nbsp;<a class="removeFacet" href="${facetUrl}">&times;</a></span>
                 </li>
             </c:otherwise>
         </c:choose>

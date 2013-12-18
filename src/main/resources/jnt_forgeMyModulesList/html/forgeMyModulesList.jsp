@@ -4,9 +4,6 @@
 <%@ taglib prefix="utility" uri="http://www.jahia.org/tags/utilityLib" %>
 <%@ taglib prefix="template" uri="http://www.jahia.org/tags/templateLib" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ taglib prefix="functions" uri="http://www.jahia.org/tags/functions" %>
-<%@ taglib prefix="user" uri="http://www.jahia.org/tags/user" %>
-<%@ taglib prefix="query" uri="http://www.jahia.org/tags/queryLib" %>
 <%--@elvariable id="currentNode" type="org.jahia.services.content.JCRNodeWrapper"--%>
 <%--@elvariable id="out" type="java.io.PrintWriter"--%>
 <%--@elvariable id="script" type="org.jahia.services.render.scripting.Script"--%>
@@ -14,15 +11,13 @@
 <%--@elvariable id="workspace" type="java.lang.String"--%>
 <%--@elvariable id="renderContext" type="org.jahia.services.render.RenderContext"--%>
 <%--@elvariable id="currentResource" type="org.jahia.services.render.Resource"--%>
-<%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
+<c:set var="resourceReadOnly" value="${currentResource.moduleParams.readOnly}"/>
+<template:include view="hidden.header"/>
 
-<c:set var="title" value="${currentNode.properties['jcr:title'].string}"/>
-<c:set var="published" value="${currentNode.properties['published'].boolean}"/>
-
-<li>
-    <a href="<c:url value="${currentNode.url}" context="/"/>">${title}</a>
-    <c:if test="${not published}">
-        <span class="label label-important"><fmt:message key="jnt_forgeModule.label.notPublished"/></span>
-    </c:if>
-</li>
+<ul>
+    <c:forEach items="${moduleMap.currentList}" var="subchild" begin="${moduleMap.begin}" end="${moduleMap.end}">
+        <template:module node="${subchild}" view="${moduleMap.subNodesView}" editable="${moduleMap.editable && !resourceReadOnly}"/>
+    </c:forEach>
+</ul>
+<template:include view="hidden.footer"/>

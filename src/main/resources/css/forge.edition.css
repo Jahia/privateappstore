@@ -83,3 +83,12 @@
 #jnt_forge .editable-input {
     display: inline-block;
 }
+#jnt_forge #myModulesUploadForm form.file_upload {
+    margin: 20px 0 10px 0;
+}
+#jnt_forge #myModulesUploadForm table.table {
+    margin-bottom: 0;
+}
+#jnt_forge #moduleHeader table.table {
+    margin-bottom: 0;
+}

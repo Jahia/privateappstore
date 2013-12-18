@@ -54,30 +54,31 @@ public class CalculateCompletion  extends Action {
             mandatoryProperties.clear();
 
         mandatoryProperties.add(new Object[]{"jcr:title", TEXT, 20});
-//        mandatoryProperties.add(new Object[]{"description", TEXT, 20});
+        mandatoryProperties.add(new Object[]{"description", TEXT, 20});
         mandatoryProperties.add(new Object[]{"j:defaultCategory", WEAKREFERENCE, 10});
         mandatoryProperties.add(new Object[]{"versions", VERSIONS, 10});
-//        mandatoryProperties.add(new Object[]{"screenshots", SCREENSHOTS, 5});
-        // TODO icon
-
-        int authorEmailType;
-        if (module.hasProperty("authorNameDisplayedAs") && module.getPropertyAsString("authorNameDisplayedAs").equals("organisation")
-                || (module.getSession().getUser().getProperty("j:email") != null && module.getSession().getUser().getProperty("j:email").isEmpty()))
-            authorEmailType = TEXT;
-        else
-            authorEmailType = SKIP;
-//        mandatoryProperties.add(new Object[]{"authorEmail", authorEmailType, 5});
     }
 
-    private static void initOtherProperties(JCRNodeWrapper module) {
+    private static void initOtherProperties(JCRNodeWrapper module) throws RepositoryException {
 
         otherProperties = new ArrayList<Object[]>();
 
-        otherProperties.add(new Object[]{"howToInstall", TEXT, 5});
+        otherProperties.add(new Object[]{"howToInstall", TEXT, 10});
         otherProperties.add(new Object[]{"authorURL", TEXT, 5});
+        otherProperties.add(new Object[]{"icon", NODE, 5});
+        otherProperties.add(new Object[]{"screenshots", SCREENSHOTS, 5});
         otherProperties.add(new Object[]{"video", NODE, 5});
         otherProperties.add(new Object[]{"FAQ", TEXT, 5});
         otherProperties.add(new Object[]{"j:tags", TAGS, 5});
+//        int authorEmailType;
+//        if (module.hasProperty("authorNameDisplayedAs") && module.getPropertyAsString("authorNameDisplayedAs").equals("organisation")
+//                || (module.getSession().getUser().getProperty("j:email") != null && module.getSession().getUser().getProperty("j:email").isEmpty())) {
+//            authorEmailType = TEXT;
+//        }
+//        else {
+//            authorEmailType = SKIP;
+//        }
+//        otherProperties.add(new Object[]{"authorEmail", authorEmailType, 5});
     }
 
     @Override

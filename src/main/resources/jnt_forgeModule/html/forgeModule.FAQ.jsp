@@ -18,7 +18,6 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
 <template:addResources type="javascript" resources="html5shiv.js"/>
-<template:addResources type="css" resources="bootstrap-wysihtml5.css,bootstrap-editable.css"/>
 
 <c:set var="id" value="${currentNode.identifier}"/>
 <c:set var="FAQ" value="${currentNode.properties['FAQ'].string}"/>
@@ -47,6 +46,7 @@
 <c:if test="${isDeveloper && not viewAsUser}">
 
     <c:url var="postURL" value="${url.base}${currentNode.path}"/>
+    <template:addResources type="css" resources="bootstrap-wysihtml5.css,bootstrap-editable.css"/>
     <template:addResources type="inlinejavascript">
 
         <script type="text/javascript">

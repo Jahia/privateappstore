@@ -36,6 +36,10 @@
             <c:when test="${not empty reviewsNode}">
                 <template:addCacheDependency node="${reviewsNode}"/>
 
+                <c:set var="isDeveloper" value="${jcr:hasPermission(currentNode, 'jcr:write')}"/>
+                <c:if test="${isDeveloper}">
+                    <c:set var="viewAsUser" value="${not empty param['viewAs'] && param['viewAs'] eq 'user'}" />
+                </c:if>
                 <c:set var="isForgeAdmin" value="${jcr:hasPermission(renderContext.site, 'jahiaForgeModerateModule')}"/>
 
                 <c:if test="${isForgeAdmin}">
@@ -109,7 +113,11 @@
 
                 </c:forEach>
 
-
+                <c:if test="${isDeveloper && not viewAsUser && functions:length(reviews.nodes) eq 0}">
+                    <div class="alert alert-info">
+                        <fmt:message key="jnt_review.label.alert.noReviews"/>
+                    </div>
+                </c:if>
 
                 <c:if test="${isForgeAdmin && isReportedOverall}">
 
@@ -145,9 +153,6 @@
                     </c:forEach>
 
                 </c:if>
-
-
-
 
             </c:when>
             <c:otherwise>

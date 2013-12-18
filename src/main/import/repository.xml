@@ -70,13 +70,19 @@
                                                         <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" label="Tags"/>
                                                 </field-facet-1>
                                             </facets-list>
+                                                <content-list j:invertCondition="false"
+                                               j:requireLoggedUser="false"
+                                               j:requirePrivilegedUser="false"
+                                               j:requiredPermissionNames="jahiaForgeUploadModule"
+                                               j:skin="skins.bootstrap-rounded-title"
+                                               j:style="grey"
+                                               jcr:mixinTypes="jmix:accessControlled jmix:requiredPermissions jmix:skinnable jmix:style"
+                                               jcr:primaryType="jnt:contentList">
                                                 <forge-my-modules-list j:invertCondition="false"
                                                         j:requireLoggedUser="false"
                                                         j:requirePrivilegedUser="false"
                                                         j:requiredPermissionNames="jahiaForgeUploadModule"
-                                                        j:skin="skins.bootstrap-rounded-title"
-                                                                   j:style="grey"
-                                                        jcr:mixinTypes="jmix:accessControlled jmix:requiredPermissions jmix:skinnable jmix:style"
+                                                           jcr:mixinTypes="jmix:accessControlled jmix:requiredPermissions"
                                                                    jcr:primaryType="jnt:forgeMyModulesList">
                                                 <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                                                 <j:translation_en jcr:language="en"
@@ -84,12 +90,20 @@
                                                                   jcr:primaryType="jnt:translation"
                                                                   jcr:title="My Modules"/>
                                             </forge-my-modules-list>
-                                                <file-upload-form j:view="jar"
-                                                   jcr:mixinTypes="jmix:renderable"
-                                                   jcr:primaryType="jnt:fileUpload"/>
+                                                    <file-upload-form j:id="myModulesUploadForm"
+                                                      j:skin="skins.custom"
+                                                      j:view="jar"
+                                                      jcr:mixinTypes="jmix:customSkin jmix:renderable jmix:skinnable"
+                                                      jcr:primaryType="jnt:fileUpload"/>
+                                                    <j:translation_en jcr:language="en"
+                                                      jcr:mixinTypes="mix:title"
+                                                      jcr:primaryType="jnt:translation"
+                                                      jcr:title="My Modules"/>
+                                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                                                </content-list>
                                         </bootstrap-row-col1>
                                     </bootstrap-row-col1>
-                                    <bootstrap-row-col2 jcr:primaryType="jnt:bootstrapColumn" offset="1" span="8">
+                                        <bootstrap-row-col2 jcr:primaryType="jnt:bootstrapColumn" offset="0" span="9">
                                         <bootstrap-row-col2 jcr:primaryType="jnt:contentList">
                                                 <forgeModulesList columnsNumber="3"
                                                    jcr:mixinTypes="jmix:accessControlled"

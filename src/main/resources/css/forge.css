@@ -292,3 +292,8 @@
 #jnt_forge {
     margin: 1em 0;
 }
+#jnt_forge a.removeFacet {
+    color: #ffffff;
+    text-decoration: none;
+    cursor: pointer;
+}
