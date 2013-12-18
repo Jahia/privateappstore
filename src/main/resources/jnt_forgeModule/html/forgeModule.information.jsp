@@ -146,6 +146,16 @@
             <span content="${tag.node.name}" itemprop="keywords"></span>
         </c:forEach>
 
+        <div class="term"><fmt:message key="jnt_forgeModule.label.moduleId"/></div>
+        <div class="description">
+            ${currentNode.name}
+        </div>
+
+        <div class="term"><fmt:message key="jnt_forgeModule.label.groupId"/></div>
+        <div class="description">
+            ${currentNode.properties['groupId'].string}
+        </div>
+
         <div class="term"><fmt:message key="jnt_forgeModule.label.updated"/></div>
         <div class="description">
             <time itemprop="datePublished">
