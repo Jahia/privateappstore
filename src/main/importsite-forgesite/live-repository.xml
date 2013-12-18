@@ -219,16 +219,6 @@
                                   jcr:mimeType="image/png"
                                   jcr:primaryType="jnt:resource"
                                   jcr:uuid="294d1f2e-18ab-4394-87f2-7b996c52a193"/>
-                            <thumbnail jcr:lastModified="2013-12-18T09:27:59.137+01:00"
-                                jcr:lastModifiedBy="root"
-                                jcr:mimeType="image/png"
-                                jcr:primaryType="jnt:resource"
-                                jcr:uuid="71b4cc34-3f13-4212-8fd8-a837581df99f"/>
-                            <thumbnail2 jcr:lastModified="2013-12-18T09:27:59.137+01:00"
-                                 jcr:lastModifiedBy="root"
-                                 jcr:mimeType="image/png"
-                                 jcr:primaryType="jnt:resource"
-                                 jcr:uuid="2fce1eac-5a50-4833-b504-47676f7fda7d"/>
                         </glyphicons-halflings-white.png>
                         <glyphicons-halflings.png j:height="159"
                                             j:lastPublished="2013-12-18T09:34:49.003+01:00"
@@ -248,16 +238,6 @@
                                   jcr:mimeType="image/png"
                                   jcr:primaryType="jnt:resource"
                                   jcr:uuid="a5e6463a-02dd-44d7-99d3-0a9523438fee"/>
-                            <thumbnail jcr:lastModified="2013-12-18T09:27:59.137+01:00"
-                                jcr:lastModifiedBy="root"
-                                jcr:mimeType="image/png"
-                                jcr:primaryType="jnt:resource"
-                                jcr:uuid="65d53d81-6c50-4d2b-bcac-4b965d3b8695"/>
-                            <thumbnail2 jcr:lastModified="2013-12-18T09:27:59.137+01:00"
-                                 jcr:lastModifiedBy="root"
-                                 jcr:mimeType="image/png"
-                                 jcr:primaryType="jnt:resource"
-                                 jcr:uuid="979880f1-a505-4bff-a5be-68f0428c59c8"/>
                         </glyphicons-halflings.png>
                     </img>
                 </bootstrap>
