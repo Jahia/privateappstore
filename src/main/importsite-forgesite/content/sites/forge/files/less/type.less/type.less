@@ -57,7 +57,7 @@ a.text-success:focus { color: darken(@successText, 10%); }
 // -------------------------
 
 h1, h2, h3, h4, h5, h6 {
-  margin: (@baseLineHeight / 2) 0;
+  margin: (@baseLineHeight / 2) 1;
   font-family: @headingsFontFamily;
   font-weight: @headingsFontWeight;
   line-height: @baseLineHeight;
@@ -72,17 +72,17 @@ h1, h2, h3, h4, h5, h6 {
 
 h1,
 h2,
-h3 { line-height: @baseLineHeight * 2; }
+h3 { line-height: @baseLineHeight * 1.429; }
 
-h1 { font-size: @baseFontSize * 2.75; } // ~38px
-h2 { font-size: @baseFontSize * 2.25; } // ~32px
-h3 { font-size: @baseFontSize * 1.75; } // ~24px
-h4 { font-size: @baseFontSize * 1.25; } // ~18px
+h1 { font-size: @baseFontSize * 1.273; } // ~14px
+h2 { font-size: @baseFontSize * 1.182; } // ~13px
+h3 { font-size: @baseFontSize * 1.091; } // ~12px
+h4 { font-size: @baseFontSize * 1; } // ~11px
 h5 { font-size: @baseFontSize; }
-h6 { font-size: @baseFontSize * 0.85; } // ~12px
+h6 { font-size: @baseFontSize * 0.85; } // ~0.9px
 
-h1 small { font-size: @baseFontSize * 1.75; } // ~24px
-h2 small { font-size: @baseFontSize * 1.25; } // ~18px
+h1 small { font-size: @baseFontSize * 1.182; } // ~13px
+h2 small { font-size: @baseFontSize * 1; } // ~11px
 h3 small { font-size: @baseFontSize; }
 h4 small { font-size: @baseFontSize; }
 
@@ -91,10 +91,19 @@ h4 small { font-size: @baseFontSize; }
 // -------------------------
 
 .page-header {
-  padding-bottom: (@baseLineHeight / 2) - 1;
-  margin: @baseLineHeight 0 (@baseLineHeight * 1.5);
-  border-bottom: 1px solid @grayLighter;
+  padding: (@baseLineHeight / 2);
+  margin: (@baseLineHeight / 2) 0 ;
+  //border-bottom: 1px solid @grayDark;
+  color: @white;
+  background: lighten(@linkColor, 10%);
+  border-top: 4px solid @linkColor ;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.1);
 }
+.page-header h1,.page-header h2,.page-header h3,.page-header h4, {
+   color: @white;
+   font-size: @baseFontSize *1.5;
+ }
+
 
 
 
