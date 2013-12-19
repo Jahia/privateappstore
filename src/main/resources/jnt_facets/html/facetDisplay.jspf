@@ -24,7 +24,7 @@
                 <c:param name="N-forgeModulesList"
                          value="${functions:encodeUrlParam(facet:getFacetDrillDownUrl(facetValue, activeFacetsVars[facetParamVarName]))}"/>
             </c:url>
-            <li><a href="${facetUrl}" rel="nofollow"><span class="label label-info">
+            <li><a href="${fn:escapeXml(facetUrl)}" rel="nofollow"><span class="label label-info">
                 <facet:facetValueLabel currentFacetField="${currentFacet}" facetValueCount="${facetValue}"
                                        facetValueLabels="${facetValueLabels}" facetValueFormats="${facetValueFormats}"
                                        facetValueRenderers="${facetValueRenderers}"

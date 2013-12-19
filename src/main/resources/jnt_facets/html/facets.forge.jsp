@@ -198,7 +198,7 @@
                         <c:url var="facetUrl" value="${url.mainResource}">
                             <c:param name="${facetParamVarName}" value="${functions:encodeUrlParam(facetDrillDownUrl)}"/>
                         </c:url>
-                        <li><a href="${facetUrl}"><facet:facetValueLabel currentActiveFacetValue="${facetValue}" facetValueLabels="${facetValueLabels}"/></a> (${facetValue.value})<br/></li>
+                        <li><a href="${fn:escapeXml(facetUrl)}"><facet:facetValueLabel currentActiveFacetValue="${facetValue}" facetValueLabels="${facetValueLabels}"/></a> (${facetValue.value})<br/></li>
                     </c:if>
                     </c:forEach>
                     <c:if test="${not empty currentFacetLabel}">
