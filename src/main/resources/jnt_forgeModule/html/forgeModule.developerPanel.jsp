@@ -124,6 +124,19 @@
                     }
                 });
 
+                $('#confirmDeleteModule-${id}').click(function() {
+
+                    var btn = $(this);
+
+                    if (!btn.hasClass('disabled')) {
+
+                        $.post('<c:url value='${url.base}${currentNode.path}.deleteModule.do'/>', null, function(result) {
+                            $('#deleteModuleModal-${id}').modal('hide');
+                            window.location = '<c:url value='${url.base}${currentNode.resolveSite.path}/home.html'/>';
+                        }, "json");
+                    }
+                });
+
                 $('#viewAsUserBtn-${id}').tooltip();
 
             });
@@ -162,6 +175,27 @@
                     <c:otherwise><fmt:message key="jnt_forgeModule.label.developer.publish"/></c:otherwise>
                 </c:choose>
             </button>
+            <button id="deleteModule-${id}" class="btn btn-small" data-toggle="modal" data-target="#deleteModuleModal-${id}">
+                <fmt:message key="jnt_forgeModule.label.developer.delete"/>
+            </button>
+        </div>
+
+        <div id="deleteModuleModal-${id}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="deleteModuleModal-${id}" aria-hidden="true">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3 id="deleteModuleModal-${id}"><fmt:message key="jnt_forgeModule.label.developer.modal.delete.header"/></h3>
+            </div>
+            <div class="modal-body">
+                <p>
+                    <fmt:message key="jnt_forgeModule.label.developer.modal.delete.body">
+                        <fmt:param value="${currentNode.displayableName}"/>
+                    </fmt:message>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" aria-hidden="true"><fmt:message key="jnt_review.label.admin.modal.delete.cancel"/></button>
+                <button class="btn btn-primary" id="confirmDeleteModule-${id}"><fmt:message key="jnt_review.label.admin.modal.delete.confirm"/></button>
+            </div>
         </div>
 
     </section>
