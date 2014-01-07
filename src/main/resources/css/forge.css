@@ -297,3 +297,6 @@
     text-decoration: none;
     cursor: pointer;
 }
+.modal-footer .btn {
+    margin-bottom:0;
+}
