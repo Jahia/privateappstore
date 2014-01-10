@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <content xmlns:j="http://www.jahia.org/jahia/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0">
     <modules jcr:primaryType="jnt:modules">
-        <forge j:dependencies="bootstrap bootstrap-components default facets rating siteSettings templates-bootstrap videostreaming"
+        <forge j:dependencies="bootstrap bootstrap-components default facets rating siteSettings templates-forge videostreaming"
                j:installedModules="forge"
                j:moduleType="module"
                j:title="Jahia Forge"
                jcr:primaryType="jnt:module">
                 
             <templates j:rootTemplatePath="/base"
-                       j:templateSetContext="/modules/templates-bootstrap"
+                       j:templateSetContext="/modules/templates-forge"
                        jcr:primaryType="jnt:templatesFolder">
                 <files jcr:primaryType="jnt:folder"/>
                 <contents jcr:primaryType="jnt:contentFolder"/>
