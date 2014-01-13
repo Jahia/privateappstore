@@ -6,7 +6,7 @@
                j:moduleType="module"
                j:title="Jahia Forge"
                jcr:primaryType="jnt:module">
-                
+
             <templates j:rootTemplatePath="/base"
                        j:templateSetContext="/modules/templates-forge"
                        jcr:primaryType="jnt:templatesFolder">
@@ -26,7 +26,8 @@
                                     <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                                     <bootstrap-row-col1 jcr:primaryType="jnt:bootstrapColumn" offset="0" span="3">
                                         <bootstrap-row-col1 jcr:primaryType="jnt:contentList">
-                                                <forge-administration j:invertCondition="false"
+                                                <forge-administration aClass="btn btn-primary"
+                                                       j:invertCondition="false"
                                                        j:perUser="true"
                                                        j:requireLoggedUser="false"
                                                        j:requirePrivilegedUser="false"
