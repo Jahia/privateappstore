@@ -1,5 +1,5 @@
 .bodywrapper ul.wysihtml5-toolbar {
-  margin: 0;
+  margin: 0 0 10px 0;
   padding: 0;
   display: block;
 }
@@ -12,7 +12,7 @@
   float: left;
   display: list-item;
   list-style: none;
-  margin: 0 5px 10px 0;
+  margin: 0 1px 0 0;
 }
 .bodywrapper ul.wysihtml5-toolbar a[data-wysihtml5-command=bold] {
   font-weight: bold;
