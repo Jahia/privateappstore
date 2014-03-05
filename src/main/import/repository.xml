@@ -451,22 +451,6 @@
                                  jcr:primaryType="jnt:translation"
                                  jcr:title="Forge Modules Repository"/>
                     </forge-modules-repository>
-                    <forge-modules-categories jcr:mixinTypes="jmix:accessControlled"
-                                      jcr:primaryType="jnt:contentFolder">
-                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                        <j:translation_en jcr:language="en"
-                                 jcr:mixinTypes="mix:title"
-                                 jcr:primaryType="jnt:translation"
-                                 jcr:title="Forge Modules Categories"/>
-                        <games jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Games"/>
-                        </games>
-                        <social jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Social"/>
-                        </social>
-                    </forge-modules-categories>
                     <forge-modules-required-versions jcr:mixinTypes="jmix:accessControlled"
                                              jcr:primaryType="jnt:contentFolder">
                         <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
