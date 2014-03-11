@@ -179,6 +179,7 @@
 }
 .bodywrapper #jnt_forge .forgeModule  {
     margin-bottom: 15px;
+    min-height: 345px;
 }
 .bodywrapper #jnt_forge .forgeModule h4  {
     margin-bottom:0;
