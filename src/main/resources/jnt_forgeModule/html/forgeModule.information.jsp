@@ -69,6 +69,7 @@
 
             var categories = [];
             <c:if test="${! empty moduleCategories && jcr:hasChildrenOfType(moduleCategories, 'jnt:category')}">
+            <template:addCacheDependency node="${moduleCategories}"/>
                 <c:forEach items="${jcr:getNodes(moduleCategories, 'jnt:category')}" var="moduleCategory">
                     categories.push({value: '${moduleCategory.identifier}', text: '${moduleCategory.displayableName}'});
                 </c:forEach>
