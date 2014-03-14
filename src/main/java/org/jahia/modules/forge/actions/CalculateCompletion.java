@@ -217,7 +217,7 @@ public class CalculateCompletion  extends Action {
 
             Map<String, Object> propertyMap = new HashMap<String, Object>();
             propertyMap.put("name",
-                new JahiaResourceBundle(session.getLocale(), "Jahia Forge").get("jnt_forgeModule."+name.replace(':', '_'), name));
+                new JahiaResourceBundle(session.getLocale(), "Jahia Private App Store").get("jnt_forgeModule."+name.replace(':', '_'), name));
             propertyMap.put("mandatory", mandatory);
 
             todoList.put(index++, propertyMap);

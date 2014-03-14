@@ -32,7 +32,7 @@ public class EditVideo extends Action {
 
         JCRNodeWrapper module = resource.getNode();
 
-        logger.info("Start editing video node of Forge module " + module.getPath());
+        logger.info("Start editing video node of Private App Store module " + module.getPath());
 
         session.checkout(module);
 
@@ -60,7 +60,7 @@ public class EditVideo extends Action {
 
         session.save();
 
-        logger.info("Video node successfully edited in Forge module " + module.getPath());
+        logger.info("Video node successfully edited in Private App Store module " + module.getPath());
 
         return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject());
     }

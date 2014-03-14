@@ -41,7 +41,7 @@
             </c:if>
             <template:tokenizedForm allowsMultipleSubmits="true">
             <form class="file_upload" id="file_upload_${currentNode.identifier}"
-                  action="<c:url value='${url.base}${renderContext.site.path}/contents/forge-modules-repository.createModuleFromJar.do'/>" method="POST" enctype="multipart/form-data"
+                  action="<c:url value='${url.base}${renderContext.site.path}/contents/modules-repository.createModuleFromJar.do'/>" method="POST" enctype="multipart/form-data"
                   accept="application/json">
                 <div id="file_upload_container${currentNode.identifier}" class="btn btn-block">
                     <input type="file" name="file" multiple>

@@ -29,4 +29,4 @@
 
 <query:definition var="listQuery" statement="${statement}"/>
 <c:set target="${moduleMap}" property="listQuery" value="${listQuery}" />
-<template:addCacheDependency flushOnPathMatchingRegexp="${renderContext.site.path}/contents/forge-modules-repository/.*"/>
+<template:addCacheDependency flushOnPathMatchingRegexp="${renderContext.site.path}/contents/modules-repository/.*"/>

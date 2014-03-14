@@ -42,7 +42,6 @@
  - howToInstall (string, richtext) i18n
  - FAQ (string, richtext) i18n
  - codeRepository (string)
- - license (weakreference,category[root='forge-licenses'])
  - downloadCount (long) = 0 hidden onconflict=latest autocreated
  - supportedByJahia (boolean) = false autocreated
  - reviewedByJahia (boolean) = false autocreated
@@ -64,7 +63,7 @@
  - qualifier (string) multiple
 
 [jnt:forgeModuleVersion]> jnt:content, jmix:editorialContent, jmix:forge
- - requiredVersion (weakreference, choicelist[nodes='$currentSite/contents/forge-modules-required-versions//*;jnt:text'])
+ - requiredVersion (weakreference, choicelist[nodes='$currentSite/contents/modules-required-versions//*;jnt:text'])
  - versionNumber (string)
  - fileDsaSignature (string)
  - changeLog (string, richtext)

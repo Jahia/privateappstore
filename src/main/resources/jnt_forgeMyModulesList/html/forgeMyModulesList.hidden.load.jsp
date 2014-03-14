@@ -19,11 +19,11 @@
 
 <c:set var="statement"
        value="SELECT * FROM [jnt:forgeModule]
-                WHERE ISDESCENDANTNODE('${renderContext.site.path}/contents/forge-modules-repository')
+                WHERE ISDESCENDANTNODE('${renderContext.site.path}/contents/modules-repository')
                     AND [jcr:createdBy]='${currentUser.username}'
                 ORDER BY [jcr:title] ASC"/>
 
 <query:definition var="listQuery" statement="${statement}"/>
 <c:set target="${moduleMap}" property="listQuery" value="${listQuery}" />
 <c:set target="${moduleMap}" property="subNodesView" value="myModule" />
-<template:addCacheDependency flushOnPathMatchingRegexp="${renderContext.site.path}/contents/forge-modules-repository/.*"/>
+<template:addCacheDependency flushOnPathMatchingRegexp="${renderContext.site.path}/contents/modules-repository/.*"/>

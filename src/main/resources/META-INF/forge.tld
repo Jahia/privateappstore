@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
         version="2.0">
 
-    <description>Forge module tag library</description>
+    <description>Private App Store module tag library</description>
     <display-name>Forge</display-name>
     <tlib-version>1.0</tlib-version>
     <short-name>forge</short-name>

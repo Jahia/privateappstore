@@ -106,7 +106,7 @@
     <bean id="forgeRedirectFilter" class="org.jahia.modules.forge.filters.RedirectFilter">
         <property name="priority" value="-4"/>
         <property name="skipOnModes" value="live,studio"/>
-        <property name="applyOnSiteTemplateSets" value="forge"/>
+        <property name="applyOnSiteTemplateSets" value="private-app-store"/>
         <property name="applyOnConfigurations" value="page"/>
     </bean>
 

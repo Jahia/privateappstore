@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <content xmlns:j="http://www.jahia.org/jahia/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0">
     <modules jcr:primaryType="jnt:modules">
-        <forge j:dependencies="bootstrap bootstrap-components default facets rating siteSettings templates-forge videostreaming"
-               j:installedModules="forge"
+        <private-app-store j:dependencies="bootstrap bootstrap-components default facets rating siteSettings templates-private-app-store videostreaming"
+               j:installedModules="private-app-store"
                j:moduleType="module"
-               j:title="Jahia Forge"
+               j:title="Jahia Private App Store"
                jcr:primaryType="jnt:module">
 
             <templates j:rootTemplatePath="/base"
-                       j:templateSetContext="/modules/templates-forge"
+                       j:templateSetContext="/modules/templates-private-app-store"
                        jcr:primaryType="jnt:templatesFolder">
                 <files jcr:primaryType="jnt:folder"/>
                 <contents jcr:primaryType="jnt:contentFolder"/>
-                <forge-home j:hiddenTemplate="false"
+                <store-home j:hiddenTemplate="false"
                             jcr:mixinTypes="jmix:accessControlled"
                             jcr:primaryType="jnt:pageTemplate">
                     <pagecontent jcr:primaryType="jnt:contentList">
@@ -26,7 +26,7 @@
                                     <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                                     <bootstrap-row-col1 jcr:primaryType="jnt:bootstrapColumn" offset="0" span="3">
                                         <bootstrap-row-col1 jcr:primaryType="jnt:contentList">
-                                                <forge-administration aClass="btn btn-primary"
+                                                <store-administration aClass="btn btn-primary"
                                                        j:invertCondition="false"
                                                        j:perUser="true"
                                                        j:requireLoggedUser="false"
@@ -34,14 +34,14 @@
                                                        j:requiredPermissionNames="jcr:write_live"
                                                        jcr:mixinTypes="jmix:cache jmix:requiredPermissions"
                                                        jcr:primaryType="jnt:siteLink"
-                                                       targetTemplate="forge">
+                                                       targetTemplate="store-admin">
                                                     <j:translation_en jcr:language="en"
                                                       jcr:mixinTypes="mix:title"
                                                       jcr:primaryType="jnt:translation"
-                                                      jcr:title="Forge administration"/>
-                                                </forge-administration>
-                                                <forge-url jcr:primaryType="jnt:forgeUrl"/>
-                                                <facets-list j:bindedComponent="/modules/forge/templates/forge-home/pagecontent/bootstrap-container/bootstrap-container/bootstrap-row/bootstrap-row-col2/bootstrap-row-col2/forgeModulesList"
+                                                      jcr:title="Private App Store Administration"/>
+                                                </store-administration>
+                                                <store-url jcr:primaryType="jnt:forgeUrl"/>
+                                                <facets-list j:bindedComponent="/modules/private-app-store/templates/store-home/pagecontent/bootstrap-container/bootstrap-container/bootstrap-row/bootstrap-row-col2/bootstrap-row-col2/modulesList"
                                               j:type="jnt:forgeModule"
                                               j:view="forge"
                                               jcr:mixinTypes="jmix:accessControlled jmix:renderable"
@@ -80,7 +80,7 @@
                                                j:style="grey"
                                                jcr:mixinTypes="jmix:accessControlled jmix:requiredPermissions jmix:skinnable jmix:style"
                                                jcr:primaryType="jnt:contentList">
-                                                <forge-my-modules-list j:invertCondition="false"
+                                                <store-my-modules-list j:invertCondition="false"
                                                         j:requireLoggedUser="false"
                                                         j:requirePrivilegedUser="false"
                                                         j:requiredPermissionNames="jahiaForgeUploadModule"
@@ -91,7 +91,7 @@
                                                                   jcr:mixinTypes="mix:title"
                                                                   jcr:primaryType="jnt:translation"
                                                                   jcr:title="My Modules"/>
-                                            </forge-my-modules-list>
+                                            </store-my-modules-list>
                                                     <file-upload-form j:id="myModulesUploadForm"
                                                       j:skin="skins.custom"
                                                       j:view="jar"
@@ -111,13 +111,13 @@
                                                    jcr:mixinTypes="jmix:accessControlled"
                                                    jcr:primaryType="jnt:forgeModulesList"
                                                    nbOfModulePerPage="20"
-                                                   startNode="/modules/forge/contents/forge-modules-repository">
+                                                   startNode="/modules/private-app-store/contents/modules-repository">
                                                     <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                                                 </forgeModulesList>
                                                 <bootstrap-pagination displayNbOfItemsPerPage="true"
                                                        displayNbOfItemsPerPageValues="6"
                                                        displayPager="true"
-                                                       j:bindedComponent="/modules/forge/templates/forge-home/pagecontent/bootstrap-container/bootstrap-container/bootstrap-row/bootstrap-row-col2/bootstrap-row-col2/forgeModulesList"
+                                                       j:bindedComponent="/modules/private-app-store/templates/store-home/pagecontent/bootstrap-container/bootstrap-container/bootstrap-row/bootstrap-row-col2/bootstrap-row-col2/modulesList"
                                                        jcr:primaryType="jnt:bootstrapPager"
                                                        nbOfPages="10"
                                                        pageSize="6"
@@ -133,9 +133,9 @@
                     <j:translation_en jcr:language="en"
                                       jcr:mixinTypes="mix:title"
                                       jcr:primaryType="jnt:translation"
-                                      jcr:title="Forge Home"/>
-                </forge-home>
-                <forge-module j:applyOn="jnt:forgeModule"
+                                      jcr:title="Private App Store Home"/>
+                </store-home>
+                <store-module j:applyOn="jnt:forgeModule"
                               j:defaultTemplate="true"
                               j:hiddenTemplate="false"
                               jcr:mixinTypes="jmix:accessControlled"
@@ -144,7 +144,7 @@
                     <j:translation_en jcr:language="en"
                                       jcr:mixinTypes="mix:title"
                                       jcr:primaryType="jnt:translation"
-                                      jcr:title="Forge Module"/>
+                                      jcr:title="Private App Store Module"/>
                     <pagecontent jcr:primaryType="jnt:contentList">
                             <bootstrap-container fluid="true"
                                        j:id="jnt_forge"
@@ -168,11 +168,11 @@
                                                              jcr:primaryType="jnt:mainResourceDisplay">
                                                 <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                                             </developer-panel>
-                                            <forge-admin-panel j:mainResourceView="forgeAdminPanel"
+                                            <store-admin-panel j:mainResourceView="forgeAdminPanel"
                                                                jcr:mixinTypes="jmix:accessControlled"
                                                                jcr:primaryType="jnt:mainResourceDisplay">
                                                 <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                            </forge-admin-panel>
+                                            </store-admin-panel>
                                         </module-aside>
                                     </module-aside>
                                         <module-main jcr:primaryType="jnt:bootstrapColumn" offset="0" span="9">
@@ -347,13 +347,13 @@
                             </bootstrap-container>
                         </bootstrap-container>
                     </pagecontent>
-                </forge-module>
+                </store-module>
                     <siteSettingsBase j:hiddenTemplate="false" jcr:primaryType="jnt:template">
                     <j:translation_en jcr:language="en"
                                       jcr:mixinTypes="mix:title"
                                       jcr:primaryType="jnt:translation"
                                       jcr:title="siteSettingsBase"/>
-                    <forge j:applyOn="jnt:virtualsite"
+                    <store-admin j:applyOn="jnt:virtualsite"
                            j:defaultTemplate="false"
                            j:hiddenTemplate="true"
                       j:requiredPermissionNames="jahiaForgeModerateModule"
@@ -363,7 +363,7 @@
                         <j:translation_en jcr:language="en"
                                           jcr:mixinTypes="mix:title"
                                           jcr:primaryType="jnt:translation"
-                                          jcr:title="forge"/>
+                                          jcr:title="Private App Store Administration"/>
                         <pagecontent jcr:primaryType="jnt:contentList">
                                 <bootstrap-container fluid="true" jcr:primaryType="jnt:bootstrapContainer">
                                     <bootstrap-container jcr:primaryType="jnt:contentList">
@@ -375,26 +375,26 @@
                                 <bootstrap-tabular-list fadeIn="true"
                                              jcr:primaryType="jnt:bootstrapTabularList"
                                              tabsPosition="top">
-                                        <forge-settings jcr:primaryType="jnt:contentList">
+                                        <store-settings jcr:primaryType="jnt:contentList">
                                         <j:translation_en jcr:language="en"
                                              jcr:mixinTypes="mix:title"
                                              jcr:primaryType="jnt:translation"
-                                                jcr:title="Forge settings"/>
+                                                jcr:title="Private App Store Settings"/>
                                         <forgesettings jcr:primaryType="jnt:forgeSettings"/>
-                                        </forge-settings>
-                                        <forge-roles jcr:primaryType="jnt:contentList">
+                                        </store-settings>
+                                        <store-roles jcr:primaryType="jnt:contentList">
                                         <j:translation_en jcr:language="en"
                                              jcr:mixinTypes="mix:title"
                                              jcr:primaryType="jnt:translation"
-                                                jcr:title="Forge roles"/>
+                                                jcr:title="Private App Store roles"/>
                                             <manage-roles jcr:primaryType="jnt:manageRoles"
-                                            roles="forge-administrator forge-developer reader">
+                                            roles="store-administrator store-developer reader">
                                                 <j:translation_en jcr:language="en"
                                                    jcr:mixinTypes="mix:title"
                                                    jcr:primaryType="jnt:translation"
-                                                   jcr:title="Forge roles"/>
+                                                   jcr:title="Private App Store roles"/>
                                             </manage-roles>
-                                        </forge-roles>
+                                        </store-roles>
                                     <categories jcr:primaryType="jnt:contentList">
                                         <j:translation_en jcr:language="en"
                                              jcr:mixinTypes="mix:title"
@@ -407,7 +407,7 @@
                                 </bootstrap-container>
                                 </bootstrap-container>
                         </pagecontent>
-                    </forge>
+                    </store-admin>
                 </siteSettingsBase>
                     <redirect j:hiddenTemplate="false"
                       j:view="bootstrap"
@@ -435,7 +435,7 @@
                             <rich-text jcr:primaryType="jnt:bigText">
                                 <j:translation_en jcr:language="en"
                                        jcr:primaryType="jnt:translation"
-                                       text="&lt;h3 style=&#34;text-align: center;&#34;&gt;&#xA; &lt;span style=&#34;text-align: center;&#34;&gt;This page cannot be accessed in edit mode. Go to live mode to use the forge&lt;/span&gt;&lt;/h3&gt;&#xA;"/>
+                                       text="&lt;h3 style=&#34;text-align: center;&#34;&gt;&#xA; &lt;span style=&#34;text-align: center;&#34;&gt;This page cannot be accessed in edit mode. Go to live mode to use the Private App Store&lt;/span&gt;&lt;/h3&gt;&#xA;"/>
                             </rich-text>
                         </pagecontent>
                     </redirect>
@@ -444,21 +444,21 @@
                 <portlets jcr:primaryType="jnt:portletFolder"/>
                 <files jcr:primaryType="jnt:folder"/>
                 <contents jcr:primaryType="jnt:contentFolder">
-                    <forge-modules-repository jcr:mixinTypes="jmix:accessControlled"
+                    <modules-repository jcr:mixinTypes="jmix:accessControlled"
                                       jcr:primaryType="jnt:contentFolder">
                         <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                         <j:translation_en jcr:language="en"
                                  jcr:mixinTypes="mix:title"
                                  jcr:primaryType="jnt:translation"
-                                 jcr:title="Forge Modules Repository"/>
-                    </forge-modules-repository>
-                    <forge-modules-required-versions jcr:mixinTypes="jmix:accessControlled"
+                                 jcr:title="Private App Store Modules Repository"/>
+                    </modules-repository>
+                    <modules-required-versions jcr:mixinTypes="jmix:accessControlled"
                                              jcr:primaryType="jnt:contentFolder">
                         <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                         <j:translation_en jcr:language="en"
                                  jcr:mixinTypes="mix:title"
                                  jcr:primaryType="jnt:translation"
-                                 jcr:title="Forge Modules-Required Versions"/>
+                                 jcr:title="Private App Store Modules-Required Versions"/>
                         <version-6_6 jcr:mixinTypes="jmix:accessControlled"
                             jcr:primaryType="jnt:contentFolder">
                             <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
@@ -491,14 +491,14 @@
                                 <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.5.0.1"/>
                             </version-6_5_0_1>
                         </version-6_5>
-                    </forge-modules-required-versions>
-                    <forge-modules-release-type jcr:mixinTypes="jmix:accessControlled"
+                    </modules-required-versions>
+                    <modules-release-type jcr:mixinTypes="jmix:accessControlled"
                                         jcr:primaryType="jnt:contentFolder">
                         <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                         <j:translation_en jcr:language="en"
                                  jcr:mixinTypes="mix:title"
                                  jcr:primaryType="jnt:translation"
-                                 jcr:title="forge-modules-release-type"/>
+                                 jcr:title="modules-release-type"/>
                         <simple-text jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
                             <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                             <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Hotfix"/>
@@ -509,9 +509,9 @@
                                     jcr:primaryType="jnt:translation"
                                     text="Service Pack"/>
                         </simple-text-1>
-                    </forge-modules-release-type>
+                    </modules-release-type>
                 </contents>
-        </forge>
+        </private-app-store>
     </modules>
 
 </content>

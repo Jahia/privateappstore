@@ -32,7 +32,7 @@ public class AddVideo extends Action {
 
         JCRNodeWrapper module = resource.getNode();
 
-        logger.info("Start adding video node to Forge module " + module.getPath());
+        logger.info("Start adding video node to Private App Store module " + module.getPath());
 
         session.checkout(module);
 
@@ -49,7 +49,7 @@ public class AddVideo extends Action {
 
         session.save();
 
-        logger.info("Video node successfully added to Forge module " + module.getPath());
+        logger.info("Video node successfully added to Private App Store module " + module.getPath());
 
         return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject());
     }

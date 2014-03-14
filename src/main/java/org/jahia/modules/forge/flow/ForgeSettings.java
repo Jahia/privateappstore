@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
- * Bean to handle forge settings flow.
+ * Bean to handle Private App Store settings flow.
  */
 public class ForgeSettings implements Serializable {
 
@@ -69,34 +69,5 @@ public class ForgeSettings implements Serializable {
     public void setUser(String user) {
         this.user = user;
     }
-
-    public void validateView(ValidationContext context) {
-
-        // try basic http connexion
-        GetMethod httpMethod = new GetMethod(url + "/jahia-catalog.properties");
-        httpMethod.addRequestHeader("Authorization", "Basic " + Base64.encode((user + ":" + password).getBytes()));
-        HttpClient httpClient = new HttpClient();
-        try {
-            int i = httpClient.executeMethod(httpMethod);
-            if (i != 200) {
-                context.getMessageContext().addMessage(new MessageBuilder()
-                        .error()
-                        .source("testUrl")
-                        .defaultText(
-                                Messages.getWithArgs("resources.Jahia_Forge",
-                                        "jahiaForge.errors.url.not.working", LocaleContextHolder.getLocale(), url + "/jahia-catalog.properties -> " + i))
-                        .build());
-            }
-        } catch (IOException e) {
-            context.getMessageContext().addMessage(new MessageBuilder()
-                    .error()
-                    .source("testUrl")
-                    .defaultText(
-                            Messages.get("resources.JahiaForge",
-                                    "url.not.working", LocaleContextHolder.getLocale()))
-                    .build());
-        }
-    }
-
 
 }

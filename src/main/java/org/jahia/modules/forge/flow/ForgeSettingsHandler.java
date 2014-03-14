@@ -15,7 +15,7 @@ import javax.jcr.RepositoryException;
 import java.io.Serializable;
 
 /**
- * Flow handler for forge settings
+ * Flow handler for Private App Store settings
  */
 public class ForgeSettingsHandler implements Serializable {
 
@@ -35,7 +35,7 @@ public class ForgeSettingsHandler implements Serializable {
                 forgeSettings.setUser(site.getProperty("forgeSettingsUser").getString());
             }
         } catch (RepositoryException e) {
-            logger.warn("unable to read forge settings",e);
+            logger.warn("unable to read Private App Store settings",e);
         }
 
         return forgeSettings;
@@ -64,7 +64,7 @@ public class ForgeSettingsHandler implements Serializable {
                                 Messages.get(ResourceBundles.JAHIA_INTERNAL_RESOURCES, "label.changeSaved",
                                         LocaleContextHolder.getLocale())).build());
             } catch (RepositoryException e) {
-                logger.warn("unable to save forge settings",e);
+                logger.warn("unable to save Private App Store settings",e);
             }
         }
 

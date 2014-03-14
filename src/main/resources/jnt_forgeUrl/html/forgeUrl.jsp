@@ -24,9 +24,9 @@
 <c:set var="siteUrl" value="${url.server}${siteUrl}" />
 <fmt:message var="copyToClipboard" key="forgeUrl.copyToClipboard"/>
 <fmt:message var="copied" key="forgeUrl.copied"/>
-<fmt:message key="jnt_forgeUrl"/>
+<label for="forgeUrlInput${currentNode.identifier}"><fmt:message key="jnt_forgeUrl"/></label>
 <div class="input-append">
-    <input class="span12" type="text" value="${siteUrl}" readonly />
+    <input id="forgeUrlInput${currentNode.identifier}" class="span12" type="text" value="${siteUrl}" readonly />
     <button id="copyForgeUrl${currentNode.identifier}" class="btn" type="button" data-clipboard-text="${siteUrl}" title="${copyToClipboard}"><i class="icon-screenshot"></i></button>
 </div>
 

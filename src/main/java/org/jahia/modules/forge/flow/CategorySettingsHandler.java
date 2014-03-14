@@ -55,7 +55,7 @@ public class CategorySettingsHandler implements Serializable{
                     .error()
                     .source("rootCategory")
                     .defaultText(
-                            Messages.getWithArgs("resources.Jahia_Forge",
+                            Messages.getWithArgs("resources.Jahia_Private_App_Store",
                                     "jahiaForge.settings.rootCategory.error", LocaleContextHolder.getLocale(),e.getMessage())).build());
             e.printStackTrace();
         }
@@ -80,7 +80,7 @@ public class CategorySettingsHandler implements Serializable{
                             .error()
                             .source("editCategory")
                             .defaultText(
-                                    Messages.getWithArgs("resources.Jahia_Forge",
+                                    Messages.getWithArgs("resources.Jahia_Private_App_Store",
                                             "jahiaForge.settings.editCategory.error", LocaleContextHolder.getLocale(),e.getMessage())).build());
                     e.printStackTrace();
                 }
@@ -143,7 +143,7 @@ public class CategorySettingsHandler implements Serializable{
                     .error()
                     .source("addCategory")
                     .defaultText(
-                            Messages.getWithArgs("resources.Jahia_Forge",
+                            Messages.getWithArgs("resources.Jahia_Private_App_Store",
                                     "jahiaForge.settings.addCategory.error", LocaleContextHolder.getLocale(),e.getMessage())).build());
             e.printStackTrace();
             return false;
@@ -165,7 +165,7 @@ public class CategorySettingsHandler implements Serializable{
                     .error()
                     .source("deleteCategory")
                     .defaultText(
-                            Messages.getWithArgs("resources.Jahia_Forge",
+                            Messages.getWithArgs("resources.Jahia_Private_App_Store",
                                     "jahiaForge.settings.deleteCategory.error", LocaleContextHolder.getLocale(),e.getMessage())).build());
             e.printStackTrace();
         }

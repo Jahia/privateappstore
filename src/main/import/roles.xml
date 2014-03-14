@@ -3,7 +3,7 @@
              xmlns:jcr="http://www.jcp.org/jcr/1.0"
              xmlns:j="http://www.jahia.org/jahia/1.0"
              xmlns:jnt="http://www.jahia.org/jahia/nt/1.0">
-    <forge-administrator j:hidden="false"
+    <store-administrator j:hidden="false"
            j:permissionNames="jahiaForgeModerateModule jahiaForgeUploadModule jcr:all_live jcr:all_default"
            j:privilegedAccess="true"
            j:roleGroup="site-role"
@@ -11,13 +11,13 @@
         <j:translation_en jcr:description=""
                           jcr:language="en"
                           jcr:primaryType="jnt:translation"
-                          jcr:title="Forge administrator"/>
+                          jcr:title="Private App Store administrator"/>
         <categories-access j:path="/sites/systemsite/categories"
                         j:permissionNames="jcr:all_default"
                         jcr:primaryType="jnt:externalPermissions"/>
-    </forge-administrator>
+    </store-administrator>
 
-    <forge-developer j:hidden="false"
+    <store-developer j:hidden="false"
                          j:permissionNames="jahiaForgeUploadModule"
                          j:privilegedAccess="true"
                          j:roleGroup="site-role"
@@ -25,7 +25,7 @@
         <j:translation_en jcr:description=""
                           jcr:language="en"
                           jcr:primaryType="jnt:translation"
-                          jcr:title="Forge developer"/>
-    </forge-developer>
+                          jcr:title="Private App Store developer"/>
+    </store-developer>
 
 </roles>

@@ -3,12 +3,10 @@ package org.jahia.modules.forge.actions;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.maven.model.Model;
 import org.apache.xerces.impl.dv.util.Base64;
 import org.jahia.api.Constants;
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
-import org.jahia.bin.SystemAction;
 import org.jahia.commons.Version;
 import org.jahia.data.templates.ModuleReleaseInfo;
 import org.jahia.services.content.JCRNodeWrapper;
@@ -20,7 +18,6 @@ import org.jahia.services.render.URLResolver;
 import org.jahia.services.templates.JahiaTemplateManagerService;
 import org.jahia.taglibs.jcr.node.JCRTagUtils;
 import org.jahia.tools.files.FileUpload;
-import org.jahia.utils.PomUtils;
 import org.jahia.utils.i18n.Messages;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -54,7 +51,7 @@ public class CreateModuleFromJar extends Action {
         if (!StringUtils.contains(filename,"-SNAPSHOT.")) {
             String extension = StringUtils.substringAfterLast(filename, ".");
             if (!(StringUtils.equals(extension,"jar") || StringUtils.equals(extension,"war"))) {
-                String error = Messages.get("resources.Jahia_Forge","forge.uploadJar.error.wrong.format",session.getLocale());
+                String error = Messages.get("resources.Jahia_Private_App_Store","forge.uploadJar.error.wrong.format",session.getLocale());
                 return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
             }
             String moduleName;
@@ -89,12 +86,12 @@ public class CreateModuleFromJar extends Action {
                     String reqVersionAttribute = attributes.getValue("Jahia-Required-Version");
                     final String requiredVersion = "version-" + reqVersionAttribute;
                     if (moduleName == null || groupId == null || requiredVersion == null) {
-                        String error = Messages.get("resources.Jahia_Forge","forge.uploadJar.error.missing.manifest.attribute",session.getLocale());
+                        String error = Messages.get("resources.Jahia_Private_App_Store","forge.uploadJar.error.missing.manifest.attribute",session.getLocale());
                         return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
                     }
                     String moduleRelPath = groupId.replace(".", "/") + "/" + moduleName;
                     moduleParams.put("url", Arrays.asList(forgeUrl + "/mavenproxy/" + site.getName() + "/" + moduleRelPath + "/" + version + "/" + moduleName + "-" + version + "." + extension));
-                    JCRNodeWrapper versions = session.getNode(resource.getNode().getResolveSite().getPath() + "/contents/forge-modules-required-versions");
+                    JCRNodeWrapper versions = session.getNode(resource.getNode().getResolveSite().getPath() + "/contents/modules-required-versions");
 
                     if (!versions.hasNode(requiredVersion)) {
                         Version v = new Version(requiredVersion);
@@ -124,7 +121,7 @@ public class CreateModuleFromJar extends Action {
                         moduleReleaseInfo.setPassword(password);
                         templateManagerService.deployToMaven(groupId,moduleName,moduleReleaseInfo, artifact);
                     } catch (IOException e) {
-                        String error = Messages.get("resources.Jahia_Forge","forge.uploadJar.error.cannot.upload",session.getLocale());
+                        String error = Messages.get("resources.Jahia_Private_App_Store","forge.uploadJar.error.cannot.upload",session.getLocale());
                         return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", error));
                     } finally {
                         FileUtils.deleteQuietly(artifact);
@@ -132,7 +129,7 @@ public class CreateModuleFromJar extends Action {
 
                     // Create module
 
-                    List<String> moduleParamKeys = Arrays.asList("description", "category", "icon", "authorNameDisplayedAs", "authorURL", "authorEmail", "FAQ", "codeRepository", "license", "downloadCount", "supportedByJahia", "reviewedByJahia", "published", "deleted", "screenshots", "video","groupId");
+                    List<String> moduleParamKeys = Arrays.asList("description", "category", "icon", "authorNameDisplayedAs", "authorURL", "authorEmail", "FAQ", "codeRepository", "downloadCount", "supportedByJahia", "reviewedByJahia", "published", "deleted", "screenshots", "video","groupId");
                     List<String> versionParamKeys = Arrays.asList("requiredVersion", "versionNumber", "fileDsaSignature", "changeLog", "url");
                     Map<String, List<String>> moduleParameters = new HashMap<String, List<String>>();
                     Map<String, List<String>> versionParameters = new HashMap<String, List<String>>();
@@ -155,7 +152,7 @@ public class CreateModuleFromJar extends Action {
 
                     JCRNodeWrapper repository = resource.getNode();
 
-                    logger.info("Start creating Forge Module {}", moduleName);
+                    logger.info("Start creating Private App Store Module {}", moduleName);
 
                     JCRNodeWrapper module;
 
@@ -185,7 +182,7 @@ public class CreateModuleFromJar extends Action {
                     logger.info("Start adding module version {} of {}", version, title);
 
                     if (hasModuleVersions && !hasValidVersionNumber(module, version)) {
-                        String error = Messages.getWithArgs("resources.Jahia_Forge","forge.uploadJar.error.versionNumber",session.getLocale(),moduleName,version);
+                        String error = Messages.getWithArgs("resources.Jahia_Private_App_Store","forge.uploadJar.error.versionNumber",session.getLocale(),moduleName,version);
                         return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", error));
                     }
 
@@ -199,7 +196,7 @@ public class CreateModuleFromJar extends Action {
 
                     logger.info("Module version {} of {} successfully added", version, title);
 
-                    logger.info("Forge Module {} successfully created and added to forge repository {}", moduleName,
+                    logger.info("Private App Store Module {} successfully created and added to repository {}", moduleName,
                             repository.getPath());
 
                     String moduleUrl = renderContext.getResponse().encodeURL(module.getUrl());
@@ -211,11 +208,11 @@ public class CreateModuleFromJar extends Action {
 
 
                 } else {
-                    String error = Messages.get("resources.Jahia_Forge","forge.uploadJar.error.unable.read.manifest",session.getLocale());
+                    String error = Messages.get("resources.Jahia_Private_App_Store","forge.uploadJar.error.unable.read.manifest",session.getLocale());
                     return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
                 }
             } catch (IOException e) {
-                String error = Messages.get("resources.Jahia_Forge","forge.uploadJar.error.unable.read.file",session.getLocale());
+                String error = Messages.get("resources.Jahia_Private_App_Store","forge.uploadJar.error.unable.read.file",session.getLocale());
                 return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", error));
             } finally {
                 if (jar != null) {
@@ -230,7 +227,7 @@ public class CreateModuleFromJar extends Action {
 
             }
         } else {
-            String error = Messages.get("resources.Jahia_Forge","forge.uploadJar.error.snapshot.not.allowed",session.getLocale());
+            String error = Messages.get("resources.Jahia_Private_App_Store","forge.uploadJar.error.snapshot.not.allowed",session.getLocale());
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", error));
         }
         // create module

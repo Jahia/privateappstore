@@ -39,7 +39,7 @@ public class EditTags extends Action {
 
         session.checkout(module);
         String siteKey = renderContext.getSite().getSiteKey();
-        logger.info("Start editing tags of Forge module " + title + " " + module.getPath());
+        logger.info("Start editing tags of Private App Store module " + title + " " + module.getPath());
         if (module.hasProperty("j:tags")) {
             JCRPropertyWrapper tags = module.getProperty("j:tags");
             Value[] values = tags.getValues();
@@ -80,7 +80,7 @@ public class EditTags extends Action {
             }
         }
         session.save();
-        logger.info("Tags of Forge module " + title + " successfully edited " + module.getPath());
+        logger.info("Tags of Private App Store module " + title + " successfully edited " + module.getPath());
 
         return ActionResult.OK_JSON;
     }

@@ -82,7 +82,7 @@ public class ReportReview extends Action {
             bindings.put("isReview", new Boolean(node.isNodeType("jnt:review")));
             bindings.put("username", user.getUsername());
 
-            mailService.sendMessageWithTemplate(templatePath, bindings, to, from, cc, bcc, locale, "Forge Modules");
+            mailService.sendMessageWithTemplate(templatePath, bindings, to, from, cc, bcc, locale, "Private App Store Modules");
         }
     }
 }
