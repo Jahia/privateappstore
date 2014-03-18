@@ -2,6 +2,7 @@ package org.jahia.modules.forge.actions;
 
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.TextExtractor;
+
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
 import org.jahia.services.content.JCRNodeWrapper;
@@ -9,9 +10,8 @@ import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
-import org.jahia.taglibs.functions.Functions;
 import org.jahia.taglibs.jcr.node.JCRTagUtils;
-import org.jahia.utils.i18n.JahiaResourceBundle;
+import org.jahia.utils.i18n.Messages;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
@@ -21,6 +21,7 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Value;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.util.*;
 
 /**
@@ -217,7 +218,7 @@ public class CalculateCompletion  extends Action {
 
             Map<String, Object> propertyMap = new HashMap<String, Object>();
             propertyMap.put("name",
-                new JahiaResourceBundle(session.getLocale(), "Jahia Private App Store").get("jnt_forgeModule."+name.replace(':', '_'), name));
+                Messages.get("resources.JahiaPrivateAppStore", "jnt_forgeModule."+name.replace(':', '_'), session.getLocale(), name));
             propertyMap.put("mandatory", mandatory);
 
             todoList.put(index++, propertyMap);
