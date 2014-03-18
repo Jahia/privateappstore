@@ -1,17 +1,8 @@
 package org.jahia.modules.forge.flow;
 
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.xerces.impl.dv.util.Base64;
-import org.jahia.utils.i18n.Messages;
-import org.springframework.binding.message.MessageBuilder;
-import org.springframework.binding.validation.ValidationContext;
-import org.springframework.context.i18n.LocaleContextHolder;
-
-import java.io.IOException;
 import java.io.Serializable;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Bean to handle Private App Store settings flow.
