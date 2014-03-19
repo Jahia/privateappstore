@@ -33,7 +33,7 @@ import java.util.Map;
 /**
  * Action called to update a module icon
  */
-public class UpdateModuleIcon extends Action {
+public class UpdateModuleIcon extends PrivateAppStoreAction {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(UpdateModuleIcon.class);
 
@@ -63,7 +63,7 @@ public class UpdateModuleIcon extends Action {
             session.save();
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("iconUpdate", true).put("iconUrl",icon.getUrl()));
         } else {
-            String error = Messages.get("resources.Jahia_Private_App_Store", "forge.updateIcon.error.wrong.format", session.getLocale());
+            String error = Messages.get("resources.private-app-store", "forge.updateIcon.error.wrong.format", session.getLocale());
 
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("iconUpdate", false).put("errorMessage",error));
         }

@@ -23,7 +23,7 @@ import java.util.Map;
  * @author Frédéric PIERRE
  * @version 1.0
  */
-public class DeleteModule extends Action {
+public class DeleteModule extends PrivateAppStoreAction {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(DeleteModule.class);
 

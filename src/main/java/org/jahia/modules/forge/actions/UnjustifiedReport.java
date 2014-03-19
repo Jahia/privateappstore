@@ -21,7 +21,7 @@ import java.util.Map;
  * @author Frédéric PIERRE
  * @version 1.0
  */
-public class UnjustifiedReport extends Action {
+public class UnjustifiedReport extends PrivateAppStoreAction {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(UnjustifiedReport.class);
 

@@ -30,7 +30,7 @@ import java.util.*;
  * @author Frédéric PIERRE
  * @version 1.0
  */
-public class CalculateCompletion  extends Action {
+public class CalculateCompletion  extends PrivateAppStoreAction {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(CalculateCompletion.class);
 
@@ -218,7 +218,7 @@ public class CalculateCompletion  extends Action {
 
             Map<String, Object> propertyMap = new HashMap<String, Object>();
             propertyMap.put("name",
-                Messages.get("resources.JahiaPrivateAppStore", "jnt_forgeModule."+name.replace(':', '_'), session.getLocale(), name));
+                Messages.get("resources.private-app-store", "jnt_forgeModule."+name.replace(':', '_'), session.getLocale(), name));
             propertyMap.put("mandatory", mandatory);
 
             todoList.put(index++, propertyMap);

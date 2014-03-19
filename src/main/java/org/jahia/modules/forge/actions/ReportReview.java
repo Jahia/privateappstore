@@ -27,7 +27,7 @@ import java.util.Map;
  * @author Frédéric PIERRE
  * @version 1.0
  */
-public class ReportReview extends Action {
+public class ReportReview extends PrivateAppStoreAction {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(ReportReview.class);
     private MailServiceImpl mailService;

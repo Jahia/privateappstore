@@ -37,7 +37,7 @@ import java.util.jar.Manifest;
 /**
  * Action to par a jar and produce an entry in module list
  */
-public class CreateModuleFromJar extends Action {
+public class CreateModuleFromJar extends PrivateAppStoreAction {
 
     private transient static Logger logger = LoggerFactory.getLogger(CreateModuleFromJar.class);
     private JahiaTemplateManagerService templateManagerService;
@@ -51,7 +51,7 @@ public class CreateModuleFromJar extends Action {
         if (!StringUtils.contains(filename,"-SNAPSHOT.")) {
             String extension = StringUtils.substringAfterLast(filename, ".");
             if (!(StringUtils.equals(extension,"jar") || StringUtils.equals(extension,"war"))) {
-                String error = Messages.get("resources.Jahia_Private_App_Store","forge.uploadJar.error.wrong.format",session.getLocale());
+                String error = Messages.get("resources.private-app-store","forge.uploadJar.error.wrong.format",session.getLocale());
                 return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
             }
             String moduleName;
@@ -86,7 +86,7 @@ public class CreateModuleFromJar extends Action {
                     String reqVersionAttribute = attributes.getValue("Jahia-Required-Version");
                     final String requiredVersion = "version-" + reqVersionAttribute;
                     if (moduleName == null || groupId == null || requiredVersion == null) {
-                        String error = Messages.get("resources.Jahia_Private_App_Store","forge.uploadJar.error.missing.manifest.attribute",session.getLocale());
+                        String error = Messages.get("resources.private-app-store","forge.uploadJar.error.missing.manifest.attribute",session.getLocale());
                         return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
                     }
                     String moduleRelPath = groupId.replace(".", "/") + "/" + moduleName;
@@ -121,7 +121,7 @@ public class CreateModuleFromJar extends Action {
                         moduleReleaseInfo.setPassword(password);
                         templateManagerService.deployToMaven(groupId,moduleName,moduleReleaseInfo, artifact);
                     } catch (IOException e) {
-                        String error = Messages.get("resources.Jahia_Private_App_Store","forge.uploadJar.error.cannot.upload",session.getLocale());
+                        String error = Messages.get("resources.private-app-store","forge.uploadJar.error.cannot.upload",session.getLocale());
                         return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", error));
                     } finally {
                         FileUtils.deleteQuietly(artifact);
@@ -182,7 +182,7 @@ public class CreateModuleFromJar extends Action {
                     logger.info("Start adding module version {} of {}", version, title);
 
                     if (hasModuleVersions && !hasValidVersionNumber(module, version)) {
-                        String error = Messages.getWithArgs("resources.Jahia_Private_App_Store","forge.uploadJar.error.versionNumber",session.getLocale(),moduleName,version);
+                        String error = Messages.getWithArgs("resources.private-app-store","forge.uploadJar.error.versionNumber",session.getLocale(),moduleName,version);
                         return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", error));
                     }
 
@@ -208,11 +208,11 @@ public class CreateModuleFromJar extends Action {
 
 
                 } else {
-                    String error = Messages.get("resources.Jahia_Private_App_Store","forge.uploadJar.error.unable.read.manifest",session.getLocale());
+                    String error = Messages.get("resources.private-app-store","forge.uploadJar.error.unable.read.manifest",session.getLocale());
                     return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
                 }
             } catch (IOException e) {
-                String error = Messages.get("resources.Jahia_Private_App_Store","forge.uploadJar.error.unable.read.file",session.getLocale());
+                String error = Messages.get("resources.private-app-store","forge.uploadJar.error.unable.read.file",session.getLocale());
                 return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", error));
             } finally {
                 if (jar != null) {
@@ -227,7 +227,7 @@ public class CreateModuleFromJar extends Action {
 
             }
         } else {
-            String error = Messages.get("resources.Jahia_Private_App_Store","forge.uploadJar.error.snapshot.not.allowed",session.getLocale());
+            String error = Messages.get("resources.private-app-store","forge.uploadJar.error.snapshot.not.allowed",session.getLocale());
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", error));
         }
         // create module

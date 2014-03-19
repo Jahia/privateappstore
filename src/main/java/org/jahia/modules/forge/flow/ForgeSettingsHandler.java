@@ -2,6 +2,7 @@ package org.jahia.modules.forge.flow;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.xerces.impl.dv.util.Base64;
+import org.jahia.modules.forge.actions.PrivateAppStoreAction;
 import org.jahia.services.content.decorator.JCRSiteNode;
 import org.jahia.utils.i18n.Messages;
 import org.jahia.utils.i18n.ResourceBundles;
@@ -12,6 +13,7 @@ import org.springframework.binding.message.MessageContext;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 import javax.jcr.RepositoryException;
+
 import java.io.Serializable;
 
 /**
@@ -24,6 +26,11 @@ public class ForgeSettingsHandler implements Serializable {
     static Logger logger = LoggerFactory.getLogger(ForgeSettingsHandler.class);
 
     private ForgeSettings forgeSettings;
+    
+    public ForgeSettingsHandler() {
+        super();
+        PrivateAppStoreAction.ensureLicense();
+    }
 
     public ForgeSettings getForgeSettingsBySite(JCRSiteNode site) {
         try {

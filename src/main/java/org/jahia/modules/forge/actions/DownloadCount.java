@@ -18,7 +18,7 @@ import java.util.Map;
  * @author Frédéric PIERRE
  * @version 1.0
  */
-public class DownloadCount  extends Action {
+public class DownloadCount  extends PrivateAppStoreAction {
 
     @Override
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource,

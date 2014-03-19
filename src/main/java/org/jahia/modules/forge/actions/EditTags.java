@@ -24,7 +24,7 @@ import java.util.Map;
  * @author Frédéric PIERRE
  * @version 1.0
  */
-public class EditTags extends Action {
+public class EditTags extends PrivateAppStoreAction {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(EditTags.class);
     private TaggingService taggingService;

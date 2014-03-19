@@ -1,31 +1,36 @@
 package org.jahia.modules.forge.flow;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import javax.jcr.Node;
+import javax.jcr.Property;
+import javax.jcr.PropertyIterator;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+
 import org.apache.commons.lang.StringUtils;
-import org.jahia.services.categories.jcr.JCRCategory;
+import org.jahia.modules.forge.actions.PrivateAppStoreAction;
 import org.jahia.services.content.JCRContentUtils;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.content.decorator.JCRSiteNode;
 import org.jahia.utils.i18n.Messages;
-import org.jahia.utils.i18n.ResourceBundles;
-import org.springframework.binding.message.Message;
 import org.springframework.binding.message.MessageBuilder;
 import org.springframework.binding.message.MessageContext;
-import org.springframework.binding.message.MessageResolver;
-import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.webflow.context.servlet.HttpServletRequestParameterMap;
 import org.springframework.webflow.core.collection.LocalParameterMap;
-import org.springframework.webflow.mvc.servlet.AbstractFlowHandler;
-
-import javax.jcr.*;
-import java.io.Serializable;
-import java.util.*;
 
 /**
- * Flow handler for catergory settings
+ * Flow handler for category settings
  */
-public class CategorySettingsHandler implements Serializable{
+public class CategorySettingsHandler implements Serializable {
 
     private static final long serialVersionUID = 871757139749838806L;
     private String rootCategoryIdentifier;
@@ -33,6 +38,15 @@ public class CategorySettingsHandler implements Serializable{
     private Map<Locale,String> categoryI18NTitles;
     private List<String> availableLanguages;
     private Set<String> categoryUsages;
+    
+    /**
+     * Initializes an instance of this class.
+     */
+    public CategorySettingsHandler() {
+        super();
+        PrivateAppStoreAction.ensureLicense();
+    }
+    
     public void init(JCRSiteNode site) {
         try {
             if (site.hasProperty("rootCategory")) {
@@ -55,7 +69,7 @@ public class CategorySettingsHandler implements Serializable{
                     .error()
                     .source("rootCategory")
                     .defaultText(
-                            Messages.getWithArgs("resources.Jahia_Private_App_Store",
+                            Messages.getWithArgs("resources.private-app-store",
                                     "jahiaForge.settings.rootCategory.error", LocaleContextHolder.getLocale(),e.getMessage())).build());
             e.printStackTrace();
         }
@@ -80,7 +94,7 @@ public class CategorySettingsHandler implements Serializable{
                             .error()
                             .source("editCategory")
                             .defaultText(
-                                    Messages.getWithArgs("resources.Jahia_Private_App_Store",
+                                    Messages.getWithArgs("resources.private-app-store",
                                             "jahiaForge.settings.editCategory.error", LocaleContextHolder.getLocale(),e.getMessage())).build());
                     e.printStackTrace();
                 }
@@ -143,7 +157,7 @@ public class CategorySettingsHandler implements Serializable{
                     .error()
                     .source("addCategory")
                     .defaultText(
-                            Messages.getWithArgs("resources.Jahia_Private_App_Store",
+                            Messages.getWithArgs("resources.private-app-store",
                                     "jahiaForge.settings.addCategory.error", LocaleContextHolder.getLocale(),e.getMessage())).build());
             e.printStackTrace();
             return false;
@@ -165,7 +179,7 @@ public class CategorySettingsHandler implements Serializable{
                     .error()
                     .source("deleteCategory")
                     .defaultText(
-                            Messages.getWithArgs("resources.Jahia_Private_App_Store",
+                            Messages.getWithArgs("resources.private-app-store",
                                     "jahiaForge.settings.deleteCategory.error", LocaleContextHolder.getLocale(),e.getMessage())).build());
             e.printStackTrace();
         }

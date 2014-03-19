@@ -21,7 +21,7 @@ import java.util.*;
  * @author Frédéric PIERRE
  * @version 1.0
  */
-public class AddReview extends Action {
+public class AddReview extends PrivateAppStoreAction {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(AddReview.class);
 

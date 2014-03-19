@@ -22,7 +22,7 @@ import java.util.*;
  * @author Frédéric PIERRE
  * @version 1.0
  */
-public class EditModuleVersion extends Action {
+public class EditModuleVersion extends PrivateAppStoreAction {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(EditModuleVersion.class);
 
