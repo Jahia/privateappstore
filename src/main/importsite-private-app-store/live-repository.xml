@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <content xmlns:j="http://www.jahia.org/jahia/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0">
     <sites jcr:primaryType="jnt:virtualsitesFolder">
-        <private-app-store forgeSettingsId="test"
-             forgeSettingsPassword="dGVzdDEyMzQ="
-             forgeSettingsUrl="https://devtools.jahia.com/nexus/content/repositories/test"
-             forgeSettingsUser="test"
+        <private-app-store 
              j:inactiveLanguages=""
              j:inactiveLiveLanguages=""
              j:lastPublished="2013-12-18T19:05:30.299+01:00"
@@ -16,7 +13,7 @@
              jcr:createdBy="system"
              jcr:lastModified="2013-12-18T19:05:30.286+01:00"
              jcr:lastModifiedBy=""
-             jcr:mixinTypes="jmix:accessControlled jmix:bootstrapSite jmix:forgeSettings"
+             jcr:mixinTypes="jmix:accessControlled jmix:bootstrapSite"
              jcr:primaryType="jnt:virtualsite"
              jcr:uuid="69182318-f64d-4cb7-b058-abb4d5d42c2a"
              responsive="false">
