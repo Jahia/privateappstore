@@ -180,6 +180,15 @@
                                     </bootstrap-row-col1>
                                         <bootstrap-row-col2 jcr:primaryType="jnt:bootstrapColumn" offset="0" span="9">
                                         <bootstrap-row-col2 jcr:primaryType="jnt:contentList">
+                                                <hidden-bootstrap-pagination displayNbOfItemsPerPage="true"
+                                                         displayNbOfItemsPerPageValues="6"
+                                                              displayPager="false"
+                                                         j:bindedComponent="/modules/private-app-store/templates/store-home/pagecontent/bootstrap-container/bootstrap-container/bootstrap-row/bootstrap-row-col2/bootstrap-row-col2/forgeModulesList"
+                                                         jcr:primaryType="jnt:bootstrapPager"
+                                                         nbOfPages="10"
+                                                         pageSize="6"
+                                                         paginationAlignment="pagination-centered"
+                                                         paginationSize=""/>
                                                 <forgeModulesList columnsNumber="3"
                                                    jcr:mixinTypes="jmix:accessControlled"
                                                    jcr:primaryType="jnt:forgeModulesList"
