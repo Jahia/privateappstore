@@ -17,10 +17,7 @@
 <template:addResources type="javascript" resources="ZeroClipboard.min.js" />
 <c:url var="moviePath" value="${url.currentModule}/javascript/ZeroClipboard.swf"/>
 <c:set var="site" value="${renderContext.site}"/>
-<c:url var="siteUrl" value="${url.base}${site.path}" />
-<c:if test="${not fn:endsWith(siteUrl, site.path)}">
-    <c:set var="siteUrl" value="${siteUrl}${site.path}" />
-</c:if>
+<c:set var="siteUrl" value="${url.base}${site.path}" />
 <c:set var="siteUrl" value="${url.server}${siteUrl}" />
 <fmt:message var="copyToClipboard" key="forgeUrl.copyToClipboard"/>
 <fmt:message var="copied" key="forgeUrl.copied"/>
