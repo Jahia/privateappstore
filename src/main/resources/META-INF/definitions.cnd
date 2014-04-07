@@ -79,7 +79,7 @@
 - forgeSettingsUrl (string)
 - forgeSettingsId (string)
 - forgeSettingsUser (string)
-- forgeSettingsPassword (string)
+- forgeSettingsPassword (string) hidden
 - rootCategory (weakreference)
 
 [jnt:forgeSettings] > jnt:content, mix:title, jmix:studioOnly, jmix:siteComponent
