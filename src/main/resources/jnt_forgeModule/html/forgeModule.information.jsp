@@ -63,13 +63,14 @@
     <c:url var="postURL" value="${url.base}${currentNode.path}"/>
 
     <c:set var="moduleCategories" value="${renderContext.site.properties['rootCategory'].node}"/>
+    <template:addCacheDependency node="${renderContext.site}"/>
+    <template:addCacheDependency node="${moduleCategories}"/>
 
     <template:addResources type="inlinejavascript">
         <script type="text/javascript">
 
             var categories = [];
             <c:if test="${! empty moduleCategories && jcr:hasChildrenOfType(moduleCategories, 'jnt:category')}">
-            <template:addCacheDependency node="${moduleCategories}"/>
                 <c:forEach items="${jcr:getNodes(moduleCategories, 'jnt:category')}" var="moduleCategory">
                     categories.push({value: '${moduleCategory.identifier}', text: '${moduleCategory.displayableName}'});
                 </c:forEach>

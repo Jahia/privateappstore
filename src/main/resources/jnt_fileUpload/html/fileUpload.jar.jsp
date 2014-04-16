@@ -101,4 +101,5 @@
             <fmt:message key="forgeSettings.fileUpload.jar.no.settings"/>
         </c:otherwise>
     </c:choose>
+    <template:addCacheDependency node="${renderContext.site}"/>
 </c:if>
