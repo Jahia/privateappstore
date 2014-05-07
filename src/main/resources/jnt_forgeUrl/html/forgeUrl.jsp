@@ -16,9 +16,7 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 <template:addResources type="javascript" resources="ZeroClipboard.min.js" />
 <c:url var="moviePath" value="${url.currentModule}/javascript/ZeroClipboard.swf"/>
-<c:set var="site" value="${renderContext.site}"/>
-<c:set var="siteUrl" value="${url.base}${site.path}" />
-<c:set var="siteUrl" value="${url.server}${siteUrl}" />
+<c:set var="siteUrl" value="${url.server}${url.context}${url.base}${renderContext.site.path}" />
 <fmt:message var="copyToClipboard" key="forgeUrl.copyToClipboard"/>
 <fmt:message var="copied" key="forgeUrl.copied"/>
 <label for="forgeUrlInput${currentNode.identifier}"><fmt:message key="jnt_forgeUrl"/></label>
