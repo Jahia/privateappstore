@@ -13,10 +13,9 @@
              jcr:createdBy="system"
              jcr:lastModified="2013-12-18T19:05:30.286+01:00"
              jcr:lastModifiedBy=""
-             jcr:mixinTypes="jmix:accessControlled jmix:bootstrapSite"
+             jcr:mixinTypes="jmix:accessControlled"
              jcr:primaryType="jnt:virtualsite"
-             jcr:uuid="69182318-f64d-4cb7-b058-abb4d5d42c2a"
-             responsive="false">
+             jcr:uuid="69182318-f64d-4cb7-b058-abb4d5d42c2a">
             <groups j:lastPublished="2013-12-18T19:05:27.360+01:00"
                  j:lastPublishedBy="root"
                  j:originWS="default"
