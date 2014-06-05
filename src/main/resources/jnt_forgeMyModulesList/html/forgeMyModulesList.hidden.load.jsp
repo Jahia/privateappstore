@@ -18,9 +18,10 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
 <c:set var="statement"
-       value="SELECT * FROM [jnt:forgeModule]
+       value="SELECT * FROM [jnt:content]
                 WHERE ISDESCENDANTNODE('${renderContext.site.path}/contents/modules-repository')
                     AND [jcr:createdBy]='${currentUser.username}'
+                    AND ([jcr:primaryType] = 'jnt:forgeModule' OR [jcr:primaryType] = 'jnt:forgePackage')
                 ORDER BY [jcr:title] ASC"/>
 
 <query:definition var="listQuery" statement="${statement}"/>
