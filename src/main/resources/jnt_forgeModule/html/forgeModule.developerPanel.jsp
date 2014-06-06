@@ -115,9 +115,9 @@
                                 btn.attr("data-value", result['published']);
 
                                 if (published)
-                                    btn.text('<fmt:message key="jnt_forgeModule.label.developer.unpublish"/>');
+                                    btn.text('<fmt:message key="jnt_forgeEntry.label.developer.unpublish"/>');
                                 else
-                                    btn.text('<fmt:message key="jnt_forgeModule.label.developer.publish"/>');
+                                    btn.text('<fmt:message key="jnt_forgeEntry.label.developer.publish"/>');
                             }
 
                         }, "json");
@@ -147,17 +147,17 @@
 
     <section id="moduleDeveloperPanel" ${viewAsUser ? 'class="viewAs"' : ''}>
 
-        <h4><fmt:message key="jnt_forgeModule.label.developer.title"/></h4>
+        <h4><fmt:message key="jnt_forgeEntry.label.developer.title"/></h4>
 
-        <h6><fmt:message key="jnt_forgeModule.label.developer.modulePageCompletion"/></h6>
+        <h6><fmt:message key="jnt_forgeEntry.label.developer.modulePageCompletion"/></h6>
         <div class="progress">
             <div id="completion-${id}" class="bar"><span class="ratingCount"></span></div>
         </div>
 
         <div id="todoListWrapper-${id}">
             <h6>
-                <fmt:message key="jnt_forgeModule.label.developer.todoList"/>&nbsp;
-                <span id="mandatoryTodoList"><fmt:message key="jnt_forgeModule.label.developer.todoListMandatory"/></span>
+                <fmt:message key="jnt_forgeEntry.label.developer.todoList"/>&nbsp;
+                <span id="mandatoryTodoList"><fmt:message key="jnt_forgeEntry.label.developer.todoListMandatory"/></span>
             </h6>
             <ul id="todoList-${id}">
             </ul>
@@ -167,16 +167,16 @@
             <a class="btn btn-small ${viewAsUser ? 'btn-primary' : ''}" id="viewAsUserBtn-${id}"
                 href="<c:url value="${url.base}${currentNode.path}.html${viewAsUser ? '' : '?viewAs=user'}"/>"
                 data-toggle="tooltip" title="<fmt:message key="jnt_forgeModule.label.developer.viewAs.tooltip"/>">
-                <fmt:message key="jnt_forgeModule.label.developer.viewAs"/>
+                <fmt:message key="jnt_forgeEntry.label.developer.viewAs"/>
             </a>
             <button id="publishModule-${id}" class="btn btn-small ${published ? 'btn-success': 'btn-danger'} disabled" data-value="${published}">
                 <c:choose>
-                    <c:when test="${published}"><fmt:message key="jnt_forgeModule.label.developer.unpublish"/></c:when>
-                    <c:otherwise><fmt:message key="jnt_forgeModule.label.developer.publish"/></c:otherwise>
+                    <c:when test="${published}"><fmt:message key="jnt_forgeEntry.label.developer.unpublish"/></c:when>
+                    <c:otherwise><fmt:message key="jnt_forgeEntry.label.developer.publish"/></c:otherwise>
                 </c:choose>
             </button>
             <button id="deleteModule-${id}" class="btn btn-small" data-toggle="modal" data-target="#deleteModuleModal-${id}">
-                <fmt:message key="jnt_forgeModule.label.developer.delete"/>
+                <fmt:message key="jnt_forgeEntry.label.developer.delete"/>
             </button>
         </div>
 

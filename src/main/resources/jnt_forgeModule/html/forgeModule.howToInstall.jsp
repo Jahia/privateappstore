@@ -76,15 +76,15 @@
 
     <c:if test="${not isEmptyTab}">
 
-        <h2><fmt:message key="jnt_forgeModule.label.howToInstall"/></h2>
+        <h2><fmt:message key="jnt_forgeEntry.label.howToInstall"/></h2>
 
         <c:if test="${isDeveloper && not viewAsUser}">
 
             <p class="editable-toggle">
-                <a id="toggle-howToInstall-${id}" href="#"><i class="icon-pencil"></i>&nbsp;<fmt:message key="jnt_forgeModule.label.edit"/></a>
+                <a id="toggle-howToInstall-${id}" href="#"><i class="icon-pencil"></i>&nbsp;<fmt:message key="jnt_forgeEntry.label.edit"/></a>
             </p>
 
-            <div data-original-title="<fmt:message key="jnt_forgeModule.label.howToInstall"/>" data-toggle="manual" data-name="howToInstall" data-type="wysihtml5"
+            <div data-original-title="<fmt:message key="jnt_forgeEntry.label.howToInstall"/>" data-toggle="manual" data-name="howToInstall" data-type="wysihtml5"
                  data-pk="1" id="howToInstall-${id}" class="editable" tabindex="-1">
 
         </c:if>

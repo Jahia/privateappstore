@@ -16,7 +16,6 @@
 <%--@elvariable id="currentResource" type="org.jahia.services.render.Resource"--%>
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
-
 <template:addResources type="javascript" resources="jquery.js, html5shiv.js, forge.js"/>
 <template:addResources type="css" resources="forge.css"/>
 
@@ -47,7 +46,6 @@
 
 <c:set var="nbOfVotes"
        value="${not empty currentNode.properties['j:nbOfVotes'] ? currentNode.properties['j:nbOfVotes'].long : null}"/>
-
 <template:include view="hidden.sql">
     <template:param name="getLatestVersion" value="true"/>
 </template:include>
@@ -56,8 +54,8 @@
 <c:if test="${isDeveloper && not viewAsUser}">
 
     <c:url var="postURL" value="${url.base}${currentNode.path}"/>
-    <fmt:message var="labelEmptyOrganisation" key="jnt_forgeModule.label.developer.emptyOrganisation"/>
-    <fmt:message var="labelEmptyFullName" key="jnt_forgeModule.label.developer.emptyFullName"/>
+    <fmt:message var="labelEmptyOrganisation" key="jnt_forgeEntry.label.developer.emptyOrganisation"/>
+    <fmt:message var="labelEmptyFullName" key="jnt_forgeEntry.label.developer.emptyFullName"/>
 
     <template:addResources type="inlinejavascript">
 
@@ -110,7 +108,7 @@
         <c:choose>
 
             <c:when test="${isDeveloper && not viewAsUser}">
-                <a data-original-title="<fmt:message key="jnt_forgeModule.label.askAuthorNameDisplayedAs"/>" data-name="authorNameDisplayedAs" data-pk="1" data-type="select"
+                <a data-original-title="<fmt:message key="jnt_forgeEntry.label.askAuthorNameDisplayedAs"/>" data-name="authorNameDisplayedAs" data-pk="1" data-type="select"
                    id="authorName-header-${id}" href="#" class="editable editable-click">${authorName}</a>
             </c:when>
 
@@ -124,7 +122,7 @@
 
     <c:url var="iconUrl" value="${url.currentModule}/img/icon.png"/>
     <img class="moduleIcon" id="moduleIcon-${currentNode.identifier}" src="${not empty icon.url ? icon.url : iconUrl}"
-         alt="<fmt:message key="jnt_forgeModule.label.moduleIcon"><fmt:param value="${title}"/></fmt:message>"/>
+         alt="<fmt:message key="jnt_forgeEntry.label.moduleIcon"><fmt:param value="${title}"/></fmt:message>"/>
 
     <c:if test="${isDeveloper && not viewAsUser}">
 
@@ -194,19 +192,29 @@
 
         <c:when test="${not empty moduleMap.latestVersion}">
             <jcr:nodeProperty node="${moduleMap.latestVersion}" name="versionNumber" var="versionNumber"/>
-            <a class="btn btn-block" href="<c:url value="${moduleMap.latestVersion.properties.url.string}" context="/"/>"
+            <c:set var="versionFiles" value="${jcr:getChildrenOfType(moduleMap.latestVersion, 'jnt:file')}"/>
+            <c:forEach items="${versionFiles}" var="file" varStatus="status">
+                <a class="btn btn-block" href="<c:url value="${file.path}" context="/"/>"
+                   <c:if test="${not isDeveloper}">onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')"</c:if>>
+                    <i class="icon-download"></i>
+                    <fmt:message key="jnt_forgeEntry.label.downloadCurrentVersion">
+                        <fmt:param value="${versionNumber.string}"/>
+                    </fmt:message>
+                </a>
+            </c:forEach>
+            <%--<a class="btn btn-block" href="<c:url value="${moduleMap.latestVersion.properties.url.string}" context="/"/>"
                <c:if test="${not isDeveloper}">onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')"</c:if>>
                 <i class="icon-download"></i>
                 <fmt:message key="jnt_forgeModule.label.downloadCurrentVersion">
                     <fmt:param value="${versionNumber.string}"/>
                 </fmt:message>
-            </a>
+            </a>--%>
         </c:when>
 
         <c:otherwise>
             <a class="btn btn-block disabled" href="#">
                 <i class="icon-download"></i>
-                <fmt:message key="jnt_forgeModule.label.downloadCurrentVersion">
+                <fmt:message key="jnt_forgeEntry.label.downloadCurrentVersion">
                     <fmt:param value="X.X.X.X"/>
                 </fmt:message>
             </a>

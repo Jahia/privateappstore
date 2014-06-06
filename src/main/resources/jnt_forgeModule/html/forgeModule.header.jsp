@@ -56,8 +56,8 @@
 <c:if test="${isDeveloper && not viewAsUser}">
 
     <c:url var="postURL" value="${url.base}${currentNode.path}"/>
-    <fmt:message var="labelEmptyOrganisation" key="jnt_forgeModule.label.developer.emptyOrganisation"/>
-    <fmt:message var="labelEmptyFullName" key="jnt_forgeModule.label.developer.emptyFullName"/>
+    <fmt:message var="labelEmptyOrganisation" key="jnt_forgeEntry.label.developer.emptyOrganisation"/>
+    <fmt:message var="labelEmptyFullName" key="jnt_forgeEntry.label.developer.emptyFullName"/>
 
     <template:addResources type="inlinejavascript">
 
@@ -110,7 +110,7 @@
         <c:choose>
 
             <c:when test="${isDeveloper && not viewAsUser}">
-                <a data-original-title="<fmt:message key="jnt_forgeModule.label.askAuthorNameDisplayedAs"/>" data-name="authorNameDisplayedAs" data-pk="1" data-type="select"
+                <a data-original-title="<fmt:message key="jnt_forgeEntry.label.askAuthorNameDisplayedAs"/>" data-name="authorNameDisplayedAs" data-pk="1" data-type="select"
                    id="authorName-header-${id}" href="#" class="editable editable-click">${authorName}</a>
             </c:when>
 
@@ -124,7 +124,7 @@
 
     <c:url var="iconUrl" value="${url.currentModule}/img/icon.png"/>
     <img class="moduleIcon" id="moduleIcon-${currentNode.identifier}" src="${not empty icon.url ? icon.url : iconUrl}"
-         alt="<fmt:message key="jnt_forgeModule.label.moduleIcon"><fmt:param value="${title}"/></fmt:message>"/>
+         alt="<fmt:message key="jnt_forgeEntry.label.moduleIcon"><fmt:param value="${title}"/></fmt:message>"/>
 
     <c:if test="${isDeveloper && not viewAsUser}">
 
@@ -197,7 +197,7 @@
             <a class="btn btn-block" href="<c:url value="${moduleMap.latestVersion.properties.url.string}" context="/"/>"
                <c:if test="${not isDeveloper}">onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')"</c:if>>
                 <i class="icon-download"></i>
-                <fmt:message key="jnt_forgeModule.label.downloadCurrentVersion">
+                <fmt:message key="jnt_forgeEntry.label.downloadCurrentVersion">
                     <fmt:param value="${versionNumber.string}"/>
                 </fmt:message>
             </a>
@@ -206,7 +206,7 @@
         <c:otherwise>
             <a class="btn btn-block disabled" href="#">
                 <i class="icon-download"></i>
-                <fmt:message key="jnt_forgeModule.label.downloadCurrentVersion">
+                <fmt:message key="jnt_forgeEntry.label.downloadCurrentVersion">
                     <fmt:param value="X.X.X.X"/>
                 </fmt:message>
             </a>

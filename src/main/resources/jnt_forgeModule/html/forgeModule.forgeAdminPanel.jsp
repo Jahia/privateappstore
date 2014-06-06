@@ -56,16 +56,16 @@
 
     <section id="moduleForgeAdminPanel" ${viewAsUser ? 'class="viewAs"' : ''}>
 
-        <h4><fmt:message key="jnt_forgeModule.label.admin.title"/></h4>
+        <h4><fmt:message key="jnt_forgeEntry.label.admin.title"/></h4>
 
         <div class="btn-group">
             <button class="forgeAdminBtn btn btn-small ${reviewedByJahia ? 'btn-success' : 'btn-danger'}"
                     data-value="${reviewedByJahia}" data-name="reviewedByJahia">
-                <fmt:message key="jnt_forgeModule.label.admin.reviewedByJahia"/>
+                <fmt:message key="jnt_forgeEntry.label.admin.reviewedByJahia"/>
             </button>
             <button class="forgeAdminBtn btn btn-small ${supportedByJahia ? 'btn-success' : 'btn-danger'}"
                     data-value="${supportedByJahia}" data-name="supportedByJahia">
-                <fmt:message key="jnt_forgeModule.label.admin.supportedByJahia"/>
+                <fmt:message key="jnt_forgeEntry.label.admin.supportedByJahia"/>
             </button>
         </div>
 

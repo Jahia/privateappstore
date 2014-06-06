@@ -123,16 +123,16 @@
                     },
                     messages: {
                         provider: {
-                            required: "<fmt:message key='jnt_forgeModule.label.askVideoProvider'/>"
+                            required: "<fmt:message key='jnt_forgeEntry.label.askVideoProvider'/>"
                         },
                         identifier: {
-                            required: "<fmt:message key='jnt_forgeModule.label.askVideoIdentifier'/>"
+                            required: "<fmt:message key='jnt_forgeEntry.label.askVideoIdentifier'/>"
                         },
                         width: {
-                            integer: "<fmt:message key='jnt_forgeModule.label.askInteger'/>"
+                            integer: "<fmt:message key='jnt_forgeEntry.label.askInteger'/>"
                         },
                         height: {
-                            integer: "<fmt:message key='jnt_forgeModule.label.askInteger'/>"
+                            integer: "<fmt:message key='jnt_forgeEntry.label.askInteger'/>"
                         }
                     },
                     submitHandler: function(form) {
@@ -161,20 +161,20 @@
 
     <c:if test="${not isEmptyTab}">
 
-        <h2><fmt:message key="jnt_forgeModule.label.video"/></h2>
+        <h2><fmt:message key="jnt_forgeEntry.label.video"/></h2>
 
         <c:if test="${isDeveloper && not viewAsUser}">
 
             <c:choose>
                 <c:when test="${hasVideoNode}">
                     <p>
-                        <a id="toggle-video-${id}" href="#"><i class="icon-pencil"></i>&nbsp;<fmt:message key="jnt_forgeModule.label.edit"/></a>
-                        <a id="remove-video-${id}" href="#"><i class="icon-remove"></i>&nbsp;<fmt:message key="jnt_forgeModule.label.remove"/></a>
+                        <a id="toggle-video-${id}" href="#"><i class="icon-pencil"></i>&nbsp;<fmt:message key="jnt_forgeEntry.label.edit"/></a>
+                        <a id="remove-video-${id}" href="#"><i class="icon-remove"></i>&nbsp;<fmt:message key="jnt_forgeEntry.label.remove"/></a>
                     </p>
                 </c:when>
                 <c:otherwise>
                     <p>
-                        <a id="toggle-video-${id}" href="#"><i class="icon-plus"></i>&nbsp;<fmt:message key="jnt_forgeModule.label.add"/></a>
+                        <a id="toggle-video-${id}" href="#"><i class="icon-plus"></i>&nbsp;<fmt:message key="jnt_forgeEntry.label.add"/></a>
                     </p>
                 </c:otherwise>
             </c:choose>
@@ -184,7 +184,7 @@
                     <fieldset>
 
                         <div class="control-group">
-                            <label class="control-label" for="provider"><fmt:message key="jnt_forgeModule.label.videoProvider"/></label>
+                            <label class="control-label" for="provider"><fmt:message key="jnt_forgeEntry.label.videoProvider"/></label>
                             <div class="controls">
                                 <select name="provider" id="provider" >
                                     <option value="youtube" ${videoProvider eq 'youtube' ? 'selected' : ''}>youtube</option>
@@ -195,25 +195,25 @@
                         </div>
 
                         <div class="control-group">
-                            <label class="control-label" for="identifier"><fmt:message key="jnt_forgeModule.label.videoIdentifier"/></label>
+                            <label class="control-label" for="identifier"><fmt:message key="jnt_forgeEntry.label.videoIdentifier"/></label>
                             <div class="controls">
-                                <input placeholder="<fmt:message key="jnt_forgeModule.label.videoIdentifier" />" type="text"
+                                <input placeholder="<fmt:message key="jnt_forgeEntry.label.videoIdentifier" />" type="text"
                                        name="identifier" id="identifier" value="${videoIdentifier}"/>
                             </div>
                         </div>
 
                         <div class="control-group">
-                            <label class="control-label" for="width"><fmt:message key="jnt_forgeModule.label.videoWidth"/></label>
+                            <label class="control-label" for="width"><fmt:message key="jnt_forgeEntry.label.videoWidth"/></label>
                             <div class="controls">
-                                <input placeholder="<fmt:message key="jnt_forgeModule.label.videoWidth" />" type="text"
+                                <input placeholder="<fmt:message key="jnt_forgeEntry.label.videoWidth" />" type="text"
                                        name="width" id="width" value="${videoWidth}"/>
                             </div>
                         </div>
 
                         <div class="control-group">
-                            <label class="control-label" for="height"><fmt:message key="jnt_forgeModule.label.videoHeight"/></label>
+                            <label class="control-label" for="height"><fmt:message key="jnt_forgeEntry.label.videoHeight"/></label>
                             <div class="controls">
-                                <input placeholder="<fmt:message key="jnt_forgeModule.label.videoHeight" />" type="text"
+                                <input placeholder="<fmt:message key="jnt_forgeEntry.label.videoHeight" />" type="text"
                                        name="height" id="height" value="${videoHeight}"/>
                             </div>
                         </div>
@@ -223,14 +223,14 @@
                                 <label class="checkbox">
                                     <input type="checkbox" name="allowfullscreen" id="allowfullscreen"
                                            ${empty videoAllowfullscreen || not empty videoAllowfullscreen && videoAllowfullscreen ? 'checked' : ''}/>
-                                    <fmt:message key="jnt_forgeModule.label.videoAllowfullscreen"/>
+                                    <fmt:message key="jnt_forgeEntry.label.videoAllowfullscreen"/>
                                 </label>
                             </div>
                         </div>
 
                         <div class="control-group">
                             <div class="controls">
-                                <input type="submit" class="btn btn-primary" value="<fmt:message key="jnt_forgeModule.label.submit"/>"/>
+                                <input type="submit" class="btn btn-primary" value="<fmt:message key="jnt_forgeEntry.label.submit"/>"/>
                             </div>
                         </div>
 

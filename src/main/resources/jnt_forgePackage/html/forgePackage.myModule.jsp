@@ -23,6 +23,6 @@
 <li>
     <a href="<c:url value="${currentNode.url}" context="/"/>">${title}</a>
     <c:if test="${not published}">
-        <span class="label label-important"><fmt:message key="jnt_forgeModule.label.notPublished"/></span>
+        <span class="label label-important"><fmt:message key="jnt_forgeEntry.label.notPublished"/></span>
     </c:if>
 </li>

@@ -31,7 +31,7 @@
 
 <c:set var="linked" value="${ui:getBindedComponent(currentNode, renderContext, 'j:bindedComponent')}"/>
 <c:set var="targetNode" value="${renderContext.mainResource.node}"/>
-<c:if test="${jcr:isNodeType(renderContext.mainResource.node, 'jnt:forgeModule')}">
+<c:if test="${jcr:isNodeType(renderContext.mainResource.node, 'jnt:forgeModule') or jcr:isNodeType(renderContext.mainResource.node, 'jnt:forgePackage')}">
     <jcr:node var="targetNode" path="${renderContext.mainResource.node.path}/screenshots"/>
     <c:set var="isDeveloper" value="${jcr:hasPermission(renderContext.mainResource.node, 'jcr:write')}"/>
     <c:if test="${isDeveloper}">
@@ -40,7 +40,6 @@
 </c:if>
 
 <c:if test="${isDeveloper && not viewAsUser}">
-
     <c:if test="${!empty currentNode.properties.target}">
         <c:set var="targetNode" value="${currentNode.properties.target.node}"/>
     </c:if>

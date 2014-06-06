@@ -29,7 +29,6 @@
 
 <template:include view="hidden.header"/>
 <c:set var="columnsNumber" value="4"/>
-
 <template:addResources type="inlinejavascript">
     <script type="text/javascript">
 
@@ -91,7 +90,6 @@
 
     </script>
 </template:addResources>
-
 <c:choose>
 
     <c:when test="${isDeveloper && not viewAsUser}">
@@ -102,7 +100,7 @@
                         data-name="${moduleScreenshot.name}" data-parent-path="${moduleScreenshot.parent.path}">
                         <img class="move-screenshot" src="${moduleScreenshot.thumbnailUrls['thumbnail2']}"/>
                         <a class="remove-screenshot" data-path="<c:url value='${url.base}${moduleScreenshot.path}'/>"
-                           href="#"><i class="icon-remove"></i>&nbsp;<fmt:message key="jnt_forgeModule.label.remove"/></a>
+                           href="#"><i class="icon-remove"></i>&nbsp;<fmt:message key="jnt_forgeEntry.label.remove"/></a>
                     </li>
                 </c:forEach>
             </ul>
@@ -135,5 +133,4 @@
     </c:otherwise>
 
 </c:choose>
-
 <template:include view="hidden.footer"/>

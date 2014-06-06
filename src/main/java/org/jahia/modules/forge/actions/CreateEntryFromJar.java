@@ -224,9 +224,9 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
                                 module = modulesList.addNode(subJarInputStream.getManifest().getMainAttributes().getValue("Bundle-SymbolicName"), "jnt:forgePackageModule");
                             }
                             
-                            module.setProperty("ModuleName", subJarInputStream.getManifest().getMainAttributes().getValue("Implementation-Title"));
-                            module.setProperty("ModuleVersion", subJarInputStream.getManifest().getMainAttributes().getValue("Implementation-Version"));
-                            module.setProperty("ModuleGroupId", subJarInputStream.getManifest().getMainAttributes().getValue("Jahia-GroupId"));
+                            module.setProperty("moduleName", subJarInputStream.getManifest().getMainAttributes().getValue("Implementation-Title"));
+                            module.setProperty("moduleVersion", subJarInputStream.getManifest().getMainAttributes().getValue("Implementation-Version"));
+                            module.setProperty("moduleGroupId", subJarInputStream.getManifest().getMainAttributes().getValue("Jahia-GroupId"));
                         }
 
                         logger.info("Private App Store Package {} successfully created and added to repository {}", packageName,

@@ -54,7 +54,7 @@
 <c:if test="${isDeveloper && not viewAsUser}">
 
     <c:url var="postURL" value="${url.base}${currentNode.path}"/>
-    <fmt:message var="labelEmpty" key="jnt_forgeModule.label.empty"/>
+    <fmt:message var="labelEmpty" key="jnt_forgeEntry.label.empty"/>
 
     <template:addResources type="inlinejavascript">
 
@@ -94,13 +94,13 @@
                     </c:when>
                     <c:otherwise>
                         $('#authorEmail-${id}').popover({
-                            title: '<fmt:message key="jnt_forgeModule.label.editAuthorEmail"/>',
+                            title: '<fmt:message key="jnt_forgeEntry.label.editAuthorEmail"/>',
                             <c:choose>
                                 <c:when test="${not empty userEmail}">
-                                    content: '<fmt:message key="jnt_forgeModule.label.uneditableAuthorEmail"/>',
+                                    content: '<fmt:message key="jnt_forgeEntry.label.uneditableAuthorEmail"/>',
                                 </c:when>
                                 <c:otherwise>
-                                    content: '<fmt:message key="jnt_forgeModule.label.emptyAuthorEmail"/>',
+                                    content: '<fmt:message key="jnt_forgeEntry.label.emptyAuthorEmail"/>',
                                 </c:otherwise>
                             </c:choose>
                             placement: 'top',
@@ -159,15 +159,15 @@
 
         <section class="moduleDescription">
 
-            <h2><fmt:message key="jnt_forgeModule.label.description"/></h2>
+            <h2><fmt:message key="jnt_forgeEntry.label.moduleDescription"/></h2>
 
             <c:if test="${isDeveloper && not viewAsUser}">
 
             <p class="editable-toggle">
-                <a id="toggle-description-${id}" href="#"><i class="icon-pencil"></i>&nbsp;<fmt:message key="jnt_forgeModule.label.edit"/></a>
+                <a id="toggle-description-${id}" href="#"><i class="icon-pencil"></i>&nbsp;<fmt:message key="jnt_forgeEntry.label.edit"/></a>
             </p>
 
-            <div data-original-title="<fmt:message key="jnt_forgeModule.label.description"/>" data-toggle="manual" data-name="description" data-type="wysihtml5"
+            <div data-original-title="<fmt:message key="jnt_forgeEntry.label.moduleDescription"/>" data-toggle="manual" data-name="description" data-type="wysihtml5"
                  data-pk="1" id="description-${id}" class="editable" tabindex="-1">
 
                 </c:if>
@@ -186,14 +186,14 @@
 
                     <c:when test="${isDeveloper && not viewAsUser}">
                         <a id="authorURL-${id}" class="btn btn-small btn-primary editable"
-                           data-original-title="<fmt:message key="jnt_forgeModule.label.editAuthorURL"/>" data-pk="1"
-                           data-type="text" data-name="authorURL" href="#" ><fmt:message key="jnt_forgeModule.label.editAuthorURL"/></a>
+                           data-original-title="<fmt:message key="jnt_forgeEntry.label.editAuthorURL"/>" data-pk="1"
+                           data-type="text" data-name="authorURL" href="#" ><fmt:message key="jnt_forgeEntry.label.editAuthorURL"/></a>
 
                         <c:choose>
                             <c:when test="${authorIsOrganisation}">
                                 <a id="authorEmail-${id}" class="btn btn-small btn-primary editable"
-                                   data-original-title="<fmt:message key="jnt_forgeModule.label.editAuthorEmail"/>" data-pk="1"
-                                   data-type="text" data-name="authorEmail" href="#"><fmt:message key="jnt_forgeModule.label.editAuthorEmail"/></a>
+                                   data-original-title="<fmt:message key="jnt_forgeEntry.label.editAuthorEmail"/>" data-pk="1"
+                                   data-type="text" data-name="authorEmail" href="#"><fmt:message key="jnt_forgeEntry.label.editAuthorEmail"/></a>
                             </c:when>
                             <c:otherwise>
                                 <a id="authorEmail-${id}" class="btn btn-small btn-primary" href="#">${not empty userEmail ? userEmail : labelEmpty}</a>
@@ -202,8 +202,8 @@
 
                         <section class="moduleTags">
 
-                            <h5><fmt:message key="jnt_forgeModule.label.tags"/></h5>
-                            <a href="#" id="tags-${id}" class="editable editable-click" data-type="select2" data-pk="1" data-original-title="<fmt:message key="jnt_forgeModule.label.developer.addTag"/>">
+                            <h5><fmt:message key="jnt_forgeEntry.label.tags"/></h5>
+                            <a href="#" id="tags-${id}" class="editable editable-click" data-type="select2" data-pk="1" data-original-title="<fmt:message key="jnt_forgeEntry.label.developer.addTag"/>">
                                 <c:forEach items="${assignedTags}" var="tag" varStatus="status">${tag.node.name}${not status.last ? ', ' : ''}</c:forEach>
                             </a>
 
@@ -213,14 +213,14 @@
 
                     <c:otherwise>
                         <c:if test="${not empty authorURL}">
-                            <a class="btn btn-small btn-primary" target="_blank" href="${authorURL}"><fmt:message key="jnt_forgeModule.label.authorURL"/></a>
+                            <a class="btn btn-small btn-primary" target="_blank" href="${authorURL}"><fmt:message key="jnt_forgeEntry.label.authorURL"/></a>
                         </c:if>
                         <c:choose>
                             <c:when test="${authorIsOrganisation && not empty authorEmail}">
-                                <a class="btn btn-small btn-primary" href="mailto:${authorEmail}?Subject=${fn:replace(title, " ","%20")}%20-%20Version:%20${versionNumber.string}"><fmt:message key="jnt_forgeModule.label.authorEmail"/></a>
+                                <a class="btn btn-small btn-primary" href="mailto:${authorEmail}?Subject=${fn:replace(title, " ","%20")}%20-%20Version:%20${versionNumber.string}"><fmt:message key="jnt_forgeEntry.label.authorEmail"/></a>
                             </c:when>
                             <c:when test="${not authorIsOrganisation && not empty userEmail}">
-                                <a class="btn btn-small btn-primary" href="mailto:${userEmail}?Subject=${fn:replace(title, " ","%20")}%20-%20Version:%20${versionNumber.string}"><fmt:message key="jnt_forgeModule.label.authorEmail"/></a>
+                                <a class="btn btn-small btn-primary" href="mailto:${userEmail}?Subject=${fn:replace(title, " ","%20")}%20-%20Version:%20${versionNumber.string}"><fmt:message key="jnt_forgeEntry.label.authorEmail"/></a>
                             </c:when>
                         </c:choose>
                         <c:if test="${not empty authorEmail}">
@@ -230,7 +230,7 @@
 
                             <section class="moduleTags">
 
-                                <h5><fmt:message key="jnt_forgeModule.label.tags"/></h5>
+                                <h5><fmt:message key="jnt_forgeEntry.label.tags"/></h5>
                                 <ul class="inline unstyled">
                                     <c:forEach items="${assignedTags}" var="tag" varStatus="status">
                                         <li class="tag">${tag.node.name}</li>
@@ -253,7 +253,7 @@
 
             <section class="moduleVideo">
 
-                <h2><fmt:message key="jnt_forgeModule.label.video"/></h2>
+                <h2><fmt:message key="jnt_forgeEntry.label.video"/></h2>
                 <template:module path="${videoNode.path}" view="forge"/>
 
             </section>

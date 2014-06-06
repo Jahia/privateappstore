@@ -19,10 +19,26 @@
 <template:addCacheDependency flushOnPathMatchingRegexp="${currentNode.path}/.*"/>
 <jcr:sql
         var="query"
-        sql="SELECT * FROM [jnt:forgeModuleVersion] AS moduleVersion
-            WHERE isdescendantnode(moduleVersion,['${currentNode.path}'])"
+        sql="SELECT * FROM [jnt:forgePackageVersion] AS packageVersion
+            WHERE isdescendantnode(packageVersion,['${currentNode.path}'])"
+        />
+<jcr:sql
+        var="filesQuery"
+        sql="SELECT * FROM [jnt:forgePackageVersion] AS packageVersion
+            WHERE isdescendantnode(packageVersion,['${currentNode.path}'])"
         />
 <c:set var="sortedModules" value="${forge:sortByVersion(query.nodes)}"/>
 <c:set target="${moduleMap}" property="latestVersion" value="${forge:latestVersion(sortedModules)}" />
 <c:set target="${moduleMap}" property="previousVersions" value="${forge:previousVersions(sortedModules)}" />
 <c:set target="${moduleMap}" property="nextVersions" value="${forge:nextVersions(sortedModules)}" />
+<c:if test="${not empty moduleMap.latestVersion.path}">
+    <jcr:sql
+            var="modulesQuery"
+            sql="SELECT * FROM [jnt:forgePackageModule] AS packageVersion
+            WHERE isdescendantnode(packageVersion,['${moduleMap.latestVersion.path}'])
+            ORDER BY [moduleName]" />
+    <c:set target="${moduleMap}" property="submodules" value="${modulesQuery.nodes}" />
+</c:if>
+
+
+

@@ -42,13 +42,9 @@
 </c:if>
 
 <div id="fileList${renderContext.mainResource.node.identifier}">
-
     <section id="moduleScreenshots">
-
-        <h2><fmt:message key="jnt_forgeModule.label.screenshots"/></h2>
-
+        <h2><fmt:message key="jnt_forgeEntry.label.screenshots"/></h2>
         <template:addCacheDependency path="${currentNode.path}/screenshots"/>
         <template:module node="${screenshots}"/>
-
     </section>
 </div>

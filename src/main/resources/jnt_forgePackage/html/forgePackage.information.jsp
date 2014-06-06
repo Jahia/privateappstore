@@ -56,10 +56,10 @@
 
 <c:if test="${isDeveloper && not viewAsUser}">
 
-    <fmt:message var="labelNotSelected" key="jnt_forgeModule.label.notSelected"/>
-    <fmt:message var="labelEmpty" key="jnt_forgeModule.label.empty"/>
-    <fmt:message var="labelEmptyOrganisation" key="jnt_forgeModule.label.developer.emptyOrganisation"/>
-    <fmt:message var="labelEmptyFullName" key="jnt_forgeModule.label.developer.emptyFullName"/>
+    <fmt:message var="labelNotSelected" key="jnt_forgeEntry.label.notSelected"/>
+    <fmt:message var="labelEmpty" key="jnt_forgeEntry.label.empty"/>
+    <fmt:message var="labelEmptyOrganisation" key="jnt_forgeEntry.label.developer.emptyOrganisation"/>
+    <fmt:message var="labelEmptyFullName" key="jnt_forgeEntry.label.developer.emptyFullName"/>
     <c:url var="postURL" value="${url.base}${currentNode.path}"/>
 
     <c:set var="moduleCategories" value="${renderContext.site.properties['rootCategory'].node}"/>
@@ -125,19 +125,19 @@
             <c:if test="${currentNode.properties['reviewedByJahia'].boolean}">
                 <span class="label label-success">
                     <i class="icon-ok icon-white"></i>
-                    <fmt:message key="jnt_forgeModule.label.admin.reviewedByJahia"/>
+                    <fmt:message key="jnt_forgeEntry.label.admin.reviewedByJahia"/>
                 </span>
             </c:if>
             <c:if test="${currentNode.properties['supportedByJahia'].boolean}">
                 <span class="label label-warning">
                     <i class="icon-wrench icon-white"></i>
-                    <fmt:message key="jnt_forgeModule.label.admin.supportedByJahia"/>
+                    <fmt:message key="jnt_forgeEntry.label.admin.supportedByJahia"/>
                 </span>
             </c:if>
         </div>
     </c:if>
 
-    <h4><fmt:message key="jnt_forgeModule.label.information"/></h4>
+    <h4><fmt:message key="jnt_forgeEntry.label.information"/></h4>
 
     <div itemscope="" itemtype="http://schema.org/SoftwareApplication">
         <span content="${title}" itemprop="name"></span>
@@ -147,38 +147,38 @@
             <span content="${tag.node.name}" itemprop="keywords"></span>
         </c:forEach>
 
-        <div class="term"><fmt:message key="jnt_forgeModule.label.moduleId"/></div>
+        <div class="term"><fmt:message key="jnt_forgeEntry.label.packageId"/></div>
         <div class="description">
             ${currentNode.name}
         </div>
 
-        <div class="term"><fmt:message key="jnt_forgeModule.label.groupId"/></div>
+        <%--<div class="term"><fmt:message key="jnt_forgeModule.label.groupId"/></div>
         <div class="description">
             ${currentNode.properties['groupId'].string}
-        </div>
+        </div>--%>
 
-        <div class="term"><fmt:message key="jnt_forgeModule.label.updated"/></div>
+        <div class="term"><fmt:message key="jnt_forgeEntry.label.updated"/></div>
         <div class="description">
             <time itemprop="datePublished">
                 <fmt:formatDate value="${latestVersion.properties['jcr:lastModified'].date.time}" pattern="yyyy-MM-dd" />
             </time>
         </div>
 
-        <div class="term"><fmt:message key="jnt_forgeModule.label.version"/></div>
+        <div class="term"><fmt:message key="jnt_forgeEntry.label.version"/></div>
         <div class="description" itemprop="softwareVersion">${versionNumber.string}</div>
 
         <c:if test="${not empty requiredVersion}">
-            <div class="term"><fmt:message key="jnt_forgeModule.label.relatedJahiaVersion"/></div>
+            <div class="term"><fmt:message key="jnt_forgeEntry.label.relatedJahiaVersion"/></div>
             <div class="description">${requiredVersion.node.displayableName}</div>
         </c:if>
 
 
         <div itemtype="http://schema.org/Organization" itemscope="" itemprop="author">
 
-            <div class="term"><fmt:message key="jnt_forgeModule.label.authorName"/></div>
+            <div class="term"><fmt:message key="jnt_forgeEntry.label.authorName"/></div>
             <div class="description" itemprop="name">
                 <c:if test="${isDeveloper && not viewAsUser}">
-                    <a data-original-title="<fmt:message key="jnt_forgeModule.label.askAuthorNameDisplayedAs"/>" data-name="authorNameDisplayedAs" data-pk="1" data-type="select"
+                    <a data-original-title="<fmt:message key="jnt_forgeEntry.label.askAuthorNameDisplayedAs"/>" data-name="authorNameDisplayedAs" data-pk="1" data-type="select"
                        id="authorName-information-${id}" href="#" class="editable editable-click">
                 </c:if>
                 ${authorName}
@@ -193,7 +193,7 @@
         </div>
 
         <c:if test="${jcr:isNodeType(currentNode, 'jmix:rating') && nbOfVotes gt 0}">
-            <div class="term"><fmt:message key="jnt_forgeModule.label.rating"/></div>
+            <div class="term"><fmt:message key="jnt_forgeEntry.label.rating"/></div>
             <div class="description" itemtype="http://schema.org/AggregateRating" itemscope="" itemprop="aggregateRating">
                 <span itemprop="worstRating" content="1"></span>
                 <span itemprop="bestRating" content="5"></span>
@@ -205,10 +205,10 @@
             </div>
         </c:if>
 
-        <div class="term"><h4><fmt:message key="jnt_forgeModule.label.category"/></h4></div>
+        <div class="term"><h4><fmt:message key="jnt_forgeEntry.label.category"/></h4></div>
         <div class="description" itemprop="applicationCategory">
             <c:if test="${isDeveloper && not viewAsUser}">
-                <a data-original-title="<fmt:message key="jnt_forgeModule.label.askCategory"/>" data-name="j:defaultCategory" data-pk="1" data-type="select"
+                <a data-original-title="<fmt:message key="jnt_forgeEntry.label.askCategory"/>" data-name="j:defaultCategory" data-pk="1" data-type="select"
                    id="category-${id}" href="#" class="editable editable-click">
             </c:if>
             ${not empty category ? category.node.displayableName : labelNotSelected}

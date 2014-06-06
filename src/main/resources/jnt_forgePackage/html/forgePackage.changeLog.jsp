@@ -31,7 +31,6 @@
 <c:set value="${moduleMap.latestVersion}" var="latestVersion"/>
 <c:set value="${moduleMap.previousVersions}" var="previousVersions"/>
 <c:set value="${moduleMap.nextVersions}" var="nextVersions"/>
-
 <c:if test="${isDeveloper && not viewAsUser}">
 
     <template:addResources type="inlinejavascript">
@@ -63,7 +62,7 @@
         <section class="newVersions">
             <c:forEach items="${nextVersions}" var="nextVersion" varStatus="status">
                     <c:if test="${status.first}">
-                        <h2><fmt:message key="jnt_forgeModule.label.newVersions"/></h2>
+                        <h2><fmt:message key="jnt_forgeEntry.label.newVersions"/></h2>
                         <c:set var="newVersionAvailable" value="true" />
                     </c:if>
                     <article class="previousVersion">
@@ -83,7 +82,7 @@
         <c:when test="${not empty latestVersion}">
 
             <section class="whatsNew">
-                <h2><fmt:message key="jnt_forgeModule.label.version"/></h2>
+                <h2><fmt:message key="jnt_forgeEntry.label.version"/></h2>
                 <template:module node="${latestVersion}">
                     <template:param name="isDeveloper" value="${isDeveloper}"/>
                     <template:param name="viewAsUser" value="${viewAsUser}"/>
@@ -110,7 +109,7 @@
             <c:if test="${isDeveloper && not viewAsUser}">
                 <c:forEach items="${previousVersions}" var="previousVersion" varStatus="status">
                         <c:if test="${status.first}">
-                            <h2><fmt:message key="jnt_forgeModule.label.previousVersions"/></h2>
+                            <h2><fmt:message key="jnt_forgeEntry.label.previousVersions"/></h2>
                         </c:if>
                         <article class="previousVersion">
                             <template:module node="${previousVersion}">
@@ -124,7 +123,7 @@
                 <c:forEach items="${previousVersions}" var="previousVersion" varStatus="status">
                     <c:if test="${previousVersion.properties['published'].boolean}">
                         <c:if test="${status.first}">
-                            <h2><fmt:message key="jnt_forgeModule.label.previousVersions"/></h2>
+                            <h2><fmt:message key="jnt_forgeEntry.label.previousVersions"/></h2>
                         </c:if>
                         <article class="previousVersion">
                             ${previousVersion.path}
