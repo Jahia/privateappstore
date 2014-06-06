@@ -4,9 +4,8 @@
 <%@ taglib prefix="utility" uri="http://www.jahia.org/tags/utilityLib" %>
 <%@ taglib prefix="template" uri="http://www.jahia.org/tags/templateLib" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ taglib prefix="functions" uri="http://www.jahia.org/tags/functions" %>
-<%@ taglib prefix="user" uri="http://www.jahia.org/tags/user" %>
 <%@ taglib prefix="query" uri="http://www.jahia.org/tags/queryLib" %>
+<%@ taglib prefix="forge" uri="http://www.jahia.org/modules/forge/tags" %>
 <%--@elvariable id="currentNode" type="org.jahia.services.content.JCRNodeWrapper"--%>
 <%--@elvariable id="out" type="java.io.PrintWriter"--%>
 <%--@elvariable id="script" type="org.jahia.services.render.scripting.Script"--%>
@@ -17,14 +16,13 @@
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
-<c:set var="statement"
-       value="SELECT * FROM [jnt:content]
-                WHERE ISDESCENDANTNODE('${renderContext.site.path}/contents/modules-repository')
-                    AND [jcr:createdBy]='${currentUser.username}'
-                    AND ([jcr:primaryType] = 'jnt:forgeModule' OR [jcr:primaryType] = 'jnt:forgePackage')
-                ORDER BY [jcr:title] ASC"/>
-
-<query:definition var="listQuery" statement="${statement}"/>
-<c:set target="${moduleMap}" property="listQuery" value="${listQuery}" />
-<c:set target="${moduleMap}" property="subNodesView" value="myModule" />
-<template:addCacheDependency flushOnPathMatchingRegexp="${renderContext.site.path}/contents/modules-repository/.*"/>
+<template:addCacheDependency flushOnPathMatchingRegexp="${currentNode.path}/.*"/>
+<jcr:sql
+        var="query"
+        sql="SELECT * FROM [jnt:forgeModuleVersion] AS moduleVersion
+            WHERE isdescendantnode(moduleVersion,['${currentNode.path}'])"
+        />
+<c:set var="sortedModules" value="${forge:sortByVersion(query.nodes)}"/>
+<c:set target="${moduleMap}" property="latestVersion" value="${forge:latestVersion(sortedModules)}" />
+<c:set target="${moduleMap}" property="previousVersions" value="${forge:previousVersions(sortedModules)}" />
+<c:set target="${moduleMap}" property="nextVersions" value="${forge:nextVersions(sortedModules)}" />

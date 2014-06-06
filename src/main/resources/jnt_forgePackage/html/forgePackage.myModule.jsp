@@ -17,14 +17,12 @@
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
-<c:set var="statement"
-       value="SELECT * FROM [jnt:content]
-                WHERE ISDESCENDANTNODE('${renderContext.site.path}/contents/modules-repository')
-                    AND [jcr:createdBy]='${currentUser.username}'
-                    AND ([jcr:primaryType] = 'jnt:forgeModule' OR [jcr:primaryType] = 'jnt:forgePackage')
-                ORDER BY [jcr:title] ASC"/>
+<c:set var="title" value="${currentNode.properties['jcr:title'].string}"/>
+<c:set var="published" value="${currentNode.properties['published'].boolean}"/>
 
-<query:definition var="listQuery" statement="${statement}"/>
-<c:set target="${moduleMap}" property="listQuery" value="${listQuery}" />
-<c:set target="${moduleMap}" property="subNodesView" value="myModule" />
-<template:addCacheDependency flushOnPathMatchingRegexp="${renderContext.site.path}/contents/modules-repository/.*"/>
+<li>
+    <a href="<c:url value="${currentNode.url}" context="/"/>">${title}</a>
+    <c:if test="${not published}">
+        <span class="label label-important"><fmt:message key="jnt_forgeModule.label.notPublished"/></span>
+    </c:if>
+</li>

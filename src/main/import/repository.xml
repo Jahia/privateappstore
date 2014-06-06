@@ -217,7 +217,7 @@
                                       jcr:primaryType="jnt:translation"
                                       jcr:title="Private App Store Home"/>
                 </store-home>
-                <store-module j:applyOn="jnt:forgeModule"
+                    <store-module j:applyOn="jnt:forgeModule jnt:forgePackage"
                               j:defaultTemplate="true"
                               j:hiddenTemplate="false"
                               jcr:mixinTypes="jmix:accessControlled"

@@ -121,4 +121,3 @@
 [jnt:categorySettings] > jnt:content, mix:title, jmix:studioOnly, jmix:siteComponent
 
 [jnt:forgeUrl] > jnt:content, jmix:siteComponent, jmix:studioOnly
-
