@@ -66,7 +66,6 @@ import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
@@ -116,6 +115,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
                         packageParams.put("packageName", Arrays.asList(packageName));
                         packageParams.put("jcr:title", Arrays.asList(attributes.getValue("Jahia-Package-Name")));
                         packageParams.put("description", Arrays.asList(attributes.getValue("Jahia-Package-Description")));
+                        packageParams.put("versionNumber", Arrays.asList(version));
 
                         String reqVersionAttribute = "7.0.1.0";//attributes.getValue("Jahia-Required-Version");
                         final String requiredVersion = "version-" + reqVersionAttribute;
@@ -205,12 +205,25 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
                         JarInputStream jarInputStream = new JarInputStream(uploadedFile.getInputStream());
                         JarEntry jarEntry;
 
-                        JCRNodeWrapper modulesList = packageVersion.addNode("modulesList", "jnt:forgePackageModulesList");
+                        JCRNodeWrapper modulesList;
+
+                        if (packageVersion.hasNode("modulesList")) {
+                            modulesList = packageVersion.getNode("modulesList");
+                        } else {
+                            modulesList = packageVersion.addNode("modulesList", "jnt:forgePackageModulesList");
+                        }
 
                         while ((jarEntry = jarInputStream.getNextJarEntry()) != null) {
                             JarInputStream subJarInputStream = new JarInputStream(jar.getInputStream(jarEntry));
 
-                            JCRNodeWrapper module = modulesList.addNode(subJarInputStream.getManifest().getMainAttributes().getValue("Bundle-SymbolicName"), "jnt:forgePackageModule");
+                            JCRNodeWrapper module;
+
+                            if (modulesList.hasNode(subJarInputStream.getManifest().getMainAttributes().getValue("Bundle-SymbolicName"))) {
+                                module = modulesList.getNode(subJarInputStream.getManifest().getMainAttributes().getValue("Bundle-SymbolicName"));
+                            } else {
+                                module = modulesList.addNode(subJarInputStream.getManifest().getMainAttributes().getValue("Bundle-SymbolicName"), "jnt:forgePackageModule");
+                            }
+                            
                             module.setProperty("ModuleName", subJarInputStream.getManifest().getMainAttributes().getValue("Implementation-Title"));
                             module.setProperty("ModuleVersion", subJarInputStream.getManifest().getMainAttributes().getValue("Implementation-Version"));
                             module.setProperty("ModuleGroupId", subJarInputStream.getManifest().getMainAttributes().getValue("Jahia-GroupId"));
@@ -224,8 +237,8 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
 
                         session.save();
 
-                        return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("packageUrl", packageUrl).put(
-                                "packageAbsoluteUrl", packageAbsoluteUrl));
+                        return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("successRedirectUrl", packageUrl).put(
+                                "successRedirectAbsoluteUrl", packageAbsoluteUrl));
                     } else {
                         Map<String, List<String>> moduleParams = new HashMap<String, List<String>>();
                         String groupId;
@@ -365,8 +378,8 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
                         String moduleAbsoluteUrl = module.getProvider().getAbsoluteContextPath(request) + moduleUrl;
                         session.save();
 
-                        return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("moduleUrl", moduleUrl).put(
-                                "moduleAbsoluteUrl", moduleAbsoluteUrl));
+                        return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("successRedirectUrl", moduleUrl).put(
+                                "successRedirectAbsoluteUrl", moduleAbsoluteUrl));
                     }
                 } else {
                     String error = Messages.get("resources.private-app-store","forge.uploadJar.error.unable.read.manifest",session.getLocale());

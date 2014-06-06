@@ -56,7 +56,7 @@
  - published (boolean) = false autocreated
  - deleted (boolean) = false autocreated hidden
  - groupId (string)
- + screenshots (jnt:forgeModuleScreenshotsList) = jnt:forgeModuleScreenshotsList autocreated hidden
+ + screenshots (jnt:forgeScreenshotsList) = jnt:forgeScreenshotsList autocreated hidden
  + icon (jnt:folder)
  + video (jnt:videostreaming) = jnt:videostreaming
  + * (jnt:forgeModuleVersion)
@@ -74,7 +74,7 @@
  - reviewedByJahia (boolean) = false autocreated
  - published (boolean) = false autocreated
  - deleted (boolean) = false autocreated hidden
- + screenshots (jnt:forgeModuleScreenshotsList) = jnt:forgeModuleScreenshotsList autocreated hidden
+ + screenshots (jnt:forgeScreenshotsList) = jnt:forgeScreenshotsList autocreated hidden
  + icon (jnt:folder)
  + video (jnt:videostreaming) = jnt:videostreaming
  + * (jnt:forgePackageVersion)
@@ -88,7 +88,7 @@
  - beta (long)
  - qualifier (string) multiple
 
-[jnt:forgeModuleVersion]> jnt:content, jmix:editorialContent, jmix:forge
+[jnt:forgeModuleVersion] > jnt:content, jmix:editorialContent, jmix:forge
  - requiredVersion (weakreference, choicelist[nodes='$currentSite/contents/modules-required-versions//*;jnt:text'])
  - versionNumber (string)
  - fileDsaSignature (string)
@@ -96,7 +96,7 @@
  - published (boolean) = false autocreated
  - url (string)
 
-[jnt:forgePackageVersion]> jnt:content, jmix:editorialContent, jmix:forge
+[jnt:forgePackageVersion] > jnt:content, jmix:editorialContent, jmix:forge
  - requiredVersion (weakreference, choicelist[nodes='$currentSite/contents/modules-required-versions//*;jnt:text'])
  - versionNumber (string)
  - fileDsaSignature (string)
@@ -105,7 +105,7 @@
  + modulesList (jnt:forgePackageModulesList)
  + * (jnt:file)
 
-[jnt:forgeModuleScreenshotsList] > jnt:content, jmix:list orderable
+[jnt:forgeScreenshotsList] > jnt:content, jmix:list orderable
  + * (jnt:file) = jnt:file
 
 [jmix:forgeSettings] mixin

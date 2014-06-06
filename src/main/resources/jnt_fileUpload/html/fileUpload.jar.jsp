@@ -69,7 +69,7 @@
                             if (result.error != undefined && result.error.length >0) {
                                 $("#error${currentNode.identifier}").html(result.error);
                             } else {
-                                window.location = result.moduleUrl;
+                                window.location = result.successRedirectUrl;
                             }
                         },
                         acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
