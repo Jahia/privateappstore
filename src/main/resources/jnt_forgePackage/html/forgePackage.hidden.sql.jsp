@@ -31,11 +31,18 @@
 <c:set target="${moduleMap}" property="latestVersion" value="${forge:latestVersion(sortedModules)}" />
 <c:set target="${moduleMap}" property="previousVersions" value="${forge:previousVersions(sortedModules)}" />
 <c:set target="${moduleMap}" property="nextVersions" value="${forge:nextVersions(sortedModules)}" />
-
+<c:choose>
+    <c:when test="${empty moduleMap.latestVersion}">
+        <c:set var="versionNode" value="${sortedModules[0]}"/>
+    </c:when>
+    <c:otherwise>
+        <c:set var="versionNode" value="${moduleMap.latestVersion}"/>
+    </c:otherwise>
+</c:choose>
 <jcr:sql
         var="modulesQuery"
         sql="SELECT * FROM [jnt:forgePackageModule] AS packageVersion
-        WHERE isdescendantnode(packageVersion,['${sortedModules[0].path}'])
+        WHERE isdescendantnode(packageVersion,['${versionNode.path}'])
         ORDER BY [moduleName]" />
 <c:set target="${moduleMap}" property="submodules" value="${modulesQuery.nodes}" />
 
