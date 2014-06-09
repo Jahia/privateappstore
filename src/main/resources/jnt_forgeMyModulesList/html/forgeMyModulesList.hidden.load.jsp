@@ -26,5 +26,5 @@
 
 <query:definition var="listQuery" statement="${statement}"/>
 <c:set target="${moduleMap}" property="listQuery" value="${listQuery}" />
-<c:set target="${moduleMap}" property="subNodesView" value="myModule" />
+<c:set target="${moduleMap}" property="subNodesView" value="list" />
 <template:addCacheDependency flushOnPathMatchingRegexp="${renderContext.site.path}/contents/modules-repository/.*"/>
