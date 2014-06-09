@@ -36,7 +36,6 @@
 [jnt:forgePackageModule] > jnt:content
  - moduleName (string)
  - moduleVersion (string)
- - moduleGroupId (string)
 
 [jnt:forgePackageModulesList] > jmix:list
  + * (jnt:forgePackageModule)
