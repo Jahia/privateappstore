@@ -254,13 +254,13 @@
         </section>
         <c:if test="${not empty moduleMap.submodules}">
             <section>
-                <h2>Current Package version modules </h2>
+                <h2><fmt:message key="jnt_forgeEntry.label.packageVersionModulesList"/></h2>
 
                 <table cellpadding="0" cellspacing="0" border="0" class="table table-hover table-bordered" id="modules_table">
                     <thead>
                     <tr>
-                        <th>Module Name</th>
-                        <th>Module Version</th>
+                        <th><fmt:message key="jnt_forgeEntry.label.moduleName"/></th>
+                        <th><fmt:message key="jnt_forgeEntry.label.moduleVersion"/></th>
                     </tr>
                     </thead>
                     <tbody>

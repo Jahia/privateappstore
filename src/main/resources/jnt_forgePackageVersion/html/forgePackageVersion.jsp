@@ -15,12 +15,13 @@
 <%--@elvariable id="currentResource" type="org.jahia.services.render.Resource"--%>
 <%--@elvariable id="currentUser" type="org.jahia.services.usermanager.JahiaUser"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
-
 <c:set var="id" value="${currentNode.identifier}"/>
 <jcr:nodeProperty node="${currentNode}" name="changeLog" var="changeLog"/>
 <jcr:nodeProperty node="${currentNode}" name="versionNumber" var="versionNumber"/>
 <jcr:nodeProperty node="${currentNode}" name="requiredVersion" var="requiredVersion"/>
 <jcr:nodeProperty node="${currentNode}" name="published" var="published"/>
+<template:include view="versionHidden.sql"/>
+
 
 <c:if test="${isDeveloper && not viewAsUser}">
 
@@ -99,6 +100,25 @@ ${changeLog.string}
 <c:if test="${isDeveloper && not viewAsUser}">
     </div>
 </c:if>
+
+<h2><fmt:message key="jnt_forgeEntry.modulesList"/></h2>
+
+<table cellpadding="0" cellspacing="0" border="0" class="table table-hover table-bordered" id="modules_table">
+    <thead>
+    <tr>
+        <th><fmt:message key="jnt_forgeEntry.label.moduleName"/></th>
+        <th><fmt:message key="jnt_forgeEntry.label.moduleVersion"/></th>
+    </tr>
+    </thead>
+    <tbody>
+    <c:forEach items="${moduleMap.submodules}" var="submodule">
+        <tr>
+            <td>${submodule.properties['moduleName'].string}</td>
+            <td>${submodule.properties['moduleVersion'].string}</td>
+        </tr>
+    </c:forEach>
+    </tbody>
+</table>
 
 <footer>
     <dl class="inline">
