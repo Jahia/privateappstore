@@ -94,7 +94,7 @@
 
             <c:if test="${isDeveloper && not viewAsUser}">
                 <div class="alert alert-info">
-                    <fmt:message key="jnt_forgeModule.label.developer.emptyChangeLog"/>
+                    <fmt:message key="jnt_forgePackage.label.developer.emptyChangeLog"/>
                 </div>
             </c:if>
 

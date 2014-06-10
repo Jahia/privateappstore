@@ -197,7 +197,7 @@
             <jcr:nodeProperty node="${moduleMap.latestVersion}" name="versionNumber" var="versionNumber"/>
             <c:set var="versionFiles" value="${jcr:getChildrenOfType(moduleMap.latestVersion, 'jnt:file')}"/>
             <c:forEach items="${versionFiles}" var="file" varStatus="status">
-                <a class="btn btn-block" href="<c:url value="${file.path}" context="/"/>"
+                <a class="btn btn-block" href="<c:url value="${url.files}${file.path}" context="/"/>"
                    <c:if test="${not isDeveloper}">onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')"</c:if>>
                     <i class="icon-download"></i>
                     <fmt:message key="jnt_forgeEntry.label.downloadCurrentVersion">

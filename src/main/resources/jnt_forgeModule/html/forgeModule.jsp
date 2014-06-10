@@ -36,7 +36,7 @@
         <a href="<c:url value="${currentNode.url}" context="/"/>">
             <c:url var="iconUrl" value="${url.currentModule}/img/icon.png"/>
             <img class="moduleIcon" src="${not empty icon.url ? icon.url : iconUrl}"
-                 alt="<fmt:message key="jnt_forgeModule.label.moduleIcon"><fmt:param value="${title}"/></fmt:message>"/>
+                 alt="<fmt:message key="jnt_forgeEntry.label.moduleIcon"><fmt:param value="${title}"/></fmt:message>"/>
         </a>
         <a href="<c:url value="${currentNode.url}" context="/"/>"><h4>${title}</h4></a>
         <p class="moduleAuthor">${authorName}</p>
@@ -46,10 +46,10 @@
 
     <footer class="badges">
         <c:if test="${currentNode.properties['reviewedByJahia'].boolean}">
-            <span class="badge badge-success badge-reviewedByJahia" data-toggle="tooltip" title="<fmt:message key="jnt_forgeModule.label.admin.reviewedByJahia"/>"><i class="icon-ok icon-white"></i></span>
+            <span class="badge badge-success badge-reviewedByJahia" data-toggle="tooltip" title="<fmt:message key="jnt_forgeEntry.label.admin.reviewedByJahia"/>"><i class="icon-ok icon-white"></i></span>
         </c:if>
         <c:if test="${currentNode.properties['supportedByJahia'].boolean}">
-            <span class="badge badge-warning badge-supportedByJahia" data-toggle="tooltip" title="<fmt:message key="jnt_forgeModule.label.admin.supportedByJahia"/>"><i class="icon-wrench icon-white"></i></span>
+            <span class="badge badge-warning badge-supportedByJahia" data-toggle="tooltip" title="<fmt:message key="jnt_forgeEntry.label.admin.supportedByJahia"/>"><i class="icon-wrench icon-white"></i></span>
         </c:if>
     </footer>
 
