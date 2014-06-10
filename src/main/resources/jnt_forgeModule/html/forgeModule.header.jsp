@@ -137,6 +137,7 @@
                 <div id="drop-box-file-upload-${currentNode.identifier}"><fmt:message key="forge.editModule.uploadIcon.label"/></div>
             </div>
         </form>
+        <div id="error${currentNode.identifier}" class="text-error"></div>
         <table id="files${currentNode.identifier}" class="table"></table>
         <script>
             /*global $ */
@@ -153,7 +154,7 @@
                             d = new Date();
                             $("#moduleIcon-${currentNode.identifier}").attr("src", response.iconUrl+"?"+d.getTime());
                         } else {
-                            alert(response.errorMessage);
+                            $("#error${currentNode.identifier}").html(response.errorMessage);
                         }
 
                     },
@@ -164,7 +165,9 @@
                         handler.formData = {
                             'jcrNodeType': "jnt:file",
                             'jcrReturnContentType': "json",
-                            'jcrReturnContentTypeOverride': 'application/json; charset=UTF-8'                    };
+                            'jcrReturnContentTypeOverride': 'application/json; charset=UTF-8'
+                        };
+                        $("#error${currentNode.identifier}").html("");
                         callBack();
                     },
                     buildUploadRow: function (files, index) {
