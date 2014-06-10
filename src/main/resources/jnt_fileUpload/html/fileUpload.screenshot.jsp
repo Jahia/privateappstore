@@ -48,7 +48,7 @@
               action="<c:url value='${url.base}${targetNode.path}'/>" method="POST" enctype="multipart/form-data"
               accept="application/json">
             <div id="file_upload_container" class="btn btn-block">
-                <input type="file" name="file" multiple>
+                <input type="file" name="file" accept="image/*" multiple>
                 <button><fmt:message key="forge.uploadScreenshots.label"/></button>
                 <div id="drop-box-file-upload-${currentNode.identifier}"><fmt:message key="forge.uploadScreenshots.label"/></div>
             </div>

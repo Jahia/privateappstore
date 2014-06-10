@@ -48,6 +48,7 @@ import org.jahia.api.Constants;
 import org.jahia.bin.ActionResult;
 import org.jahia.commons.Version;
 import org.jahia.data.templates.ModuleReleaseInfo;
+import org.jahia.data.templates.ModulesPackage;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.decorator.JCRSiteNode;
@@ -135,7 +136,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
 
         JCRNodeWrapper modulesPackage;
 
-        String packageName = attributes.getValue("Bundle-SymbolicName");
+        String packageName = attributes.getValue("Bundle-SymbolicName");//Jahia-Package-ID
         String packageRelPath = "packages/" + packageName;
         String version = attributes.getValue("Jahia-Package-Version");
 
@@ -156,25 +157,18 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
 
         packageParams.put("requiredVersion", Arrays.asList(versions.getNode(requiredVersion).getIdentifier()));
 
-        // create list of modules to add in jcr
-        JarInputStream jarInputStream = new JarInputStream(uploadedFile.getInputStream());
-        JarEntry jarEntry;
+        // Get list of modules from packages
+        Map<String, ModulesPackage.PackagedModule> packagedModuleMap = ModulesPackage.create(jar).getModules();
 
-        List<Map> moduleParamsList = new ArrayList<Map>();
-
-        while ((jarEntry = jarInputStream.getNextJarEntry()) != null) {
-            JarInputStream subJarInputStream = new JarInputStream(jar.getInputStream(jarEntry));
-            if (subJarInputStream.getManifest() != null) {
-                if (subJarInputStream.getManifest().getMainAttributes().getValue("Bundle-SymbolicName") == null) {
-                    String error = Messages.getWithArgs("resources.private-app-store","forge.uploadJar.package.error.missing.manifest.attribute.bundleSymbolicName",session.getLocale(), jarEntry.getName());
-                    return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
-                } else {
-                    Map<String, String> moduleParams = new HashMap<String, String>();
-                    moduleParams.put("Bundle-SymbolicName", subJarInputStream.getManifest().getMainAttributes().getValue("Bundle-SymbolicName"));
-                    moduleParams.put("moduleName", subJarInputStream.getManifest().getMainAttributes().getValue("Implementation-Title"));
-                    moduleParams.put("moduleVersion", subJarInputStream.getManifest().getMainAttributes().getValue("Implementation-Version"));
-                    moduleParamsList.add(moduleParams);
-                }
+        // check for each modules if manifest have Bundle-SymbolicName
+        for(String mapKey : packagedModuleMap.keySet()){
+            if (packagedModuleMap.get(mapKey).getManifestAttributes().getValue("Bundle-SymbolicName") == null) {
+                String error = Messages.getWithArgs("resources.private-app-store","forge.uploadJar.package.error.missing.manifest.attribute.bundleSymbolicName",session.getLocale(), StringUtils.substringBeforeLast(packagedModuleMap.get(mapKey).getModuleFile().getName(), ".jar") + ".jar");
+                return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
+            }
+            if (packagedModuleMap.get(mapKey).getManifestAttributes().getValue("Jahia-GroupId") == null) {
+                String error = Messages.getWithArgs("resources.private-app-store","forge.uploadJar.package.error.missing.manifest.attribute.jahiaGroupId",session.getLocale(), StringUtils.substringBeforeLast(packagedModuleMap.get(mapKey).getModuleFile().getName(), ".jar") + ".jar");
+                return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
             }
         }
 
@@ -250,17 +244,17 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
             modulesList = packageVersion.addNode("modulesList", "jnt:forgePackageModulesList");
         }
 
-        for (Map<String, String> moduleParameters : moduleParamsList ) {
+        for(String mapKey : packagedModuleMap.keySet()){
             JCRNodeWrapper module;
-            
-            if (modulesList.hasNode(moduleParameters.get("Bundle-SymbolicName"))) {
-                module = modulesList.getNode(moduleParameters.get("Bundle-SymbolicName"));
+
+            if (modulesList.hasNode(packagedModuleMap.get(mapKey).getManifestAttributes().getValue("Bundle-SymbolicName"))) {
+                module = modulesList.getNode(packagedModuleMap.get(mapKey).getManifestAttributes().getValue("Bundle-SymbolicName"));
             } else {
-                module = modulesList.addNode(moduleParameters.get("Bundle-SymbolicName"), "jnt:forgePackageModule");
+                module = modulesList.addNode(packagedModuleMap.get(mapKey).getManifestAttributes().getValue("Bundle-SymbolicName"), "jnt:forgePackageModule");
             }
 
-            module.setProperty("moduleName", moduleParameters.get("moduleName"));
-            module.setProperty("moduleVersion", moduleParameters.get("moduleVersion"));
+            module.setProperty("moduleName", packagedModuleMap.get(mapKey).getManifestAttributes().getValue("Implementation-Title"));
+            module.setProperty("moduleVersion", packagedModuleMap.get(mapKey).getManifestAttributes().getValue("Implementation-Version"));
         }
 
         logger.info("Private App Store Package {} successfully created and added to repository {}", packageName,

@@ -130,7 +130,7 @@
               action="<c:url value='${url.base}${renderContext.mainResource.node.path}.updateModuleIcon.do'/>" method="POST" enctype="multipart/form-data"
               accept="application/json">
             <div id="file_upload_container-${currentNode.identifier}" class="btn btn-block">
-                <input type="file" name="file" multiple>
+                <input type="file" name="file" accept="image/*" multiple>
                 <button><fmt:message key="forge.editModule.uploadIcon.label"/></button>
                 <div id="drop-box-file-upload-${currentNode.identifier}"><fmt:message key="forge.editModule.uploadIcon.label"/></div>
             </div>

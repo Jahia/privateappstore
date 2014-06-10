@@ -54,7 +54,7 @@
 
             </form>
             </template:tokenizedForm>
-            <div id="error${currentNode.identifier}" class="error"></div>
+            <div id="error${currentNode.identifier}" class="error text-error"></div>
             <table id="files${currentNode.identifier}" class="table"></table>
             <script>
                 /*global $ */
