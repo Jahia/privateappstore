@@ -91,19 +91,25 @@ public class UpdateModuleIcon extends PrivateAppStoreAction {
         if (fileUpload != null && fileUpload.getFileItems() != null && fileUpload.getFileItems().size() > 0) {
             final Map<String, DiskFileItem> stringDiskFileItemMap = fileUpload.getFileItems();
             DiskFileItem itemEntry = stringDiskFileItemMap.get(stringDiskFileItemMap.keySet().iterator().next());
-            icon = iconFolder.uploadFile(itemEntry.getName(), itemEntry.getInputStream(),
-                    JCRContentUtils.getMimeType(itemEntry.getName(), itemEntry.getContentType()));
-            String fileExtension = FilenameUtils.getExtension(icon.getName());
+            if (StringUtils.substringBefore(itemEntry.getContentType(), "/").equals("image")) {
+                icon = iconFolder.uploadFile(itemEntry.getName(), itemEntry.getInputStream(),
+                        JCRContentUtils.getMimeType(itemEntry.getName(), itemEntry.getContentType()));
+                String fileExtension = FilenameUtils.getExtension(icon.getName());
 
-            final File f = File.createTempFile("thumb", "." + fileExtension);
-            imageService.createThumb(imageService.getImage(icon), f, 125, false);
-            InputStream is = new FileInputStream(f);
-            icon = iconFolder.uploadFile(itemEntry.getName(),is,JCRContentUtils.getMimeType(itemEntry.getName(),itemEntry.getContentType()));
-            is.close();
-            session.save();
-            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("iconUpdate", true).put("iconUrl",icon.getUrl()));
+                final File f = File.createTempFile("thumb", "." + fileExtension);
+                imageService.createThumb(imageService.getImage(icon), f, 125, false);
+                InputStream is = new FileInputStream(f);
+                icon = iconFolder.uploadFile(itemEntry.getName(),is,JCRContentUtils.getMimeType(itemEntry.getName(),itemEntry.getContentType()));
+                is.close();
+                session.save();
+                return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("iconUpdate", true).put("iconUrl",icon.getUrl()));
+            } else {
+                String error = Messages.get("resources.private-app-store", "forge.updateIcon.error.wrong.format", session.getLocale());
+
+                return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("iconUpdate", false).put("errorMessage",error));
+            }
         } else {
-            String error = Messages.get("resources.private-app-store", "forge.updateIcon.error.wrong.format", session.getLocale());
+            String error = Messages.get("resources.private-app-store", "forge.updateIcon.error.noFileFound", session.getLocale());
 
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("iconUpdate", false).put("errorMessage",error));
         }
