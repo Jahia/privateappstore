@@ -136,7 +136,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
 
         JCRNodeWrapper modulesPackage;
 
-        String packageName = attributes.getValue("Bundle-SymbolicName");//Jahia-Package-ID
+        String packageName = attributes.getValue("Jahia-Package-ID");
         String packageRelPath = "packages/" + packageName;
         String version = attributes.getValue("Jahia-Package-Version");
 
