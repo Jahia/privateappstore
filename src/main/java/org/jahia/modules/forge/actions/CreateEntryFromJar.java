@@ -40,6 +40,7 @@
  */
 package org.jahia.modules.forge.actions;
 
+import com.ctc.wstx.util.StringUtil;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -102,7 +103,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
                 Manifest manifest = jar.getManifest();
                 if (manifest != null) {
                     Attributes attributes = manifest.getMainAttributes();
-                    if (attributes.getValue("Jahia-Package-Name") != null) {
+                    if (attributes.getValue("Jahia-Package-ID") != null) {
                         return createPackage(uploadedFile, jar, attributes, request, renderContext, resource, session);
                     } else {
                         return createModule(uploadedFile, attributes, request, renderContext, resource, session, extension);
@@ -149,7 +150,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
 
         String reqVersionAttribute = attributes.getValue("Jahia-Required-Version");
         final String requiredVersion = "version-" + reqVersionAttribute;
-        if (packageName ==null || reqVersionAttribute == null || version == null) {
+        if (StringUtils.isEmpty(packageName) || StringUtils.isEmpty(reqVersionAttribute) || StringUtils.isEmpty(version)) {
             String error = Messages.get("resources.private-app-store","forge.uploadJar.package.error.missing.manifest.attribute",session.getLocale());
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
         }
@@ -162,11 +163,11 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
 
         // check for each modules if manifest have Bundle-SymbolicName
         for(String mapKey : packagedModuleMap.keySet()){
-            if (packagedModuleMap.get(mapKey).getManifestAttributes().getValue("Bundle-SymbolicName") == null) {
+            if (StringUtils.isEmpty(packagedModuleMap.get(mapKey).getManifestAttributes().getValue("Bundle-SymbolicName"))) {
                 String error = Messages.getWithArgs("resources.private-app-store","forge.uploadJar.package.error.missing.manifest.attribute.bundleSymbolicName",session.getLocale(), StringUtils.substringBeforeLast(packagedModuleMap.get(mapKey).getModuleFile().getName(), ".jar") + ".jar");
                 return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
             }
-            if (packagedModuleMap.get(mapKey).getManifestAttributes().getValue("Jahia-GroupId") == null) {
+            if (StringUtils.isEmpty(packagedModuleMap.get(mapKey).getManifestAttributes().getValue("Jahia-GroupId"))) {
                 String error = Messages.getWithArgs("resources.private-app-store","forge.uploadJar.package.error.missing.manifest.attribute.jahiaGroupId",session.getLocale(), StringUtils.substringBeforeLast(packagedModuleMap.get(mapKey).getModuleFile().getName(), ".jar") + ".jar");
                 return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
             }
