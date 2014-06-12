@@ -45,12 +45,21 @@
                         var bar = $('#completion-${id}').css('width', completion+"%");
                         bar.children('.ratingCount').html(completion+"%");
 
-                        if (completion < 60)
+                        if (completion < 60){
+                            bar.removeClass('bar-success');
+                            bar.removeClass('bar-warning');
                             bar.addClass('bar-danger');
-                        else if (!canBePublished)
+                        }
+                        else if (!canBePublished){
+                            bar.removeClass('bar-success');
+                            bar.removeClass('bar-danger');
                             bar.addClass('bar-warning');
-                        else
+                        }
+                        else{
+                            bar.removeClass('bar-danger');
+                            bar.removeClass('bar-warning');
                             bar.addClass('bar-success');
+                        }
 
                         if (canBePublished)
                             $('#publishModule-${id}').removeClass('disabled');
