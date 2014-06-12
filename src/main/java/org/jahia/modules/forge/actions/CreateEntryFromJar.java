@@ -103,7 +103,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
                 Manifest manifest = jar.getManifest();
                 if (manifest != null) {
                     Attributes attributes = manifest.getMainAttributes();
-                    if (attributes.getValue("Jahia-Package-ID") != null) {
+                    if (attributes.getValue("Jahia-Package-Name") != null) {
                         return createPackage(uploadedFile, jar, attributes, request, renderContext, resource, session);
                     } else {
                         return createModule(uploadedFile, attributes, request, renderContext, resource, session, extension);
@@ -296,7 +296,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
         String forgeUrl = StringUtils.substringBefore(request.getRequestURL().toString(), "/render");
         String reqVersionAttribute = attributes.getValue("Jahia-Required-Version");
         final String requiredVersion = "version-" + reqVersionAttribute;
-        if (moduleName == null || groupId == null || reqVersionAttribute == null) {
+        if (StringUtils.isEmpty(moduleName) || StringUtils.isEmpty(groupId) || StringUtils.isEmpty(reqVersionAttribute)) {
             String error = Messages.get("resources.private-app-store","forge.uploadJar.error.missing.manifest.attribute",session.getLocale());
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
         }
@@ -429,7 +429,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
 
     private boolean hasValidVersionNumber(JCRNodeWrapper node, String versionNumber) throws RepositoryException {
 
-        if (versionNumber == null ) {
+        if (StringUtils.isEmpty(versionNumber)) {
             return false;
         }
 
