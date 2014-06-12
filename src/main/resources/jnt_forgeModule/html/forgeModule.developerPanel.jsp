@@ -120,13 +120,17 @@
 
                             var published = result['published'];
                             if (result['published'] != null) {
-                                btn.toggleClass('btn-success btn-danger');
+                                //btn.toggleClass('btn-success btn-danger');
                                 btn.attr("data-value", result['published']);
 
-                                if (published)
-                                    btn.text('<fmt:message key="jnt_forgeEntry.label.developer.unpublish"/>');
-                                else
-                                    btn.text('<fmt:message key="jnt_forgeEntry.label.developer.publish"/>');
+                                if (published){
+                                    //btn.text('<fmt:message key="jnt_forgeEntry.label.developer.unpublish"/>');
+                                    window.location.reload();
+                                }
+                                else{
+                                   // btn.text('<fmt:message key="jnt_forgeEntry.label.developer.publish"/>');
+                                    window.location.reload();
+                                }
                             }
 
                         }, "json");
