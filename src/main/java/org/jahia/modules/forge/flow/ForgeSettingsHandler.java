@@ -1,14 +1,12 @@
 /**
  * ==========================================================================================
- * =                        DIGITAL FACTORY v7.0 - Enterprise Distribution                  =
+ * =                            JAHIA'S ENTERPRISE DISTRIBUTION                             =
  * ==========================================================================================
  *
- *     Copyright (C) 2002-2014 Jahia Solutions Group. All rights reserved.
- *
- *     Rooted in Open Source CMS, Jahia's Digital Industrialization paradigm is about
+ *     Rooted in Open Source CMS, Jahia’s Digital Industrialization paradigm is about
  *     streamlining Enterprise digital projects across channels to truly control
  *     time-to-market and TCO, project after project.
- *     Putting an end to "the Tunnel effect", the Jahia Studio enables IT and
+ *     Putting an end to “the Tunnel effect”, the Jahia Studio enables IT and
  *     marketing teams to collaboratively and iteratively build cutting-edge
  *     online business solutions.
  *     These, in turn, are securely and easily deployed as modules and apps,
@@ -23,20 +21,25 @@
  *
  *     For more information, please visit http://www.jahia.com
  *
- * JAHIA'S ENTERPRISE DISTRIBUTION - IMPORTANT LICENSING INFORMATION
- * ===============================================================
+ * JAHIA'S ENTERPRISE DISTRIBUTIONS LICENSING - IMPORTANT INFORMATION
+ * ==========================================================================================
  *
- *     This file is part of a Jahia Enterprise Distribution.
+ *     Copyright (C) 2002-2014 Jahia Solutions Group. All rights reserved.
  *
- *     Jahia's Enterprise Distributions must be used in accordance
- *     with the terms contained in the Jahia Solutions Group Terms & Conditions as well as
+ *     This file is part of a Jahia's Enterprise Distribution.
+ *
+ *     Jahia's Enterprise Distributions must be used in accordance with the terms
+ *     contained in the Jahia Solutions Group Terms & Conditions as well as
  *     the Jahia Sustainable Enterprise License (JSEL).
  *
- *     See the license for the rights, obligations and limitations governing use
- *     of the contents of the software.
+ *     For questions regarding licensing, support, production usage...
+ *     please contact our team at sales@jahia.com or go to http://www.jahia.com/license.
  *
- *     For questions regarding licensing, support, production usage,
- *     please contact our team at sales@jahia.com or go to: http://www.jahia.com/license
+ * ==========================================================================================
+ *
+ *
+ *
+ *
  */
 package org.jahia.modules.forge.flow;
 
