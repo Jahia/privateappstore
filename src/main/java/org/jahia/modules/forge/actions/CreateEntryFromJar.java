@@ -154,27 +154,12 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
         String reqVersionAttribute = attributes.getValue("Jahia-Required-Version");
         final String requiredVersion = "version-" + reqVersionAttribute;
         if (StringUtils.isEmpty(packageName) || StringUtils.isEmpty(reqVersionAttribute) || StringUtils.isEmpty(version)) {
-            String error = Messages.get("resources.private-app-store","forge.uploadJar.package.error.missing.manifest.attribute",session.getLocale());
+            String error = Messages.get("resources.private-app-store","forge.uploadJar.error.missing.manifest.attribute",session.getLocale());
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
         }
         JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
 
         packageParams.put("requiredVersion", Arrays.asList(versions.getNode(requiredVersion).getIdentifier()));
-
-        // Get list of modules from packages
-        Map<String, ModulesPackage.PackagedModule> packagedModuleMap = ModulesPackage.create(jar).getModules();
-
-        // check for each modules if manifest have Bundle-SymbolicName
-        for(String mapKey : packagedModuleMap.keySet()){
-            if (StringUtils.isEmpty(packagedModuleMap.get(mapKey).getManifestAttributes().getValue("Bundle-SymbolicName"))) {
-                String error = Messages.getWithArgs("resources.private-app-store","forge.uploadJar.package.error.missing.manifest.attribute.bundleSymbolicName",session.getLocale(), StringUtils.substringBeforeLast(packagedModuleMap.get(mapKey).getModuleFile().getName(), ".jar") + ".jar");
-                return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
-            }
-            if (StringUtils.isEmpty(packagedModuleMap.get(mapKey).getManifestAttributes().getValue("Jahia-GroupId"))) {
-                String error = Messages.getWithArgs("resources.private-app-store","forge.uploadJar.package.error.missing.manifest.attribute.jahiaGroupId",session.getLocale(), StringUtils.substringBeforeLast(packagedModuleMap.get(mapKey).getModuleFile().getName(), ".jar") + ".jar");
-                return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
-            }
-        }
 
         // Create package
         List<String> packageParamKeys = Arrays.asList("description", "category", "icon", "authorNameDisplayedAs", "authorURL", "authorEmail", "FAQ", "downloadCount", "supportedByJahia", "reviewedByJahia", "published", "deleted", "screenshots", "video");
@@ -247,6 +232,9 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
         } else {
             modulesList = packageVersion.addNode("modulesList", "jnt:forgePackageModulesList");
         }
+
+        // Get list of modules from package
+        Map<String, ModulesPackage.PackagedModule> packagedModuleMap = ModulesPackage.create(jar).getModules();
 
         for(String mapKey : packagedModuleMap.keySet()){
             JCRNodeWrapper module;
