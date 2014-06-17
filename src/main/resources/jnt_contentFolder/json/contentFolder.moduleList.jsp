@@ -20,7 +20,7 @@
                         </c:when>
                         <c:otherwise>
                             <c:set var="versions" value="${jcr:getChildrenOfType(child, 'jnt:forgePackageVersion')}"/>
-                            <c:set var="groupID" value="${'PACKAGE'}"/>
+                            <c:set var="groupID" value="${'package'}"/>
                             <c:url var="downloadUrl" value="${url.files}${file.path}" context="/"/>
                         </c:otherwise>
                     </c:choose>
