@@ -107,6 +107,8 @@
 [jnt:forgeScreenshotsList] > jnt:content, jmix:list orderable
  + * (jnt:file) = jnt:file
 
+[jnt:forgeModuleScreenshotsList] > jnt:forgeScreenshotsList
+
 [jmix:forgeSettings] mixin
    extends = jnt:virtualsite
  - forgeSettingsUrl (string)
