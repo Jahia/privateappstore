@@ -107,12 +107,12 @@ public class UpdateModuleIcon extends PrivateAppStoreAction {
                 session.save();
                 return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("iconUpdate", true).put("iconUrl",icon.getUrl()));
             } else {
-                String error = Messages.get("resources.private-app-store", "forge.updateIcon.error.wrong.format", session.getLocale());
+                String error = Messages.get("resources.privateappstore", "forge.updateIcon.error.wrong.format", session.getLocale());
 
                 return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("iconUpdate", false).put("errorMessage",error));
             }
         } else {
-            String error = Messages.get("resources.private-app-store", "forge.updateIcon.error.noFileFound", session.getLocale());
+            String error = Messages.get("resources.privateappstore", "forge.updateIcon.error.noFileFound", session.getLocale());
 
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("iconUpdate", false).put("errorMessage",error));
         }

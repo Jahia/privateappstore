@@ -96,7 +96,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
         if (!StringUtils.contains(filename,"-SNAPSHOT.")) {
             String extension = StringUtils.substringAfterLast(filename, ".");
             if (!(StringUtils.equals(extension,"jar") || StringUtils.equals(extension,"war"))) {
-                String error = Messages.get("resources.private-app-store","forge.uploadJar.error.wrong.format",session.getLocale());
+                String error = Messages.get("resources.privateappstore","forge.uploadJar.error.wrong.format",session.getLocale());
                 return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
             }
             OutputStream out = null;
@@ -112,11 +112,11 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
                         return createModule(uploadedFile, attributes, request, renderContext, resource, session, extension);
                     }
                 } else {
-                    String error = Messages.get("resources.private-app-store","forge.uploadJar.error.unable.read.manifest",session.getLocale());
+                    String error = Messages.get("resources.privateappstore","forge.uploadJar.error.unable.read.manifest",session.getLocale());
                     return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
                 }
             } catch (IOException e) {
-                String error = Messages.get("resources.private-app-store","forge.uploadJar.error.unable.read.file",session.getLocale());
+                String error = Messages.get("resources.privateappstore","forge.uploadJar.error.unable.read.file",session.getLocale());
                 return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", error));
             } finally {
                 if (jar != null) {
@@ -130,7 +130,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
                 }
             }
         } else {
-            String error = Messages.get("resources.private-app-store", "forge.uploadJar.error.snapshot.not.allowed", session.getLocale());
+            String error = Messages.get("resources.privateappstore", "forge.uploadJar.error.snapshot.not.allowed", session.getLocale());
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", error));
         }
     }
@@ -154,7 +154,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
         String reqVersionAttribute = attributes.getValue("Jahia-Required-Version");
         final String requiredVersion = "version-" + reqVersionAttribute;
         if (StringUtils.isEmpty(packageName) || StringUtils.isEmpty(reqVersionAttribute) || StringUtils.isEmpty(version)) {
-            String error = Messages.get("resources.private-app-store","forge.uploadJar.error.missing.manifest.attribute",session.getLocale());
+            String error = Messages.get("resources.privateappstore","forge.uploadJar.error.missing.manifest.attribute",session.getLocale());
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
         }
         JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
@@ -209,7 +209,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
         logger.info("Start adding package version {} of {}", version, title);
 
         if (hasPackageVersions && !hasValidVersionNumber(modulesPackage, version)) {
-            String error = Messages.getWithArgs("resources.private-app-store", "forge.uploadJar.error.versionNumber", session.getLocale(), packageName, version);
+            String error = Messages.getWithArgs("resources.privateappstore", "forge.uploadJar.error.versionNumber", session.getLocale(), packageName, version);
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", error));
         }
 
@@ -288,7 +288,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
         String reqVersionAttribute = attributes.getValue("Jahia-Required-Version");
         final String requiredVersion = "version-" + reqVersionAttribute;
         if (StringUtils.isEmpty(moduleName) || StringUtils.isEmpty(groupId) || StringUtils.isEmpty(reqVersionAttribute)) {
-            String error = Messages.get("resources.private-app-store","forge.uploadJar.error.missing.manifest.attribute",session.getLocale());
+            String error = Messages.get("resources.privateappstore","forge.uploadJar.error.missing.manifest.attribute",session.getLocale());
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error",error));
         }
         String moduleRelPath = groupId.replace(".", "/") + "/" + moduleName;
@@ -313,7 +313,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
             moduleReleaseInfo.setPassword(password);
             templateManagerService.deployToMaven(groupId,moduleName,moduleReleaseInfo, artifact);
         } catch (IOException e) {
-            String error = Messages.get("resources.private-app-store","forge.uploadJar.error.cannot.upload",session.getLocale());
+            String error = Messages.get("resources.privateappstore","forge.uploadJar.error.cannot.upload",session.getLocale());
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", error));
         } finally {
             FileUtils.deleteQuietly(artifact);
@@ -372,7 +372,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
         logger.info("Start adding module version {} of {}", version, title);
 
         if (hasModuleVersions && !hasValidVersionNumber(module, version)) {
-            String error = Messages.getWithArgs("resources.private-app-store","forge.uploadJar.error.versionNumber",session.getLocale(),moduleName,version);
+            String error = Messages.getWithArgs("resources.privateappstore","forge.uploadJar.error.versionNumber",session.getLocale(),moduleName,version);
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("error", error));
         }
 

@@ -51,15 +51,15 @@
         <groupId>org.jahia.modules</groupId>
         <version>7.0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>private-app-store</artifactId>
+    <artifactId>privateappstore</artifactId>
     <name>Jahia Private App Store</name>
     <version>2.0.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <description>This is the custom module (Private App Store) for running on a Jahia server.</description>
     <scm>
-        <connection>scm:git:git@github.com:Jahia/private-app-store.git</connection>
-        <url>scm:git:git@github.com:Jahia/private-app-store.git</url>
-        <developerConnection>scm:git:git@github.com:Jahia/private-app-store.git</developerConnection>
+        <connection>scm:git:git@github.com:Jahia/privateappstore.git</connection>
+        <url>scm:git:git@github.com:Jahia/privateappstore.git</url>
+        <developerConnection>scm:git:git@github.com:Jahia/privateappstore.git</developerConnection>
     </scm>  
     <distributionManagement>
         <repository>
@@ -107,7 +107,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-            <Jahia-Depends>bootstrap,bootstrap-components,default,facets,rating,siteSettings,templates-private-app-store,videostreaming</Jahia-Depends>
+            <Jahia-Depends>bootstrap,bootstrap-components,default,facets,rating,siteSettings,templates-privateappstore,videostreaming</Jahia-Depends>
                         <Jahia-Module-Type>module</Jahia-Module-Type>
             <Embed-Dependency>*; scope=compile; type=!pom; inline=false</Embed-Dependency> 
                     </instructions>
@@ -120,9 +120,9 @@
                     <execution>
                         <id>package-importsite</id>
                         <configuration>
-                            <src>${basedir}/src/main/importsite-private-app-store</src>
+                            <src>${basedir}/src/main/importsite-privateappstore</src>
                             <dest>${project.build.directory}/${project.build.finalName}/META-INF</dest>
-                            <archiveName>importsite-private-app-store.zip</archiveName>
+                            <archiveName>importsite-privateappstore.zip</archiveName>
                         </configuration>
                         <goals>
                             <goal>package-imports</goal>

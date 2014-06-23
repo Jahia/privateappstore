@@ -261,7 +261,7 @@ public class CalculateCompletion  extends PrivateAppStoreAction {
 
             Map<String, Object> propertyMap = new HashMap<String, Object>();
             propertyMap.put("name",
-                Messages.get("resources.private-app-store", "jnt_forgeModule."+name.replace(':', '_'), session.getLocale(), name));
+                Messages.get("resources.privateappstore", "jnt_forgeModule."+name.replace(':', '_'), session.getLocale(), name));
             propertyMap.put("mandatory", mandatory);
 
             todoList.put(index++, propertyMap);

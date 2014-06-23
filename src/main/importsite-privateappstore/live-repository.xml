@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <content xmlns:j="http://www.jahia.org/jahia/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0">
     <sites jcr:primaryType="jnt:virtualsitesFolder">
-        <private-app-store 
+        <privateappstore 
              j:inactiveLanguages=""
              j:inactiveLiveLanguages=""
              j:lastPublished="2013-12-18T19:05:30.299+01:00"
@@ -61,7 +61,7 @@
                              jcr:uuid="abe935e1-443d-4e0d-8499-12cbe8305adb">
                     <j:members jcr:primaryType="jnt:members"
                           jcr:uuid="d755c660-819c-4020-ac93-5b9421e1f2c8">
-                        <site-administrators___2 j:member="/sites/private-app-store/groups/site-administrators"
+                        <site-administrators___2 j:member="/sites/privateappstore/groups/site-administrators"
                                            jcr:primaryType="jnt:member"
                                            jcr:uuid="e67fd27b-217d-4016-838f-effdcb741db5"/>
                     </j:members>
@@ -85,7 +85,7 @@
                                                             j:principal="g:privileged"
                                                             j:protected="true"
                                                             j:roles="contributor"
-                                                            j:sourceAce="/sites/private-app-store/j:acl/REFcontributor_currentSite-access_g_privileged"
+                                                            j:sourceAce="/sites/privateappstore/j:acl/REFcontributor_currentSite-access_g_privileged"
                                                             jcr:primaryType="jnt:externalAce"
                                                             jcr:uuid="e91de210-bc68-42b6-95a2-3694ae5581bb"/>
                 <GRANT_g_site-privileged j:aceType="GRANT"
@@ -442,6 +442,6 @@
                                  jcr:primaryType="jnt:contentList"
                                  jcr:uuid="a69855b1-c1b8-4f52-a998-34739b65419b"/>
             </home>
-        </private-app-store>
+        </privateappstore>
     </sites>
 </content>

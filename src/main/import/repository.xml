@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <content xmlns:j="http://www.jahia.org/jahia/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0">
     <modules jcr:primaryType="jnt:modules">
-        <private-app-store j:dependencies="bootstrap bootstrap-components default facets rating siteSettings templates-private-app-store videostreaming"
-               j:installedModules="private-app-store"
+        <privateappstore j:dependencies="bootstrap bootstrap-components default facets rating siteSettings templates-privateappstore videostreaming"
+               j:installedModules="privateappstore"
                          j:modulePriority="0"
                j:moduleType="module"
                j:title="Jahia Private App Store"
@@ -79,7 +79,7 @@
                     </modules-release-type>
                 </contents>
             <templates j:rootTemplatePath="/base"
-                       j:templateSetContext="/modules/templates-private-app-store"
+                       j:templateSetContext="/modules/templates-privateappstore"
                        jcr:primaryType="jnt:templatesFolder">
                 <files jcr:primaryType="jnt:folder"/>
                 <contents jcr:primaryType="jnt:contentFolder"/>
@@ -113,7 +113,7 @@
                                                       jcr:title="Private App Store Administration"/>
                                                 </store-administration>
                                                 <store-url jcr:primaryType="jnt:forgeUrl"/>
-                                                <facets-list j:bindedComponent="/modules/private-app-store/templates/store-home/pagecontent/bootstrap-container/bootstrap-container/bootstrap-row/bootstrap-row-col2/bootstrap-row-col2/forgeModulesList"
+                                                <facets-list j:bindedComponent="/modules/privateappstore/templates/store-home/pagecontent/bootstrap-container/bootstrap-container/bootstrap-row/bootstrap-row-col2/bootstrap-row-col2/forgeModulesList"
                                               j:type="jnt:forgeModule"
                                               j:view="forge"
                                               jcr:mixinTypes="jmix:accessControlled jmix:renderable"
@@ -183,7 +183,7 @@
                                                 <hidden-bootstrap-pagination displayNbOfItemsPerPage="true"
                                                          displayNbOfItemsPerPageValues="6"
                                                               displayPager="false"
-                                                         j:bindedComponent="/modules/private-app-store/templates/store-home/pagecontent/bootstrap-container/bootstrap-container/bootstrap-row/bootstrap-row-col2/bootstrap-row-col2/forgeModulesList"
+                                                         j:bindedComponent="/modules/privateappstore/templates/store-home/pagecontent/bootstrap-container/bootstrap-container/bootstrap-row/bootstrap-row-col2/bootstrap-row-col2/forgeModulesList"
                                                          jcr:primaryType="jnt:bootstrapPager"
                                                          nbOfPages="10"
                                                          pageSize="6"
@@ -193,13 +193,13 @@
                                                    jcr:mixinTypes="jmix:accessControlled"
                                                    jcr:primaryType="jnt:forgeModulesList"
                                                    nbOfModulePerPage="20"
-                                                   startNode="/modules/private-app-store/contents/modules-repository">
+                                                   startNode="/modules/privateappstore/contents/modules-repository">
                                                     <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                                                 </forgeModulesList>
                                                 <bootstrap-pagination displayNbOfItemsPerPage="true"
                                                        displayNbOfItemsPerPageValues="6"
                                                        displayPager="true"
-                                                       j:bindedComponent="/modules/private-app-store/templates/store-home/pagecontent/bootstrap-container/bootstrap-container/bootstrap-row/bootstrap-row-col2/bootstrap-row-col2/forgeModulesList"
+                                                       j:bindedComponent="/modules/privateappstore/templates/store-home/pagecontent/bootstrap-container/bootstrap-container/bootstrap-row/bootstrap-row-col2/bootstrap-row-col2/forgeModulesList"
                                                        jcr:primaryType="jnt:bootstrapPager"
                                                        nbOfPages="10"
                                                        pageSize="6"
@@ -523,7 +523,7 @@
                     </redirect>
                 </templates>
                 
-        </private-app-store>
+        </privateappstore>
     </modules>
 
 </content>
