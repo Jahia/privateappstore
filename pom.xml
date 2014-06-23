@@ -57,9 +57,9 @@
     <packaging>bundle</packaging>
     <description>This is the custom module (Private App Store) for running on a Jahia server.</description>
     <scm>
-        <connection>scm:git:git@github.com:Jahia/forge.git</connection>
-        <url>scm:git:git@github.com:Jahia/forge.git</url>
-        <developerConnection>scm:git:git@github.com:Jahia/forge.git</developerConnection>
+        <connection>scm:git:git@github.com:Jahia/private-app-store.git</connection>
+        <url>scm:git:git@github.com:Jahia/private-app-store.git</url>
+        <developerConnection>scm:git:git@github.com:Jahia/private-app-store.git</developerConnection>
     </scm>  
     <distributionManagement>
         <repository>
