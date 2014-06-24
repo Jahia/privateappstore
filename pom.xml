@@ -70,14 +70,21 @@
           <id>jahia-enterprise-snapshots</id>
           <url>https://devtools.jahia.com/nexus/content/repositories/jahia-enterprise-snapshots</url>
         </snapshotRepository>
-  </distributionManagement>
-    <repositories>
-        <repository>
-            <id>jahiaRepository</id>
-            <name>Jahia's Maven Repository</name>
-            <url>http://maven.jahia.org/maven2</url>
-        </repository>
-    </repositories>
+  </distributionManagement>  
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>jahia-public</id>
+      <name>Jahia Public Repository</name>
+      <url>https://devtools.jahia.com/nexus/content/groups/public</url>
+    </repository>
+  </repositories>
     <pluginRepositories>
         <pluginRepository>
             <id>jahiaRepository</id>
