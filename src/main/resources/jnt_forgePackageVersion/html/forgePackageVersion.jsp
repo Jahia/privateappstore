@@ -57,13 +57,15 @@
     </div>
 
     <div class="pull-right">
-
-        <a class="btn btn-small" href="${currentNode.properties.url.string}"
+    <c:set var="versionFiles" value="${jcr:getChildrenOfType(currentNode, 'jnt:file')}"/>
+    <c:forEach items="${versionFiles}" var="file" varStatus="status">
+        <a class="btn btn-small" href="${url.context}${url.files}${file.path}"
            onclick="countDownload('<c:url value="${url.base}${currentNode.path}"/>')">
             <fmt:message key="jnt_forgeEntry.label.downloadVersion">
                 <fmt:param value="${versionNumber.string}"/>
             </fmt:message>
         </a>
+    </c:forEach>
 
         <c:if test="${isDeveloper && not viewAsUser}">
             <c:url value="${url.base}${currentNode.path}" var="currentNodePath"/>

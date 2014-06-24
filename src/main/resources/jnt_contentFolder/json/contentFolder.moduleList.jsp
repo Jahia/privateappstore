@@ -21,7 +21,7 @@
                         <c:otherwise>
                             <c:set var="versions" value="${jcr:getChildrenOfType(child, 'jnt:forgePackageVersion')}"/>
                             <c:set var="groupID" value="${'package'}"/>
-                            <c:url var="downloadUrl" value="${url.files}${file.path}" context="/"/>
+                            <c:url var="downloadUrl" value="${url.server}${url.context}${url.files}${file.path}" context="/"/>
                         </c:otherwise>
                     </c:choose>
                     <c:if test="${child.properties.published.boolean}">
@@ -59,7 +59,7 @@
                                                 <c:otherwise>
                                                     <c:set var="files" value="${jcr:getChildrenOfType(version, 'jnt:file')}"/>
                                                     <c:forEach var="file" items="${files}">
-                                                        <c:url var="downloadUrl" value="${url.server}${url.files}${file.path}" context="/"/>
+                                                        <c:url var="downloadUrl" value="${url.server}${url.context}${url.files}${file.path}" context="/"/>
                                                     </c:forEach>
                                                 </c:otherwise>
                                             </c:choose>
