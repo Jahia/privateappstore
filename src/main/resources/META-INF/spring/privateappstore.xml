@@ -7,7 +7,7 @@
         <property name="name" value="createEntryFromJar"/>
         <property name="requireAuthenticatedUser" value="true"/>
         <property name="requiredPermission" value="jahiaForgeUploadModule"/>
-        <property name="templateManagerService" ref="JahiaTemplateManagerService"/>
+        <property name="mavenExecutable" value="${mvnPath:mvn}"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.DeleteModule" >
