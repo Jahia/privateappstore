@@ -33,7 +33,7 @@
 <c:set var="avgRating"
        value="${not empty nbOfVotes && not empty currentNode.properties['j:sumOfVotes'] ?
        currentNode.properties['j:sumOfVotes'].long / nbOfVotes : null}"/>
-<jcr:nodeProperty node="${currentNode}" name="j:tags" var="assignedTags"/>
+<jcr:nodeProperty node="${currentNode}" name="j:tagList" var="assignedTags"/>
 <jcr:node var="videoNode" path="${currentNode.path}/video"/>
 
 <%@include file="../../commons/authorName.jspf"%>
@@ -144,7 +144,7 @@
         <c:if test="${not empty icon}"><span content="${icon.url}" itemprop="image"></span></c:if>
         <span content="${latestVersion.properties.url.string}" itemprop="downloadUrl"></span>
         <c:forEach items="${assignedTags}" var="tag" varStatus="status">
-            <span content="${tag.node.name}" itemprop="keywords"></span>
+            <span content="${tag.string}" itemprop="keywords"></span>
         </c:forEach>
 
         <div class="term"><fmt:message key="jnt_forgeEntry.label.packageId"/></div>

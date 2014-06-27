@@ -36,12 +36,6 @@
         <property name="requireAuthenticatedUser" value="true"/>
     </bean>
 
-    <bean class="org.jahia.modules.forge.actions.EditTags" >
-        <property name="name" value="EditTags"/>
-        <property name="taggingService" ref="org.jahia.services.tags.TaggingService"/>
-        <property name="requireAuthenticatedUser" value="true"/>
-    </bean>
-
     <bean class="org.jahia.modules.forge.actions.CalculateCompletion" >
         <property name="name" value="CalculateCompletion"/>
         <property name="requireAuthenticatedUser" value="true"/>

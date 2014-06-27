@@ -42,7 +42,7 @@
 <c:set var="avgRating"
        value="${not empty nbOfVotes && not empty currentNode.properties['j:sumOfVotes'] ?
        currentNode.properties['j:sumOfVotes'].long / nbOfVotes : null}"/>
-<jcr:nodeProperty node="${currentNode}" name="j:tags" var="assignedTags"/>
+<jcr:nodeProperty node="${currentNode}" name="j:tagList" var="assignedTags"/>
 <jcr:node var="videoNode" path="${currentNode.path}/video"/>
 
 <template:addCacheDependency path="${author.localPath}"/>
@@ -108,26 +108,83 @@
                         });
                     </c:otherwise>
                 </c:choose>
-                
-                <jcr:sql var="tags" sql="SELECT * FROM [jnt:tag] WHERE ischildnode(['${renderContext.site.path}/tags'])"/>
-
-                <c:set var="tagsList" value=""/>
-                <c:forEach items="${tags.nodes}" var="tag" varStatus="status">
-                    <%--<c:set var="tagsList" value="${tagsList} {id: '${tag.identifier}', text:'${tag.name}'} ${not status.last ? ',': ''}"/>--%>
-                    <c:set var="tagsList" value="${tagsList} '${tag.name}'${not status.last ? ',': ''}"/>
-                </c:forEach>
 
                 $('#tags-${id}').editable({
                     inputclass: 'input-large',
                     select2: {
-                        tags: [${tagsList}],
-                        tokenSeparators: [",", " "]
+                        tags: true,
+                        tokenSeparators: [",", " "],
+                        createSearchChoice: function (term) {
+                            return {
+                                id: $.trim(term),
+                                text: $.trim(term)
+                            };
+                        },
+                        ajax: {
+                            url: '<c:url value="${url.base}${currentNode.path}.matchingTags.do"/>',
+                            dataType: 'json',
+                            data: function(term, page) {
+                                return {
+                                    q: term,
+                                    limit:-1
+                                };
+                            },
+                            results: function(data, page) {
+                                return {
+                                    results: $.map( data.tags, function( item ) {
+                                        return {
+                                            id: item.name,
+                                            text: item.name
+                                        }
+                                    })
+                                };
+                            }
+                        },
+
+                        // Take default tags from the input value
+                        initSelection: function (element, callback) {
+                            var data = [];
+
+                            function splitVal(string, separator) {
+                                var val, i, l;
+                                if (string === null || string.length < 1) return [];
+                                val = string.split(separator);
+                                for (i = 0, l = val.length; i < l; i = i + 1) val[i] = $.trim(val[i]);
+                                return val;
+                            }
+
+                            $(splitVal(element.val(), ",")).each(function () {
+                                data.push({
+                                    id: this,
+                                    text: this
+                                });
+                            });
+
+                            callback(data);
+                        }
                     },
-                    source: [${tagsList}],
-                    <jsp:include page="../../commons/bootstrap-editable-options.jsp">
-                        <jsp:param name="postURL" value="${postURL}.editTags.do"/>
-                        <jsp:param name="jcrMethodToCall" value="post"/>
-                    </jsp:include>
+                    mode: 'popup',
+                    ajaxOptions: {
+                        type: 'post',
+                        dataType: 'json',
+                        traditional:true
+                    },
+                    params: function(params) {
+                        var data = {};
+                        data['jcr:mixinTypes'] = 'jmix:tagged';
+                        if(params.value.length > 0){
+                            data['j:tagList'] = params.value;
+                        }else {
+                            data['j:tagList'] = "jcrClearAllValues";
+                        }
+                        data['jcrMethodToCall'] = 'put';
+                        return data;
+                    },
+                    url: '${postURL}/',
+                    success: function(response, newValue) {
+                        $('#moduleDeveloperPanel').triggerHandler('forgeModuleUpdated');
+                    },
+                    onblur:'ignore'
                 });
 
                 <%--$.fn.addPopover = function() {
@@ -142,7 +199,6 @@
                     $('#authorEmail-${id}').editable('disable').addPopover();
 
                 </c:if>--%>
-
             });
 
         </script>
@@ -204,7 +260,7 @@
 
                             <h5><fmt:message key="jnt_forgeEntry.label.tags"/></h5>
                             <a href="#" id="tags-${id}" class="editable editable-click" data-type="select2" data-pk="1" data-original-title="<fmt:message key="jnt_forgeEntry.label.developer.addTag"/>">
-                                <c:forEach items="${assignedTags}" var="tag" varStatus="status">${tag.node.name}${not status.last ? ', ' : ''}</c:forEach>
+                                <c:forEach items="${assignedTags}" var="tag" varStatus="status">${tag.string}${not status.last ? ', ' : ''}</c:forEach>
                             </a>
 
                         </section>
@@ -233,7 +289,7 @@
                                 <h5><fmt:message key="jnt_forgeEntry.label.tags"/></h5>
                                 <ul class="inline unstyled">
                                     <c:forEach items="${assignedTags}" var="tag" varStatus="status">
-                                        <li class="tag">${tag.node.name}</li>
+                                        <li class="tag">${tag.string}</li>
                                     </c:forEach>
                                 </ul>
 

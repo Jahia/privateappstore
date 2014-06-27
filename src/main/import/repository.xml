@@ -132,8 +132,8 @@
                                                                       jcr:primaryType="jnt:translation"
                                                                       label="Category"/>
                                                 </field-facet>
-                                                <field-facet-1 facet="Tags"
-                                                               field="jmix:tagged;j:tags"
+                                                <field-facet-1 facet="tagList"
+                                                               field="jmix:tagged;j:tagList"
                                                                jcr:mixinTypes="jmix:accessControlled"
                                                                jcr:primaryType="jnt:fieldFacet"
                                                                limit="100"
