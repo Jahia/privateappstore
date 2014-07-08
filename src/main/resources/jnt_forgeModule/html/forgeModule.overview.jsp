@@ -116,8 +116,8 @@
                         tokenSeparators: [",", " "],
                         createSearchChoice: function (term) {
                             return {
-                                id: $.trim(term),
-                                text: $.trim(term)
+                                id: $.trim(term.toLowerCase()),
+                                text: $.trim(term.toLowerCase())
                             };
                         },
                         ajax: {
@@ -125,7 +125,7 @@
                             dataType: 'json',
                             data: function(term, page) {
                                 return {
-                                    q: term,
+                                    q: term.trim().toLowerCase(),
                                     limit:-1
                                 };
                             },
@@ -161,6 +161,12 @@
                             });
 
                             callback(data);
+                        },
+                        formatSelection: function(item) {
+                            return item.text.trim().toLowerCase();
+                        },
+                        formatResult: function(item) {
+                            return item.text.trim().toLowerCase();
                         }
                     },
                     mode: 'popup',
