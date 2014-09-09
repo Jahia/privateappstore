@@ -20,6 +20,9 @@
         <property name="requireAuthenticatedUser" value="true"/>
     </bean>
 
+    <bean class="org.jahia.modules.forge.actions.CustomMatchingTags" >
+        <property name="taggingService" ref="org.jahia.services.tags.TaggingService"/>
+    </bean>
 
     <bean class="org.jahia.modules.forge.actions.EditModuleVersion" >
         <property name="name" value="EditModuleVersion"/>

@@ -118,19 +118,13 @@
                     select2: {
                         tags: true,
                         tokenSeparators: [",", " "],
-                        createSearchChoice: function (term) {
-                            return {
-                                id: $.trim(term.toLowerCase()),
-                                text: $.trim(term.toLowerCase())
-                            };
-                        },
                         ajax: {
-                            url: '<c:url value="${url.base}${currentNode.path}.matchingTags.do"/>',
+                            url: '<c:url value="${url.base}${currentNode.path}.customMatchingTags.do"/>',
                             dataType: 'json',
                             data: function(term, page) {
                                 return {
-                                    q: term.trim().toLowerCase(),
-                                    limit:-1
+                                    q: term,
+                                    limit:10
                                 };
                             },
                             results: function(data, page) {
@@ -167,10 +161,10 @@
                             callback(data);
                         },
                         formatSelection: function(item) {
-                            return item.text.trim().toLowerCase();
+                            return item.text;
                         },
                         formatResult: function(item) {
-                            return item.text.trim().toLowerCase();
+                            return item.text;
                         }
                     },
                     mode: 'popup',
