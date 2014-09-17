@@ -40,7 +40,7 @@ public class CustomMatchingTags extends Action{
         String transformedPrefix = taggingService.getTagHandler().execute(prefix);
         if(StringUtils.isNotEmpty(transformedPrefix)){
             JSONObject tagJSON = new JSONObject();
-            tagJSON.put("name", taggingService.getTagHandler().execute(prefix));
+            tagJSON.put("name", transformedPrefix);
             tagJSON.put("count", 0);
             tagsJSON.put(tagJSON);
         }

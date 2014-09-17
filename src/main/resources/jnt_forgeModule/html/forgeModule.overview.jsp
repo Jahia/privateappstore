@@ -260,7 +260,7 @@
 
                             <h5><fmt:message key="jnt_forgeEntry.label.tags"/></h5>
                             <a href="#" id="tags-${id}" class="editable editable-click" data-type="select2" data-pk="1" data-original-title="<fmt:message key="jnt_forgeEntry.label.developer.addTag"/>">
-                                <c:forEach items="${assignedTags}" var="tag" varStatus="status">${tag.string}${not status.last ? ', ' : ''}</c:forEach>
+                                <c:forEach items="${assignedTags}" var="tag" varStatus="status">${fn:escapeXml(tag.string)}${not status.last ? ', ' : ''}</c:forEach>
                             </a>
 
                         </section>
@@ -289,7 +289,7 @@
                                 <h5><fmt:message key="jnt_forgeEntry.label.tags"/></h5>
                                 <ul class="inline unstyled">
                                     <c:forEach items="${assignedTags}" var="tag" varStatus="status">
-                                        <li class="tag">${tag.string}</li>
+                                        <li class="tag">${fn:escapeXml(tag.string)}</li>
                                     </c:forEach>
                                 </ul>
 

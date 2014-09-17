@@ -144,7 +144,7 @@
         <c:if test="${not empty icon}"><span content="${icon.url}" itemprop="image"></span></c:if>
         <span content="${latestVersion.properties.url.string}" itemprop="downloadUrl"></span>
         <c:forEach items="${assignedTags}" var="tag" varStatus="status">
-            <span content="${tag.string}" itemprop="keywords"></span>
+            <span content="${fn:escapeXml(tag.string)}" itemprop="keywords"></span>
         </c:forEach>
 
         <div class="term"><fmt:message key="jnt_forgeEntry.label.moduleId"/></div>
