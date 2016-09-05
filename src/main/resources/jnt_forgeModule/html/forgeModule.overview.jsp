@@ -252,7 +252,7 @@
                                    data-type="text" data-name="authorEmail" href="#"><fmt:message key="jnt_forgeEntry.label.editAuthorEmail"/></a>
                             </c:when>
                             <c:otherwise>
-                                <a id="authorEmail-${id}" class="btn btn-small btn-primary" href="#">${not empty userEmail ? userEmail : labelEmpty}</a>
+                                <a id="authorEmail-${id}" class="btn btn-small btn-primary" href="#">${not empty userEmail ? userEmail.string : labelEmpty}</a>
                             </c:otherwise>
                         </c:choose>
 
@@ -276,7 +276,7 @@
                                 <a class="btn btn-small btn-primary" href="mailto:${authorEmail}?Subject=${fn:replace(title, " ","%20")}%20-%20Version:%20${versionNumber.string}"><fmt:message key="jnt_forgeEntry.label.authorEmail"/></a>
                             </c:when>
                             <c:when test="${not authorIsOrganisation && not empty userEmail}">
-                                <a class="btn btn-small btn-primary" href="mailto:${userEmail}?Subject=${fn:replace(title, " ","%20")}%20-%20Version:%20${versionNumber.string}"><fmt:message key="jnt_forgeEntry.label.authorEmail"/></a>
+                                <a class="btn btn-small btn-primary" href="mailto:${userEmail.string}?Subject=${fn:replace(title, " ","%20")}%20-%20Version:%20${versionNumber.string}"><fmt:message key="jnt_forgeEntry.label.authorEmail"/></a>
                             </c:when>
                         </c:choose>
                         <c:if test="${not empty authorEmail}">
