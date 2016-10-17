@@ -25,6 +25,11 @@
 
 [jmix:forge] > jmix:droppableContent, jmix:editorialContent mixin
 
+[jmix:forgeElement] mixin
+ - forcedRating (string) hidden
+ - status (string, choicelist[resourceBundle]) = 'community' autocreated < 'community', 'labs', 'prereleased', 'supported'
+
+
 [jnt:forgeCategoryFilter] > jnt:content, jmix:forge, jmix:bindedComponent
  - categoryList (weakreference, category[autoSelectParent=false]) multiple
 
@@ -42,7 +47,7 @@
 [jnt:forgePackageModulesList] > jmix:list
  + * (jnt:forgePackageModule)
 
-[jnt:forgeModule] > jnt:content, mix:title, jmix:editorialContent, jmix:tagged, jmix:categorized, jmix:forge, jmix:reviews, jmix:rating
+[jnt:forgeModule] > jnt:content, mix:title, jmix:editorialContent, jmix:tagged, jmix:categorized, jmix:forge, jmix:forgeElement, jmix:reviews, jmix:rating
  - jcr:title (string) mandatory
  - description (string, richtext) i18n
  - authorNameDisplayedAs (string, choicelist[resourceBundle]) = 'username' autocreated < 'username', 'fullName', 'organisation'
@@ -62,7 +67,7 @@
  + video (jnt:videostreaming) = jnt:videostreaming
  + * (jnt:forgeModuleVersion)
 
-[jnt:forgePackage] > jnt:content, mix:title, jmix:editorialContent, jmix:tagged, jmix:categorized, jmix:forge, jmix:reviews, jmix:rating
+[jnt:forgePackage] > jnt:content, mix:title, jmix:editorialContent, jmix:tagged, jmix:categorized, jmix:forge, jmix:forgeElement, jmix:reviews, jmix:rating
  - jcr:title (string) mandatory
  - description (string, richtext) i18n
  - authorNameDisplayedAs (string, choicelist[resourceBundle]) = 'username' autocreated < 'username', 'fullName', 'organisation'

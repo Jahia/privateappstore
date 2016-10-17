@@ -72,13 +72,11 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
 
     @Override
     public ActionResult doExecute(HttpServletRequest request, RenderContext renderContext, Resource resource, JCRSessionWrapper session, Map<String, List<String>> parameters, URLResolver urlResolver) throws Exception {
-
         final FileUpload fu = (FileUpload) request.getAttribute(FileUpload.FILEUPLOAD_ATTRIBUTE);
 
         DiskFileItem uploadedFile = fu.getFileItems().get("file");
-
         String filename = uploadedFile.getName();
-
+        Map formParameters = fu.getParameterMap();
         if (!StringUtils.contains(filename, "-SNAPSHOT.")) {
             String extension = StringUtils.substringAfterLast(filename, ".");
             if (!(StringUtils.equals(extension, "jar") || StringUtils.equals(extension, "war"))) {
@@ -93,9 +91,9 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
                 if (manifest != null) {
                     Attributes attributes = manifest.getMainAttributes();
                     if (attributes.getValue("Jahia-Package-Name") != null) {
-                        return createPackage(uploadedFile, jar, attributes, request, renderContext, resource, session);
+                        return createPackage(uploadedFile, jar, attributes, request, renderContext, resource, session, formParameters);
                     } else {
-                        return createModule(uploadedFile, attributes, request, renderContext, resource, session, extension);
+                        return createModule(uploadedFile, attributes, request, renderContext, resource, session, extension, formParameters);
                     }
                 } else {
                     String error = Messages.get("resources.privateappstore", "forge.uploadJar.error.unable.read.manifest", session.getLocale());
@@ -121,7 +119,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
         }
     }
 
-    private ActionResult createPackage(DiskFileItem uploadedFile, JarFile jar, Attributes attributes, HttpServletRequest request, RenderContext renderContext, Resource resource, JCRSessionWrapper session) throws Exception {
+    private ActionResult createPackage(DiskFileItem uploadedFile, JarFile jar, Attributes attributes, HttpServletRequest request, RenderContext renderContext, Resource resource, JCRSessionWrapper session, Map<String, List<String>> formParams) throws Exception {
         JCRNodeWrapper repository = resource.getNode();
 
         JCRNodeWrapper modulesPackage;
@@ -243,11 +241,16 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
 
         session.save();
 
-        return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("successRedirectUrl", packageUrl).put(
+        ActionResult uploadResult =  new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("successRedirectUrl", packageUrl).put(
                 "successRedirectAbsoluteUrl", packageAbsoluteUrl));
+        if(formParams.containsKey("redirectURL")){
+            uploadResult.setUrl(formParams.get("redirectURL").get(0));
+        }
+
+        return uploadResult;
     }
 
-    private ActionResult createModule(DiskFileItem uploadedFile, Attributes attributes, HttpServletRequest request, RenderContext renderContext, Resource resource, JCRSessionWrapper session, String extension) throws Exception {
+    private ActionResult createModule(DiskFileItem uploadedFile, Attributes attributes, HttpServletRequest request, RenderContext renderContext, Resource resource, JCRSessionWrapper session, String extension, Map<String, List<String>> formParams) throws Exception {
         JCRNodeWrapper repository = resource.getNode();
 
         Map<String, List<String>> moduleParams = new HashMap<String, List<String>>();
@@ -377,9 +380,13 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
         String moduleUrl = renderContext.getResponse().encodeURL(module.getUrl());
         String moduleAbsoluteUrl = module.getProvider().getAbsoluteContextPath(request) + moduleUrl;
         session.save();
-
-        return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("successRedirectUrl", moduleUrl).put(
+        ActionResult uploadResult =  new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("successRedirectUrl", moduleUrl).put(
                 "successRedirectAbsoluteUrl", moduleAbsoluteUrl));
+        if(formParams.containsKey("redirectURL")){
+            uploadResult.setUrl(formParams.get("redirectURL").get(0));
+        }
+
+        return uploadResult;
     }
 
     public void setMavenExecutable(String mavenExecutable) {

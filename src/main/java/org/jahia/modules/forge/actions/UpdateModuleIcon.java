@@ -71,6 +71,11 @@ public class UpdateModuleIcon extends PrivateAppStoreAction {
         JCRNodeWrapper iconFolder =  createNode(req, new HashMap<String, List<String>>(),resource.getNode(),"jnt:folder","icon",true);
         JCRNodeWrapper icon;
         final FileUpload fileUpload = (FileUpload) req.getAttribute(FileUpload.FILEUPLOAD_ATTRIBUTE);
+        String redirectURL = null;
+        ActionResult result;
+        if(fileUpload.getParameterMap().containsKey("redirectURL")){
+            redirectURL = fileUpload.getParameterMap().get("redirectURL").get(0);
+        }
         if (fileUpload != null && fileUpload.getFileItems() != null && fileUpload.getFileItems().size() > 0) {
             final Map<String, DiskFileItem> stringDiskFileItemMap = fileUpload.getFileItems();
             DiskFileItem itemEntry = stringDiskFileItemMap.get(stringDiskFileItemMap.keySet().iterator().next());
@@ -85,17 +90,19 @@ public class UpdateModuleIcon extends PrivateAppStoreAction {
                 icon = iconFolder.uploadFile(itemEntry.getName(),is,JCRContentUtils.getMimeType(itemEntry.getName(),itemEntry.getContentType()));
                 is.close();
                 session.save();
-                return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("iconUpdate", true).put("iconUrl",icon.getUrl()));
+                result = new ActionResult(HttpServletResponse.SC_OK, redirectURL, new JSONObject().put("iconUpdate", true).put("iconUrl",icon.getUrl()));
             } else {
                 String error = Messages.get("resources.privateappstore", "forge.updateIcon.error.wrong.format", session.getLocale());
-
-                return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("iconUpdate", false).put("errorMessage",error));
+                result = new ActionResult(HttpServletResponse.SC_OK, redirectURL, new JSONObject().put("iconUpdate", false).put("errorMessage",error));
             }
         } else {
             String error = Messages.get("resources.privateappstore", "forge.updateIcon.error.noFileFound", session.getLocale());
-
-            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("iconUpdate", false).put("errorMessage",error));
+            result = new ActionResult(HttpServletResponse.SC_OK, redirectURL, new JSONObject().put("iconUpdate", false).put("errorMessage",error));
         }
+        if(!StringUtils.isEmpty(redirectURL)){
+            result.setUrl(redirectURL);
+        }
+        return result;
     }
 
     public void setImageService(JahiaImageService imageService) {

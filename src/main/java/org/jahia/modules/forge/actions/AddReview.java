@@ -23,6 +23,7 @@
  */
 package org.jahia.modules.forge.actions;
 
+import org.apache.commons.lang.StringUtils;
 import org.jahia.api.Constants;
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
@@ -60,7 +61,6 @@ public class AddReview extends PrivateAppStoreAction {
             node.addMixin("jmix:reviews");
             session.save();
         }
-
         String path = node.getPath() + "/reviews";
         List<String> rating = new ArrayList<String>();
 
@@ -76,7 +76,16 @@ public class AddReview extends PrivateAppStoreAction {
 
         session.save();
 
-        return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("moduleUrl", node.getUrl()));
+        JSONObject result = new JSONObject();
+        String returnUrl = getParameter(parameters, "returnUrl");
+
+        if(StringUtils.isEmpty(returnUrl)){
+            result.put("moduleUrl", node.getUrl());
+        }
+        else{
+            result.put("moduleUrl", returnUrl);
+        }
+        return new ActionResult(HttpServletResponse.SC_OK, returnUrl, result);
 
     }
 }
