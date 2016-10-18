@@ -33,7 +33,7 @@
     </parent>
     <artifactId>privateappstore</artifactId>
     <name>Jahia Private App Store</name>
-    <version>3.0.1-SNAPSHOT</version>
+    <version>3.0.2-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <description>This is the custom module (Private App Store) for running on a Jahia server.</description>
     <scm>
