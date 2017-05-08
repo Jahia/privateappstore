@@ -19,7 +19,8 @@
     <div class="${msg.severity == 'ERROR' ? 'validationError' : ''} alert ${msg.severity == 'ERROR' ? 'alert-error' : 'alert-success'}"><button type="button" class="close" data-dismiss="alert">&times;</button>${fn:escapeXml(msg.text)}</div>
 </c:forEach>
 <div class="box-1">
-    <form:form modelAttribute="forgeSettings" cssClass="form" autocomplete="off">
+    <c:url var="urlAction" value="${url.base}${renderContext.mainResource.path}?${fn:substringAfter(flowExecutionUrl,'?')}"/>
+    <form:form modelAttribute="forgeSettings" cssClass="form" autocomplete="off" action="${urlAction}">
         <h3><fmt:message key="jahiaForge.settings.title"/></h3>
         <div class="container-fluid">
             <div class="row-fluid">

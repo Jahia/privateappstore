@@ -77,7 +77,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
         DiskFileItem uploadedFile = fu.getFileItems().get("file");
         String filename = uploadedFile.getName();
         Map formParameters = fu.getParameterMap();
-        if (!StringUtils.contains(filename, "-SNAPSHOT.")) {
+        if (!StringUtils.contains(filename, "SNAPSHOT.")) {
             String extension = StringUtils.substringAfterLast(filename, ".");
             if (!(StringUtils.equals(extension, "jar") || StringUtils.equals(extension, "war"))) {
                 String error = Messages.get("resources.privateappstore", "forge.uploadJar.error.wrong.format", session.getLocale());
