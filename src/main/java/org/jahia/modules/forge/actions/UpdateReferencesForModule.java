@@ -32,6 +32,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.xerces.impl.dv.util.Base64;
 import org.jahia.bin.ActionResult;
 import org.jahia.data.templates.ModuleReleaseInfo;
+import org.jahia.services.cache.CacheHelper;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.content.JCRSessionWrapper;
@@ -69,7 +70,7 @@ public class UpdateReferencesForModule extends PrivateAppStoreAction {
 
             ModuleReleaseInfo releaseInfo = getModuleReleaseInfo(renderContext.getSite());
 
-            String url = releaseInfo.getRepositoryUrl() + StringUtils.substringAfter(module.getProperty("url").getString(),"/mavenproxy/private-app-store");
+            String url = module.getProperty("url").getString();
             HttpClient client = new HttpClient();
             GetMethod getMethod = new GetMethod(url);
             getMethod.addRequestHeader("Authorization", "Basic " + Base64.encode((releaseInfo.getUsername() + ":" + releaseInfo.getPassword()).getBytes()));
@@ -89,12 +90,13 @@ public class UpdateReferencesForModule extends PrivateAppStoreAction {
                     } else {
                         module.setProperty("references", "none");
                     }
+                    session.save();
+                    CacheHelper.flushOutputCachesForPath(module.getParent().getPath(), true);
                 } finally {
                     FileUtils.forceDelete(tmpJarFile);
                 }
 
             }
-        session.save();
 
         return ActionResult.OK_JSON;
     }
