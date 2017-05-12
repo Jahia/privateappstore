@@ -23,18 +23,15 @@
  */
 package org.jahia.modules.forge.actions;
 
-import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.xerces.impl.dv.util.Base64;
 import org.jahia.bin.ActionResult;
 import org.jahia.data.templates.ModuleReleaseInfo;
 import org.jahia.services.cache.CacheHelper;
 import org.jahia.services.content.JCRNodeWrapper;
-import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.decorator.JCRSiteNode;
 import org.jahia.services.render.RenderContext;
