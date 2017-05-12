@@ -15,6 +15,11 @@
         <property name="requireAuthenticatedUser" value="true"/>
     </bean>
 
+    <bean class="org.jahia.modules.forge.actions.UpdateReferencesForModule" >
+        <property name="name" value="UpdateReferences"/>
+        <property name="requireAuthenticatedUser" value="true"/>
+    </bean>
+
     <bean class="org.jahia.modules.forge.actions.PublishModule" >
         <property name="name" value="PublishModule"/>
         <property name="requireAuthenticatedUser" value="true"/>

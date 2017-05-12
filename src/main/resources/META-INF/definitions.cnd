@@ -101,6 +101,7 @@
  - changeLog (string, richtext)
  - published (boolean) = false autocreated
  - url (string)
+ - references (string) multiple
 
 [jnt:forgePackageVersion] > jnt:content, jmix:editorialContent, jmix:forge
  - requiredVersion (weakreference, choicelist[nodes='$currentSite/contents/modules-required-versions//*;jnt:text'])

@@ -273,6 +273,8 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
         //moduleParams.put("authorEmail", Arrays.asList(attributes.getValue("")));
         moduleParams.put("codeRepository", Arrays.asList(attributes.getValue("Jahia-Source-Control-Connection")));
         moduleParams.put("versionNumber", Arrays.asList(version));
+
+
         String forgeUrl = StringUtils.substringBefore(request.getRequestURL().toString(), "/render");
         String reqVersionAttribute = attributes.getValue("Jahia-Required-Version");
         final String requiredVersion = "version-" + reqVersionAttribute;
@@ -366,6 +368,14 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
         }
 
         JCRNodeWrapper moduleVersion = createNode(request, versionParameters, module, "jnt:forgeModuleVersion", module.getName() + "-" + version, false);
+
+        String value = attributes.getValue("Jahia-Depends");
+        if(value!=null) {
+            String[] jahiaDepends = value.split(",");
+            moduleVersion.setProperty("references", jahiaDepends);
+        } else {
+            moduleVersion.setProperty("references", "none");
+        }
 
         if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
             List<String> roles = Arrays.asList("owner");
