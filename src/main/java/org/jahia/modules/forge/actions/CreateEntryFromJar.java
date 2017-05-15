@@ -179,6 +179,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
             modulesPackage = createNode(request, packageParameters, repository, "jnt:forgePackage", packageName, false);
         } else {
             modulesPackage = repository.getNode(packageRelPath);
+            packageParameters.remove("description");
             setProperties(modulesPackage, packageParameters);
         }
 
@@ -348,6 +349,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
             module = createNode(request, moduleParameters, repository, "jnt:forgeModule", moduleName, false);
         } else {
             module = repository.getNode(moduleRelPath);
+            moduleParameters.remove("description");
             setProperties(module, moduleParameters);
         }
 
