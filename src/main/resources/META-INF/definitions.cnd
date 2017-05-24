@@ -62,6 +62,7 @@
  - published (boolean) = false autocreated
  - deleted (boolean) = false autocreated hidden
  - groupId (string)
+ - license (string, richtext) i18n indexed=no
  + screenshots (jnt:forgeScreenshotsList) = jnt:forgeScreenshotsList autocreated hidden
  + icon (jnt:folder)
  + video (jnt:videostreaming) = jnt:videostreaming
@@ -80,6 +81,7 @@
  - reviewedByJahia (boolean) = false autocreated
  - published (boolean) = false autocreated
  - deleted (boolean) = false autocreated hidden
+ - license (string, richtext) i18n indexed=no
  + screenshots (jnt:forgeScreenshotsList) = jnt:forgeScreenshotsList autocreated hidden
  + icon (jnt:folder)
  + video (jnt:videostreaming) = jnt:videostreaming

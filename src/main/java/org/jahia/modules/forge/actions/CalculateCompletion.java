@@ -93,6 +93,7 @@ public class CalculateCompletion  extends PrivateAppStoreAction {
         otherProperties.add(new Object[]{"screenshots", SCREENSHOTS, 5});
         otherProperties.add(new Object[]{"video", NODE, 5});
         otherProperties.add(new Object[]{"FAQ", TEXT, 5});
+        otherProperties.add(new Object[]{"license", TEXT, 5});
         otherProperties.add(new Object[]{"j:tagList", TAGS, 5});
 //        int authorEmailType;
 //        if (module.hasProperty("authorNameDisplayedAs") && module.getPropertyAsString("authorNameDisplayedAs").equals("organisation")
