@@ -87,7 +87,7 @@ public class CalculateCompletion  extends PrivateAppStoreAction {
 
         otherProperties = new ArrayList<Object[]>();
 
-        otherProperties.add(new Object[]{"howToInstall", TEXT, 10});
+        otherProperties.add(new Object[]{"howToInstall", TEXT, 5});
         otherProperties.add(new Object[]{"authorURL", TEXT, 5});
         otherProperties.add(new Object[]{"icon", NODE, 5});
         otherProperties.add(new Object[]{"screenshots", SCREENSHOTS, 5});
