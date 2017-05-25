@@ -27,7 +27,7 @@
 
 [jmix:forgeElement] mixin
  - forcedRating (string) hidden
- - status (string, choicelist[resourceBundle]) = 'community' autocreated < 'community', 'labs', 'prereleased', 'supported'
+ - status (string, choicelist[resourceBundle]) = 'community' indexed=no autocreated < 'community', 'labs', 'prereleased', 'supported'
 
 
 [jnt:forgeCategoryFilter] > jnt:content, jmix:forge, jmix:bindedComponent
@@ -48,8 +48,8 @@
  + * (jnt:forgePackageModule)
 
 [jnt:forgeModule] > jnt:content, mix:title, jmix:editorialContent, jmix:tagged, jmix:categorized, jmix:forge, jmix:forgeElement, jmix:reviews, jmix:rating
- - jcr:title (string) mandatory boost=2.0
- - description (string, richtext) i18n boost=2.0
+ - jcr:title (string) mandatory scoreboost=3.0
+ - description (string, richtext) i18n
  - authorNameDisplayedAs (string, choicelist[resourceBundle]) = 'username' indexed=no autocreated < 'username', 'fullName', 'organisation'
  - authorURL (string) indexed=no
  - authorEmail (string) indexed=no
@@ -69,8 +69,8 @@
  + * (jnt:forgeModuleVersion)
 
 [jnt:forgePackage] > jnt:content, mix:title, jmix:editorialContent, jmix:tagged, jmix:categorized, jmix:forge, jmix:forgeElement, jmix:reviews, jmix:rating
- - jcr:title (string) mandatory boost=4.0
- - description (string, richtext) i18n boost=4.0
+ - jcr:title (string) mandatory scoreboost=4.0
+ - description (string, richtext) i18n scoreboost=2.0
  - authorNameDisplayedAs (string, choicelist[resourceBundle])  = 'username' indexed=no autocreated < 'username', 'fullName', 'organisation'
  - authorURL (string) indexed=no
  - authorEmail (string) indexed=no
