@@ -112,4 +112,25 @@
         <property name="applyOnConfigurations" value="page"/>
     </bean>
 
+    <bean parent="jobSchedulingBean">
+        <property name="ramJob" value="true"/>
+        <property name="jobDetail">
+            <bean class="org.springframework.scheduling.quartz.JobDetailBean">
+                <property name="name" value="ForgeDependenciesJob"/>
+                <property name="jobClass" value="org.jahia.modules.forge.job.DependenciesJob"/>
+                <property name="jobDataAsMap">
+                    <map>
+                    </map>
+                </property>
+            </bean>
+        </property>
+
+        <property name="trigger">
+            <bean class="org.quartz.CronTrigger">
+                <property name="name" value="ForgeDependenciesJob"/>
+                <property name="cronExpression" value="0 15 2 * * ?"/>
+            </bean>
+        </property>
+    </bean>
+
 </beans>
