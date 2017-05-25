@@ -34,6 +34,7 @@ import org.jahia.services.cache.CacheHelper;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.decorator.JCRSiteNode;
+import org.jahia.services.content.rules.BackgroundAction;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
@@ -43,6 +44,7 @@ import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.jar.Attributes;
@@ -56,46 +58,51 @@ import java.util.jar.Manifest;
  * @author Frédéric PIERRE
  * @version 1.0
  */
-public class UpdateReferencesForModule extends PrivateAppStoreAction {
+public class UpdateReferencesForModule extends PrivateAppStoreAction implements BackgroundAction {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(UpdateReferencesForModule.class);
+    private static String[] EMPTY_REFERENCES = new String[]{"none"};
 
     @Override
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource, JCRSessionWrapper session, Map<String, List<String>> parameters, URLResolver urlResolver) throws Exception {
 
         JCRNodeWrapper module = resource.getNode();
 
-            ModuleReleaseInfo releaseInfo = getModuleReleaseInfo(renderContext.getSite());
-
-            String url = module.getProperty("url").getString();
-            HttpClient client = new HttpClient();
-            GetMethod getMethod = new GetMethod(url);
-            getMethod.addRequestHeader("Authorization", "Basic " + Base64.encode((releaseInfo.getUsername() + ":" + releaseInfo.getPassword()).getBytes()));
-
-            int res = client.executeMethod(null, getMethod);
-            if (res == 200) {
-                File tmpJarFile = File.createTempFile("appStore", ".jar");
-                try {
-                    IOUtils.copy(getMethod.getResponseBodyAsStream(), new FileOutputStream(tmpJarFile));
-                    JarFile jarFile = new JarFile(tmpJarFile);
-                    Manifest manifest = jarFile.getManifest();
-                    Attributes attributes = manifest.getMainAttributes();
-                    String value = attributes.getValue("Jahia-Depends");
-                    if(value!=null) {
-                        String[] jahiaDepends = value.split(",");
-                        module.setProperty("references", jahiaDepends);
-                    } else {
-                        module.setProperty("references", "none");
-                    }
-                    session.save();
-                    CacheHelper.flushOutputCachesForPath(module.getParent().getPath(), true);
-                } finally {
-                    FileUtils.forceDelete(tmpJarFile);
-                }
-
-            }
+        updateDependencies(module);
 
         return ActionResult.OK_JSON;
+    }
+
+    private void updateDependencies(JCRNodeWrapper module) throws RepositoryException, IOException {
+        ModuleReleaseInfo releaseInfo = getModuleReleaseInfo(module.getResolveSite());
+
+        String url = module.getProperty("url").getString();
+        HttpClient client = new HttpClient();
+        GetMethod getMethod = new GetMethod(url);
+        getMethod.addRequestHeader("Authorization", "Basic " + Base64.encode((releaseInfo.getUsername() + ":" + releaseInfo.getPassword()).getBytes()));
+
+        int res = client.executeMethod(null, getMethod);
+        if (res == 200) {
+            File tmpJarFile = File.createTempFile("appStore", ".jar");
+            try {
+                IOUtils.copy(getMethod.getResponseBodyAsStream(), new FileOutputStream(tmpJarFile));
+                JarFile jarFile = new JarFile(tmpJarFile);
+                Manifest manifest = jarFile.getManifest();
+                Attributes attributes = manifest.getMainAttributes();
+                String value = attributes.getValue("Jahia-Depends");
+                if(value!=null) {
+                    String[] jahiaDepends = value.split(",");
+                    module.setProperty("references", jahiaDepends);
+                } else {
+                    module.setProperty("references", EMPTY_REFERENCES);
+                }
+                module.getSession().save();
+                CacheHelper.flushOutputCachesForPath(module.getParent().getPath(), true);
+            } finally {
+                FileUtils.forceDelete(tmpJarFile);
+            }
+
+        }
     }
 
     private ModuleReleaseInfo getModuleReleaseInfo(final JCRSiteNode siteNode) throws RepositoryException {
@@ -107,5 +114,16 @@ public class UpdateReferencesForModule extends PrivateAppStoreAction {
         info.setUsername(user);
         info.setPassword(password);
         return info;
+    }
+
+    @Override
+    public void executeBackgroundAction(JCRNodeWrapper jcrNodeWrapper) {
+        try {
+            updateDependencies(jcrNodeWrapper);
+        } catch (RepositoryException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
