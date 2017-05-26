@@ -180,6 +180,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
         } else {
             modulesPackage = repository.getNode(packageRelPath);
             packageParameters.remove("description");
+            packageParameters.remove("jcr:title");
             setProperties(modulesPackage, packageParameters);
         }
 
@@ -350,6 +351,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
         } else {
             module = repository.getNode(moduleRelPath);
             moduleParameters.remove("description");
+            moduleParameters.remove("jcr:title");
             setProperties(module, moduleParameters);
         }
 
