@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="json" uri="http://www.atg.com/taglibs/json" %>
 <%@ taglib prefix="functions" uri="http://www.jahia.org/tags/functions" %>
 <%@ taglib prefix="jcr" uri="http://www.jahia.org/tags/jcr" %>
@@ -36,7 +37,12 @@
                             <json:property name="id" value="${child.identifier}"/>
                             <json:property name="path" value="${child.path}"/>
                             <json:property name="jcrprimarytype" value="${child.properties['jcr:primaryType'].string}"/>
-                            <c:url context="/" var="localUrl" value="${url.server}${child.url}"/>
+                            <c:url context="/" var="localUrl" value="${url.server}${child.url}">
+                                <c:param name="dx" value="true"/>
+                            </c:url>
+                            <c:if test="${!fn:contains(localUrl, 'https') && !fn:contains(localUrl, 'localhost')}">
+                                <c:set var="localUrl" value="${fn:replace(localUrl, 'http', 'https')}"/>
+                            </c:if>
                             <json:property name="remoteUrl" value="${localUrl}"/>
                             <json:property name="groupId" value="${groupID}"/>
                             <json:property name="name" value="${child.name}"/>
