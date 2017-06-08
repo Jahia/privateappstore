@@ -24,12 +24,13 @@
     ==========================================================================================
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">  
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>jahia-modules</artifactId>
         <groupId>org.jahia.modules</groupId>
-        <version>7.1.0.0</version>
+        <version>7.1.1.0</version>
     </parent>
     <artifactId>privateappstore</artifactId>
     <name>Jahia Private App Store</name>
@@ -40,31 +41,31 @@
         <connection>scm:git:git@github.com:Jahia/privateappstore.git</connection>
         <url>scm:git:git@github.com:Jahia/privateappstore</url>
         <developerConnection>scm:git:git@github.com:Jahia/privateappstore.git</developerConnection>
-    </scm>  
+    </scm>
     <distributionManagement>
         <repository>
-          <id>jahia-enterprise-releases</id>
-          <url>https://devtools.jahia.com/nexus/content/repositories/jahia-enterprise-releases</url>
+            <id>jahia-enterprise-releases</id>
+            <url>https://devtools.jahia.com/nexus/content/repositories/jahia-enterprise-releases</url>
         </repository>
         <snapshotRepository>
-          <id>jahia-enterprise-snapshots</id>
-          <url>https://devtools.jahia.com/nexus/content/repositories/jahia-enterprise-snapshots</url>
+            <id>jahia-enterprise-snapshots</id>
+            <url>https://devtools.jahia.com/nexus/content/repositories/jahia-enterprise-snapshots</url>
         </snapshotRepository>
-  </distributionManagement>  
-  <repositories>
-    <repository>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>never</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>jahia-public</id>
-      <name>Jahia Public Repository</name>
-      <url>https://devtools.jahia.com/nexus/content/groups/public</url>
-    </repository>
-  </repositories>
+    </distributionManagement>
+    <repositories>
+        <repository>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <id>jahia-public</id>
+            <name>Jahia Public Repository</name>
+            <url>https://devtools.jahia.com/nexus/content/groups/public</url>
+        </repository>
+    </repositories>
     <pluginRepositories>
         <pluginRepository>
             <id>jahiaRepository</id>
@@ -94,29 +95,15 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-            <Jahia-Depends>bootstrap,bootstrap-components,default,facets,rating,siteSettings,templates-privateappstore,videostreaming</Jahia-Depends>
+                        <Jahia-Depends>
+                            default,facets,rating,siteSettings,videostreaming
+                        </Jahia-Depends>
                         <Jahia-Module-Type>module</Jahia-Module-Type>
-            <Embed-Dependency>*; scope=compile; type=!pom; inline=false</Embed-Dependency> 
+                        <Embed-Dependency>*; scope=compile; type=!pom; inline=false</Embed-Dependency>
                     </instructions>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.jahia.server</groupId>
-                <artifactId>jahia-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>package-importsite</id>
-                        <configuration>
-                            <src>${basedir}/src/main/importsite-privateappstore</src>
-                            <dest>${project.build.directory}/${project.build.finalName}/META-INF</dest>
-                            <archiveName>importsite-privateappstore.zip</archiveName>
-                        </configuration>
-                        <goals>
-                            <goal>package-imports</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+
         </plugins>
     </build>
 </project>

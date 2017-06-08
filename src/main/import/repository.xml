@@ -1,528 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <content xmlns:j="http://www.jahia.org/jahia/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0">
     <modules jcr:primaryType="jnt:modules">
-        <privateappstore j:dependencies="bootstrap bootstrap-components default facets rating siteSettings templates-privateappstore videostreaming"
-               j:installedModules="privateappstore"
-                         j:modulePriority="0"
-               j:moduleType="module"
-               j:title="Jahia Private App Store"
-               jcr:primaryType="jnt:module">
+        <privateappstore
+                j:dependencies="default facets rating siteSettings videostreaming"
+                j:installedModules="privateappstore"
+                j:modulePriority="0"
+                j:moduleType="module"
+                j:title="Jahia Private App Store"
+                jcr:primaryType="jnt:module">
 
-                <portlets jcr:primaryType="jnt:portletFolder"/>
-                <files jcr:primaryType="jnt:folder"/>
-                <contents jcr:primaryType="jnt:contentFolder">
-                    <modules-repository jcr:mixinTypes="jmix:accessControlled"
-                                jcr:primaryType="jnt:contentFolder">
-                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                        <j:translation_en jcr:language="en"
-                                 jcr:mixinTypes="mix:title"
-                                 jcr:primaryType="jnt:translation"
-                                 jcr:title="Private App Store Modules Repository"/>
-                    </modules-repository>
-                    <modules-required-versions jcr:mixinTypes="jmix:accessControlled"
-                                       jcr:primaryType="jnt:contentFolder">
-                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                        <j:translation_en jcr:language="en"
-                                 jcr:mixinTypes="mix:title"
-                                 jcr:primaryType="jnt:translation"
-                                 jcr:title="Private App Store Modules-Required Versions"/>
-                        <version-6_6 jcr:mixinTypes="jmix:accessControlled"
-                            jcr:primaryType="jnt:contentFolder">
-                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                            <j:translation_en jcr:language="en"
-                                    jcr:mixinTypes="mix:title"
-                                    jcr:primaryType="jnt:translation"
-                                    jcr:title="Jahia 6.6"/>
-                            <version-6_6_0_0 jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-                                <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.6.0.0"/>
-                            </version-6_6_0_0>
-                            <version-6_6_0_1 jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-                                <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.6.0.1"/>
-                            </version-6_6_0_1>
-                        </version-6_6>
-                        <version-6_5 jcr:mixinTypes="jmix:accessControlled"
-                            jcr:primaryType="jnt:contentFolder">
-                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                            <j:translation_en jcr:language="en"
-                                    jcr:mixinTypes="mix:title"
-                                    jcr:primaryType="jnt:translation"
-                                    jcr:title="Jahia 6.5"/>
-                            <version-6_5_0_0 jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-                                <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.5.0.0"/>
-                            </version-6_5_0_0>
-                            <version-6_5_0_1 jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-                                <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.5.0.1"/>
-                            </version-6_5_0_1>
-                        </version-6_5>
-                    </modules-required-versions>
-                    <modules-release-type jcr:mixinTypes="jmix:accessControlled"
-                                  jcr:primaryType="jnt:contentFolder">
-                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                        <j:translation_en jcr:language="en"
-                                 jcr:mixinTypes="mix:title"
-                                 jcr:primaryType="jnt:translation"
-                                 jcr:title="modules-release-type"/>
-                        <simple-text jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Hotfix"/>
-                        </simple-text>
-                        <simple-text-1 jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
-                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                            <j:translation_en jcr:language="en"
-                                    jcr:primaryType="jnt:translation"
-                                    text="Service Pack"/>
-                        </simple-text-1>
-                    </modules-release-type>
-                </contents>
-            <templates j:rootTemplatePath="/base"
-                       j:templateSetContext="/modules/templates-privateappstore"
-                       jcr:primaryType="jnt:templatesFolder">
-                <files jcr:primaryType="jnt:folder"/>
-                <contents jcr:primaryType="jnt:contentFolder"/>
-                <store-home j:hiddenTemplate="false"
-                            jcr:mixinTypes="jmix:accessControlled"
-                            jcr:primaryType="jnt:pageTemplate">
-                    <pagecontent jcr:primaryType="jnt:contentList">
-                            <top-area jcr:primaryType="jnt:area"/>
-                            <bootstrap-container fluid="true" jcr:primaryType="jnt:bootstrapContainer">
-                            <bootstrap-container jcr:primaryType="jnt:contentList">
-                                <bootstrap-row fluid="true"
-                                               j:id="jnt_forge"
-                                               j:skin="skins.custom"
-                                               jcr:mixinTypes="jmix:accessControlled jmix:customSkin jmix:skinnable"
-                                               jcr:primaryType="jnt:bootstrapRow">
-                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                    <bootstrap-row-col1 jcr:primaryType="jnt:bootstrapColumn" offset="0" span="3">
-                                        <bootstrap-row-col1 jcr:primaryType="jnt:contentList">
-                                                <store-administration aClass="btn btn-primary"
-                                                       j:invertCondition="false"
-                                                       j:perUser="true"
-                                                       j:requireLoggedUser="false"
-                                                       j:requirePrivilegedUser="false"
-                                                       j:requiredPermissionNames="jcr:write_live"
-                                                       jcr:mixinTypes="jmix:cache jmix:requiredPermissions"
-                                                       jcr:primaryType="jnt:siteLink"
-                                                       targetTemplate="store-admin">
-                                                    <j:translation_en jcr:language="en"
-                                                      jcr:mixinTypes="mix:title"
-                                                      jcr:primaryType="jnt:translation"
-                                                      jcr:title="Private App Store Administration"/>
-                                                </store-administration>
-                                                <store-url jcr:primaryType="jnt:forgeUrl"/>
-                                                <facets-list j:bindedComponent="/modules/privateappstore/templates/store-home/pagecontent/bootstrap-container/bootstrap-container/bootstrap-row/bootstrap-row-col2/bootstrap-row-col2/forgeModulesList"
-                                              j:type="jnt:forgeModule"
-                                              j:view="forge"
-                                              jcr:mixinTypes="jmix:accessControlled jmix:renderable"
-                                                         jcr:primaryType="jnt:facets">
-                                                <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                    <field-facet facet="j:defaultCategory"
-                                                 field="jmix:categorized;j:defaultCategory"
-                                                             jcr:mixinTypes="jmix:accessControlled"
-                                                             jcr:primaryType="jnt:fieldFacet"
-                                                             limit="100"
-                                                             mincount="1"
-                                                             missing="false"
-                                                             offset="0">
-                                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                    <j:translation_en jcr:language="en"
-                                                                      jcr:primaryType="jnt:translation"
-                                                                      label="Category"/>
-                                                </field-facet>
-                                                <field-facet-1 facet="tagList"
-                                                               field="jmix:tagged;j:tagList"
-                                                               jcr:mixinTypes="jmix:accessControlled"
-                                                               jcr:primaryType="jnt:fieldFacet"
-                                                               limit="100"
-                                                               mincount="1"
-                                                               missing="false"
-                                                               offset="0">
-                                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                        <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" label="Tags"/>
-                                                </field-facet-1>
-                                            </facets-list>
-                                                <content-list j:invertCondition="false"
-                                               j:requireLoggedUser="false"
-                                               j:requirePrivilegedUser="false"
-                                               j:requiredPermissionNames="jahiaForgeUploadModule"
-                                               j:skin="skins.bootstrap-rounded-title"
-                                               j:style="grey"
-                                               jcr:mixinTypes="jmix:accessControlled jmix:requiredPermissions jmix:skinnable jmix:style"
-                                               jcr:primaryType="jnt:contentList">
-                                                <store-my-modules-list j:invertCondition="false"
-                                                        j:requireLoggedUser="false"
-                                                        j:requirePrivilegedUser="false"
-                                                        j:requiredPermissionNames="jahiaForgeUploadModule"
-                                                           jcr:mixinTypes="jmix:accessControlled jmix:requiredPermissions"
-                                                                   jcr:primaryType="jnt:forgeMyModulesList">
-                                                <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                <j:translation_en jcr:language="en"
-                                                                  jcr:mixinTypes="mix:title"
-                                                                  jcr:primaryType="jnt:translation"
-                                                                  jcr:title="My Modules"/>
-                                            </store-my-modules-list>
-                                                    <file-upload-form j:id="myModulesUploadForm"
-                                                      j:skin="skins.custom"
-                                                      j:view="jar"
-                                                      jcr:mixinTypes="jmix:customSkin jmix:renderable jmix:skinnable"
-                                                      jcr:primaryType="jnt:fileUpload"/>
-                                                    <j:translation_en jcr:language="en"
-                                                      jcr:mixinTypes="mix:title"
-                                                      jcr:primaryType="jnt:translation"
-                                                      jcr:title="My Modules"/>
-                                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                </content-list>
-                                                <left-side-area jcr:primaryType="jnt:area"/>
-                                        </bootstrap-row-col1>
-                                    </bootstrap-row-col1>
-                                        <bootstrap-row-col2 jcr:primaryType="jnt:bootstrapColumn" offset="0" span="9">
-                                        <bootstrap-row-col2 jcr:primaryType="jnt:contentList">
-                                                <hidden-bootstrap-pagination displayNbOfItemsPerPage="true"
-                                                         displayNbOfItemsPerPageValues="6"
-                                                              displayPager="false"
-                                                         j:bindedComponent="/modules/privateappstore/templates/store-home/pagecontent/bootstrap-container/bootstrap-container/bootstrap-row/bootstrap-row-col2/bootstrap-row-col2/forgeModulesList"
-                                                         jcr:primaryType="jnt:bootstrapPager"
-                                                         nbOfPages="10"
-                                                         pageSize="6"
-                                                         paginationAlignment="pagination-centered"
-                                                         paginationSize=""/>
-                                                <forgeModulesList columnsNumber="3"
-                                                   jcr:mixinTypes="jmix:accessControlled"
-                                                   jcr:primaryType="jnt:forgeModulesList"
-                                                   nbOfModulePerPage="20"
-                                                   startNode="/modules/privateappstore/contents/modules-repository">
-                                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                </forgeModulesList>
-                                                <bootstrap-pagination displayNbOfItemsPerPage="true"
-                                                       displayNbOfItemsPerPageValues="6"
-                                                       displayPager="true"
-                                                       j:bindedComponent="/modules/privateappstore/templates/store-home/pagecontent/bootstrap-container/bootstrap-container/bootstrap-row/bootstrap-row-col2/bootstrap-row-col2/forgeModulesList"
-                                                       jcr:primaryType="jnt:bootstrapPager"
-                                                       nbOfPages="10"
-                                                       pageSize="6"
-                                                       paginationAlignment="pagination-centered"
-                                                       paginationSize=""/>
-                                        </bootstrap-row-col2>
-                                    </bootstrap-row-col2>
-                                </bootstrap-row>
-                            </bootstrap-container>
-                        </bootstrap-container>
-                    </pagecontent>
-                    <j:acl jcr:primaryType="jnt:acl"/>
-                    <j:translation_en jcr:language="en"
-                                      jcr:mixinTypes="mix:title"
-                                      jcr:primaryType="jnt:translation"
-                                      jcr:title="Private App Store Home"/>
-                </store-home>
-                    <store-module j:applyOn="jnt:forgeModule jnt:forgePackage"
-                              j:defaultTemplate="true"
-                              j:hiddenTemplate="false"
-                              jcr:mixinTypes="jmix:accessControlled"
-                              jcr:primaryType="jnt:contentTemplate">
+            <portlets jcr:primaryType="jnt:portletFolder"/>
+            <files jcr:primaryType="jnt:folder"/>
+            <contents jcr:primaryType="jnt:contentFolder">
+                <modules-repository jcr:mixinTypes="jmix:accessControlled"
+                                    jcr:primaryType="jnt:contentFolder">
                     <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                     <j:translation_en jcr:language="en"
                                       jcr:mixinTypes="mix:title"
                                       jcr:primaryType="jnt:translation"
-                                      jcr:title="Private App Store Module"/>
-                    <pagecontent jcr:primaryType="jnt:contentList">
-                            <bootstrap-container fluid="true"
-                                       j:id="jnt_forge"
-                                       j:skin="skins.custom"
-                                       jcr:mixinTypes="jmix:customSkin jmix:skinnable"
-                                       jcr:primaryType="jnt:bootstrapContainer">
-                            <bootstrap-container jcr:primaryType="jnt:contentList">
-                                <bootstrap-row fluid="true"
-                                               jcr:mixinTypes="jmix:accessControlled"
-                                               jcr:primaryType="jnt:bootstrapRow">
-                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                        <module-aside jcr:primaryType="jnt:bootstrapColumn" offset="0" span="3">
-                                        <module-aside jcr:primaryType="jnt:contentList">
-                                            <main-resource-display j:mainResourceView="header"
-                                                                   jcr:mixinTypes="jmix:accessControlled"
-                                                                   jcr:primaryType="jnt:mainResourceDisplay">
-                                                <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                            </main-resource-display>
-                                            <developer-panel j:mainResourceView="developerPanel"
-                                                             jcr:mixinTypes="jmix:accessControlled"
-                                                             jcr:primaryType="jnt:mainResourceDisplay">
-                                                <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                            </developer-panel>
-                                            <store-admin-panel j:mainResourceView="forgeAdminPanel"
-                                                               jcr:mixinTypes="jmix:accessControlled"
-                                                               jcr:primaryType="jnt:mainResourceDisplay">
-                                                <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                            </store-admin-panel>
-                                        </module-aside>
-                                    </module-aside>
-                                        <module-main jcr:primaryType="jnt:bootstrapColumn" offset="0" span="9">
-                                        <module-main jcr:primaryType="jnt:contentList">
-                                            <bootstrap-tabular-list fadeIn="true"
-                                                                    jcr:mixinTypes="jmix:accessControlled"
-                                                                    jcr:primaryType="jnt:bootstrapTabularList"
-                                                                    tabsPosition="top">
-                                                <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                <overview jcr:mixinTypes="jmix:accessControlled"
-                                                          jcr:primaryType="jnt:contentList">
-                                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                    <j:translation_en jcr:language="en"
-                                                                      jcr:mixinTypes="mix:title"
-                                                                      jcr:primaryType="jnt:translation"
-                                                                      jcr:title="Overview"/>
-                                                    <bootstrap-row fluid="true"
-                                                                   jcr:mixinTypes="jmix:accessControlled"
-                                                                   jcr:primaryType="jnt:bootstrapRow">
-                                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                            <overview-main jcr:primaryType="jnt:bootstrapColumn" offset="0" span="9">
-                                                            <overview-main jcr:primaryType="jnt:contentList">
-                                                                <main-resource-display j:mainResourceView="overview"
-                                                                                       jcr:mixinTypes="jmix:accessControlled"
-                                                                                       jcr:primaryType="jnt:mainResourceDisplay">
-                                                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                                </main-resource-display>
-                                                            </overview-main>
-                                                        </overview-main>
-                                                            <overview-aside jcr:primaryType="jnt:bootstrapColumn" offset="0" span="3">
-                                                            <overview-aside jcr:primaryType="jnt:contentList">
-                                                                <main-resource-display j:mainResourceView="information"
-                                                                                       jcr:mixinTypes="jmix:accessControlled"
-                                                                                       jcr:primaryType="jnt:mainResourceDisplay">
-                                                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                                </main-resource-display>
-                                                            </overview-aside>
-                                                        </overview-aside>
-                                                    </bootstrap-row>
-                                                </overview>
-                                                <screenshots jcr:mixinTypes="jmix:accessControlled"
-                                                             jcr:primaryType="jnt:contentList">
-                                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                    <j:translation_en jcr:language="en"
-                                                                      jcr:mixinTypes="mix:title"
-                                                                      jcr:primaryType="jnt:translation"
-                                                                      jcr:title="Screenshots"/>
-                                                    <main-resource-display j:mainResourceView="screenshots"
-                                                                           jcr:mixinTypes="jmix:accessControlled"
-                                                                           jcr:primaryType="jnt:mainResourceDisplay">
-                                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                    </main-resource-display>
-                                                    <file-upload-form j:invertCondition="false"
-                                                                      j:requireLoggedUser="true"
-                                                                      j:requirePrivilegedUser="false"
-                                                                      j:requiredPermissions="#/permissions/repository-permissions/jcr:all_live"
-                                                                      j:view="screenshot"
-                                                                      jcr:mixinTypes="jmix:accessControlled jmix:renderable jmix:requiredPermissions"
-                                                                      jcr:primaryType="jnt:fileUpload">
-                                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                    </file-upload-form>
-                                                </screenshots>
-                                                <video jcr:mixinTypes="jmix:accessControlled"
-                                                       jcr:primaryType="jnt:contentList">
-                                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                    <j:translation_en jcr:language="en"
-                                                                      jcr:mixinTypes="mix:title"
-                                                                      jcr:primaryType="jnt:translation"
-                                                                      jcr:title="Video"/>
-                                                    <main-resource-display j:mainResourceView="video"
-                                                                           jcr:mixinTypes="jmix:accessControlled"
-                                                                           jcr:primaryType="jnt:mainResourceDisplay">
-                                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                    </main-resource-display>
-                                                </video>
-                                                <reviews jcr:mixinTypes="jmix:accessControlled"
-                                                         jcr:primaryType="jnt:contentList">
-                                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                    <j:translation_en jcr:language="en"
-                                                                      jcr:mixinTypes="mix:title"
-                                                                      jcr:primaryType="jnt:translation"
-                                                                      jcr:title="Reviews"/>
-                                                        <rich-text jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:bigText">
-                                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                        <j:translation_en jcr:language="en"
-                                                                          jcr:primaryType="jnt:translation"
-                                                                          text="&lt;h2 class='reviewsHeader'&gt;  User reviews&lt;/h2&gt; "/>
-                                                    </rich-text>
-                                                    <addreview commentMandatory="false"
-                                                               commentMinLength="50"
-                                                               jcr:mixinTypes="jmix:accessControlled"
-                                                               jcr:primaryType="jnt:addReview">
-                                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                    </addreview>
-                                                    <rating-split j:view="ratingsSplit"
-                                                                  jcr:mixinTypes="jmix:accessControlled jmix:renderable"
-                                                                  jcr:primaryType="jnt:reviewsList">
-                                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                    </rating-split>
-                                                    <reviews-list jcr:mixinTypes="jmix:accessControlled"
-                                                                  jcr:primaryType="jnt:reviewsList">
-                                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                    </reviews-list>
-                                                </reviews>
-                                                <installation jcr:mixinTypes="jmix:accessControlled"
-                                                              jcr:primaryType="jnt:contentList">
-                                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                    <j:translation_en jcr:language="en"
-                                                                      jcr:mixinTypes="mix:title"
-                                                                      jcr:primaryType="jnt:translation"
-                                                                      jcr:title="Installation"/>
-                                                    <main-resource-display j:mainResourceView="howToInstall"
-                                                                           jcr:mixinTypes="jmix:accessControlled"
-                                                                           jcr:primaryType="jnt:mainResourceDisplay">
-                                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                    </main-resource-display>
-                                                </installation>
-                                                <faq jcr:mixinTypes="jmix:accessControlled"
-                                                     jcr:primaryType="jnt:contentList">
-                                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                    <j:translation_en jcr:language="en"
-                                                                      jcr:mixinTypes="mix:title"
-                                                                      jcr:primaryType="jnt:translation"
-                                                                      jcr:title="FAQ"/>
-                                                    <main-resource-display j:mainResourceView="FAQ"
-                                                                           jcr:mixinTypes="jmix:accessControlled"
-                                                                           jcr:primaryType="jnt:mainResourceDisplay">
-                                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                    </main-resource-display>
-                                                </faq>
-                                                <changelog jcr:mixinTypes="jmix:accessControlled"
-                                                           jcr:primaryType="jnt:contentList">
-                                                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                    <j:translation_en jcr:language="en"
-                                                                      jcr:mixinTypes="mix:title"
-                                                                      jcr:primaryType="jnt:translation"
-                                                                      jcr:title="Versions"/>
-                                                    <main-resource-display j:mainResourceView="changeLog"
-                                                                           jcr:mixinTypes="jmix:accessControlled"
-                                                                           jcr:primaryType="jnt:mainResourceDisplay">
-                                                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
-                                                    </main-resource-display>
-                                                        <file-upload-form j:invertCondition="false"
-                                                         j:requireLoggedUser="false"
-                                                         j:requirePrivilegedUser="false"
-                                                         j:requiredPermissionNames="jcr:write_live"
-                                                         j:view="jar"
-                                                         jcr:mixinTypes="jmix:renderable jmix:requiredPermissions"
-                                                     jcr:primaryType="jnt:fileUpload"/>
-                                                    </changelog>
-                                                    <permissions j:invertCondition="false"
-                                                 j:requireLoggedUser="false"
-                                                 j:requirePrivilegedUser="false"
-                                                 j:requiredPermissionNames="jcr:write_live"
-                                                 jcr:mixinTypes="jmix:requiredPermissions"
-                                                 jcr:primaryType="jnt:contentList">
-                                                        <j:translation_en jcr:language="en"
-                                                         jcr:mixinTypes="mix:title"
-                                                         jcr:primaryType="jnt:translation"
-                                                         jcr:title="Permissions"/>
-                                                        <manage-roles jcr:primaryType="jnt:manageRoles" roles="reader">
-                                                            <j:translation_en jcr:language="en"
-                                                            jcr:mixinTypes="mix:title"
-                                                            jcr:primaryType="jnt:translation"
-                                                            jcr:title="Module permissions"/>
-                                                        </manage-roles>
-                                                    </permissions>
-                                                </bootstrap-tabular-list>
-                                        </module-main>
-                                    </module-main>
-                                </bootstrap-row>
-                            </bootstrap-container>
-                        </bootstrap-container>
-                    </pagecontent>
-                </store-module>
-                    <siteSettingsBase j:hiddenTemplate="false" jcr:primaryType="jnt:template">
+                                      jcr:title="Private App Store Modules Repository"/>
+                </modules-repository>
+                <modules-required-versions jcr:mixinTypes="jmix:accessControlled"
+                                           jcr:primaryType="jnt:contentFolder">
+                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                     <j:translation_en jcr:language="en"
                                       jcr:mixinTypes="mix:title"
                                       jcr:primaryType="jnt:translation"
-                                      jcr:title="siteSettingsBase"/>
-                    <store-admin j:applyOn="jnt:virtualsite"
-                           j:defaultTemplate="false"
-                           j:hiddenTemplate="true"
-                      j:requiredPermissionNames="jahiaForgeModerateModule"
-                           j:titleKey="forgeSettings.label"
-                      jcr:mixinTypes="jmix:rbTitle"
-                           jcr:primaryType="jnt:contentTemplate">
+                                      jcr:title="Private App Store Modules-Required Versions"/>
+                    <version-6_6 jcr:mixinTypes="jmix:accessControlled"
+                                 jcr:primaryType="jnt:contentFolder">
+                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                         <j:translation_en jcr:language="en"
                                           jcr:mixinTypes="mix:title"
                                           jcr:primaryType="jnt:translation"
-                                          jcr:title="Private App Store Administration"/>
-                        <pagecontent jcr:primaryType="jnt:contentList">
-                                <bootstrap-container fluid="true" jcr:primaryType="jnt:bootstrapContainer">
-                                    <bootstrap-container jcr:primaryType="jnt:contentList">
-                                <workspace-default jcr:primaryType="jnt:workspaceSwitch" workspace="default">
-                                    <j:translation_en jcr:language="en"
+                                          jcr:title="Jahia 6.6"/>
+                        <version-6_6_0_0 jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.6.0.0"/>
+                        </version-6_6_0_0>
+                        <version-6_6_0_1 jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.6.0.1"/>
+                        </version-6_6_0_1>
+                    </version-6_6>
+                    <version-6_5 jcr:mixinTypes="jmix:accessControlled"
+                                 jcr:primaryType="jnt:contentFolder">
+                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                        <j:translation_en jcr:language="en"
                                           jcr:mixinTypes="mix:title"
                                           jcr:primaryType="jnt:translation"
-                                          jcr:title="www"/>
-                                <bootstrap-tabular-list fadeIn="true"
-                                             jcr:primaryType="jnt:bootstrapTabularList"
-                                             tabsPosition="top">
-                                        <store-settings jcr:primaryType="jnt:contentList">
-                                        <j:translation_en jcr:language="en"
-                                             jcr:mixinTypes="mix:title"
-                                             jcr:primaryType="jnt:translation"
-                                                jcr:title="Private App Store Settings"/>
-                                        <forgesettings jcr:primaryType="jnt:forgeSettings"/>
-                                        </store-settings>
-                                        <store-roles jcr:primaryType="jnt:contentList">
-                                        <j:translation_en jcr:language="en"
-                                             jcr:mixinTypes="mix:title"
-                                             jcr:primaryType="jnt:translation"
-                                                jcr:title="Private App Store roles"/>
-                                            <manage-roles jcr:primaryType="jnt:manageRoles"
-                                                  roles="reader store-administrator store-developer">
-                                                <j:translation_en jcr:language="en"
-                                                   jcr:mixinTypes="mix:title"
-                                                   jcr:primaryType="jnt:translation"
-                                                   jcr:title="Private App Store roles"/>
-                                            </manage-roles>
-                                        </store-roles>
-                                    <categories jcr:primaryType="jnt:contentList">
-                                        <j:translation_en jcr:language="en"
-                                             jcr:mixinTypes="mix:title"
-                                             jcr:primaryType="jnt:translation"
-                                                jcr:title="Categories"/>
-                                        <categorysettings jcr:primaryType="jnt:categorySettings"/>
-                                    </categories>
-                                </bootstrap-tabular-list>
-                                </workspace-default>
-                                </bootstrap-container>
-                                </bootstrap-container>
-                        </pagecontent>
-                    </store-admin>
-                </siteSettingsBase>
-                    <redirect j:hiddenTemplate="false"
-                      j:view="bootstrap"
-                      jcr:primaryType="jnt:template">
+                                          jcr:title="Jahia 6.5"/>
+                        <version-6_5_0_0 jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.5.0.0"/>
+                        </version-6_5_0_0>
+                        <version-6_5_0_1 jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                            <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                            <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="6.5.0.1"/>
+                        </version-6_5_0_1>
+                    </version-6_5>
+                </modules-required-versions>
+                <modules-release-type jcr:mixinTypes="jmix:accessControlled"
+                                      jcr:primaryType="jnt:contentFolder">
+                    <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                    <j:translation_en jcr:language="en"
+                                      jcr:mixinTypes="mix:title"
+                                      jcr:primaryType="jnt:translation"
+                                      jcr:title="modules-release-type"/>
+                    <simple-text jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
+                        <j:translation_en jcr:language="en" jcr:primaryType="jnt:translation" text="Hotfix"/>
+                    </simple-text>
+                    <simple-text-1 jcr:mixinTypes="jmix:accessControlled" jcr:primaryType="jnt:text">
+                        <j:acl j:inherit="true" jcr:primaryType="jnt:acl"/>
                         <j:translation_en jcr:language="en"
-                                 jcr:mixinTypes="mix:title"
-                                 jcr:primaryType="jnt:translation"
-                                 jcr:title="redirect"/>
-                        <redirect-content j:applyOn="jnt:content"
-                                 j:defaultTemplate="false"
-                                 j:hiddenTemplate="false"
-                                 jcr:primaryType="jnt:contentTemplate">
-                            <j:translation_en jcr:language="en"
-                                    jcr:mixinTypes="mix:title"
-                                    jcr:primaryType="jnt:translation"
-                                    jcr:title="Redirect content"/>
-                        </redirect-content>
-                        <redirect-page j:hiddenTemplate="true" jcr:primaryType="jnt:pageTemplate">
-                            <j:translation_en jcr:language="en"
-                                    jcr:mixinTypes="mix:title"
-                                    jcr:primaryType="jnt:translation"
-                                    jcr:title="Redirect page"/>
-                        </redirect-page>
-                        <pagecontent jcr:primaryType="jnt:contentList">
-                            <rich-text jcr:primaryType="jnt:bigText">
-                                <j:translation_en jcr:language="en"
-                                       jcr:primaryType="jnt:translation"
-                                       text="&lt;h3 style=&#34;text-align: center;&#34;&gt;&#xA; &lt;span style=&#34;text-align: center;&#34;&gt;This page cannot be accessed in edit mode. Go to live mode to use the Private App Store&lt;/span&gt;&lt;/h3&gt;&#xA;"/>
-                            </rich-text>
-                        </pagecontent>
-                    </redirect>
-                </templates>
-                
+                                          jcr:primaryType="jnt:translation"
+                                          text="Service Pack"/>
+                    </simple-text-1>
+                </modules-release-type>
+            </contents>
+            <templates j:rootTemplatePath="/base" jcr:primaryType="jnt:templatesFolder">
+                <files jcr:primaryType="jnt:folder"/>
+                <contents jcr:primaryType="jnt:contentFolder"/>
+            </templates>
+
         </privateappstore>
     </modules>
 
