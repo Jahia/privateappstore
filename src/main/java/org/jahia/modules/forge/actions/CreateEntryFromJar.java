@@ -67,6 +67,7 @@ import java.util.regex.Pattern;
 public class CreateEntryFromJar extends PrivateAppStoreAction {
 
     private transient static Logger logger = LoggerFactory.getLogger(CreateEntryFromJar.class);
+    private static String[] EMPTY_REFERENCES = new String[]{"none"};
 
     String mavenExecutable;
 
@@ -378,7 +379,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
             String[] jahiaDepends = value.split(",");
             moduleVersion.setProperty("references", jahiaDepends);
         } else {
-            moduleVersion.setProperty("references", "none");
+            moduleVersion.setProperty("references", EMPTY_REFERENCES);
         }
 
         if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
