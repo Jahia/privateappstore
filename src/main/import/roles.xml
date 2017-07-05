@@ -18,7 +18,7 @@
     </store-administrator>
 
     <store-developer j:hidden="false"
-                         j:permissionNames="jahiaForgeUploadModule"
+                         j:permissionNames="jahiaForgeUploadModule jcr:write_live jcr:modifyAccessControl_live"
                          j:privilegedAccess="true"
                          j:roleGroup="site-role"
                          jcr:primaryType="jnt:role">
