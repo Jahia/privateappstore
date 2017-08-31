@@ -105,13 +105,6 @@
         <property name="applyOnNodeTypes" value="jnt:forgeModule"/>
     </bean>
 
-    <bean id="forgeRedirectFilter" class="org.jahia.modules.forge.filters.RedirectFilter">
-        <property name="priority" value="-4"/>
-        <property name="skipOnModes" value="live,studio"/>
-        <property name="applyOnSiteTemplateSets" value="privateappstore"/>
-        <property name="applyOnConfigurations" value="page"/>
-    </bean>
-
     <bean parent="jobSchedulingBean">
         <property name="ramJob" value="true"/>
         <property name="jobDetail">
