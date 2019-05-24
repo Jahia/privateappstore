@@ -59,9 +59,8 @@ import java.util.jar.Manifest;
  * @version 1.0
  */
 public class UpdateReferencesForModule extends PrivateAppStoreAction implements BackgroundAction {
-
-    private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(UpdateReferencesForModule.class);
-    private static String[] EMPTY_REFERENCES = new String[]{"none"};
+    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(UpdateReferencesForModule.class);
+    private static final String[] EMPTY_REFERENCES = new String[]{"none"};
 
     @Override
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource, JCRSessionWrapper session, Map<String, List<String>> parameters, URLResolver urlResolver) throws Exception {
@@ -86,18 +85,19 @@ public class UpdateReferencesForModule extends PrivateAppStoreAction implements 
             File tmpJarFile = File.createTempFile("appStore", ".jar");
             try {
                 IOUtils.copy(getMethod.getResponseBodyAsStream(), new FileOutputStream(tmpJarFile));
-                JarFile jarFile = new JarFile(tmpJarFile);
-                Manifest manifest = jarFile.getManifest();
-                Attributes attributes = manifest.getMainAttributes();
-                String value = attributes.getValue("Jahia-Depends");
-                if(value!=null) {
-                    String[] jahiaDepends = value.split(",");
-                    module.setProperty("references", jahiaDepends);
-                } else {
-                    module.setProperty("references", EMPTY_REFERENCES);
+                try (JarFile jarFile = new JarFile(tmpJarFile)) {
+                    Manifest manifest = jarFile.getManifest();
+                    Attributes attributes = manifest.getMainAttributes();
+                    String value = attributes.getValue("Jahia-Depends");
+                    if (value != null) {
+                        String[] jahiaDepends = value.split(",");
+                        module.setProperty("references", jahiaDepends);
+                    } else {
+                        module.setProperty("references", EMPTY_REFERENCES);
+                    }
+                    module.getSession().save();
+                    CacheHelper.flushOutputCachesForPath(module.getParent().getPath(), true);
                 }
-                module.getSession().save();
-                CacheHelper.flushOutputCachesForPath(module.getParent().getPath(), true);
             } finally {
                 FileUtils.forceDelete(tmpJarFile);
             }
@@ -120,10 +120,8 @@ public class UpdateReferencesForModule extends PrivateAppStoreAction implements 
     public void executeBackgroundAction(JCRNodeWrapper jcrNodeWrapper) {
         try {
             updateDependencies(jcrNodeWrapper);
-        } catch (RepositoryException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (RepositoryException | IOException e) {
+            logger.error("Error while updating dependencies", e);
         }
     }
 }
