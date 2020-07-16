@@ -8,60 +8,72 @@
         <property name="requireAuthenticatedUser" value="true"/>
         <property name="requiredPermission" value="jahiaForgeUploadModule"/>
         <property name="mavenExecutable" value="${mvnPath:mvn}"/>
+        <property name="requiredMethods" value="POST"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.DeleteModule" >
         <property name="name" value="DeleteModule"/>
         <property name="requireAuthenticatedUser" value="true"/>
+        <property name="requiredMethods" value="POST"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.UpdateReferencesForModule" >
         <property name="name" value="UpdateReferences"/>
         <property name="requireAuthenticatedUser" value="true"/>
+        <property name="requiredMethods" value="POST"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.PublishModule" >
         <property name="name" value="PublishModule"/>
         <property name="requireAuthenticatedUser" value="true"/>
+        <property name="requiredMethods" value="POST"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.CustomMatchingTags" >
         <property name="taggingService" ref="org.jahia.services.tags.TaggingService"/>
+        <property name="requiredMethods" value="GET"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.EditModuleVersion" >
         <property name="name" value="EditModuleVersion"/>
         <property name="requireAuthenticatedUser" value="true"/>
+        <property name="requiredMethods" value="POST"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.AddVideo" >
         <property name="name" value="AddVideo"/>
         <property name="requireAuthenticatedUser" value="true"/>
+        <property name="requiredMethods" value="POST"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.EditVideo" >
         <property name="name" value="EditVideo"/>
         <property name="requireAuthenticatedUser" value="true"/>
+        <property name="requiredMethods" value="POST"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.CalculateCompletion" >
         <property name="name" value="CalculateCompletion"/>
         <property name="requireAuthenticatedUser" value="true"/>
+        <property name="requiredMethods" value="GET"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.DownloadCount" >
         <property name="name" value="DownloadCount"/>
         <property name="requireAuthenticatedUser" value="false"/>
+        <property name="requiredMethods" value="POST"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.AddReview" >
         <property name="name" value="AddReview"/>
         <property name="requireAuthenticatedUser" value="false"/>
+        <property name="requiredMethods" value="POST"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.ReplyReview" >
         <property name="name" value="ReplyReview"/>
         <property name="requireAuthenticatedUser" value="true"/>
+        <property name="requiredMethods" value="POST"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.ReportReview" >
@@ -69,16 +81,19 @@
         <property name="requireAuthenticatedUser" value="true"/>
         <property name="templatePath" value="/mails/templates/reportedReviewNotification.vm"/>
         <property name="mailService" ref="MailService"/>
+        <property name="requiredMethods" value="POST"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.UnjustifiedReport" >
         <property name="name" value="UnjustifiedReport"/>
         <property name="requireAuthenticatedUser" value="true"/>
+        <property name="requiredMethods" value="POST"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.DeleteReview" >
         <property name="name" value="DeleteReview"/>
         <property name="requireAuthenticatedUser" value="true"/>
+        <property name="requiredMethods" value="POST, GET"/>
     </bean>
 
     <bean class="org.jahia.modules.forge.actions.UpdateModuleIcon" >
@@ -86,6 +101,7 @@
         <property name="requireAuthenticatedUser" value="true"/>
         <property name="requiredPermission" value="jcr:write"/>
         <property name="imageService" ref="imageService"/>
+        <property name="requiredMethods" value="POST"/>
     </bean>
 
     <bean name="mavenProxyController" class="org.jahia.modules.forge.proxy.MavenProxy">
