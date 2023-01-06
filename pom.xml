@@ -40,11 +40,12 @@
         <connection>scm:git:git@github.com:Jahia/privateappstore.git</connection>
         <url>scm:git:git@github.com:Jahia/privateappstore</url>
         <developerConnection>scm:git:git@github.com:Jahia/privateappstore.git</developerConnection>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
     <properties>
         <require-capability>osgi.extender;filter:="(osgi.extender=org.jahia.bundles.blueprint.extender.config)"</require-capability>
-        <jahia-module-signature>MCwCFGXNPTEVe/eJLmnxDGTaqJvcRo68AhQO5Rmd1aMCfnifm7nOEAdAKogqsw==</jahia-module-signature>
+        <jahia-module-signature>MCwCFEPVpbnRA/mwpz5WyrgkoYKwOhWyAhQv6wGIK58LWbMj0mlbFWLBBhYpqA==</jahia-module-signature>
+        <jahia-key>org.jahia.privateAppStore</jahia-key>
     </properties>
     <distributionManagement>
         <repository>

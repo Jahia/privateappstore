@@ -25,7 +25,6 @@ package org.jahia.modules.forge.actions;
 
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.TextExtractor;
-
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
 import org.jahia.services.content.JCRNodeWrapper;
@@ -44,7 +43,6 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Value;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.util.*;
 
 /**
@@ -53,7 +51,7 @@ import java.util.*;
  * @author Frédéric PIERRE
  * @version 1.0
  */
-public class CalculateCompletion  extends PrivateAppStoreAction {
+public class CalculateCompletion extends Action {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(CalculateCompletion.class);
 
@@ -152,12 +150,12 @@ public class CalculateCompletion  extends PrivateAppStoreAction {
     }
 
     private void checkProperty(String name, int type, int percentage, boolean mandatory,
-                                      JCRSessionWrapper session, JCRNodeWrapper module) {
+                               JCRSessionWrapper session, JCRNodeWrapper module) {
         checkProperty(name, type, percentage, mandatory, session, module, false);
     }
 
     private static void checkProperty(String name, int type, int percentage, boolean mandatory,
-                               JCRSessionWrapper session, JCRNodeWrapper module, boolean simpleCheck) {
+                                      JCRSessionWrapper session, JCRNodeWrapper module, boolean simpleCheck) {
 
         boolean completed = true;
 
@@ -232,8 +230,7 @@ public class CalculateCompletion  extends PrivateAppStoreAction {
             if (simpleCheck)
                 return;
             completion += percentage;
-        }
-        else {
+        } else {
             if (mandatory) {
                 canBePublished = false;
                 if (simpleCheck)
@@ -242,7 +239,7 @@ public class CalculateCompletion  extends PrivateAppStoreAction {
 
             Map<String, Object> propertyMap = new HashMap<String, Object>();
             propertyMap.put("name",
-                Messages.get("resources.privateappstore", "jnt_forgeModule."+name.replace(':', '_'), session.getLocale(), name));
+                    Messages.get("resources.privateappstore", "jnt_forgeModule." + name.replace(':', '_'), session.getLocale(), name));
             propertyMap.put("mandatory", mandatory);
 
             todoList.put(index++, propertyMap);

@@ -45,7 +45,7 @@ import java.util.*;
  * @author Frédéric PIERRE
  * @version 1.0
  */
-public class AddReview extends PrivateAppStoreAction {
+public class AddReview extends Action {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(AddReview.class);
 
@@ -79,10 +79,9 @@ public class AddReview extends PrivateAppStoreAction {
         JSONObject result = new JSONObject();
         String returnUrl = getParameter(parameters, "returnUrl");
 
-        if(StringUtils.isEmpty(returnUrl)){
+        if (StringUtils.isEmpty(returnUrl)) {
             result.put("moduleUrl", node.getUrl());
-        }
-        else{
+        } else {
             result.put("moduleUrl", returnUrl);
         }
         return new ActionResult(HttpServletResponse.SC_OK, returnUrl, result);

@@ -44,7 +44,7 @@ import java.util.Map;
  * @author Frédéric PIERRE
  * @version 1.0
  */
-public class EditVideo extends PrivateAppStoreAction {
+public class EditVideo extends Action {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(EditVideo.class);
 

@@ -37,7 +37,7 @@ public class RedirectFilter extends AbstractFilter {
             throws Exception {
         new URLGenerator(renderContext, resource);
         String url = "/" + resource.getLocale() + renderContext.getURLGenerator().getResourcePath();
-        if (renderContext.getServletPath().endsWith(renderContext.getMode()+"frame")) {
+        if (renderContext.getServletPath().endsWith(renderContext.getMode() + "frame")) {
             if (resource.getNode().isNodeType("jnt:page")) {
                 resource.setTemplate("redirect-page");
             } else {

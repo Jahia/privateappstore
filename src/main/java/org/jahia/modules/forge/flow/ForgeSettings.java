@@ -23,9 +23,9 @@
  */
 package org.jahia.modules.forge.flow;
 
-import java.io.Serializable;
-
 import org.apache.commons.lang.StringUtils;
+
+import java.io.Serializable;
 
 /**
  * Bean to handle Private App Store settings flow.
@@ -62,8 +62,8 @@ public class ForgeSettings implements Serializable {
     }
 
     public void setUrl(String url) {
-        if (StringUtils.endsWith(url,"/")) {
-            url = StringUtils.substringBeforeLast(url,"/");
+        if (StringUtils.endsWith(url, "/")) {
+            url = StringUtils.substringBeforeLast(url, "/");
         }
         this.url = StringUtils.trim(url);
     }

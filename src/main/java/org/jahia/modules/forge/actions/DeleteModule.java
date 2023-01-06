@@ -25,17 +25,14 @@ package org.jahia.modules.forge.actions;
 
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
-import org.jahia.bin.Render;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +43,7 @@ import java.util.Map;
  * @author Frédéric PIERRE
  * @version 1.0
  */
-public class DeleteModule extends PrivateAppStoreAction {
+public class DeleteModule extends Action {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(DeleteModule.class);
 
@@ -55,7 +52,7 @@ public class DeleteModule extends PrivateAppStoreAction {
 
         JCRNodeWrapper module = resource.getNode();
         session.checkout(module);
-        logger.info("Module "+module.getDisplayableName()+" has been deleted by user "+renderContext.getUser().getUsername());
+        logger.info("Module " + module.getDisplayableName() + " has been deleted by user " + renderContext.getUser().getUsername());
         module.remove();
         session.save();
 

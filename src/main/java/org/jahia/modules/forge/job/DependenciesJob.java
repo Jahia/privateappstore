@@ -47,24 +47,25 @@ public class DependenciesJob extends BackgroundJob {
     private static final long serialVersionUID = 1L;
 
     private static final Logger logger = LoggerFactory.getLogger(DependenciesJob.class);
+
     @Override
     public void executeJahiaJob(JobExecutionContext jobExecutionContext) throws Exception {
         logger.info("Beginning update of dependencies for missing ones.");
-        JCRTemplate.getInstance().doExecute(JahiaUserManagerService.getInstance().getRootUserName(),null, Constants.LIVE_WORKSPACE, Locale.ENGLISH,new JCRCallback<Object>() {
+        JCRTemplate.getInstance().doExecute(JahiaUserManagerService.getInstance().getRootUserName(), null, Constants.LIVE_WORKSPACE, Locale.ENGLISH, new JCRCallback<Object>() {
             @Override
             public Object doInJCR(JCRSessionWrapper session) throws RepositoryException {
                 try {
                     Map<String, UpdateReferencesForModule> beansOfType = SpringContextSingleton.getBeansOfType(UpdateReferencesForModule.class);
-                    if(!beansOfType.isEmpty()) {
+                    if (!beansOfType.isEmpty()) {
                         UpdateReferencesForModule module = beansOfType.values().iterator().next();
                         JCRNodeIteratorWrapper nodes = session.getWorkspace().getQueryManager().createQuery("select * from [jnt:forgeModuleVersion] where references is null", Query.JCR_SQL2).execute().getNodes();
                         while (nodes.hasNext()) {
                             JCRNodeWrapper jcrNodeWrapper = (JCRNodeWrapper) nodes.nextNode();
-                            if(!jcrNodeWrapper.hasProperty("references")) {
-                                logger.info("Updating dependencies of "+jcrNodeWrapper.getDisplayableName());
+                            if (!jcrNodeWrapper.hasProperty("references")) {
+                                logger.info("Updating dependencies of " + jcrNodeWrapper.getDisplayableName());
                                 module.executeBackgroundAction(jcrNodeWrapper);
                             } else {
-                                logger.info("Skipping updating dependencies of "+jcrNodeWrapper.getDisplayableName()+" as they already exist");
+                                logger.info("Skipping updating dependencies of " + jcrNodeWrapper.getDisplayableName() + " as they already exist");
                             }
                         }
                     }
