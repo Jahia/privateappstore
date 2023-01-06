@@ -27,7 +27,6 @@ import org.apache.commons.lang.StringUtils;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.templates.ModuleVersion;
 
-import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import java.util.*;
@@ -45,13 +44,13 @@ public class ForgeFunctions {
         // get Version
 
         LinkedList<ModuleVersion> versions = new LinkedList<ModuleVersion>();
-        Map<ModuleVersion,JCRNodeWrapper> modules = new HashMap<ModuleVersion, JCRNodeWrapper>();
+        Map<ModuleVersion, JCRNodeWrapper> modules = new HashMap<ModuleVersion, JCRNodeWrapper>();
         while (moduleIterator.hasNext()) {
             JCRNodeWrapper module = (JCRNodeWrapper) moduleIterator.nextNode();
             try {
                 ModuleVersion moduleVersion = new ModuleVersion(module.getProperty("versionNumber").getString());
                 versions.add(moduleVersion);
-                modules.put(moduleVersion,module);
+                modules.put(moduleVersion, module);
             } catch (RepositoryException e) {
                 // unable to read version, do nothing
             }
@@ -78,7 +77,7 @@ public class ForgeFunctions {
                 // property cannot be read, do nothing
             }
         }
-        return  null;
+        return null;
     }
 
     public static List<JCRNodeWrapper> previousVersions(List<JCRNodeWrapper> modules) {
@@ -86,10 +85,10 @@ public class ForgeFunctions {
         if (lastVersion == null || modules == null) {
             return null;
         }
-        List<JCRNodeWrapper> previousModules= new ArrayList<JCRNodeWrapper>(modules);
-        for (JCRNodeWrapper module: modules) {
+        List<JCRNodeWrapper> previousModules = new ArrayList<JCRNodeWrapper>(modules);
+        for (JCRNodeWrapper module : modules) {
             previousModules.remove(module);
-            if (StringUtils.equals(lastVersion.getPath(),module.getPath())) {
+            if (StringUtils.equals(lastVersion.getPath(), module.getPath())) {
                 break;
             }
         }
@@ -98,13 +97,13 @@ public class ForgeFunctions {
 
     public static List<JCRNodeWrapper> nextVersions(List<JCRNodeWrapper> modules) {
         JCRNodeWrapper lastVersion = latestVersion(modules);
-        if (lastVersion == null|| modules == null) {
+        if (lastVersion == null || modules == null) {
             return modules;
         }
-        List<JCRNodeWrapper> nextModules= new ArrayList<JCRNodeWrapper>(modules);
+        List<JCRNodeWrapper> nextModules = new ArrayList<JCRNodeWrapper>(modules);
         boolean delete = false;
-        for (JCRNodeWrapper module: modules) {
-            if (StringUtils.equals(lastVersion.getPath(),module.getPath())) {
+        for (JCRNodeWrapper module : modules) {
+            if (StringUtils.equals(lastVersion.getPath(), module.getPath())) {
                 delete = true;
             }
             if (delete) {

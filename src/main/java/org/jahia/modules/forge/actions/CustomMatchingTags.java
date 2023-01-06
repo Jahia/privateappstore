@@ -42,7 +42,7 @@ import java.util.Map;
 /**
  * Created by kevan on 09/09/14.
  */
-public class CustomMatchingTags extends Action{
+public class CustomMatchingTags extends Action {
     private TaggingService taggingService;
 
     @Override
@@ -53,7 +53,7 @@ public class CustomMatchingTags extends Action{
         Map<String, Long> tags = taggingService.getTagsSuggester().suggest(prefix, path, 1l, limit, 0l, true, session);
         JSONObject result = new JSONObject();
         JSONArray tagsJSON = new JSONArray();
-        for(String tag : tags.keySet()){
+        for (String tag : tags.keySet()) {
             JSONObject tagJSON = new JSONObject();
             tagJSON.put("name", tag);
             tagJSON.put("count", tags.get(tag));
@@ -61,7 +61,7 @@ public class CustomMatchingTags extends Action{
         }
 
         String transformedPrefix = taggingService.getTagHandler().execute(prefix);
-        if(StringUtils.isNotEmpty(transformedPrefix)){
+        if (StringUtils.isNotEmpty(transformedPrefix)) {
             JSONObject tagJSON = new JSONObject();
             tagJSON.put("name", transformedPrefix);
             tagJSON.put("count", 0);

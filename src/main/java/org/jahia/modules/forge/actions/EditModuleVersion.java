@@ -37,7 +37,8 @@ import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Date: 2013-03-27
@@ -45,7 +46,7 @@ import java.util.*;
  * @author Frédéric PIERRE
  * @version 1.0
  */
-public class EditModuleVersion extends PrivateAppStoreAction {
+public class EditModuleVersion extends Action {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(EditModuleVersion.class);
 
@@ -72,7 +73,7 @@ public class EditModuleVersion extends PrivateAppStoreAction {
 
         if (relatedJahiaVersionUUID != null) {
             JCRNodeWrapper relatedJahiaVersion = session.getNodeByUUID(relatedJahiaVersionUUID);
-            moduleVersion.setProperty("relatedJahiaVersion",relatedJahiaVersion);
+            moduleVersion.setProperty("relatedJahiaVersion", relatedJahiaVersion);
         }
 
         final FileUpload fu = (FileUpload) req.getAttribute(FileUpload.FILEUPLOAD_ATTRIBUTE);

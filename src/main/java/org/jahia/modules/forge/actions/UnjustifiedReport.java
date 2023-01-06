@@ -44,7 +44,7 @@ import java.util.Map;
  * @author Frédéric PIERRE
  * @version 1.0
  */
-public class UnjustifiedReport extends PrivateAppStoreAction {
+public class UnjustifiedReport extends Action {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(UnjustifiedReport.class);
 
@@ -57,7 +57,7 @@ public class UnjustifiedReport extends PrivateAppStoreAction {
         JCRNodeWrapper module = node.isNodeType("jnt:review") ? node.getParent().getParent() : node.getParent().getParent().getParent();
 
         session.checkout(node);
-        node.setProperty("unjustifiedReport",true);
+        node.setProperty("unjustifiedReport", true);
         session.save();
 
         logger.info("Reported review " + node.getPath() + " considered as unjustified");

@@ -31,6 +31,7 @@ import org.apache.maven.model.Model;
 import org.apache.xerces.impl.dv.util.Base64;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.jahia.api.Constants;
+import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
 import org.jahia.commons.Version;
 import org.jahia.data.templates.ModuleReleaseInfo;
@@ -54,7 +55,10 @@ import org.slf4j.LoggerFactory;
 import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
@@ -65,7 +69,7 @@ import java.util.regex.Pattern;
 /**
  * Action to par a jar and produce an entry in module list
  */
-public class CreateEntryFromJar extends PrivateAppStoreAction {
+public class CreateEntryFromJar extends Action {
 
     private static final Logger logger = LoggerFactory.getLogger(CreateEntryFromJar.class);
     private static final String[] EMPTY_REFERENCES = new String[]{"none"};
@@ -249,9 +253,9 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
 
         session.save();
 
-        ActionResult uploadResult =  new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("successRedirectUrl", packageUrl).put(
+        ActionResult uploadResult = new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("successRedirectUrl", packageUrl).put(
                 "successRedirectAbsoluteUrl", packageAbsoluteUrl));
-        if(formParams.containsKey(REDIRECT_URL)){
+        if (formParams.containsKey(REDIRECT_URL)) {
             uploadResult.setUrl(formParams.get(REDIRECT_URL).get(0));
         }
 
@@ -380,7 +384,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
         JCRNodeWrapper moduleVersion = createNode(request, versionParameters, module, JNT_FORGEMODULEVERSION, module.getName() + "-" + version, false);
 
         String value = attributes.getValue("Jahia-Depends");
-        if(value!=null) {
+        if (value != null) {
             String[] jahiaDepends = value.split(",");
             moduleVersion.setProperty("references", jahiaDepends);
         } else {
@@ -400,9 +404,9 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
         String moduleUrl = renderContext.getResponse().encodeURL(module.getUrl());
         String moduleAbsoluteUrl = module.getProvider().getAbsoluteContextPath(request) + moduleUrl;
         session.save();
-        ActionResult uploadResult =  new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("successRedirectUrl", moduleUrl).put(
+        ActionResult uploadResult = new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("successRedirectUrl", moduleUrl).put(
                 "successRedirectAbsoluteUrl", moduleAbsoluteUrl));
-        if(formParams.containsKey(REDIRECT_URL)){
+        if (formParams.containsKey(REDIRECT_URL)) {
             uploadResult.setUrl(formParams.get(REDIRECT_URL).get(0));
         }
 
@@ -416,7 +420,7 @@ public class CreateEntryFromJar extends PrivateAppStoreAction {
         this.mavenExecutable = mavenExecutable;
     }
 
-    private JCRNodeWrapper getJahiaVersion(String requiredVersion, Resource resource, JCRSessionWrapper session) throws RepositoryException{
+    private JCRNodeWrapper getJahiaVersion(String requiredVersion, Resource resource, JCRSessionWrapper session) throws RepositoryException {
         JCRNodeWrapper versions = session.getNode(resource.getNode().getResolveSite().getPath() + "/contents/modules-required-versions");
 
         if (!versions.hasNode(requiredVersion)) {

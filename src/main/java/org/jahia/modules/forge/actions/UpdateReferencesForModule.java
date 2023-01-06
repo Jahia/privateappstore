@@ -28,6 +28,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.xerces.impl.dv.util.Base64;
+import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
 import org.jahia.data.templates.ModuleReleaseInfo;
 import org.jahia.services.cache.CacheHelper;
@@ -58,7 +59,7 @@ import java.util.jar.Manifest;
  * @author Frédéric PIERRE
  * @version 1.0
  */
-public class UpdateReferencesForModule extends PrivateAppStoreAction implements BackgroundAction {
+public class UpdateReferencesForModule extends Action implements BackgroundAction {
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(UpdateReferencesForModule.class);
     private static final String[] EMPTY_REFERENCES = new String[]{"none"};
 

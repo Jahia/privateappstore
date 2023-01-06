@@ -50,7 +50,7 @@ import java.util.Map;
  * @author Frédéric PIERRE
  * @version 1.0
  */
-public class ReportReview extends PrivateAppStoreAction {
+public class ReportReview extends Action {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(ReportReview.class);
     private MailServiceImpl mailService;
@@ -100,7 +100,7 @@ public class ReportReview extends PrivateAppStoreAction {
             String cc = null;
             String bcc = null;
 
-            Map<String,Object> bindings = new HashMap<String,Object>();
+            Map<String, Object> bindings = new HashMap<String, Object>();
             bindings.put("reportedNodePath", node.getPath());
             bindings.put("isReview", new Boolean(node.isNodeType("jnt:review")));
             bindings.put("username", user.getUsername());

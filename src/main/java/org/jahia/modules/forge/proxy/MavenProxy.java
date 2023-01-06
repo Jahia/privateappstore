@@ -48,7 +48,7 @@ public class MavenProxy implements Controller {
     public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         if (request.getMethod().equals("GET")) {
-            String pathInfo = StringUtils.substringAfter(request.getPathInfo(),"/mavenproxy/");
+            String pathInfo = StringUtils.substringAfter(request.getPathInfo(), "/mavenproxy/");
             String siteName = StringUtils.substringBefore(pathInfo, "/");
             String path = "/" + StringUtils.substringAfter(pathInfo, "/");
 
@@ -73,8 +73,8 @@ public class MavenProxy implements Controller {
     }
 
     private ModuleReleaseInfo getModuleReleaseInfo(final String siteName) throws RepositoryException {
-        JCRSessionWrapper session =  JCRSessionFactory.getInstance().getCurrentUserSession("live");
-        JCRSiteNode siteNode = (JCRSiteNode) session.getNode("/sites/"+siteName);
+        JCRSessionWrapper session = JCRSessionFactory.getInstance().getCurrentUserSession("live");
+        JCRSiteNode siteNode = (JCRSiteNode) session.getNode("/sites/" + siteName);
         String forgeSettingsUrl = siteNode.getProperty("forgeSettingsUrl").getString();
         String user = siteNode.getProperty("forgeSettingsUser").getString();
         String password = new String(Base64.decode(siteNode.getProperty("forgeSettingsPassword").getString()));

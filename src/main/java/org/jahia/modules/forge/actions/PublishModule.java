@@ -46,7 +46,7 @@ import java.util.Map;
  * @author Frédéric PIERRE
  * @version 1.0
  */
-public class PublishModule  extends PrivateAppStoreAction {
+public class PublishModule extends Action {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(PublishModule.class);
 
@@ -80,7 +80,7 @@ public class PublishModule  extends PrivateAppStoreAction {
                     }
                 }
                 if (!hasPublishedVersion) {
-                    sortedVersions.get(0).setProperty("published",true);
+                    sortedVersions.get(0).setProperty("published", true);
                     session.save();
                 }
             }

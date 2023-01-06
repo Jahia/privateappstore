@@ -44,7 +44,7 @@ import java.util.Map;
  * @author Frédéric PIERRE
  * @version 1.0
  */
-public class AddVideo extends PrivateAppStoreAction {
+public class AddVideo extends Action {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(AddVideo.class);
 
@@ -64,8 +64,7 @@ public class AddVideo extends PrivateAppStoreAction {
 
         if (allowfullscreen != null && allowfullscreen.equals("on")) {
             videoNode.setProperty("allowfullscreen", true);
-        }
-        else {
+        } else {
             videoNode.setProperty("allowfullscreen", false);
         }
         videoNode.setProperty("html5Player", true);

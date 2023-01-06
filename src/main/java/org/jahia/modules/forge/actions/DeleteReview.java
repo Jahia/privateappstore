@@ -44,7 +44,7 @@ import java.util.Map;
  * @author Frédéric PIERRE
  * @version 1.0
  */
-public class DeleteReview extends PrivateAppStoreAction {
+public class DeleteReview extends Action {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(DeleteReview.class);
 
@@ -73,8 +73,7 @@ public class DeleteReview extends PrivateAppStoreAction {
 
             node.remove();
 
-        }
-        else {  // then node is a reply to a review
+        } else {  // then node is a reply to a review
 
             module = node.getParent().getParent().getParent();
 
