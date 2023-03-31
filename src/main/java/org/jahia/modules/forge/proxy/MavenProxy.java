@@ -68,6 +68,8 @@ public class MavenProxy implements Controller {
             try (final CloseableHttpResponse httpResponse = httpClient.execute(httpMethod)) {
                 if (httpResponse.getCode() == HttpServletResponse.SC_OK) {
                     IOUtils.copy(httpResponse.getEntity().getContent(), response.getOutputStream());
+                } else {
+                    response.sendError(httpResponse.getCode());
                 }
             } catch (IOException ex) {
                 LOGGER.error(ex.getMessage(), ex);
