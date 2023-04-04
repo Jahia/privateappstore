@@ -23,10 +23,7 @@
  */
 package org.jahia.modules.forge.proxy;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.io.IOUtils;
+import java.io.IOException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.xerces.impl.dv.util.Base64;
 import org.jahia.data.templates.ModuleReleaseInfo;
@@ -39,10 +36,19 @@ import org.springframework.web.servlet.mvc.Controller;
 import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.io.IOUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.jahia.services.SpringContextSingleton;
+import org.jahia.services.notification.HttpClientService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.util.UriComponentsBuilder;
 
 public class MavenProxy implements Controller {
 
-//    private HttpClientService httpClientService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MavenProxy.class);
 
     @Override
     public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -55,18 +61,19 @@ public class MavenProxy implements Controller {
             ModuleReleaseInfo releaseInfo = getModuleReleaseInfo(siteName);
 
             String url = releaseInfo.getRepositoryUrl() + path;
-            HttpClient client = new HttpClient();
-            GetMethod getMethod = new GetMethod(url);
-            getMethod.addRequestHeader("Authorization", "Basic " + Base64.encode((releaseInfo.getUsername() + ":" + releaseInfo.getPassword()).getBytes()));
-
-            int res = client.executeMethod(null, getMethod);
-            if (res == 200) {
-                for (Header header : getMethod.getResponseHeaders()) {
-                    response.setHeader(header.getName(), header.getValue());
+            // Usage of SpringContextSingleton to prevent bug QA-9515
+            final CloseableHttpClient httpClient = ((HttpClientService) SpringContextSingleton.getBean("HttpClientService")).getHttpClient(url);
+            final HttpGet httpMethod = new HttpGet(UriComponentsBuilder.fromHttpUrl(url).build(false).toUri());
+            httpMethod.addHeader("Authorization", "Basic " + Base64.encode((releaseInfo.getUsername() + ":" + releaseInfo.getPassword()).getBytes()));
+            try (final CloseableHttpResponse httpResponse = httpClient.execute(httpMethod)) {
+                if (httpResponse.getCode() == HttpServletResponse.SC_OK) {
+                    IOUtils.copy(httpResponse.getEntity().getContent(), response.getOutputStream());
+                } else {
+                    response.sendError(httpResponse.getCode());
                 }
-                IOUtils.copy(getMethod.getResponseBodyAsStream(), response.getOutputStream());
-            } else {
-                response.sendError(res);
+            } catch (IOException ex) {
+                LOGGER.error(ex.getMessage(), ex);
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             }
         }
         return null;
@@ -84,9 +91,4 @@ public class MavenProxy implements Controller {
         info.setPassword(password);
         return info;
     }
-
-//    public void setHttpClientService(HttpClientService httpClientService) {
-//        this.httpClientService = httpClientService;
-//    }
-
 }

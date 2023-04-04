@@ -23,8 +23,6 @@
  */
 package org.jahia.modules.forge.actions;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.xerces.impl.dv.util.Base64;
@@ -51,7 +49,13 @@ import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
-
+import javax.servlet.http.HttpServletResponse;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.jahia.services.SpringContextSingleton;
+import org.jahia.services.notification.HttpClientService;
+import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * Date: 2013-05-17
@@ -60,6 +64,7 @@ import java.util.jar.Manifest;
  * @version 1.0
  */
 public class UpdateReferencesForModule extends Action implements BackgroundAction {
+
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(UpdateReferencesForModule.class);
     private static final String[] EMPTY_REFERENCES = new String[]{"none"};
 
@@ -77,32 +82,35 @@ public class UpdateReferencesForModule extends Action implements BackgroundActio
         ModuleReleaseInfo releaseInfo = getModuleReleaseInfo(module.getResolveSite());
 
         String url = module.getProperty("url").getString();
-        HttpClient client = new HttpClient();
-        GetMethod getMethod = new GetMethod(url);
-        getMethod.addRequestHeader("Authorization", "Basic " + Base64.encode((releaseInfo.getUsername() + ":" + releaseInfo.getPassword()).getBytes()));
+        // Usage of SpringContextSingleton to prevent bug QA-9515
+        final CloseableHttpClient httpClient = ((HttpClientService) SpringContextSingleton.getBean("HttpClientService")).getHttpClient(url);
+        final HttpGet httpMethod = new HttpGet(UriComponentsBuilder.fromHttpUrl(url).build(false).toUri());
+        httpMethod.addHeader("Authorization", "Basic " + Base64.encode((releaseInfo.getUsername() + ":" + releaseInfo.getPassword()).getBytes()));
 
-        int res = client.executeMethod(null, getMethod);
-        if (res == 200) {
-            File tmpJarFile = File.createTempFile("appStore", ".jar");
-            try {
-                IOUtils.copy(getMethod.getResponseBodyAsStream(), new FileOutputStream(tmpJarFile));
-                try (JarFile jarFile = new JarFile(tmpJarFile)) {
-                    Manifest manifest = jarFile.getManifest();
-                    Attributes attributes = manifest.getMainAttributes();
-                    String value = attributes.getValue("Jahia-Depends");
-                    if (value != null) {
-                        String[] jahiaDepends = value.split(",");
-                        module.setProperty("references", jahiaDepends);
-                    } else {
-                        module.setProperty("references", EMPTY_REFERENCES);
+        try ( CloseableHttpResponse httpResponse = httpClient.execute(httpMethod)) {
+            if (httpResponse.getCode() == HttpServletResponse.SC_OK) {
+                File tmpJarFile = File.createTempFile("appStore", ".jar");
+                try {
+                    IOUtils.copy(httpResponse.getEntity().getContent(), new FileOutputStream(tmpJarFile));
+                    try ( JarFile jarFile = new JarFile(tmpJarFile)) {
+                        Manifest manifest = jarFile.getManifest();
+                        Attributes attributes = manifest.getMainAttributes();
+                        String value = attributes.getValue("Jahia-Depends");
+                        if (value != null) {
+                            String[] jahiaDepends = value.split(",");
+                            module.setProperty("references", jahiaDepends);
+                        } else {
+                            module.setProperty("references", EMPTY_REFERENCES);
+                        }
+                        module.getSession().save();
+                        CacheHelper.flushOutputCachesForPath(module.getParent().getPath(), true);
                     }
-                    module.getSession().save();
-                    CacheHelper.flushOutputCachesForPath(module.getParent().getPath(), true);
+                } finally {
+                    FileUtils.forceDelete(tmpJarFile);
                 }
-            } finally {
-                FileUtils.forceDelete(tmpJarFile);
             }
-
+        } catch (IOException ex) {
+            logger.error(ex.getMessage(), ex);
         }
     }
 
