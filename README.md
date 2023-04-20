@@ -4,7 +4,7 @@
 
 Private App store
 ======================
-Jahia module that enable a store
+Jahia module that enables a store
 
 ## Open-Source
 
