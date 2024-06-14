@@ -67,6 +67,7 @@ public class MavenProxy implements Controller {
             httpMethod.addHeader("Authorization", "Basic " + Base64.encode((releaseInfo.getUsername() + ":" + releaseInfo.getPassword()).getBytes()));
             try (final CloseableHttpResponse httpResponse = httpClient.execute(httpMethod)) {
                 if (httpResponse.getCode() == HttpServletResponse.SC_OK) {
+                    response.setContentType(httpResponse.getEntity().getContentType());
                     IOUtils.copy(httpResponse.getEntity().getContent(), response.getOutputStream());
                 } else {
                     response.sendError(httpResponse.getCode());
