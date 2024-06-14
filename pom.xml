@@ -33,14 +33,14 @@
     </parent>
     <artifactId>privateappstore</artifactId>
     <name>Jahia Private App Store</name>
-    <version>4.2.1</version>
+    <version>4.2.2-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <description>This is the custom module (Private App Store) for running on a Jahia server.</description>
     <scm>
         <connection>scm:git:git@github.com:Jahia/privateappstore.git</connection>
         <url>scm:git:git@github.com:Jahia/privateappstore</url>
         <developerConnection>scm:git:git@github.com:Jahia/privateappstore.git</developerConnection>
-        <tag>4_2_1</tag>
+        <tag>HEAD</tag>
     </scm>
     <properties>
         <require-capability>
