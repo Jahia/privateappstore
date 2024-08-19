@@ -58,17 +58,15 @@
                                                            value="${version.properties.versionNumber.string}"/>
                                             <json:property name="requiredVersion"
                                                            value="${version.properties.requiredVersion.node.name}"/>
-                                            <c:choose>
-                                                <c:when test="${child.properties['jcr:primaryType'].string eq 'jnt:forgeModule'}">
-                                                    <c:set var="downloadUrl" value="${version.properties.url.string}"/>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <c:set var="files" value="${jcr:getChildrenOfType(version, 'jnt:file')}"/>
-                                                    <c:forEach var="file" items="${files}">
-                                                        <c:url var="downloadUrl" value="${url.server}${url.context}${url.files}${file.path}" context="/"/>
-                                                    </c:forEach>
-                                                </c:otherwise>
-                                            </c:choose>
+                                            <c:set var="files" value="${jcr:getChildrenOfType(version, 'jnt:file')}"/>
+                                            <c:if test="${empty files}">
+                                                <c:set var="downloadUrl" value="${version.properties.url.string}"/>    
+                                            </c:if>
+                                            <c:if test="${not empty files}">
+                                                <c:forEach var="file" items="${files}">
+                                                    <c:url var="downloadUrl" value="${url.server}${url.context}${url.files}${file.path}" context="/"/>
+                                                </c:forEach>
+                                            </c:if>
                                             <json:property name="downloadUrl" value="${downloadUrl}"/>
                                         </json:object>
                                     </c:if>

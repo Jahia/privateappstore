@@ -49,6 +49,7 @@
         </require-capability>
         <jahia-module-signature>MCwCFE8DcBvkgN28BwxF2YHIgH8A0md6AhQt4t/+UEVnWbjdT667GE6LwbKHWg==</jahia-module-signature>
 	<jahia-key>org.jahia.privateAppStore</jahia-key>
+        <jahia.plugin.version>6.10</jahia.plugin.version>
     </properties>
     <distributionManagement>
         <repository>
