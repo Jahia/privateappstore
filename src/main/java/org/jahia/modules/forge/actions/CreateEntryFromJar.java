@@ -115,7 +115,7 @@ public class CreateEntryFromJar extends Action {
                     while ((entry = tarInputStream.getNextTarEntry()) != null) {
                         if (entry.isFile() && entry.getName().equals("package/package.json")) {
                             final JSONObject jsonObject = new JSONObject(IOUtils.toString(tarInputStream, "UTF-8"));
-                            return createNpmModule(uploadedFile, jsonObject, request, renderContext, resource, session, extension, formParameters);
+                            return createJavascriptModule(uploadedFile, jsonObject, request, renderContext, resource, session, extension, formParameters);
                         }
                     }
 
@@ -156,7 +156,7 @@ public class CreateEntryFromJar extends Action {
         }
     }
     
-    private ActionResult createNpmModule(DiskFileItem uploadedFile, JSONObject jsonObject, HttpServletRequest request, RenderContext renderContext, Resource resource, JCRSessionWrapper session, String extension, Map<String, List<String>> formParams) throws Exception {
+    private ActionResult createJavascriptModule(DiskFileItem uploadedFile, JSONObject jsonObject, HttpServletRequest request, RenderContext renderContext, Resource resource, JCRSessionWrapper session, String extension, Map<String, List<String>> formParams) throws Exception {
         JCRNodeWrapper repository = resource.getNode();
         final String version = jsonObject.getString("version");
         final String moduleName = jsonObject.getString("name");
@@ -183,7 +183,7 @@ public class CreateEntryFromJar extends Action {
         final JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
         moduleParams.put(REQUIRED_VERSION, Arrays.asList(versions.getNode(requiredVersion).getIdentifier()));
 
-        // TODO: upload NPM module
+        // TODO: upload Javascript module
 
         // Create module
         final List<String> moduleParamKeys = Arrays.asList(DESCRIPTION, "category", "icon", "authorNameDisplayedAs", AUTHOR_URL, "authorEmail", "FAQ", "codeRepository", "downloadCount", "supportedByJahia", "reviewedByJahia", "published", "deleted", "screenshots", "video", "groupId");
@@ -209,7 +209,7 @@ public class CreateEntryFromJar extends Action {
             }
         }
 
-        logger.info("Start creating Private App Store NPM Module {}", moduleName);
+        logger.info("Start creating Private App Store Javascript Module {}", moduleName);
 
         JCRNodeWrapper module;
 
@@ -260,9 +260,9 @@ public class CreateEntryFromJar extends Action {
             moduleVersion.grantRoles("u:" + session.getUser().getUsername(), new HashSet<String>(roles));
         }
 
-        logger.info("NPM Module version {} of {} successfully added", version, title);
+        logger.info("Javascript Module version {} of {} successfully added", version, title);
 
-        logger.info("Private App Store NPM Module {} successfully created and added to repository {}", moduleName,
+        logger.info("Private App Store Javascript Module {} successfully created and added to repository {}", moduleName,
                 repository.getPath());
 
         final String moduleUrl = renderContext.getResponse().encodeURL(module.getUrl());
