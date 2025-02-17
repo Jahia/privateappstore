@@ -47,6 +47,7 @@
                             <json:property name="groupId" value="${groupID}"/>
                             <json:property name="name" value="${child.name}"/>
                             <json:property name="title" value="${child.displayableName}"/>
+                            <json:property name="status" value="${child.properties.status.string}"/>
                             <c:if test="${not empty icon}">
                                 <json:property name="icon" value="${url.server}${icon.url}"/>
                             </c:if>
