@@ -133,8 +133,10 @@ public class CreateEntryFromJar extends Action {
             return errorResult(session, ERR_UNABLE_READ_FILE);
         }
         if (uploadedFile.getSize() > MAX_UPLOAD_SIZE_BYTES) {
-            logger.warn("CreateEntryFromJar: rejected oversized upload '{}' ({} bytes)",
-                    ActionSecurityUtils.sanitizeForLog(uploadedFile.getName()), uploadedFile.getSize());
+            if (logger.isWarnEnabled()) {
+                logger.warn("CreateEntryFromJar: rejected oversized upload '{}' ({} bytes)",
+                        ActionSecurityUtils.sanitizeForLog(uploadedFile.getName()), uploadedFile.getSize());
+            }
             uploadedFile.delete();
             return errorResult(session, ERR_UNABLE_READ_FILE);
         }
@@ -507,7 +509,7 @@ public class CreateEntryFromJar extends Action {
         String redirectUrl = formParams.get(REDIRECT_URL).get(0);
         if (ActionSecurityUtils.isSafeRedirect(redirectUrl)) {
             result.setUrl(redirectUrl);
-        } else {
+        } else if (logger.isWarnEnabled()) {
             logger.warn(LOG_UNSAFE_REDIRECT, ActionSecurityUtils.sanitizeForLog(redirectUrl));
         }
     }

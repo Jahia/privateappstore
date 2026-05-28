@@ -75,7 +75,7 @@ public class PublishModule extends Action {
         return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(PUBLISHED, published));
     }
 
-    private static void ensureLatestVersionPublished(JCRNodeWrapper module, JCRSessionWrapper session) throws Exception {
+    private static void ensureLatestVersionPublished(JCRNodeWrapper module, JCRSessionWrapper session) throws javax.jcr.RepositoryException {
         NodeIterator ni = module.getNodes();
         List<JCRNodeWrapper> sortedVersions = ForgeFunctions.sortModulesByVersion(ni);
         if (sortedVersions.isEmpty()) {

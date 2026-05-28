@@ -88,7 +88,7 @@ public class UpdateModuleIcon extends Action {
             String candidate = fileUpload.getParameterMap().get("redirectURL").get(0);
             if (ActionSecurityUtils.isSafeRedirect(candidate)) {
                 redirectURL = candidate;
-            } else {
+            } else if (logger.isWarnEnabled()) {
                 logger.warn("UpdateModuleIcon: rejected unsafe redirectURL '{}'",
                         ActionSecurityUtils.sanitizeForLog(candidate));
             }
@@ -101,8 +101,10 @@ public class UpdateModuleIcon extends Action {
                     && "image".equals(StringUtils.substringBefore(itemEntry.getContentType(), "/"))
                     && !"image/svg+xml".equalsIgnoreCase(itemEntry.getContentType());
             if (itemEntry.getSize() > MAX_ICON_SIZE_BYTES) {
-                logger.warn("UpdateModuleIcon: rejected oversized icon '{}' ({} bytes)",
-                        ActionSecurityUtils.sanitizeForLog(itemEntry.getName()), itemEntry.getSize());
+                if (logger.isWarnEnabled()) {
+                    logger.warn("UpdateModuleIcon: rejected oversized icon '{}' ({} bytes)",
+                            ActionSecurityUtils.sanitizeForLog(itemEntry.getName()), itemEntry.getSize());
+                }
                 result = wrongFormatResult(session, redirectURL);
             } else if (isImageContentType && ALLOWED_ICON_EXTENSIONS.contains(uploadExtension)) {
                 result = processValidIcon(session, iconFolder, itemEntry, redirectURL);

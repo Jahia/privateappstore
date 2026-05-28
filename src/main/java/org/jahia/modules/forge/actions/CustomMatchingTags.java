@@ -52,7 +52,7 @@ public class CustomMatchingTags extends Action {
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource, JCRSessionWrapper session, Map<String, List<String>> parameters, URLResolver urlResolver) throws Exception {
         String prefix = parameters.get("q") != null && parameters.get("q").size() > 0 ? parameters.get("q").get(0) : "";
         String path = parameters.get("path") != null && parameters.get("path").size() > 0 ? parameters.get("path").get(0) : renderContext.getSite().getPath();
-        Long limit = parameters.get(LIMIT) != null && parameters.get(LIMIT).size() > 0 ? Long.valueOf(parameters.get(LIMIT).get(0)) : 10l;
+        Long limit = parameters.get(LIMIT) != null && !parameters.get(LIMIT).isEmpty() ? Long.valueOf(parameters.get(LIMIT).get(0)) : 10l;
         Map<String, Long> tags = taggingService.getTagsSuggester().suggest(prefix, path, 1l, limit, 0l, true, session);
         JSONObject result = new JSONObject();
         JSONArray tagsJSON = new JSONArray();

@@ -59,7 +59,7 @@ final class ActionSecurityUtils {
         if (input == null) {
             return "null";
         }
-        String stripped = input.replaceAll("[\\r\\n\\t\\f\\u0000-\\u001F\\u007F]", "_");
+        String stripped = input.replaceAll("[\\u0000-\\u001F\\u007F]", "_");
         if (stripped.length() > 200) {
             stripped = stripped.substring(0, 200) + "...";
         }
