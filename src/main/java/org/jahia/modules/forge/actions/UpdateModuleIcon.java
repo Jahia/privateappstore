@@ -75,47 +75,54 @@ public class UpdateModuleIcon extends Action {
 
     @Override
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource, JCRSessionWrapper session, Map<String, List<String>> parameters, URLResolver urlResolver) throws Exception {
-        // cleanup folder icon
         if (session.getNode(resource.getNode().getPath()).hasNode("icon")) {
             session.getNode(resource.getNode().getPath()).getNode("icon").remove();
         }
         JCRNodeWrapper iconFolder = createNode(req, new HashMap<String, List<String>>(), resource.getNode(), "jnt:folder", "icon", true);
         final FileUpload fileUpload = (FileUpload) req.getAttribute(FileUpload.FILEUPLOAD_ATTRIBUTE);
-        String redirectURL = null;
-        ActionResult result;
-        if (fileUpload != null && fileUpload.getParameterMap().containsKey("redirectURL")) {
-            // Only accept a site-relative redirect target to prevent open redirect.
-            String candidate = fileUpload.getParameterMap().get("redirectURL").get(0);
-            if (ActionSecurityUtils.isSafeRedirect(candidate)) {
-                redirectURL = candidate;
-            } else if (logger.isWarnEnabled()) {
-                logger.warn("UpdateModuleIcon: rejected unsafe redirectURL '{}'",
-                        ActionSecurityUtils.sanitizeForLog(candidate));
-            }
-        }
-        if (fileUpload != null && fileUpload.getFileItems() != null && fileUpload.getFileItems().size() > 0) {
-            final Map<String, DiskFileItem> stringDiskFileItemMap = fileUpload.getFileItems();
-            DiskFileItem itemEntry = stringDiskFileItemMap.get(stringDiskFileItemMap.keySet().iterator().next());
-            String uploadExtension = FilenameUtils.getExtension(itemEntry.getName()).toLowerCase();
-            boolean isImageContentType = itemEntry.getContentType() != null
-                    && "image".equals(StringUtils.substringBefore(itemEntry.getContentType(), "/"))
-                    && !"image/svg+xml".equalsIgnoreCase(itemEntry.getContentType());
-            if (itemEntry.getSize() > MAX_ICON_SIZE_BYTES) {
-                if (logger.isWarnEnabled()) {
-                    logger.warn("UpdateModuleIcon: rejected oversized icon '{}' ({} bytes)",
-                            ActionSecurityUtils.sanitizeForLog(itemEntry.getName()), itemEntry.getSize());
-                }
-                result = wrongFormatResult(session, redirectURL);
-            } else if (isImageContentType && ALLOWED_ICON_EXTENSIONS.contains(uploadExtension)) {
-                result = processValidIcon(session, iconFolder, itemEntry, redirectURL);
-            } else {
-                result = wrongFormatResult(session, redirectURL);
-            }
-        } else {
+        String redirectURL = extractSafeRedirect(fileUpload);
+
+        if (fileUpload == null || fileUpload.getFileItems() == null || fileUpload.getFileItems().isEmpty()) {
             String error = Messages.get(RESOURCES, "forge.updateIcon.error.noFileFound", session.getLocale());
-            result = new ActionResult(HttpServletResponse.SC_OK, redirectURL, new JSONObject().put(ICON_UPDATE, false).put(ERROR_MESSAGE, error));
+            return new ActionResult(HttpServletResponse.SC_OK, redirectURL, new JSONObject().put(ICON_UPDATE, false).put(ERROR_MESSAGE, error));
         }
-        return result;
+        final Map<String, DiskFileItem> stringDiskFileItemMap = fileUpload.getFileItems();
+        DiskFileItem itemEntry = stringDiskFileItemMap.get(stringDiskFileItemMap.keySet().iterator().next());
+        return validateAndProcessIcon(session, iconFolder, itemEntry, redirectURL);
+    }
+
+    private static String extractSafeRedirect(FileUpload fileUpload) {
+        if (fileUpload == null || !fileUpload.getParameterMap().containsKey("redirectURL")) {
+            return null;
+        }
+        String candidate = fileUpload.getParameterMap().get("redirectURL").get(0);
+        if (ActionSecurityUtils.isSafeRedirect(candidate)) {
+            return candidate;
+        }
+        if (logger.isWarnEnabled()) {
+            logger.warn("UpdateModuleIcon: rejected unsafe redirectURL '{}'",
+                    ActionSecurityUtils.sanitizeForLog(candidate));
+        }
+        return null;
+    }
+
+    private ActionResult validateAndProcessIcon(JCRSessionWrapper session, JCRNodeWrapper iconFolder,
+                                                DiskFileItem itemEntry, String redirectURL) throws JSONException {
+        if (itemEntry.getSize() > MAX_ICON_SIZE_BYTES) {
+            if (logger.isWarnEnabled()) {
+                logger.warn("UpdateModuleIcon: rejected oversized icon '{}' ({} bytes)",
+                        ActionSecurityUtils.sanitizeForLog(itemEntry.getName()), itemEntry.getSize());
+            }
+            return wrongFormatResult(session, redirectURL);
+        }
+        String uploadExtension = FilenameUtils.getExtension(itemEntry.getName()).toLowerCase();
+        boolean isImageContentType = itemEntry.getContentType() != null
+                && "image".equals(StringUtils.substringBefore(itemEntry.getContentType(), "/"))
+                && !"image/svg+xml".equalsIgnoreCase(itemEntry.getContentType());
+        if (!isImageContentType || !ALLOWED_ICON_EXTENSIONS.contains(uploadExtension)) {
+            return wrongFormatResult(session, redirectURL);
+        }
+        return processValidIcon(session, iconFolder, itemEntry, redirectURL);
     }
 
     private ActionResult processValidIcon(JCRSessionWrapper session, JCRNodeWrapper iconFolder,
