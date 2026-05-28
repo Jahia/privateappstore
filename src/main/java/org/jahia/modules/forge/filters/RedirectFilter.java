@@ -28,9 +28,21 @@ import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLGenerator;
 import org.jahia.services.render.filter.AbstractFilter;
 import org.jahia.services.render.filter.RenderChain;
+import org.jahia.services.render.filter.RenderFilter;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 
 
+@Component(service = RenderFilter.class)
 public class RedirectFilter extends AbstractFilter {
+
+    @Activate
+    public void activate() {
+        setPriority(-4);
+        setSkipOnModes("live,studio");
+        setApplyOnSiteTemplateSets("privateappstore");
+        setApplyOnConfigurations("page");
+    }
 
     @Override
     public String prepare(RenderContext renderContext, Resource resource, RenderChain chain)

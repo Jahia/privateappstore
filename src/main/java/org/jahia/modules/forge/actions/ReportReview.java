@@ -33,6 +33,9 @@ import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
 import org.jahia.services.usermanager.JahiaUser;
 import org.json.JSONObject;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 
 import javax.jcr.RepositoryException;
@@ -50,12 +53,23 @@ import java.util.Map;
  * @author Frédéric PIERRE
  * @version 1.0
  */
+@Component(service = Action.class)
 public class ReportReview extends Action {
 
-    private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(ReportReview.class);
-    private MailServiceImpl mailService;
-    private String templatePath;
+    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(ReportReview.class);
+    private static final String DEFAULT_TEMPLATE_PATH = "/mails/templates/reportedReviewNotification.vm";
 
+    private MailServiceImpl mailService;
+    private String templatePath = DEFAULT_TEMPLATE_PATH;
+
+    @Activate
+    public void activate() {
+        setName("ReportReview");
+        setRequireAuthenticatedUser(true);
+        setRequiredMethods("POST");
+    }
+
+    @Reference
     public void setMailService(MailServiceImpl mailService) {
         this.mailService = mailService;
     }

@@ -35,6 +35,8 @@ import org.jahia.services.render.URLResolver;
 import org.jahia.taglibs.jcr.node.JCRTagUtils;
 import org.jahia.utils.i18n.Messages;
 import org.json.JSONObject;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 
 import javax.jcr.ItemNotFoundException;
@@ -55,9 +57,18 @@ import java.util.Map;
  * @author Frédéric PIERRE
  * @version 1.0
  */
+@Component(service = Action.class)
 public class CalculateCompletion extends Action {
 
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(CalculateCompletion.class);
+
+    @Activate
+    public void activate() {
+        setName("CalculateCompletion");
+        setRequireAuthenticatedUser(true);
+        setRequiredMethods("GET");
+    }
+
 
     private static final int TEXT = 100;
     private static final int WEAKREFERENCE = 200;

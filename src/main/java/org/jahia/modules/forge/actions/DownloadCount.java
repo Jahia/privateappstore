@@ -30,6 +30,8 @@ import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -41,7 +43,15 @@ import java.util.Map;
  * @author Frédéric PIERRE
  * @version 1.0
  */
+@Component(service = Action.class)
 public class DownloadCount extends Action {
+
+    @Activate
+    public void activate() {
+        setName("DownloadCount");
+        setRequireAuthenticatedUser(false);
+        setRequiredMethods("POST");
+    }
 
     @Override
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource,

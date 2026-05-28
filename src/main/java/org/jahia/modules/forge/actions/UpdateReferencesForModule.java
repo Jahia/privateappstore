@@ -37,6 +37,9 @@ import org.jahia.services.content.rules.BackgroundAction;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 
 import javax.jcr.RepositoryException;
@@ -53,7 +56,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.jahia.services.SpringContextSingleton;
 import org.jahia.services.notification.HttpClientService;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -63,10 +65,25 @@ import org.springframework.web.util.UriComponentsBuilder;
  * @author Frédéric PIERRE
  * @version 1.0
  */
+@Component(service = Action.class)
 public class UpdateReferencesForModule extends Action implements BackgroundAction {
 
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(UpdateReferencesForModule.class);
     private static final String[] EMPTY_REFERENCES = new String[]{"none"};
+
+    private HttpClientService httpClientService;
+
+    @Activate
+    public void activate() {
+        setName("UpdateReferences");
+        setRequireAuthenticatedUser(true);
+        setRequiredMethods("POST");
+    }
+
+    @Reference
+    public void setHttpClientService(HttpClientService httpClientService) {
+        this.httpClientService = httpClientService;
+    }
 
     @Override
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource, JCRSessionWrapper session, Map<String, List<String>> parameters, URLResolver urlResolver) throws Exception {
@@ -82,8 +99,7 @@ public class UpdateReferencesForModule extends Action implements BackgroundActio
         ModuleReleaseInfo releaseInfo = getModuleReleaseInfo(module.getResolveSite());
 
         String url = module.getProperty("url").getString();
-        // Usage of SpringContextSingleton to prevent bug QA-9515
-        final CloseableHttpClient httpClient = ((HttpClientService) SpringContextSingleton.getBean("HttpClientService")).getHttpClient(url);
+        final CloseableHttpClient httpClient = httpClientService.getHttpClient(url);
         final HttpGet httpMethod = new HttpGet(UriComponentsBuilder.fromHttpUrl(url).build(false).toUri());
         httpMethod.addHeader("Authorization", "Basic " + Base64.encode((releaseInfo.getUsername() + ":" + releaseInfo.getPassword()).getBytes()));
 

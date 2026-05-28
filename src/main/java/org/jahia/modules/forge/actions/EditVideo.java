@@ -31,6 +31,8 @@ import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
 import org.json.JSONObject;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,10 +46,18 @@ import java.util.Map;
  * @author Frédéric PIERRE
  * @version 1.0
  */
+@Component(service = Action.class)
 public class EditVideo extends Action {
 
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(EditVideo.class);
     private static final String ALLOWFULLSCREEN = "allowfullscreen";
+
+    @Activate
+    public void activate() {
+        setName("EditVideo");
+        setRequireAuthenticatedUser(true);
+        setRequiredMethods("POST");
+    }
 
     @Override
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource,

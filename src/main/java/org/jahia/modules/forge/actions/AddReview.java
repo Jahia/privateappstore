@@ -33,6 +33,8 @@ import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
 import org.json.JSONObject;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,9 +47,17 @@ import java.util.*;
  * @author Frédéric PIERRE
  * @version 1.0
  */
+@Component(service = Action.class)
 public class AddReview extends Action {
 
-    private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(AddReview.class);
+    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AddReview.class);
+
+    @Activate
+    public void activate() {
+        setName("AddReview");
+        setRequireAuthenticatedUser(false);
+        setRequiredMethods("POST");
+    }
 
     @Override
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource,

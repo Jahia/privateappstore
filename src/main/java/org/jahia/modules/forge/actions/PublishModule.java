@@ -32,6 +32,8 @@ import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
 import org.json.JSONObject;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 
 import javax.jcr.NodeIterator;
@@ -46,10 +48,18 @@ import java.util.Map;
  * @author Frédéric PIERRE
  * @version 1.0
  */
+@Component(service = Action.class)
 public class PublishModule extends Action {
 
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(PublishModule.class);
     private static final String PUBLISHED = "published";
+
+    @Activate
+    public void activate() {
+        setName("PublishModule");
+        setRequireAuthenticatedUser(true);
+        setRequiredMethods("POST");
+    }
 
     @Override
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource,

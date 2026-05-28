@@ -40,6 +40,9 @@ import org.jahia.tools.files.FileUpload;
 import org.jahia.utils.i18n.Messages;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -57,6 +60,7 @@ import java.util.Set;
 /**
  * Action called to update a module icon
  */
+@Component(service = Action.class)
 public class UpdateModuleIcon extends Action {
 
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(UpdateModuleIcon.class);
@@ -71,7 +75,15 @@ public class UpdateModuleIcon extends Action {
     private static final Set<String> ALLOWED_ICON_EXTENSIONS =
             new HashSet<>(Arrays.asList("png", "jpg", "jpeg", "gif", "webp"));
 
-    JahiaImageService imageService;
+    private JahiaImageService imageService;
+
+    @Activate
+    public void activate() {
+        setName("UpdateModuleIcon");
+        setRequireAuthenticatedUser(true);
+        setRequiredPermission("jcr:write");
+        setRequiredMethods("POST");
+    }
 
     @Override
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource, JCRSessionWrapper session, Map<String, List<String>> parameters, URLResolver urlResolver) throws Exception {
@@ -156,6 +168,7 @@ public class UpdateModuleIcon extends Action {
         return new ActionResult(HttpServletResponse.SC_OK, redirectURL, new JSONObject().put(ICON_UPDATE, false).put(ERROR_MESSAGE, error));
     }
 
+    @Reference
     public void setImageService(JahiaImageService imageService) {
         this.imageService = imageService;
     }

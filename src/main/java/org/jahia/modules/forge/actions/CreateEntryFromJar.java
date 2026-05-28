@@ -50,6 +50,8 @@ import org.jahia.utils.ProcessHelper;
 import org.jahia.utils.i18n.Messages;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,9 +78,11 @@ import org.apache.commons.io.IOUtils;
 /**
  * Action to par a jar and produce an entry in module list
  */
+@Component(service = Action.class)
 public class CreateEntryFromJar extends Action {
 
     private static final Logger logger = LoggerFactory.getLogger(CreateEntryFromJar.class);
+    private static final String DEFAULT_MAVEN_EXECUTABLE = "mvn";
     private static final String[] EMPTY_REFERENCES = new String[]{"none"};
     private static final String JNT_FORGEMODULEVERSION = "jnt:forgeModuleVersion";
     private static final String JNT_FORGEPACKAGEVERSION = "jnt:forgePackageVersion";
@@ -123,6 +127,18 @@ public class CreateEntryFromJar extends Action {
     private static final long MAX_TAR_ENTRY_SIZE_BYTES = 10L * 1024 * 1024;
 
     String mavenExecutable;
+
+    @Activate
+    public void activate() {
+        setName("createEntryFromJar");
+        setRequireAuthenticatedUser(true);
+        setRequiredPermission("jahiaForgeUploadModule");
+        setRequiredMethods("POST");
+        if (mavenExecutable == null) {
+            String configured = System.getProperty("mvnPath", DEFAULT_MAVEN_EXECUTABLE);
+            setMavenExecutable(configured);
+        }
+    }
 
     @Override
     public ActionResult doExecute(HttpServletRequest request, RenderContext renderContext, Resource resource, JCRSessionWrapper session, Map<String, List<String>> parameters, URLResolver urlResolver) throws Exception {
