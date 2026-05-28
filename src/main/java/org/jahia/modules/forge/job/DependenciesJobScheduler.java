@@ -32,7 +32,9 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
+import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import java.text.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +53,7 @@ public class DependenciesJobScheduler {
     private JobDetail jobDetail;
 
     @Activate
-    public void start() throws Exception {
+    public void start() throws SchedulerException, ParseException {
         jobDetail = BackgroundJob.createJahiaJob(JOB_NAME, DependenciesJob.class);
         if (!SettingsBean.getInstance().isProcessingServer()) {
             return;
@@ -64,7 +66,7 @@ public class DependenciesJobScheduler {
     }
 
     @Deactivate
-    public void stop() throws Exception {
+    public void stop() throws SchedulerException {
         if (jobDetail == null || !SettingsBean.getInstance().isProcessingServer()) {
             return;
         }

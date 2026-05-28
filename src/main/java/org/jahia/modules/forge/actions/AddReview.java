@@ -35,7 +35,6 @@ import org.jahia.services.render.URLResolver;
 import org.json.JSONObject;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,8 +48,6 @@ import java.util.*;
  */
 @Component(service = Action.class)
 public class AddReview extends Action {
-
-    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AddReview.class);
 
     @Activate
     public void activate() {

@@ -179,7 +179,7 @@ public class CreateEntryFromJar extends Action {
              TarArchiveInputStream tarInputStream = new TarArchiveInputStream(gzipInputStream)) {
 
             TarArchiveEntry entry;
-            while ((entry = tarInputStream.getNextTarEntry()) != null) {
+            while ((entry = tarInputStream.getNextEntry()) != null) {
                 if (!entry.isFile() || !"package/package.json".equals(entry.getName())) {
                     continue;
                 }

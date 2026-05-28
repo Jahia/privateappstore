@@ -53,20 +53,24 @@ import java.util.Map;
  * @author Frédéric PIERRE
  * @version 1.0
  */
-@Component(service = Action.class)
+@Component(service = Action.class, property = "templatePath=/mails/templates/reportedReviewNotification.vm")
 public class ReportReview extends Action {
 
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(ReportReview.class);
-    private static final String DEFAULT_TEMPLATE_PATH = "/mails/templates/reportedReviewNotification.vm";
+    private static final String TEMPLATE_PATH_PROPERTY = "templatePath";
 
     private MailServiceImpl mailService;
-    private String templatePath = DEFAULT_TEMPLATE_PATH;
+    private String templatePath;
 
     @Activate
-    public void activate() {
+    public void activate(Map<String, Object> properties) {
         setName("ReportReview");
         setRequireAuthenticatedUser(true);
         setRequiredMethods("POST");
+        Object configured = properties.get(TEMPLATE_PATH_PROPERTY);
+        if (configured != null) {
+            this.templatePath = configured.toString();
+        }
     }
 
     @Reference
