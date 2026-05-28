@@ -46,7 +46,8 @@ import java.util.Map;
  */
 public class EditVideo extends Action {
 
-    private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(EditVideo.class);
+    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(EditVideo.class);
+    private static final String ALLOWFULLSCREEN = "allowfullscreen";
 
     @Override
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource,
@@ -65,7 +66,7 @@ public class EditVideo extends Action {
         String identifier = getParameter(parameters, "identifier");
         String width = getParameter(parameters, "width");
         String height = getParameter(parameters, "height");
-        String allowfullscreen = getParameter(parameters, "allowfullscreen");
+        String allowfullscreen = getParameter(parameters, ALLOWFULLSCREEN);
 
         if (provider != null)
             videoNode.setProperty("provider", provider);
@@ -77,9 +78,9 @@ public class EditVideo extends Action {
             videoNode.setProperty("height", height);
 
         if (allowfullscreen != null && allowfullscreen.equals("on"))
-            videoNode.setProperty("allowfullscreen", true);
+            videoNode.setProperty(ALLOWFULLSCREEN, true);
         else
-            videoNode.setProperty("allowfullscreen", false);
+            videoNode.setProperty(ALLOWFULLSCREEN, false);
 
         session.save();
 

@@ -44,6 +44,10 @@ import java.util.*;
 public class CategorySettingsHandler implements Serializable {
 
     private static final long serialVersionUID = 871757139749838806L;
+    private static final String RESOURCES = "resources.privateappstore";
+    private static final String ROOT_CATEGORY = "rootCategory";
+    private static final String WORKSPACE_DEFAULT = "default";
+    private static final String JCR_TITLE = "jcr:title";
     private String rootCategoryIdentifier;
     private String currentCategory;
     private Map<Locale, String> categoryI18NTitles;
@@ -52,8 +56,8 @@ public class CategorySettingsHandler implements Serializable {
 
     public void init(JCRSiteNode site) {
         try {
-            if (site.hasProperty("rootCategory")) {
-                rootCategoryIdentifier = site.getProperty("rootCategory").getNode().getIdentifier();
+            if (site.hasProperty(ROOT_CATEGORY)) {
+                rootCategoryIdentifier = site.getProperty(ROOT_CATEGORY).getNode().getIdentifier();
             }
         } catch (RepositoryException e) {
             e.printStackTrace();
@@ -64,15 +68,15 @@ public class CategorySettingsHandler implements Serializable {
 
         try {
             Node category = site.getSession().getNodeByIdentifier(rootCategoryIdentifier);
-            site.setProperty("rootCategory", category);
+            site.setProperty(ROOT_CATEGORY, category);
             site.getSession().save();
             this.rootCategoryIdentifier = rootCategoryIdentifier;
         } catch (RepositoryException e) {
             messages.addMessage(new MessageBuilder()
                     .error()
-                    .source("rootCategory")
+                    .source(ROOT_CATEGORY)
                     .defaultText(
-                            Messages.getWithArgs("resources.privateappstore",
+                            Messages.getWithArgs(RESOURCES,
                                     "jahiaForge.settings.rootCategory.error", LocaleContextHolder.getLocale(), e.getMessage())).build());
             e.printStackTrace();
         }
@@ -85,11 +89,11 @@ public class CategorySettingsHandler implements Serializable {
             if (StringUtils.startsWith(key, "lang_")) {
                 String language = StringUtils.substringAfter(key, "lang_");
                 try {
-                    Session localizedSession = JCRSessionFactory.getInstance().getCurrentUserSession("default", new Locale(language));
+                    Session localizedSession = JCRSessionFactory.getInstance().getCurrentUserSession(WORKSPACE_DEFAULT, new Locale(language));
                     if (StringUtils.isEmpty(params.get(key))) {
-                        localizedSession.getNodeByIdentifier(currentCategory).getProperty("jcr:title").remove();
+                        localizedSession.getNodeByIdentifier(currentCategory).getProperty(JCR_TITLE).remove();
                     } else {
-                        localizedSession.getNodeByIdentifier(currentCategory).setProperty("jcr:title", params.get(key));
+                        localizedSession.getNodeByIdentifier(currentCategory).setProperty(JCR_TITLE, params.get(key));
                     }
                     localizedSession.save();
                 } catch (RepositoryException e) {
@@ -97,7 +101,7 @@ public class CategorySettingsHandler implements Serializable {
                             .error()
                             .source("editCategory")
                             .defaultText(
-                                    Messages.getWithArgs("resources.privateappstore",
+                                    Messages.getWithArgs(RESOURCES,
                                             "jahiaForge.settings.editCategory.error", LocaleContextHolder.getLocale(), e.getMessage())).build());
                     e.printStackTrace();
                 }
@@ -114,9 +118,9 @@ public class CategorySettingsHandler implements Serializable {
             availableLanguages = new LinkedList<String>();
             categoryUsages = new HashSet<String>();
             for (Locale locale : site.getLanguagesAsLocales()) {
-                JCRNodeWrapper localizedCategory = JCRSessionFactory.getInstance().getCurrentUserSession("default", locale).getNodeByIdentifier(currentCategoryUUID);
-                if (localizedCategory.hasProperty("jcr:title") && StringUtils.isNotEmpty(localizedCategory.getProperty("jcr:title").getString())) {
-                    categoryI18NTitles.put(locale, localizedCategory.getProperty("jcr:title").getString());
+                JCRNodeWrapper localizedCategory = JCRSessionFactory.getInstance().getCurrentUserSession(WORKSPACE_DEFAULT, locale).getNodeByIdentifier(currentCategoryUUID);
+                if (localizedCategory.hasProperty(JCR_TITLE) && StringUtils.isNotEmpty(localizedCategory.getProperty(JCR_TITLE).getString())) {
+                    categoryI18NTitles.put(locale, localizedCategory.getProperty(JCR_TITLE).getString());
                 } else {
                     availableLanguages.add(locale.getLanguage());
                 }
@@ -127,7 +131,7 @@ public class CategorySettingsHandler implements Serializable {
                 Property prop = references.nextProperty();
                 categoryUsages.add(((JCRNodeWrapper) prop.getParent()).getDisplayableName());
             }
-            Session defaultSession = JCRSessionFactory.getInstance().getCurrentUserSession("default");
+            Session defaultSession = JCRSessionFactory.getInstance().getCurrentUserSession(WORKSPACE_DEFAULT);
             references = defaultSession.getNodeByIdentifier(currentCategory).getWeakReferences();
             while (references.hasNext()) {
                 Property prop = references.nextProperty();
@@ -141,7 +145,7 @@ public class CategorySettingsHandler implements Serializable {
     public boolean addCategory(MessageContext messages, JCRSiteNode site, String category) {
         try {
             if (StringUtils.isNotEmpty(category)) {
-                Session session = JCRSessionFactory.getInstance().getCurrentUserSession("default");
+                Session session = JCRSessionFactory.getInstance().getCurrentUserSession(WORKSPACE_DEFAULT);
                 Node rootCategory = session.getNodeByIdentifier(rootCategoryIdentifier);
                 category = JCRContentUtils.findAvailableNodeName(rootCategory, category);
                 String uuid = session.getNodeByIdentifier(rootCategoryIdentifier).addNode(category, "jnt:category").getIdentifier();
@@ -160,7 +164,7 @@ public class CategorySettingsHandler implements Serializable {
                     .error()
                     .source("addCategory")
                     .defaultText(
-                            Messages.getWithArgs("resources.privateappstore",
+                            Messages.getWithArgs(RESOURCES,
                                     "jahiaForge.settings.addCategory.error", LocaleContextHolder.getLocale(), e.getMessage())).build());
             e.printStackTrace();
             return false;
@@ -170,7 +174,7 @@ public class CategorySettingsHandler implements Serializable {
 
     public void deleteCategory(MessageContext messages) {
         try {
-            Session session = JCRSessionFactory.getInstance().getCurrentUserSession("default");
+            Session session = JCRSessionFactory.getInstance().getCurrentUserSession(WORKSPACE_DEFAULT);
             session.getNodeByIdentifier(currentCategory).remove();
             availableLanguages.clear();
             categoryI18NTitles.clear();
@@ -182,7 +186,7 @@ public class CategorySettingsHandler implements Serializable {
                     .error()
                     .source("deleteCategory")
                     .defaultText(
-                            Messages.getWithArgs("resources.privateappstore",
+                            Messages.getWithArgs(RESOURCES,
                                     "jahiaForge.settings.deleteCategory.error", LocaleContextHolder.getLocale(), e.getMessage())).build());
             e.printStackTrace();
         }

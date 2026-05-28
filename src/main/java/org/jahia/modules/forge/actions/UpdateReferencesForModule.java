@@ -87,12 +87,14 @@ public class UpdateReferencesForModule extends Action implements BackgroundActio
         final HttpGet httpMethod = new HttpGet(UriComponentsBuilder.fromHttpUrl(url).build(false).toUri());
         httpMethod.addHeader("Authorization", "Basic " + Base64.encode((releaseInfo.getUsername() + ":" + releaseInfo.getPassword()).getBytes()));
 
-        try ( CloseableHttpResponse httpResponse = httpClient.execute(httpMethod)) {
+        try (CloseableHttpResponse httpResponse = httpClient.execute(httpMethod)) {
             if (httpResponse.getCode() == HttpServletResponse.SC_OK) {
                 File tmpJarFile = File.createTempFile("appStore", ".jar");
                 try {
-                    IOUtils.copy(httpResponse.getEntity().getContent(), new FileOutputStream(tmpJarFile));
-                    try ( JarFile jarFile = new JarFile(tmpJarFile)) {
+                    try (FileOutputStream out = new FileOutputStream(tmpJarFile)) {
+                        IOUtils.copy(httpResponse.getEntity().getContent(), out);
+                    }
+                    try (JarFile jarFile = new JarFile(tmpJarFile)) {
                         Manifest manifest = jarFile.getManifest();
                         Attributes attributes = manifest.getMainAttributes();
                         String value = attributes.getValue("Jahia-Depends");

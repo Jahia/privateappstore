@@ -75,7 +75,7 @@
                 });
 
                 $('#authorURL-${id}').editable({
-                    value: '${not empty authorURL ? authorURL : ''}',
+                    value: '${functions:escapeJavaScript(not empty authorURL ? authorURL : '')}',
                     <jsp:include page="../../commons/bootstrap-editable-options.jsp">
                         <jsp:param name="postURL" value="${postURL}"/>
                         <jsp:param name="validate" value="url"/>
@@ -268,8 +268,9 @@
                     </c:when>
 
                     <c:otherwise>
-                        <c:if test="${not empty authorURL}">
-                            <a class="btn btn-small btn-primary" target="_blank" href="${authorURL}"><fmt:message key="jnt_forgeEntry.label.authorURL"/></a>
+                        <c:set var="safeAuthorURL" value="${(fn:startsWith(fn:toLowerCase(authorURL), 'http://') or fn:startsWith(fn:toLowerCase(authorURL), 'https://')) ? authorURL : ''}"/>
+                        <c:if test="${not empty safeAuthorURL}">
+                            <a class="btn btn-small btn-primary" target="_blank" rel="noopener noreferrer" href="${fn:escapeXml(safeAuthorURL)}"><fmt:message key="jnt_forgeEntry.label.authorURL"/></a>
                         </c:if>
                         <c:choose>
                             <c:when test="${authorIsOrganisation && not empty authorEmail}">

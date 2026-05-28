@@ -26,6 +26,7 @@ package org.jahia.modules.forge.actions;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.model.Model;
 import org.apache.xerces.impl.dv.util.Base64;
@@ -81,10 +82,12 @@ public class CreateEntryFromJar extends Action {
     private static final String[] EMPTY_REFERENCES = new String[]{"none"};
     private static final String JNT_FORGEMODULEVERSION = "jnt:forgeModuleVersion";
     private static final String JNT_FORGEPACKAGEVERSION = "jnt:forgePackageVersion";
+    private static final String JNT_CONTENT_FOLDER = "jnt:contentFolder";
     private static final String REDIRECT_URL = "redirectURL";
     private static final String BUNDLE_SYMBOLIC_NAME = "Bundle-SymbolicName";
     private static final String REQUIRED_VERSION = "requiredVersion";
     private static final String VERSION_NUMBER = "versionNumber";
+    private static final String VERSION_PREFIX = "version-";
     private static final String DESCRIPTION = "description";
     private static final String AUTHOR_URL = "authorURL";
     private static final String ERROR = "error";
@@ -92,6 +95,32 @@ public class CreateEntryFromJar extends Action {
     private static final String OWNER = "owner";
     private static final String MODULES_LIST = "modulesList";
     private static final String RESOURCES_PRIVATEAPPSTORE = "resources.privateappstore";
+    private static final String GROUP_ID = "groupId";
+    private static final String MODULE_NAME = "moduleName";
+    private static final String CATEGORY = "category";
+    private static final String AUTHOR_NAME_DISPLAYED_AS = "authorNameDisplayedAs";
+    private static final String AUTHOR_EMAIL = "authorEmail";
+    private static final String CODE_REPOSITORY = "codeRepository";
+    private static final String DOWNLOAD_COUNT = "downloadCount";
+    private static final String SUPPORTED_BY_JAHIA = "supportedByJahia";
+    private static final String REVIEWED_BY_JAHIA = "reviewedByJahia";
+    private static final String PUBLISHED = "published";
+    private static final String DELETED = "deleted";
+    private static final String SCREENSHOTS = "screenshots";
+    private static final String VIDEO = "video";
+    private static final String CHANGE_LOG = "changeLog";
+    private static final String FILE_DSA_SIGNATURE = "fileDsaSignature";
+    private static final String REFERENCES = "references";
+    private static final String SUCCESS_REDIRECT_URL = "successRedirectUrl";
+    private static final String SUCCESS_REDIRECT_ABSOLUTE_URL = "successRedirectAbsoluteUrl";
+    private static final String ERR_UNABLE_READ_FILE = "forge.uploadJar.error.unable.read.file";
+    private static final String ERR_MISSING_MANIFEST_ATTRIBUTE = "forge.uploadJar.error.missing.manifest.attribute";
+    private static final String ERR_VERSION_NUMBER = "forge.uploadJar.error.versionNumber";
+    private static final String LOG_UNSAFE_REDIRECT = "CreateEntryFromJar: rejected unsafe redirectURL '{}'";
+    /** Maximum accepted size for an uploaded artifact (guards against resource-exhaustion uploads). */
+    private static final long MAX_UPLOAD_SIZE_BYTES = 200L * 1024 * 1024;
+    /** Maximum size of a single tar entry we read into memory (guards against decompression bombs). */
+    private static final long MAX_TAR_ENTRY_SIZE_BYTES = 10L * 1024 * 1024;
 
     String mavenExecutable;
 
@@ -100,59 +129,78 @@ public class CreateEntryFromJar extends Action {
         final FileUpload fu = (FileUpload) request.getAttribute(FileUpload.FILEUPLOAD_ATTRIBUTE);
 
         DiskFileItem uploadedFile = fu.getFileItems().get("file");
+        if (uploadedFile == null) {
+            return errorResult(session, ERR_UNABLE_READ_FILE);
+        }
+        if (uploadedFile.getSize() > MAX_UPLOAD_SIZE_BYTES) {
+            if (logger.isWarnEnabled()) {
+                logger.warn("CreateEntryFromJar: rejected oversized upload '{}' ({} bytes)",
+                        ActionSecurityUtils.sanitizeForLog(uploadedFile.getName()), uploadedFile.getSize());
+            }
+            uploadedFile.delete();
+            return errorResult(session, ERR_UNABLE_READ_FILE);
+        }
         String filename = uploadedFile.getName();
+        if (StringUtils.contains(filename, "SNAPSHOT.")) {
+            return errorResult(session, "forge.uploadJar.error.snapshot.not.allowed");
+        }
+        String extension = StringUtils.substringAfterLast(filename, ".");
+        if (!(StringUtils.equals(extension, "jar") || StringUtils.equals(extension, "war") || StringUtils.equals(extension, "tgz"))) {
+            return errorResult(session, "forge.uploadJar.error.wrong.format");
+        }
         Map<String, List<String>> formParameters = fu.getParameterMap();
-        if (!StringUtils.contains(filename, "SNAPSHOT.")) {
-            String extension = StringUtils.substringAfterLast(filename, ".");
-            if (!(StringUtils.equals(extension, "jar") || StringUtils.equals(extension, "war") || StringUtils.equals(extension, "tgz"))) {
-                String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.wrong.format", session.getLocale());
-                return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
-            }
-            if (extension.endsWith("tgz")) {
-                try ( InputStream fileInputStream = new FileInputStream(uploadedFile.getStoreLocation());  InputStream gzipInputStream = new GZIPInputStream(fileInputStream);  TarArchiveInputStream tarInputStream = new TarArchiveInputStream(gzipInputStream)) {
+        if (extension.endsWith("tgz")) {
+            return handleTgzUpload(uploadedFile, extension, request, renderContext, resource, session, formParameters);
+        }
+        return handleJarUpload(uploadedFile, extension, request, renderContext, resource, session, formParameters);
+    }
 
-                    TarArchiveEntry entry;
-                    while ((entry = tarInputStream.getNextTarEntry()) != null) {
-                        if (entry.isFile() && entry.getName().equals("package/package.json")) {
-                            final JSONObject jsonObject = new JSONObject(IOUtils.toString(tarInputStream, "UTF-8"));
-                            return createJavascriptModule(uploadedFile, jsonObject, request, renderContext, resource, session, extension, formParameters);
-                        }
-                    }
+    private ActionResult handleTgzUpload(DiskFileItem uploadedFile, String extension, HttpServletRequest request,
+                                         RenderContext renderContext, Resource resource, JCRSessionWrapper session,
+                                         Map<String, List<String>> formParameters) throws Exception {
+        try (InputStream fileInputStream = new FileInputStream(uploadedFile.getStoreLocation());
+             InputStream gzipInputStream = new GZIPInputStream(fileInputStream);
+             TarArchiveInputStream tarInputStream = new TarArchiveInputStream(gzipInputStream)) {
 
-                    String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.unable.read.manifest", session.getLocale());
-                    return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
-                } catch (IOException ex) {
-                    logger.error("Impossible to parse archive", ex);
-                    String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.unable.read.file", session.getLocale());
-                    return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
-                }finally {
-                    uploadedFile.delete();
+            TarArchiveEntry entry;
+            while ((entry = tarInputStream.getNextTarEntry()) != null) {
+                if (!entry.isFile() || !"package/package.json".equals(entry.getName())) {
+                    continue;
                 }
-            } else {
-                try ( JarFile jar = new JarFile(uploadedFile.getStoreLocation());) {
-                    Manifest manifest = jar.getManifest();
-                    if (manifest != null) {
-                        Attributes attributes = manifest.getMainAttributes();
-                        if (attributes.getValue("Jahia-Package-Name") != null) {
-                            return createPackage(uploadedFile, jar, attributes, request, renderContext, resource, session, formParameters);
-                        } else {
-                            return createModule(uploadedFile, attributes, request, renderContext, resource, session, extension, formParameters);
-                        }
-                    } else {
-                        String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.unable.read.manifest", session.getLocale());
-                        return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
-                    }
-                } catch (IOException ex) {
-                    logger.error("Impossible to parse archive", ex);
-                    String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.unable.read.file", session.getLocale());
-                    return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
-                } finally {
-                    uploadedFile.delete();
+                if (entry.getSize() > MAX_TAR_ENTRY_SIZE_BYTES) {
+                    logger.warn("CreateEntryFromJar: package.json entry too large ({} bytes) - rejected", entry.getSize());
+                    return errorResult(session, ERR_UNABLE_READ_FILE);
                 }
+                final JSONObject jsonObject = new JSONObject(IOUtils.toString(tarInputStream, "UTF-8"));
+                return createJavascriptModule(uploadedFile, jsonObject, request, renderContext, resource, session, extension, formParameters);
             }
-        } else {
-            String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.snapshot.not.allowed", session.getLocale());
-            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
+            return errorResult(session, "forge.uploadJar.error.unable.read.manifest");
+        } catch (IOException ex) {
+            logger.error("Impossible to parse archive", ex);
+            return errorResult(session, ERR_UNABLE_READ_FILE);
+        } finally {
+            uploadedFile.delete();
+        }
+    }
+
+    private ActionResult handleJarUpload(DiskFileItem uploadedFile, String extension, HttpServletRequest request,
+                                         RenderContext renderContext, Resource resource, JCRSessionWrapper session,
+                                         Map<String, List<String>> formParameters) throws Exception {
+        try (JarFile jar = new JarFile(uploadedFile.getStoreLocation())) {
+            Manifest manifest = jar.getManifest();
+            if (manifest == null) {
+                return errorResult(session, "forge.uploadJar.error.unable.read.manifest");
+            }
+            Attributes attributes = manifest.getMainAttributes();
+            if (attributes.getValue("Jahia-Package-Name") != null) {
+                return createPackage(uploadedFile, jar, attributes, request, renderContext, resource, session, formParameters);
+            }
+            return createModule(uploadedFile, attributes, request, renderContext, resource, session, extension, formParameters);
+        } catch (IOException ex) {
+            logger.error("Impossible to parse archive", ex);
+            return errorResult(session, ERR_UNABLE_READ_FILE);
+        } finally {
+            uploadedFile.delete();
         }
     }
     
@@ -162,20 +210,19 @@ public class CreateEntryFromJar extends Action {
         final String moduleName = jsonObject.getString("name");
         final JSONObject jahiaJsonObject = jsonObject.getJSONObject("jahia");
         final JSONObject mavenJsonObject = jahiaJsonObject.getJSONObject("maven");
-        final String groupId = mavenJsonObject.getString("groupId");
+        final String groupId = mavenJsonObject.getString(GROUP_ID);
         final JCRSiteNode site = resource.getNode().getResolveSite();
         final Map<String, List<String>> moduleParams = new HashMap<>();
-        moduleParams.put("moduleName", Arrays.asList(moduleName));
-        moduleParams.put("groupId", Arrays.asList(groupId));
+        moduleParams.put(MODULE_NAME, Arrays.asList(moduleName));
+        moduleParams.put(GROUP_ID, Arrays.asList(groupId));
         moduleParams.put(Constants.JCR_TITLE, Arrays.asList(moduleName));
         moduleParams.put(VERSION_NUMBER, Arrays.asList(version));
 
         final String forgeUrl = StringUtils.substringBefore(request.getRequestURL().toString(), "/render");
         final String reqVersionAttribute = jahiaJsonObject.getString("required-version");
-        final String requiredVersion = "version-" + reqVersionAttribute;
+        final String requiredVersion = VERSION_PREFIX + reqVersionAttribute;
         if (StringUtils.isEmpty(moduleName) || StringUtils.isEmpty(groupId) || StringUtils.isEmpty(reqVersionAttribute)) {
-            String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.missing.manifest.attribute", session.getLocale());
-            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
+            return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
         }
         final String moduleRelPath = groupId.replace(".", "/") + "/" + moduleName;
         moduleParams.put("url", Arrays.asList(forgeUrl + "/mavenproxy/" + site.getName() + "/" + moduleRelPath + "/" + version + "/" + moduleName + "-" + version + "." + extension));
@@ -183,11 +230,8 @@ public class CreateEntryFromJar extends Action {
         final JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
         moduleParams.put(REQUIRED_VERSION, Arrays.asList(versions.getNode(requiredVersion).getIdentifier()));
 
-        // TODO: upload Javascript module
-
-        // Create module
-        final List<String> moduleParamKeys = Arrays.asList(DESCRIPTION, "category", "icon", "authorNameDisplayedAs", AUTHOR_URL, "authorEmail", "FAQ", "codeRepository", "downloadCount", "supportedByJahia", "reviewedByJahia", "published", "deleted", "screenshots", "video", "groupId");
-        final List<String> versionParamKeys = Arrays.asList(REQUIRED_VERSION, VERSION_NUMBER, "fileDsaSignature", "changeLog", "url");
+        final List<String> moduleParamKeys = Arrays.asList(DESCRIPTION, CATEGORY, "icon", AUTHOR_NAME_DISPLAYED_AS, AUTHOR_URL, AUTHOR_EMAIL, "FAQ", CODE_REPOSITORY, DOWNLOAD_COUNT, SUPPORTED_BY_JAHIA, REVIEWED_BY_JAHIA, PUBLISHED, DELETED, SCREENSHOTS, VIDEO, GROUP_ID);
+        final List<String> versionParamKeys = Arrays.asList(REQUIRED_VERSION, VERSION_NUMBER, FILE_DSA_SIGNATURE, CHANGE_LOG, "url");
         final Map<String, List<String>> moduleParameters = new HashMap<>();
         final Map<String, List<String>> versionParameters = new HashMap<>();
 
@@ -195,53 +239,20 @@ public class CreateEntryFromJar extends Action {
         if (StringUtils.isEmpty(title)) {
             title = moduleName;
         }
-        // manually add jcr:title
         moduleParameters.put(Constants.JCR_TITLE, Arrays.asList(title));
         versionParameters.put(Constants.JCR_TITLE, Arrays.asList(title));
-
-        for (Map.Entry<String, List<String>> moduleParam : moduleParams.entrySet()) {
-            final String moduleParamKey = moduleParam.getKey();
-            final List<String> moduleParamValue = moduleParam.getValue();
-            if (moduleParamKeys.contains(moduleParamKey) && moduleParamValue.get(0) != null) {
-                moduleParameters.put(moduleParamKey, moduleParamValue);
-            } else if (versionParamKeys.contains(moduleParamKey) && moduleParamValue.get(0) != null) {
-                versionParameters.put(moduleParamKey, moduleParamValue);
-            }
-        }
+        partitionParams(moduleParams, moduleParamKeys, versionParamKeys, moduleParameters, versionParameters);
 
         logger.info("Start creating Private App Store Javascript Module {}", moduleName);
 
-        JCRNodeWrapper module;
-
-        if (!repository.hasNode(moduleRelPath)) {
-            for (String segment : groupId.split("\\.")) {
-                if (repository.hasNode(segment)) {
-                    repository = repository.getNode(segment);
-                } else {
-                    repository = repository.addNode(segment, "jnt:contentFolder");
-                }
-            }
-            module = createNode(request, moduleParameters, repository, "jnt:forgeModule", moduleName, false);
-        } else {
-            module = repository.getNode(moduleRelPath);
-            moduleParameters.remove(DESCRIPTION);
-            moduleParameters.remove(Constants.JCR_TITLE);
-            setProperties(module, moduleParameters);
-        }
-
-        if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
-            List<String> roles = Arrays.asList(OWNER);
-            module.grantRoles("u:" + session.getUser().getUsername(), new HashSet<String>(roles));
-        }
+        JCRNodeWrapper module = upsertModuleNode(request, repository, moduleRelPath, groupId, moduleName, moduleParameters);
+        grantOwnerRole(session, module);
 
         boolean hasModuleVersions = JCRTagUtils.hasChildrenOfType(module, JNT_FORGEMODULEVERSION);
-
-        // create module version
-
         logger.info("Start adding module version {} of {}", version, title);
 
         if (hasModuleVersions && !hasValidVersionNumber(module, version)) {
-            String error = Messages.getWithArgs(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.versionNumber", session.getLocale(), moduleName, version);
+            String error = Messages.getWithArgs(RESOURCES_PRIVATEAPPSTORE, ERR_VERSION_NUMBER, session.getLocale(), moduleName, version);
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
         }
 
@@ -249,33 +260,24 @@ public class CreateEntryFromJar extends Action {
 
         String value = jahiaJsonObject.getString("module-dependencies");
         if (value != null) {
-            String[] jahiaDepends = value.split(",");
-            moduleVersion.setProperty("references", jahiaDepends);
+            moduleVersion.setProperty(REFERENCES, value.split(","));
         } else {
-            moduleVersion.setProperty("references", EMPTY_REFERENCES);
+            moduleVersion.setProperty(REFERENCES, EMPTY_REFERENCES);
         }
-
-        if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
-            List<String> roles = Arrays.asList(OWNER);
-            moduleVersion.grantRoles("u:" + session.getUser().getUsername(), new HashSet<String>(roles));
-        }
+        grantOwnerRole(session, moduleVersion);
 
         logger.info("Javascript Module version {} of {} successfully added", version, title);
-
-        logger.info("Private App Store Javascript Module {} successfully created and added to repository {}", moduleName,
-                repository.getPath());
+        logger.info("Private App Store Javascript Module {} successfully created and added to repository {}", moduleName, repository.getPath());
 
         final String moduleUrl = renderContext.getResponse().encodeURL(module.getUrl());
         final String moduleAbsoluteUrl = module.getProvider().getAbsoluteContextPath(request) + moduleUrl;
         session.save();
         moduleVersion.uploadFile(uploadedFile.getName(), uploadedFile.getInputStream(), uploadedFile.getContentType());
         session.save();
-        
-        final ActionResult uploadResult = new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("successRedirectUrl", moduleUrl).put(
-                "successRedirectAbsoluteUrl", moduleAbsoluteUrl));
-        if (formParams.containsKey(REDIRECT_URL)) {
-            uploadResult.setUrl(formParams.get(REDIRECT_URL).get(0));
-        }
+
+        final ActionResult uploadResult = new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(SUCCESS_REDIRECT_URL, moduleUrl).put(
+                SUCCESS_REDIRECT_ABSOLUTE_URL, moduleAbsoluteUrl));
+        applySafeRedirect(uploadResult, formParams);
 
         return uploadResult;
     }
@@ -297,18 +299,15 @@ public class CreateEntryFromJar extends Action {
         packageParams.put(VERSION_NUMBER, Arrays.asList(version));
 
         String reqVersionAttribute = attributes.getValue("Jahia-Required-Version");
-        final String requiredVersion = "version-" + reqVersionAttribute;
+        final String requiredVersion = VERSION_PREFIX + reqVersionAttribute;
         if (StringUtils.isEmpty(packageName) || StringUtils.isEmpty(reqVersionAttribute) || StringUtils.isEmpty(version)) {
-            String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.missing.manifest.attribute", session.getLocale());
-            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
+            return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
         }
         JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
-
         packageParams.put(REQUIRED_VERSION, Arrays.asList(versions.getNode(requiredVersion).getIdentifier()));
 
-        // Create package
-        List<String> packageParamKeys = Arrays.asList(DESCRIPTION, "category", "icon", "authorNameDisplayedAs", AUTHOR_URL, "authorEmail", "FAQ", "downloadCount", "supportedByJahia", "reviewedByJahia", "published", "deleted", "screenshots", "video");
-        List<String> versionParamKeys = Arrays.asList(REQUIRED_VERSION, VERSION_NUMBER, "fileDsaSignature", "changeLog");
+        List<String> packageParamKeys = Arrays.asList(DESCRIPTION, CATEGORY, "icon", AUTHOR_NAME_DISPLAYED_AS, AUTHOR_URL, AUTHOR_EMAIL, "FAQ", DOWNLOAD_COUNT, SUPPORTED_BY_JAHIA, REVIEWED_BY_JAHIA, PUBLISHED, DELETED, SCREENSHOTS, VIDEO);
+        List<String> versionParamKeys = Arrays.asList(REQUIRED_VERSION, VERSION_NUMBER, FILE_DSA_SIGNATURE, CHANGE_LOG);
         Map<String, List<String>> packageParameters = new HashMap<>();
         Map<String, List<String>> versionParameters = new HashMap<>();
 
@@ -316,103 +315,73 @@ public class CreateEntryFromJar extends Action {
         if (StringUtils.isEmpty(title)) {
             title = packageName;
         }
-
-        // manually add jcr:title
         packageParameters.put(Constants.JCR_TITLE, Arrays.asList(title));
         versionParameters.put(Constants.JCR_TITLE, Arrays.asList(title));
-
-        for (Map.Entry<String, List<String>> packageParam : packageParams.entrySet()) {
-            String packageParamKey = packageParam.getKey();
-            List<String> packageParamValue = packageParam.getValue();
-            if (packageParamKeys.contains(packageParamKey) && packageParamValue.get(0) != null) {
-                packageParameters.put(packageParamKey, packageParamValue);
-            } else if (versionParamKeys.contains(packageParamKey) && packageParamValue.get(0) != null) {
-                versionParameters.put(packageParamKey, packageParamValue);
-            }
-        }
+        partitionParams(packageParams, packageParamKeys, versionParamKeys, packageParameters, versionParameters);
 
         logger.info("Start creating Private App Store Package {}", packageName);
 
-        if (!repository.hasNode(packageRelPath)) {
-            if (repository.hasNode(PACKAGES)) {
-                repository = repository.getNode(PACKAGES);
-            } else {
-                repository = repository.addNode(PACKAGES, "jnt:contentFolder");
-            }
-            modulesPackage = createNode(request, packageParameters, repository, "jnt:forgePackage", packageName, false);
-        } else {
-            modulesPackage = repository.getNode(packageRelPath);
-            packageParameters.remove(DESCRIPTION);
-            packageParameters.remove(Constants.JCR_TITLE);
-            setProperties(modulesPackage, packageParameters);
-        }
-
-        if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
-            List<String> roles = Arrays.asList(OWNER);
-            modulesPackage.grantRoles("u:" + session.getUser().getUsername(), new HashSet<String>(roles));
-        }
+        modulesPackage = upsertPackageNode(request, repository, packageRelPath, packageName, packageParameters);
+        grantOwnerRole(session, modulesPackage);
 
         boolean hasPackageVersions = JCRTagUtils.hasChildrenOfType(modulesPackage, JNT_FORGEPACKAGEVERSION);
-
-        // create package version
         logger.info("Start adding package version {} of {}", version, title);
 
         if (hasPackageVersions && !hasValidVersionNumber(modulesPackage, version)) {
-            String error = Messages.getWithArgs(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.versionNumber", session.getLocale(), packageName, version);
+            String error = Messages.getWithArgs(RESOURCES_PRIVATEAPPSTORE, ERR_VERSION_NUMBER, session.getLocale(), packageName, version);
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
         }
 
         JCRNodeWrapper packageVersion = createNode(request, versionParameters, modulesPackage, JNT_FORGEPACKAGEVERSION, modulesPackage.getName() + "-" + version, false);
-
-        if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
-            List<String> roles = Arrays.asList(OWNER);
-            packageVersion.grantRoles("u:" + session.getUser().getUsername(), new HashSet<String>(roles));
-        }
-
+        grantOwnerRole(session, packageVersion);
         packageVersion.uploadFile(uploadedFile.getName(), uploadedFile.getInputStream(), uploadedFile.getContentType());
 
         logger.info("Package version {} of {} successfully added", version, title);
 
-        // create modules list
-        JCRNodeWrapper modulesList;
+        populatePackageModulesList(packageVersion, jar);
 
-        if (packageVersion.hasNode(MODULES_LIST)) {
-            modulesList = packageVersion.getNode(MODULES_LIST);
-        } else {
-            modulesList = packageVersion.addNode(MODULES_LIST, "jnt:forgePackageModulesList");
-        }
-
-        // Get list of modules from package
-        Map<String, ModulesPackage.PackagedModule> packagedModuleMap = ModulesPackage.create(jar).getModules();
-
-        for (ModulesPackage.PackagedModule packagedModule : packagedModuleMap.values()) {
-            JCRNodeWrapper module;
-
-            if (modulesList.hasNode(packagedModule.getManifestAttributes().getValue(BUNDLE_SYMBOLIC_NAME))) {
-                module = modulesList.getNode(packagedModule.getManifestAttributes().getValue(BUNDLE_SYMBOLIC_NAME));
-            } else {
-                module = modulesList.addNode(packagedModule.getManifestAttributes().getValue(BUNDLE_SYMBOLIC_NAME), "jnt:forgePackageModule");
-            }
-
-            module.setProperty("moduleName", packagedModule.getManifestAttributes().getValue("Implementation-Title"));
-            module.setProperty("moduleVersion", packagedModule.getManifestAttributes().getValue("Implementation-Version"));
-        }
-
-        logger.info("Private App Store Package {} successfully created and added to repository {}", packageName,
-                repository.getPath());
+        logger.info("Private App Store Package {} successfully created and added to repository {}", packageName, modulesPackage.getParent().getPath());
 
         String packageUrl = renderContext.getResponse().encodeURL(modulesPackage.getUrl());
         String packageAbsoluteUrl = modulesPackage.getProvider().getAbsoluteContextPath(request) + packageUrl;
-
         session.save();
 
-        ActionResult uploadResult = new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("successRedirectUrl", packageUrl).put(
-                "successRedirectAbsoluteUrl", packageAbsoluteUrl));
-        if (formParams.containsKey(REDIRECT_URL)) {
-            uploadResult.setUrl(formParams.get(REDIRECT_URL).get(0));
-        }
-
+        ActionResult uploadResult = new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(SUCCESS_REDIRECT_URL, packageUrl).put(
+                SUCCESS_REDIRECT_ABSOLUTE_URL, packageAbsoluteUrl));
+        applySafeRedirect(uploadResult, formParams);
         return uploadResult;
+    }
+
+    private JCRNodeWrapper upsertPackageNode(HttpServletRequest request, JCRNodeWrapper repositoryStart,
+                                             String packageRelPath, String packageName,
+                                             Map<String, List<String>> packageParameters) throws RepositoryException {
+        if (!repositoryStart.hasNode(packageRelPath)) {
+            JCRNodeWrapper packagesFolder = repositoryStart.hasNode(PACKAGES)
+                    ? repositoryStart.getNode(PACKAGES)
+                    : repositoryStart.addNode(PACKAGES, JNT_CONTENT_FOLDER);
+            return createNode(request, packageParameters, packagesFolder, "jnt:forgePackage", packageName, false);
+        }
+        JCRNodeWrapper modulesPackage = repositoryStart.getNode(packageRelPath);
+        packageParameters.remove(DESCRIPTION);
+        packageParameters.remove(Constants.JCR_TITLE);
+        setProperties(modulesPackage, packageParameters);
+        return modulesPackage;
+    }
+
+    private static void populatePackageModulesList(JCRNodeWrapper packageVersion, JarFile jar) throws RepositoryException, IOException {
+        JCRNodeWrapper modulesList = packageVersion.hasNode(MODULES_LIST)
+                ? packageVersion.getNode(MODULES_LIST)
+                : packageVersion.addNode(MODULES_LIST, "jnt:forgePackageModulesList");
+
+        Map<String, ModulesPackage.PackagedModule> packagedModuleMap = ModulesPackage.create(jar).getModules();
+        for (ModulesPackage.PackagedModule packagedModule : packagedModuleMap.values()) {
+            String symbolicName = packagedModule.getManifestAttributes().getValue(BUNDLE_SYMBOLIC_NAME);
+            JCRNodeWrapper module = modulesList.hasNode(symbolicName)
+                    ? modulesList.getNode(symbolicName)
+                    : modulesList.addNode(symbolicName, "jnt:forgePackageModule");
+            module.setProperty(MODULE_NAME, packagedModule.getManifestAttributes().getValue("Implementation-Title"));
+            module.setProperty("moduleVersion", packagedModule.getManifestAttributes().getValue("Implementation-Version"));
+        }
     }
 
     private ActionResult createModule(DiskFileItem uploadedFile, Attributes attributes, HttpServletRequest request, RenderContext renderContext, Resource resource, JCRSessionWrapper session, String extension, Map<String, List<String>> formParams) throws Exception {
@@ -429,29 +398,83 @@ public class CreateEntryFromJar extends Action {
         JCRSiteNode site = resource.getNode().getResolveSite();
         String forgeSettingsUrl = site.getProperty("forgeSettingsUrl").getString();
 
-        moduleParams.put("moduleName", Arrays.asList(moduleName));
-        moduleParams.put("groupId", Arrays.asList(groupId));
+        moduleParams.put(MODULE_NAME, Arrays.asList(moduleName));
+        moduleParams.put(GROUP_ID, Arrays.asList(groupId));
         moduleParams.put(Constants.JCR_TITLE, Arrays.asList(attributes.getValue("Implementation-Title")));
         moduleParams.put(DESCRIPTION, Arrays.asList(attributes.getValue("Bundle-Description")));
         moduleParams.put(AUTHOR_URL, Arrays.asList(attributes.getValue("Implementation-URL")));
-        moduleParams.put("codeRepository", Arrays.asList(attributes.getValue("Jahia-Source-Control-Connection")));
+        moduleParams.put(CODE_REPOSITORY, Arrays.asList(attributes.getValue("Jahia-Source-Control-Connection")));
         moduleParams.put(VERSION_NUMBER, Arrays.asList(version));
 
 
         String forgeUrl = StringUtils.substringBefore(request.getRequestURL().toString(), "/render");
         String reqVersionAttribute = attributes.getValue("Jahia-Required-Version");
-        final String requiredVersion = "version-" + reqVersionAttribute;
+        final String requiredVersion = VERSION_PREFIX + reqVersionAttribute;
         if (StringUtils.isEmpty(moduleName) || StringUtils.isEmpty(groupId) || StringUtils.isEmpty(reqVersionAttribute)) {
-            String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.missing.manifest.attribute", session.getLocale());
-            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
+            return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
         }
         String moduleRelPath = groupId.replace(".", "/") + "/" + moduleName;
         moduleParams.put("url", Arrays.asList(forgeUrl + "/mavenproxy/" + site.getName() + "/" + moduleRelPath + "/" + version + "/" + moduleName + "-" + version + "." + extension));
 
         JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
-
         moduleParams.put(REQUIRED_VERSION, Arrays.asList(versions.getNode(requiredVersion).getIdentifier()));
 
+        ActionResult deployFailure = deployArtifact(uploadedFile, site, extension, groupId, moduleName, forgeSettingsUrl, session);
+        if (deployFailure != null) {
+            return deployFailure;
+        }
+
+        List<String> moduleParamKeys = Arrays.asList(DESCRIPTION, CATEGORY, "icon", AUTHOR_NAME_DISPLAYED_AS, AUTHOR_URL, AUTHOR_EMAIL, "FAQ", CODE_REPOSITORY, DOWNLOAD_COUNT, SUPPORTED_BY_JAHIA, REVIEWED_BY_JAHIA, PUBLISHED, DELETED, SCREENSHOTS, VIDEO, GROUP_ID);
+        List<String> versionParamKeys = Arrays.asList(REQUIRED_VERSION, VERSION_NUMBER, FILE_DSA_SIGNATURE, CHANGE_LOG, "url");
+        Map<String, List<String>> moduleParameters = new HashMap<>();
+        Map<String, List<String>> versionParameters = new HashMap<>();
+
+        String title = getParameter(moduleParams, Constants.JCR_TITLE);
+        if (StringUtils.isEmpty(title)) {
+            title = moduleName;
+        }
+        moduleParameters.put(Constants.JCR_TITLE, Arrays.asList(title));
+        versionParameters.put(Constants.JCR_TITLE, Arrays.asList(title));
+        partitionParams(moduleParams, moduleParamKeys, versionParamKeys, moduleParameters, versionParameters);
+
+        logger.info("Start creating Private App Store Module {}", moduleName);
+
+        JCRNodeWrapper module = upsertModuleNode(request, repository, moduleRelPath, groupId, moduleName, moduleParameters);
+        grantOwnerRole(session, module);
+
+        boolean hasModuleVersions = JCRTagUtils.hasChildrenOfType(module, JNT_FORGEMODULEVERSION);
+        logger.info("Start adding module version {} of {}", version, title);
+
+        if (hasModuleVersions && !hasValidVersionNumber(module, version)) {
+            String error = Messages.getWithArgs(RESOURCES_PRIVATEAPPSTORE, ERR_VERSION_NUMBER, session.getLocale(), moduleName, version);
+            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
+        }
+
+        JCRNodeWrapper moduleVersion = createNode(request, versionParameters, module, JNT_FORGEMODULEVERSION, module.getName() + "-" + version, false);
+
+        String value = attributes.getValue("Jahia-Depends");
+        if (value != null) {
+            moduleVersion.setProperty(REFERENCES, value.split(","));
+        } else {
+            moduleVersion.setProperty(REFERENCES, EMPTY_REFERENCES);
+        }
+        grantOwnerRole(session, moduleVersion);
+
+        logger.info("Module version {} of {} successfully added", version, title);
+        logger.info("Private App Store Module {} successfully created and added to repository {}", moduleName, module.getParent().getPath());
+
+        String moduleUrl = renderContext.getResponse().encodeURL(module.getUrl());
+        String moduleAbsoluteUrl = module.getProvider().getAbsoluteContextPath(request) + moduleUrl;
+        session.save();
+        ActionResult uploadResult = new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(SUCCESS_REDIRECT_URL, moduleUrl).put(
+                SUCCESS_REDIRECT_ABSOLUTE_URL, moduleAbsoluteUrl));
+        applySafeRedirect(uploadResult, formParams);
+        return uploadResult;
+    }
+
+    private ActionResult deployArtifact(DiskFileItem uploadedFile, JCRSiteNode site, String extension,
+                                        String groupId, String moduleName, String forgeSettingsUrl,
+                                        JCRSessionWrapper session) throws RepositoryException, JSONException {
         String user = site.getProperty("forgeSettingsUser").getString();
         String password = new String(Base64.decode(site.getProperty("forgeSettingsPassword").getString()));
 
@@ -466,104 +489,74 @@ public class CreateEntryFromJar extends Action {
             moduleReleaseInfo.setUsername(user);
             moduleReleaseInfo.setPassword(password);
             deployToMaven(groupId, moduleName, moduleReleaseInfo, artifact);
+            return null;
         } catch (IOException e) {
-            String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.cannot.upload", session.getLocale());
-            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
+            return errorResult(session, "forge.uploadJar.error.cannot.upload");
         } finally {
             FileUtils.deleteQuietly(artifact);
         }
+    }
 
-        // Create module
+    private static ActionResult errorResult(JCRSessionWrapper session, String messageKey) throws JSONException {
+        String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, messageKey, session.getLocale());
+        return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
+    }
 
-        List<String> moduleParamKeys = Arrays.asList(DESCRIPTION, "category", "icon", "authorNameDisplayedAs", AUTHOR_URL, "authorEmail", "FAQ", "codeRepository", "downloadCount", "supportedByJahia", "reviewedByJahia", "published", "deleted", "screenshots", "video", "groupId");
-        List<String> versionParamKeys = Arrays.asList(REQUIRED_VERSION, VERSION_NUMBER, "fileDsaSignature", "changeLog", "url");
-        Map<String, List<String>> moduleParameters = new HashMap<>();
-        Map<String, List<String>> versionParameters = new HashMap<>();
-
-        String title = getParameter(moduleParams, Constants.JCR_TITLE);
-        if (StringUtils.isEmpty(title)) {
-            title = moduleName;
+    private static void applySafeRedirect(ActionResult result, Map<String, List<String>> formParams) {
+        if (!formParams.containsKey(REDIRECT_URL)) {
+            return;
         }
-        // manually add jcr:title
-        moduleParameters.put(Constants.JCR_TITLE, Arrays.asList(title));
-        versionParameters.put(Constants.JCR_TITLE, Arrays.asList(title));
+        String redirectUrl = formParams.get(REDIRECT_URL).get(0);
+        if (ActionSecurityUtils.isSafeRedirect(redirectUrl)) {
+            result.setUrl(redirectUrl);
+        } else if (logger.isWarnEnabled()) {
+            logger.warn(LOG_UNSAFE_REDIRECT, ActionSecurityUtils.sanitizeForLog(redirectUrl));
+        }
+    }
 
-        for (Map.Entry<String, List<String>> moduleParam : moduleParams.entrySet()) {
-            String moduleParamKey = moduleParam.getKey();
-            List<String> moduleParamValue = moduleParam.getValue();
-            if (moduleParamKeys.contains(moduleParamKey) && moduleParamValue.get(0) != null) {
-                moduleParameters.put(moduleParamKey, moduleParamValue);
-            } else if (versionParamKeys.contains(moduleParamKey) && moduleParamValue.get(0) != null) {
-                versionParameters.put(moduleParamKey, moduleParamValue);
+    private static void grantOwnerRole(JCRSessionWrapper session, JCRNodeWrapper node) throws RepositoryException {
+        if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
+            node.grantRoles("u:" + session.getUser().getUsername(), new HashSet<>(Arrays.asList(OWNER)));
+        }
+    }
+
+    private static void partitionParams(Map<String, List<String>> source,
+                                        List<String> moduleKeys, List<String> versionKeys,
+                                        Map<String, List<String>> moduleTarget,
+                                        Map<String, List<String>> versionTarget) {
+        for (Map.Entry<String, List<String>> e : source.entrySet()) {
+            String key = e.getKey();
+            List<String> value = e.getValue();
+            if (value.get(0) == null) {
+                continue;
+            }
+            if (moduleKeys.contains(key)) {
+                moduleTarget.put(key, value);
+            } else if (versionKeys.contains(key)) {
+                versionTarget.put(key, value);
             }
         }
+    }
 
-        logger.info("Start creating Private App Store Module {}", moduleName);
-
-        JCRNodeWrapper module;
-
-        if (!repository.hasNode(moduleRelPath)) {
+    private JCRNodeWrapper upsertModuleNode(HttpServletRequest request, JCRNodeWrapper repositoryStart,
+                                            String moduleRelPath, String groupId, String moduleName,
+                                            Map<String, List<String>> moduleParameters) throws RepositoryException {
+        if (!repositoryStart.hasNode(moduleRelPath)) {
+            JCRNodeWrapper cursor = repositoryStart;
             for (String segment : groupId.split("\\.")) {
-                if (repository.hasNode(segment)) {
-                    repository = repository.getNode(segment);
+                if (cursor.hasNode(segment)) {
+                    cursor = cursor.getNode(segment);
                 } else {
-                    repository = repository.addNode(segment, "jnt:contentFolder");
+                    cursor = cursor.addNode(segment, JNT_CONTENT_FOLDER);
                 }
             }
-            module = createNode(request, moduleParameters, repository, "jnt:forgeModule", moduleName, false);
-        } else {
-            module = repository.getNode(moduleRelPath);
-            moduleParameters.remove(DESCRIPTION);
-            moduleParameters.remove(Constants.JCR_TITLE);
-            setProperties(module, moduleParameters);
+            return createNode(request, moduleParameters, cursor, "jnt:forgeModule", moduleName, false);
         }
-
-        if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
-            List<String> roles = Arrays.asList(OWNER);
-            module.grantRoles("u:" + session.getUser().getUsername(), new HashSet<String>(roles));
-        }
-
-        boolean hasModuleVersions = JCRTagUtils.hasChildrenOfType(module, JNT_FORGEMODULEVERSION);
-
-        // create module version
-
-        logger.info("Start adding module version {} of {}", version, title);
-
-        if (hasModuleVersions && !hasValidVersionNumber(module, version)) {
-            String error = Messages.getWithArgs(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.versionNumber", session.getLocale(), moduleName, version);
-            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
-        }
-
-        JCRNodeWrapper moduleVersion = createNode(request, versionParameters, module, JNT_FORGEMODULEVERSION, module.getName() + "-" + version, false);
-
-        String value = attributes.getValue("Jahia-Depends");
-        if (value != null) {
-            String[] jahiaDepends = value.split(",");
-            moduleVersion.setProperty("references", jahiaDepends);
-        } else {
-            moduleVersion.setProperty("references", EMPTY_REFERENCES);
-        }
-
-        if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
-            List<String> roles = Arrays.asList(OWNER);
-            moduleVersion.grantRoles("u:" + session.getUser().getUsername(), new HashSet<String>(roles));
-        }
-
-        logger.info("Module version {} of {} successfully added", version, title);
-
-        logger.info("Private App Store Module {} successfully created and added to repository {}", moduleName,
-                repository.getPath());
-
-        String moduleUrl = renderContext.getResponse().encodeURL(module.getUrl());
-        String moduleAbsoluteUrl = module.getProvider().getAbsoluteContextPath(request) + moduleUrl;
-        session.save();
-        ActionResult uploadResult = new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("successRedirectUrl", moduleUrl).put(
-                "successRedirectAbsoluteUrl", moduleAbsoluteUrl));
-        if (formParams.containsKey(REDIRECT_URL)) {
-            uploadResult.setUrl(formParams.get(REDIRECT_URL).get(0));
-        }
-
-        return uploadResult;
+        JCRNodeWrapper module = repositoryStart.getNode(moduleRelPath);
+        moduleParameters.remove(DESCRIPTION);
+        moduleParameters.remove(Constants.JCR_TITLE);
+        setProperties(module, moduleParameters);
+        return module;
     }
 
     public void setMavenExecutable(String mavenExecutable) {
@@ -620,16 +613,18 @@ public class CreateEntryFromJar extends Action {
             if (!StringUtils.isEmpty(releaseInfo.getUsername()) && !StringUtils.isEmpty(releaseInfo.getPassword())) {
                 settings = File.createTempFile("settings", ".xml");
                 try (BufferedWriter w = new BufferedWriter(new FileWriter(settings))) {
-                    w.write("<settings><servers><server><id>" + releaseInfo.getRepositoryId() + "</id><username>");
-                    w.write(releaseInfo.getUsername());
+                    // XML-escape every injected value to prevent settings.xml injection
+                    // (e.g. an attacker-controlled username/password breaking out into <mirror> elements).
+                    w.write("<settings><servers><server><id>" + StringEscapeUtils.escapeXml(releaseInfo.getRepositoryId()) + "</id><username>");
+                    w.write(StringEscapeUtils.escapeXml(releaseInfo.getUsername()));
                     w.write("</username><password>");
-                    w.write(releaseInfo.getPassword());
+                    w.write(StringEscapeUtils.escapeXml(releaseInfo.getPassword()));
                     w.write("</password></server></servers></settings>");
                 }
             }
-            JarFile jar = new JarFile(generatedJar);
-            pomFile = PomUtils.extractPomFromJar(jar, groupId, artifactId);
-            jar.close();
+            try (JarFile jar = new JarFile(generatedJar)) {
+                pomFile = PomUtils.extractPomFromJar(jar, groupId, artifactId);
+            }
 
             Model pom;
             try {

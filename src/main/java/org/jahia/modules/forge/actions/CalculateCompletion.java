@@ -43,7 +43,11 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Value;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Date: 2013-05-09
@@ -53,7 +57,7 @@ import java.util.*;
  */
 public class CalculateCompletion extends Action {
 
-    private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(CalculateCompletion.class);
+    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(CalculateCompletion.class);
 
     private static final int TEXT = 100;
     private static final int WEAKREFERENCE = 200;
@@ -63,17 +67,21 @@ public class CalculateCompletion extends Action {
     private static final int TAGS = 600;
     private static final int SKIP = 900;
 
-    private static boolean canBePublished = true;
-    private static int completion = 0, index = 0;
-    private static Map<Integer, Map<String, Object>> todoList = new LinkedHashMap<Integer, Map<String, Object>>();
-    private static List<Object[]> mandatoryProperties, otherProperties;
+    private static final String RESOURCES = "resources.privateappstore";
 
-    private static void initMandatoryProperties(JCRNodeWrapper module) throws RepositoryException {
+    private boolean canBePublished = true;
+    private int completion = 0;
+    private int index = 0;
+    private final Map<Integer, Map<String, Object>> todoList = new LinkedHashMap<>();
+    private List<Object[]> mandatoryProperties;
+    private List<Object[]> otherProperties;
 
-        if (mandatoryProperties == null)
-            mandatoryProperties = new ArrayList<Object[]>();
-        else
+    private void initMandatoryProperties() {
+        if (mandatoryProperties == null) {
+            mandatoryProperties = new ArrayList<>();
+        } else {
             mandatoryProperties.clear();
+        }
 
         mandatoryProperties.add(new Object[]{"jcr:title", TEXT, 20});
         mandatoryProperties.add(new Object[]{"description", TEXT, 20});
@@ -81,9 +89,8 @@ public class CalculateCompletion extends Action {
         mandatoryProperties.add(new Object[]{"versions", VERSIONS, 10});
     }
 
-    private static void initOtherProperties(JCRNodeWrapper module) throws RepositoryException {
-
-        otherProperties = new ArrayList<Object[]>();
+    private void initOtherProperties() {
+        otherProperties = new ArrayList<>();
 
         otherProperties.add(new Object[]{"howToInstall", TEXT, 5});
         otherProperties.add(new Object[]{"authorURL", TEXT, 5});
@@ -93,15 +100,6 @@ public class CalculateCompletion extends Action {
         otherProperties.add(new Object[]{"FAQ", TEXT, 5});
         otherProperties.add(new Object[]{"license", TEXT, 5});
         otherProperties.add(new Object[]{"j:tagList", TAGS, 5});
-//        int authorEmailType;
-//        if (module.hasProperty("authorNameDisplayedAs") && module.getPropertyAsString("authorNameDisplayedAs").equals("organisation")
-//                || (module.getSession().getUser().getProperty("j:email") != null && module.getSession().getUser().getProperty("j:email").isEmpty())) {
-//            authorEmailType = TEXT;
-//        }
-//        else {
-//            authorEmailType = SKIP;
-//        }
-//        otherProperties.add(new Object[]{"authorEmail", authorEmailType, 5});
     }
 
     @Override
@@ -115,15 +113,16 @@ public class CalculateCompletion extends Action {
 
         JCRNodeWrapper module = resource.getNode();
 
-        initMandatoryProperties(module);
-        if (otherProperties == null)
-            initOtherProperties(module);
+        initMandatoryProperties();
+        if (otherProperties == null) {
+            initOtherProperties();
+        }
 
         for (Object[] property : mandatoryProperties) {
-            checkProperty((String) property[0], (Integer) property[1], (Integer) property[2], true, session, module);
+            checkProperty((String) property[0], (Integer) property[1], (Integer) property[2], true, session, module, false);
         }
         for (Object[] property : otherProperties) {
-            checkProperty((String) property[0], (Integer) property[1], (Integer) property[2], false, session, module);
+            checkProperty((String) property[0], (Integer) property[1], (Integer) property[2], false, session, module, false);
         }
 
         JSONObject data = new JSONObject();
@@ -135,120 +134,124 @@ public class CalculateCompletion extends Action {
     }
 
     public static boolean isPublishable(JCRNodeWrapper module) throws RepositoryException {
+        return new CalculateCompletion().computePublishable(module);
+    }
 
+    private boolean computePublishable(JCRNodeWrapper module) throws RepositoryException {
         canBePublished = true;
         JCRSessionWrapper session = module.getSession();
-        initMandatoryProperties(module);
+        initMandatoryProperties();
 
         for (Object[] property : mandatoryProperties) {
             checkProperty((String) property[0], (Integer) property[1], (Integer) property[2], true, session, module, true);
-            if (!canBePublished)
-                return canBePublished;
+            if (!canBePublished) {
+                return false;
+            }
         }
-
         return canBePublished;
     }
 
     private void checkProperty(String name, int type, int percentage, boolean mandatory,
-                               JCRSessionWrapper session, JCRNodeWrapper module) {
-        checkProperty(name, type, percentage, mandatory, session, module, false);
-    }
-
-    private static void checkProperty(String name, int type, int percentage, boolean mandatory,
-                                      JCRSessionWrapper session, JCRNodeWrapper module, boolean simpleCheck) {
-
-        boolean completed = true;
-
-        switch (type) {
-
-            case TEXT:
-                String propertyAsString = module.getPropertyAsString(name);
-                if (propertyAsString == null || isEmptyHtmlText(propertyAsString))
-                    completed = false;
-                break;
-
-            case NODE:
-
-                try {
-                    module.getNode(name);
-                } catch (PathNotFoundException e) {
-                    completed = false;
-                } catch (Exception e) {
-                    logger.warn(e.getMessage(), e);
-                }
-                break;
-
-            case WEAKREFERENCE:
-
-                try {
-                    if (module.getProperty(name).isMultiple()) {
-                        for (Value uuid : module.getProperty(name).getValues()) {
-                            session.getNodeByUUID(uuid.getString());
-                        }
-                    } else {
-                        session.getNodeByUUID(module.getProperty(name).getString());
-                    }
-                } catch (ItemNotFoundException e) {
-                    completed = false;
-                } catch (PathNotFoundException e) {
-                    completed = false;
-                } catch (Exception e) {
-                    logger.warn(e.getMessage(), e);
-                }
-                break;
-
-            case SCREENSHOTS:
-
-                try {
-                    JCRNodeWrapper screenshotsList = module.getNode(name);
-                    if (!JCRTagUtils.hasChildrenOfType(screenshotsList, "jnt:file"))
-                        completed = false;
-                } catch (PathNotFoundException e) {
-                    completed = false;
-                } catch (Exception e) {
-                    logger.warn(e.getMessage(), e);
-                }
-                break;
-
-            case TAGS:
-
-                try {
-                    if (module.getProperty(name).getValues().length == 0)
-                        completed = false;
-                } catch (PathNotFoundException e) {
-                    completed = false;
-                } catch (Exception e) {
-                    logger.warn(e.getMessage(), e);
-                }
-                break;
-
-            case SKIP:
-                break;
-        }
+                               JCRSessionWrapper session, JCRNodeWrapper module, boolean simpleCheck) {
+        boolean completed = isPropertyCompleted(name, type, session, module);
 
         if (completed) {
-            if (simpleCheck)
+            if (simpleCheck) {
                 return;
-            completion += percentage;
-        } else {
-            if (mandatory) {
-                canBePublished = false;
-                if (simpleCheck)
-                    return;
             }
-
-            Map<String, Object> propertyMap = new HashMap<String, Object>();
-            propertyMap.put("name",
-                    Messages.get("resources.privateappstore", "jnt_forgeModule." + name.replace(':', '_'), session.getLocale(), name));
-            propertyMap.put("mandatory", mandatory);
-
-            todoList.put(index++, propertyMap);
+            completion += percentage;
+            return;
         }
 
+        if (mandatory) {
+            canBePublished = false;
+            if (simpleCheck) {
+                return;
+            }
+        }
+
+        Map<String, Object> propertyMap = new HashMap<>();
+        propertyMap.put("name",
+                Messages.get(RESOURCES, "jnt_forgeModule." + name.replace(':', '_'), session.getLocale(), name));
+        propertyMap.put("mandatory", mandatory);
+
+        todoList.put(index++, propertyMap);
+    }
+
+    private static boolean isPropertyCompleted(String name, int type, JCRSessionWrapper session, JCRNodeWrapper module) {
+        switch (type) {
+            case TEXT:
+                String propertyAsString = module.getPropertyAsString(name);
+                return propertyAsString != null && !isEmptyHtmlText(propertyAsString);
+            case NODE:
+                return checkNode(module, name);
+            case WEAKREFERENCE:
+                return checkWeakReference(module, name, session);
+            case SCREENSHOTS:
+                return checkScreenshots(module, name);
+            case TAGS:
+                return checkTags(module, name);
+            case SKIP:
+                return true;
+            default:
+                return true;
+        }
+    }
+
+    private static boolean checkNode(JCRNodeWrapper module, String name) {
+        try {
+            module.getNode(name);
+            return true;
+        } catch (PathNotFoundException e) {
+            return false;
+        } catch (RepositoryException e) {
+            logger.warn(e.getMessage(), e);
+            return true;
+        }
+    }
+
+    private static boolean checkWeakReference(JCRNodeWrapper module, String name, JCRSessionWrapper session) {
+        try {
+            if (module.getProperty(name).isMultiple()) {
+                for (Value uuid : module.getProperty(name).getValues()) {
+                    session.getNodeByUUID(uuid.getString());
+                }
+            } else {
+                session.getNodeByUUID(module.getProperty(name).getString());
+            }
+            return true;
+        } catch (ItemNotFoundException | PathNotFoundException e) {
+            return false;
+        } catch (RepositoryException e) {
+            logger.warn(e.getMessage(), e);
+            return true;
+        }
+    }
+
+    private static boolean checkScreenshots(JCRNodeWrapper module, String name) {
+        try {
+            JCRNodeWrapper screenshotsList = module.getNode(name);
+            return JCRTagUtils.hasChildrenOfType(screenshotsList, "jnt:file");
+        } catch (PathNotFoundException e) {
+            return false;
+        } catch (RepositoryException e) {
+            logger.warn(e.getMessage(), e);
+            return true;
+        }
+    }
+
+    private static boolean checkTags(JCRNodeWrapper module, String name) {
+        try {
+            return module.getProperty(name).getValues().length != 0;
+        } catch (PathNotFoundException e) {
+            return false;
+        } catch (RepositoryException e) {
+            logger.warn(e.getMessage(), e);
+            return true;
+        }
     }
 
     private static boolean isEmptyHtmlText(String html) {
-
         Source source = new Source(html);
         TextExtractor textExtractor = source.getTextExtractor();
 
@@ -258,5 +261,4 @@ public class CalculateCompletion extends Action {
 
         return textExtractor.toString().trim().length() == 0;
     }
-
 }

@@ -48,7 +48,8 @@ import java.util.Map;
  */
 public class PublishModule extends Action {
 
-    private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(PublishModule.class);
+    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(PublishModule.class);
+    private static final String PUBLISHED = "published";
 
     @Override
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource,
@@ -64,28 +65,28 @@ public class PublishModule extends Action {
             return ActionResult.BAD_REQUEST;
 
         boolean published = publish.equals("true");
-        module.setProperty("published", published);
+        module.setProperty(PUBLISHED, published);
         session.save();
 
-        // if no versions is published, publish the last one
         if (published) {
-            NodeIterator ni = module.getNodes();
-            List<JCRNodeWrapper> sortedVersions = ForgeFunctions.sortModulesByVersion(ni);
-            if (!sortedVersions.isEmpty()) {
-                boolean hasPublishedVersion = false;
-                for (JCRNodeWrapper version : sortedVersions) {
-                    if (version.isNodeType("jnt:forgeModuleVersion") && version.getProperty("published").getBoolean()) {
-                        hasPublishedVersion = true;
-                        break;
-                    }
-                }
-                if (!hasPublishedVersion) {
-                    sortedVersions.get(0).setProperty("published", true);
-                    session.save();
-                }
-            }
+            ensureLatestVersionPublished(module, session);
         }
 
-        return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("published", published));
+        return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(PUBLISHED, published));
+    }
+
+    private static void ensureLatestVersionPublished(JCRNodeWrapper module, JCRSessionWrapper session) throws javax.jcr.RepositoryException {
+        NodeIterator ni = module.getNodes();
+        List<JCRNodeWrapper> sortedVersions = ForgeFunctions.sortModulesByVersion(ni);
+        if (sortedVersions.isEmpty()) {
+            return;
+        }
+        for (JCRNodeWrapper version : sortedVersions) {
+            if (version.isNodeType("jnt:forgeModuleVersion") && version.getProperty(PUBLISHED).getBoolean()) {
+                return;
+            }
+        }
+        sortedVersions.get(0).setProperty(PUBLISHED, true);
+        session.save();
     }
 }

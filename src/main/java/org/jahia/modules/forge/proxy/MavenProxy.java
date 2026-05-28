@@ -24,8 +24,10 @@
 package org.jahia.modules.forge.proxy;
 
 import java.io.IOException;
+import java.net.URI;
 import org.apache.commons.lang.StringUtils;
 import org.apache.xerces.impl.dv.util.Base64;
+import org.jahia.api.Constants;
 import org.jahia.data.templates.ModuleReleaseInfo;
 import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.content.JCRSessionWrapper;
@@ -54,16 +56,40 @@ public class MavenProxy implements Controller {
     public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         if (request.getMethod().equals("GET")) {
+            JCRSessionWrapper session = JCRSessionFactory.getInstance().getCurrentUserSession("live");
+            // Require an authenticated (non-guest) user: the proxy forwards the site's stored
+            // Maven credentials, so it must never be reachable anonymously.
+            if (session.getUser() == null || Constants.GUEST_USERNAME.equals(session.getUser().getName())) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                return null;
+            }
+
             String pathInfo = StringUtils.substringAfter(request.getPathInfo(), "/mavenproxy/");
             String siteName = StringUtils.substringBefore(pathInfo, "/");
             String path = "/" + StringUtils.substringAfter(pathInfo, "/");
 
-            ModuleReleaseInfo releaseInfo = getModuleReleaseInfo(siteName);
+            // Reject path traversal and absolute-URL injection to prevent SSRF: the caller must
+            // not be able to escape the configured repository root or point at another host.
+            if (path.contains("..") || path.contains("\\") || path.contains("://") || path.contains("\n") || path.contains("\r")) {
+                LOGGER.warn("MavenProxy: rejected suspicious path '{}'", path);
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                return null;
+            }
 
-            String url = releaseInfo.getRepositoryUrl() + path;
+            ModuleReleaseInfo releaseInfo = getModuleReleaseInfo(session, siteName);
+
+            String repositoryUrl = releaseInfo.getRepositoryUrl();
+            String url = repositoryUrl + path;
+            // Canonicalize and confirm the resolved URL still lives under the repository root.
+            final URI resolvedUri = UriComponentsBuilder.fromHttpUrl(url).build(false).toUri().normalize();
+            if (repositoryUrl == null || !resolvedUri.toString().startsWith(repositoryUrl)) {
+                LOGGER.warn("MavenProxy: resolved URL '{}' escapes repository root '{}'", resolvedUri, repositoryUrl);
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                return null;
+            }
             // Usage of SpringContextSingleton to prevent bug QA-9515
             final CloseableHttpClient httpClient = ((HttpClientService) SpringContextSingleton.getBean("HttpClientService")).getHttpClient(url);
-            final HttpGet httpMethod = new HttpGet(UriComponentsBuilder.fromHttpUrl(url).build(false).toUri());
+            final HttpGet httpMethod = new HttpGet(resolvedUri);
             httpMethod.addHeader("Authorization", "Basic " + Base64.encode((releaseInfo.getUsername() + ":" + releaseInfo.getPassword()).getBytes()));
             try (final CloseableHttpResponse httpResponse = httpClient.execute(httpMethod)) {
                 if (httpResponse.getCode() == HttpServletResponse.SC_OK) {
@@ -80,8 +106,7 @@ public class MavenProxy implements Controller {
         return null;
     }
 
-    private ModuleReleaseInfo getModuleReleaseInfo(final String siteName) throws RepositoryException {
-        JCRSessionWrapper session = JCRSessionFactory.getInstance().getCurrentUserSession("live");
+    private ModuleReleaseInfo getModuleReleaseInfo(final JCRSessionWrapper session, final String siteName) throws RepositoryException {
         JCRSiteNode siteNode = (JCRSiteNode) session.getNode("/sites/" + siteName);
         String forgeSettingsUrl = siteNode.getProperty("forgeSettingsUrl").getString();
         String user = siteNode.getProperty("forgeSettingsUser").getString();

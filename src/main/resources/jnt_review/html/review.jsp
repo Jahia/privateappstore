@@ -100,7 +100,7 @@
                         alt="${fn:escapeXml(firstName)}<c:if test="${not empty firstName}">&nbsp;</c:if>${fn:escapeXml(lastName)}"
                     </c:when>
                     <c:otherwise>
-                        alt="${createdBy}"
+                        alt="${fn:escapeXml(createdBy)}"
                     </c:otherwise>
                 </c:choose>
                 width="60"
@@ -127,7 +127,7 @@
                                             ${fn:escapeXml(firstName)}<c:if test="${not empty firstName}">&nbsp;</c:if>${fn:escapeXml(lastName)}
                                         </c:when>
                                         <c:otherwise>
-                                            ${createdBy}
+                                            ${fn:escapeXml(createdBy)}
                                         </c:otherwise>
                                     </c:choose>
                                 </a>
