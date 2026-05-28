@@ -126,7 +126,6 @@
                             <h2><fmt:message key="jnt_forgeEntry.label.previousVersions"/></h2>
                         </c:if>
                         <article class="previousVersion">
-                            ${previousVersion.path}
                             <template:module node="${previousVersion}">
                                 <template:param name="isDeveloper" value="${isDeveloper}"/>
                                 <template:param name="viewAsUser" value="${viewAsUser}"/>

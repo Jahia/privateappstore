@@ -26,6 +26,7 @@ package org.jahia.modules.forge.actions;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.model.Model;
 import org.apache.xerces.impl.dv.util.Base64;
@@ -92,6 +93,10 @@ public class CreateEntryFromJar extends Action {
     private static final String OWNER = "owner";
     private static final String MODULES_LIST = "modulesList";
     private static final String RESOURCES_PRIVATEAPPSTORE = "resources.privateappstore";
+    /** Maximum accepted size for an uploaded artifact (guards against resource-exhaustion uploads). */
+    private static final long MAX_UPLOAD_SIZE_BYTES = 200L * 1024 * 1024;
+    /** Maximum size of a single tar entry we read into memory (guards against decompression bombs). */
+    private static final long MAX_TAR_ENTRY_SIZE_BYTES = 10L * 1024 * 1024;
 
     String mavenExecutable;
 
@@ -100,6 +105,16 @@ public class CreateEntryFromJar extends Action {
         final FileUpload fu = (FileUpload) request.getAttribute(FileUpload.FILEUPLOAD_ATTRIBUTE);
 
         DiskFileItem uploadedFile = fu.getFileItems().get("file");
+        if (uploadedFile == null) {
+            String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.unable.read.file", session.getLocale());
+            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
+        }
+        if (uploadedFile.getSize() > MAX_UPLOAD_SIZE_BYTES) {
+            logger.warn("CreateEntryFromJar: rejected oversized upload '{}' ({} bytes)", uploadedFile.getName(), uploadedFile.getSize());
+            uploadedFile.delete();
+            String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.unable.read.file", session.getLocale());
+            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
+        }
         String filename = uploadedFile.getName();
         Map<String, List<String>> formParameters = fu.getParameterMap();
         if (!StringUtils.contains(filename, "SNAPSHOT.")) {
@@ -114,6 +129,11 @@ public class CreateEntryFromJar extends Action {
                     TarArchiveEntry entry;
                     while ((entry = tarInputStream.getNextTarEntry()) != null) {
                         if (entry.isFile() && entry.getName().equals("package/package.json")) {
+                            if (entry.getSize() > MAX_TAR_ENTRY_SIZE_BYTES) {
+                                logger.warn("CreateEntryFromJar: package.json entry too large ({} bytes) - rejected", entry.getSize());
+                                String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.unable.read.file", session.getLocale());
+                                return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
+                            }
                             final JSONObject jsonObject = new JSONObject(IOUtils.toString(tarInputStream, "UTF-8"));
                             return createJavascriptModule(uploadedFile, jsonObject, request, renderContext, resource, session, extension, formParameters);
                         }
@@ -274,7 +294,12 @@ public class CreateEntryFromJar extends Action {
         final ActionResult uploadResult = new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("successRedirectUrl", moduleUrl).put(
                 "successRedirectAbsoluteUrl", moduleAbsoluteUrl));
         if (formParams.containsKey(REDIRECT_URL)) {
-            uploadResult.setUrl(formParams.get(REDIRECT_URL).get(0));
+            String redirectUrl = formParams.get(REDIRECT_URL).get(0);
+            if (isSafeRedirect(redirectUrl)) {
+                uploadResult.setUrl(redirectUrl);
+            } else {
+                logger.warn("CreateEntryFromJar: rejected unsafe redirectURL '{}'", redirectUrl);
+            }
         }
 
         return uploadResult;
@@ -409,7 +434,12 @@ public class CreateEntryFromJar extends Action {
         ActionResult uploadResult = new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("successRedirectUrl", packageUrl).put(
                 "successRedirectAbsoluteUrl", packageAbsoluteUrl));
         if (formParams.containsKey(REDIRECT_URL)) {
-            uploadResult.setUrl(formParams.get(REDIRECT_URL).get(0));
+            String redirectUrl = formParams.get(REDIRECT_URL).get(0);
+            if (isSafeRedirect(redirectUrl)) {
+                uploadResult.setUrl(redirectUrl);
+            } else {
+                logger.warn("CreateEntryFromJar: rejected unsafe redirectURL '{}'", redirectUrl);
+            }
         }
 
         return uploadResult;
@@ -560,10 +590,30 @@ public class CreateEntryFromJar extends Action {
         ActionResult uploadResult = new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("successRedirectUrl", moduleUrl).put(
                 "successRedirectAbsoluteUrl", moduleAbsoluteUrl));
         if (formParams.containsKey(REDIRECT_URL)) {
-            uploadResult.setUrl(formParams.get(REDIRECT_URL).get(0));
+            String redirectUrl = formParams.get(REDIRECT_URL).get(0);
+            if (isSafeRedirect(redirectUrl)) {
+                uploadResult.setUrl(redirectUrl);
+            } else {
+                logger.warn("CreateEntryFromJar: rejected unsafe redirectURL '{}'", redirectUrl);
+            }
         }
 
         return uploadResult;
+    }
+
+    /**
+     * Only allow site-relative redirect targets. Rejects absolute URLs, protocol-relative URLs
+     * and pseudo-schemes (javascript:, data:, ...) to prevent open redirect / XSS after upload.
+     */
+    private static boolean isSafeRedirect(String url) {
+        if (StringUtils.isBlank(url)) {
+            return false;
+        }
+        String lower = url.trim().toLowerCase();
+        return lower.startsWith("/")
+                && !lower.startsWith("//")
+                && !lower.startsWith("/\\")
+                && !lower.contains("://");
     }
 
     public void setMavenExecutable(String mavenExecutable) {
@@ -620,10 +670,12 @@ public class CreateEntryFromJar extends Action {
             if (!StringUtils.isEmpty(releaseInfo.getUsername()) && !StringUtils.isEmpty(releaseInfo.getPassword())) {
                 settings = File.createTempFile("settings", ".xml");
                 try (BufferedWriter w = new BufferedWriter(new FileWriter(settings))) {
-                    w.write("<settings><servers><server><id>" + releaseInfo.getRepositoryId() + "</id><username>");
-                    w.write(releaseInfo.getUsername());
+                    // XML-escape every injected value to prevent settings.xml injection
+                    // (e.g. an attacker-controlled username/password breaking out into <mirror> elements).
+                    w.write("<settings><servers><server><id>" + StringEscapeUtils.escapeXml(releaseInfo.getRepositoryId()) + "</id><username>");
+                    w.write(StringEscapeUtils.escapeXml(releaseInfo.getUsername()));
                     w.write("</username><password>");
-                    w.write(releaseInfo.getPassword());
+                    w.write(StringEscapeUtils.escapeXml(releaseInfo.getPassword()));
                     w.write("</password></server></servers></settings>");
                 }
             }

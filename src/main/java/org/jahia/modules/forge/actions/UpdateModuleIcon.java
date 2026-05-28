@@ -24,6 +24,7 @@
 package org.jahia.modules.forge.actions;
 
 import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.bin.Action;
@@ -45,9 +46,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Action called to update a module icon
@@ -55,6 +59,13 @@ import java.util.Map;
 public class UpdateModuleIcon extends Action {
 
     private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(UpdateModuleIcon.class);
+
+    private static final String RESOURCES = "resources.privateappstore";
+    /** Maximum accepted size for an uploaded icon. */
+    private static final long MAX_ICON_SIZE_BYTES = 5L * 1024 * 1024;
+    /** Allowed raster image extensions (SVG is intentionally excluded - it can carry script). */
+    private static final Set<String> ALLOWED_ICON_EXTENSIONS =
+            new HashSet<>(Arrays.asList("png", "jpg", "jpeg", "gif", "webp"));
 
     JahiaImageService imageService;
 
@@ -69,36 +80,73 @@ public class UpdateModuleIcon extends Action {
         final FileUpload fileUpload = (FileUpload) req.getAttribute(FileUpload.FILEUPLOAD_ATTRIBUTE);
         String redirectURL = null;
         ActionResult result;
-        if (fileUpload.getParameterMap().containsKey("redirectURL")) {
-            redirectURL = fileUpload.getParameterMap().get("redirectURL").get(0);
+        if (fileUpload != null && fileUpload.getParameterMap().containsKey("redirectURL")) {
+            // Only accept a site-relative redirect target to prevent open redirect.
+            String candidate = fileUpload.getParameterMap().get("redirectURL").get(0);
+            if (isSafeRedirect(candidate)) {
+                redirectURL = candidate;
+            } else {
+                logger.warn("UpdateModuleIcon: rejected unsafe redirectURL '{}'", candidate);
+            }
         }
         if (fileUpload != null && fileUpload.getFileItems() != null && fileUpload.getFileItems().size() > 0) {
             final Map<String, DiskFileItem> stringDiskFileItemMap = fileUpload.getFileItems();
             DiskFileItem itemEntry = stringDiskFileItemMap.get(stringDiskFileItemMap.keySet().iterator().next());
-            if (StringUtils.substringBefore(itemEntry.getContentType(), "/").equals("image")) {
-                icon = iconFolder.uploadFile(itemEntry.getName(), itemEntry.getInputStream(),
-                        JCRContentUtils.getMimeType(itemEntry.getName(), itemEntry.getContentType()));
-                String fileExtension = FilenameUtils.getExtension(icon.getName());
+            String uploadExtension = FilenameUtils.getExtension(itemEntry.getName()).toLowerCase();
+            boolean isImageContentType = itemEntry.getContentType() != null
+                    && "image".equals(StringUtils.substringBefore(itemEntry.getContentType(), "/"))
+                    && !"image/svg+xml".equalsIgnoreCase(itemEntry.getContentType());
+            if (itemEntry.getSize() > MAX_ICON_SIZE_BYTES) {
+                logger.warn("UpdateModuleIcon: rejected oversized icon '{}' ({} bytes)", itemEntry.getName(), itemEntry.getSize());
+                String error = Messages.get(RESOURCES, "forge.updateIcon.error.wrong.format", session.getLocale());
+                result = new ActionResult(HttpServletResponse.SC_OK, redirectURL, new JSONObject().put("iconUpdate", false).put("errorMessage", error));
+            } else if (isImageContentType && ALLOWED_ICON_EXTENSIONS.contains(uploadExtension)) {
+                File f = null;
+                try {
+                    icon = iconFolder.uploadFile(itemEntry.getName(), itemEntry.getInputStream(),
+                            JCRContentUtils.getMimeType(itemEntry.getName(), itemEntry.getContentType()));
+                    String fileExtension = FilenameUtils.getExtension(icon.getName());
 
-                final File f = File.createTempFile("thumb", "." + fileExtension);
-                imageService.createThumb(imageService.getImage(icon), f, 125, false);
-                InputStream is = new FileInputStream(f);
-                icon = iconFolder.uploadFile(itemEntry.getName(), is, JCRContentUtils.getMimeType(itemEntry.getName(), itemEntry.getContentType()));
-                is.close();
-                session.save();
-                result = new ActionResult(HttpServletResponse.SC_OK, redirectURL, new JSONObject().put("iconUpdate", true).put("iconUrl", icon.getUrl()));
+                    f = File.createTempFile("thumb", "." + fileExtension);
+                    // createThumb/getImage decode the bytes: a non-image masquerading as an image
+                    // (declared content-type) fails here and is rejected below.
+                    imageService.createThumb(imageService.getImage(icon), f, 125, false);
+                    try (InputStream is = new FileInputStream(f)) {
+                        icon = iconFolder.uploadFile(itemEntry.getName(), is, JCRContentUtils.getMimeType(itemEntry.getName(), itemEntry.getContentType()));
+                    }
+                    session.save();
+                    result = new ActionResult(HttpServletResponse.SC_OK, redirectURL, new JSONObject().put("iconUpdate", true).put("iconUrl", icon.getUrl()));
+                } catch (Exception e) {
+                    logger.warn("UpdateModuleIcon: failed to process uploaded icon '{}'", itemEntry.getName(), e);
+                    String error = Messages.get(RESOURCES, "forge.updateIcon.error.wrong.format", session.getLocale());
+                    result = new ActionResult(HttpServletResponse.SC_OK, redirectURL, new JSONObject().put("iconUpdate", false).put("errorMessage", error));
+                } finally {
+                    FileUtils.deleteQuietly(f);
+                }
             } else {
-                String error = Messages.get("resources.privateappstore", "forge.updateIcon.error.wrong.format", session.getLocale());
+                String error = Messages.get(RESOURCES, "forge.updateIcon.error.wrong.format", session.getLocale());
                 result = new ActionResult(HttpServletResponse.SC_OK, redirectURL, new JSONObject().put("iconUpdate", false).put("errorMessage", error));
             }
         } else {
-            String error = Messages.get("resources.privateappstore", "forge.updateIcon.error.noFileFound", session.getLocale());
+            String error = Messages.get(RESOURCES, "forge.updateIcon.error.noFileFound", session.getLocale());
             result = new ActionResult(HttpServletResponse.SC_OK, redirectURL, new JSONObject().put("iconUpdate", false).put("errorMessage", error));
         }
-        if (!StringUtils.isEmpty(redirectURL)) {
-            result.setUrl(redirectURL);
-        }
         return result;
+    }
+
+    /**
+     * Only allow site-relative redirect targets. Rejects absolute URLs, protocol-relative URLs
+     * and pseudo-schemes (javascript:, data:, ...) to prevent open redirect / XSS.
+     */
+    private static boolean isSafeRedirect(String url) {
+        if (StringUtils.isBlank(url)) {
+            return false;
+        }
+        String lower = url.trim().toLowerCase();
+        return lower.startsWith("/")
+                && !lower.startsWith("//")
+                && !lower.startsWith("/\\")
+                && !lower.contains("://");
     }
 
     public void setImageService(JahiaImageService imageService) {
