@@ -82,10 +82,12 @@ public class CreateEntryFromJar extends Action {
     private static final String[] EMPTY_REFERENCES = new String[]{"none"};
     private static final String JNT_FORGEMODULEVERSION = "jnt:forgeModuleVersion";
     private static final String JNT_FORGEPACKAGEVERSION = "jnt:forgePackageVersion";
+    private static final String JNT_CONTENT_FOLDER = "jnt:contentFolder";
     private static final String REDIRECT_URL = "redirectURL";
     private static final String BUNDLE_SYMBOLIC_NAME = "Bundle-SymbolicName";
     private static final String REQUIRED_VERSION = "requiredVersion";
     private static final String VERSION_NUMBER = "versionNumber";
+    private static final String VERSION_PREFIX = "version-";
     private static final String DESCRIPTION = "description";
     private static final String AUTHOR_URL = "authorURL";
     private static final String ERROR = "error";
@@ -93,6 +95,28 @@ public class CreateEntryFromJar extends Action {
     private static final String OWNER = "owner";
     private static final String MODULES_LIST = "modulesList";
     private static final String RESOURCES_PRIVATEAPPSTORE = "resources.privateappstore";
+    private static final String GROUP_ID = "groupId";
+    private static final String MODULE_NAME = "moduleName";
+    private static final String CATEGORY = "category";
+    private static final String AUTHOR_NAME_DISPLAYED_AS = "authorNameDisplayedAs";
+    private static final String AUTHOR_EMAIL = "authorEmail";
+    private static final String CODE_REPOSITORY = "codeRepository";
+    private static final String DOWNLOAD_COUNT = "downloadCount";
+    private static final String SUPPORTED_BY_JAHIA = "supportedByJahia";
+    private static final String REVIEWED_BY_JAHIA = "reviewedByJahia";
+    private static final String PUBLISHED = "published";
+    private static final String DELETED = "deleted";
+    private static final String SCREENSHOTS = "screenshots";
+    private static final String VIDEO = "video";
+    private static final String CHANGE_LOG = "changeLog";
+    private static final String FILE_DSA_SIGNATURE = "fileDsaSignature";
+    private static final String REFERENCES = "references";
+    private static final String SUCCESS_REDIRECT_URL = "successRedirectUrl";
+    private static final String SUCCESS_REDIRECT_ABSOLUTE_URL = "successRedirectAbsoluteUrl";
+    private static final String ERR_UNABLE_READ_FILE = "forge.uploadJar.error.unable.read.file";
+    private static final String ERR_MISSING_MANIFEST_ATTRIBUTE = "forge.uploadJar.error.missing.manifest.attribute";
+    private static final String ERR_VERSION_NUMBER = "forge.uploadJar.error.versionNumber";
+    private static final String LOG_UNSAFE_REDIRECT = "CreateEntryFromJar: rejected unsafe redirectURL '{}'";
     /** Maximum accepted size for an uploaded artifact (guards against resource-exhaustion uploads). */
     private static final long MAX_UPLOAD_SIZE_BYTES = 200L * 1024 * 1024;
     /** Maximum size of a single tar entry we read into memory (guards against decompression bombs). */
@@ -106,13 +130,14 @@ public class CreateEntryFromJar extends Action {
 
         DiskFileItem uploadedFile = fu.getFileItems().get("file");
         if (uploadedFile == null) {
-            String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.unable.read.file", session.getLocale());
+            String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, ERR_UNABLE_READ_FILE, session.getLocale());
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
         }
         if (uploadedFile.getSize() > MAX_UPLOAD_SIZE_BYTES) {
-            logger.warn("CreateEntryFromJar: rejected oversized upload '{}' ({} bytes)", uploadedFile.getName(), uploadedFile.getSize());
+            logger.warn("CreateEntryFromJar: rejected oversized upload '{}' ({} bytes)",
+                    ActionSecurityUtils.sanitizeForLog(uploadedFile.getName()), uploadedFile.getSize());
             uploadedFile.delete();
-            String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.unable.read.file", session.getLocale());
+            String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, ERR_UNABLE_READ_FILE, session.getLocale());
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
         }
         String filename = uploadedFile.getName();
@@ -131,7 +156,7 @@ public class CreateEntryFromJar extends Action {
                         if (entry.isFile() && entry.getName().equals("package/package.json")) {
                             if (entry.getSize() > MAX_TAR_ENTRY_SIZE_BYTES) {
                                 logger.warn("CreateEntryFromJar: package.json entry too large ({} bytes) - rejected", entry.getSize());
-                                String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.unable.read.file", session.getLocale());
+                                String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, ERR_UNABLE_READ_FILE, session.getLocale());
                                 return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
                             }
                             final JSONObject jsonObject = new JSONObject(IOUtils.toString(tarInputStream, "UTF-8"));
@@ -143,7 +168,7 @@ public class CreateEntryFromJar extends Action {
                     return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
                 } catch (IOException ex) {
                     logger.error("Impossible to parse archive", ex);
-                    String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.unable.read.file", session.getLocale());
+                    String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, ERR_UNABLE_READ_FILE, session.getLocale());
                     return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
                 }finally {
                     uploadedFile.delete();
@@ -164,7 +189,7 @@ public class CreateEntryFromJar extends Action {
                     }
                 } catch (IOException ex) {
                     logger.error("Impossible to parse archive", ex);
-                    String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.unable.read.file", session.getLocale());
+                    String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, ERR_UNABLE_READ_FILE, session.getLocale());
                     return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
                 } finally {
                     uploadedFile.delete();
@@ -185,16 +210,16 @@ public class CreateEntryFromJar extends Action {
         final String groupId = mavenJsonObject.getString("groupId");
         final JCRSiteNode site = resource.getNode().getResolveSite();
         final Map<String, List<String>> moduleParams = new HashMap<>();
-        moduleParams.put("moduleName", Arrays.asList(moduleName));
-        moduleParams.put("groupId", Arrays.asList(groupId));
+        moduleParams.put(MODULE_NAME, Arrays.asList(moduleName));
+        moduleParams.put(GROUP_ID, Arrays.asList(groupId));
         moduleParams.put(Constants.JCR_TITLE, Arrays.asList(moduleName));
         moduleParams.put(VERSION_NUMBER, Arrays.asList(version));
 
         final String forgeUrl = StringUtils.substringBefore(request.getRequestURL().toString(), "/render");
         final String reqVersionAttribute = jahiaJsonObject.getString("required-version");
-        final String requiredVersion = "version-" + reqVersionAttribute;
+        final String requiredVersion = VERSION_PREFIX + reqVersionAttribute;
         if (StringUtils.isEmpty(moduleName) || StringUtils.isEmpty(groupId) || StringUtils.isEmpty(reqVersionAttribute)) {
-            String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.missing.manifest.attribute", session.getLocale());
+            String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, ERR_MISSING_MANIFEST_ATTRIBUTE, session.getLocale());
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
         }
         final String moduleRelPath = groupId.replace(".", "/") + "/" + moduleName;
@@ -206,8 +231,8 @@ public class CreateEntryFromJar extends Action {
         // TODO: upload Javascript module
 
         // Create module
-        final List<String> moduleParamKeys = Arrays.asList(DESCRIPTION, "category", "icon", "authorNameDisplayedAs", AUTHOR_URL, "authorEmail", "FAQ", "codeRepository", "downloadCount", "supportedByJahia", "reviewedByJahia", "published", "deleted", "screenshots", "video", "groupId");
-        final List<String> versionParamKeys = Arrays.asList(REQUIRED_VERSION, VERSION_NUMBER, "fileDsaSignature", "changeLog", "url");
+        final List<String> moduleParamKeys = Arrays.asList(DESCRIPTION, CATEGORY, "icon", AUTHOR_NAME_DISPLAYED_AS, AUTHOR_URL, AUTHOR_EMAIL, "FAQ", CODE_REPOSITORY, DOWNLOAD_COUNT, SUPPORTED_BY_JAHIA, REVIEWED_BY_JAHIA, PUBLISHED, DELETED, SCREENSHOTS, VIDEO, GROUP_ID);
+        final List<String> versionParamKeys = Arrays.asList(REQUIRED_VERSION, VERSION_NUMBER, FILE_DSA_SIGNATURE, CHANGE_LOG, "url");
         final Map<String, List<String>> moduleParameters = new HashMap<>();
         final Map<String, List<String>> versionParameters = new HashMap<>();
 
@@ -238,7 +263,7 @@ public class CreateEntryFromJar extends Action {
                 if (repository.hasNode(segment)) {
                     repository = repository.getNode(segment);
                 } else {
-                    repository = repository.addNode(segment, "jnt:contentFolder");
+                    repository = repository.addNode(segment, JNT_CONTENT_FOLDER);
                 }
             }
             module = createNode(request, moduleParameters, repository, "jnt:forgeModule", moduleName, false);
@@ -261,7 +286,7 @@ public class CreateEntryFromJar extends Action {
         logger.info("Start adding module version {} of {}", version, title);
 
         if (hasModuleVersions && !hasValidVersionNumber(module, version)) {
-            String error = Messages.getWithArgs(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.versionNumber", session.getLocale(), moduleName, version);
+            String error = Messages.getWithArgs(RESOURCES_PRIVATEAPPSTORE, ERR_VERSION_NUMBER, session.getLocale(), moduleName, version);
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
         }
 
@@ -270,9 +295,9 @@ public class CreateEntryFromJar extends Action {
         String value = jahiaJsonObject.getString("module-dependencies");
         if (value != null) {
             String[] jahiaDepends = value.split(",");
-            moduleVersion.setProperty("references", jahiaDepends);
+            moduleVersion.setProperty(REFERENCES, jahiaDepends);
         } else {
-            moduleVersion.setProperty("references", EMPTY_REFERENCES);
+            moduleVersion.setProperty(REFERENCES, EMPTY_REFERENCES);
         }
 
         if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
@@ -291,14 +316,14 @@ public class CreateEntryFromJar extends Action {
         moduleVersion.uploadFile(uploadedFile.getName(), uploadedFile.getInputStream(), uploadedFile.getContentType());
         session.save();
         
-        final ActionResult uploadResult = new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("successRedirectUrl", moduleUrl).put(
-                "successRedirectAbsoluteUrl", moduleAbsoluteUrl));
+        final ActionResult uploadResult = new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(SUCCESS_REDIRECT_URL, moduleUrl).put(
+                SUCCESS_REDIRECT_ABSOLUTE_URL, moduleAbsoluteUrl));
         if (formParams.containsKey(REDIRECT_URL)) {
             String redirectUrl = formParams.get(REDIRECT_URL).get(0);
-            if (isSafeRedirect(redirectUrl)) {
+            if (ActionSecurityUtils.isSafeRedirect(redirectUrl)) {
                 uploadResult.setUrl(redirectUrl);
             } else {
-                logger.warn("CreateEntryFromJar: rejected unsafe redirectURL '{}'", redirectUrl);
+                logger.warn(LOG_UNSAFE_REDIRECT, ActionSecurityUtils.sanitizeForLog(redirectUrl));
             }
         }
 
@@ -322,9 +347,9 @@ public class CreateEntryFromJar extends Action {
         packageParams.put(VERSION_NUMBER, Arrays.asList(version));
 
         String reqVersionAttribute = attributes.getValue("Jahia-Required-Version");
-        final String requiredVersion = "version-" + reqVersionAttribute;
+        final String requiredVersion = VERSION_PREFIX + reqVersionAttribute;
         if (StringUtils.isEmpty(packageName) || StringUtils.isEmpty(reqVersionAttribute) || StringUtils.isEmpty(version)) {
-            String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.missing.manifest.attribute", session.getLocale());
+            String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, ERR_MISSING_MANIFEST_ATTRIBUTE, session.getLocale());
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
         }
         JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
@@ -332,8 +357,8 @@ public class CreateEntryFromJar extends Action {
         packageParams.put(REQUIRED_VERSION, Arrays.asList(versions.getNode(requiredVersion).getIdentifier()));
 
         // Create package
-        List<String> packageParamKeys = Arrays.asList(DESCRIPTION, "category", "icon", "authorNameDisplayedAs", AUTHOR_URL, "authorEmail", "FAQ", "downloadCount", "supportedByJahia", "reviewedByJahia", "published", "deleted", "screenshots", "video");
-        List<String> versionParamKeys = Arrays.asList(REQUIRED_VERSION, VERSION_NUMBER, "fileDsaSignature", "changeLog");
+        List<String> packageParamKeys = Arrays.asList(DESCRIPTION, CATEGORY, "icon", AUTHOR_NAME_DISPLAYED_AS, AUTHOR_URL, AUTHOR_EMAIL, "FAQ", DOWNLOAD_COUNT, SUPPORTED_BY_JAHIA, REVIEWED_BY_JAHIA, PUBLISHED, DELETED, SCREENSHOTS, VIDEO);
+        List<String> versionParamKeys = Arrays.asList(REQUIRED_VERSION, VERSION_NUMBER, FILE_DSA_SIGNATURE, CHANGE_LOG);
         Map<String, List<String>> packageParameters = new HashMap<>();
         Map<String, List<String>> versionParameters = new HashMap<>();
 
@@ -383,7 +408,7 @@ public class CreateEntryFromJar extends Action {
         logger.info("Start adding package version {} of {}", version, title);
 
         if (hasPackageVersions && !hasValidVersionNumber(modulesPackage, version)) {
-            String error = Messages.getWithArgs(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.versionNumber", session.getLocale(), packageName, version);
+            String error = Messages.getWithArgs(RESOURCES_PRIVATEAPPSTORE, ERR_VERSION_NUMBER, session.getLocale(), packageName, version);
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
         }
 
@@ -431,14 +456,14 @@ public class CreateEntryFromJar extends Action {
 
         session.save();
 
-        ActionResult uploadResult = new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("successRedirectUrl", packageUrl).put(
-                "successRedirectAbsoluteUrl", packageAbsoluteUrl));
+        ActionResult uploadResult = new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(SUCCESS_REDIRECT_URL, packageUrl).put(
+                SUCCESS_REDIRECT_ABSOLUTE_URL, packageAbsoluteUrl));
         if (formParams.containsKey(REDIRECT_URL)) {
             String redirectUrl = formParams.get(REDIRECT_URL).get(0);
-            if (isSafeRedirect(redirectUrl)) {
+            if (ActionSecurityUtils.isSafeRedirect(redirectUrl)) {
                 uploadResult.setUrl(redirectUrl);
             } else {
-                logger.warn("CreateEntryFromJar: rejected unsafe redirectURL '{}'", redirectUrl);
+                logger.warn(LOG_UNSAFE_REDIRECT, ActionSecurityUtils.sanitizeForLog(redirectUrl));
             }
         }
 
@@ -459,8 +484,8 @@ public class CreateEntryFromJar extends Action {
         JCRSiteNode site = resource.getNode().getResolveSite();
         String forgeSettingsUrl = site.getProperty("forgeSettingsUrl").getString();
 
-        moduleParams.put("moduleName", Arrays.asList(moduleName));
-        moduleParams.put("groupId", Arrays.asList(groupId));
+        moduleParams.put(MODULE_NAME, Arrays.asList(moduleName));
+        moduleParams.put(GROUP_ID, Arrays.asList(groupId));
         moduleParams.put(Constants.JCR_TITLE, Arrays.asList(attributes.getValue("Implementation-Title")));
         moduleParams.put(DESCRIPTION, Arrays.asList(attributes.getValue("Bundle-Description")));
         moduleParams.put(AUTHOR_URL, Arrays.asList(attributes.getValue("Implementation-URL")));
@@ -470,9 +495,9 @@ public class CreateEntryFromJar extends Action {
 
         String forgeUrl = StringUtils.substringBefore(request.getRequestURL().toString(), "/render");
         String reqVersionAttribute = attributes.getValue("Jahia-Required-Version");
-        final String requiredVersion = "version-" + reqVersionAttribute;
+        final String requiredVersion = VERSION_PREFIX + reqVersionAttribute;
         if (StringUtils.isEmpty(moduleName) || StringUtils.isEmpty(groupId) || StringUtils.isEmpty(reqVersionAttribute)) {
-            String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.missing.manifest.attribute", session.getLocale());
+            String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, ERR_MISSING_MANIFEST_ATTRIBUTE, session.getLocale());
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
         }
         String moduleRelPath = groupId.replace(".", "/") + "/" + moduleName;
@@ -505,8 +530,8 @@ public class CreateEntryFromJar extends Action {
 
         // Create module
 
-        List<String> moduleParamKeys = Arrays.asList(DESCRIPTION, "category", "icon", "authorNameDisplayedAs", AUTHOR_URL, "authorEmail", "FAQ", "codeRepository", "downloadCount", "supportedByJahia", "reviewedByJahia", "published", "deleted", "screenshots", "video", "groupId");
-        List<String> versionParamKeys = Arrays.asList(REQUIRED_VERSION, VERSION_NUMBER, "fileDsaSignature", "changeLog", "url");
+        List<String> moduleParamKeys = Arrays.asList(DESCRIPTION, CATEGORY, "icon", AUTHOR_NAME_DISPLAYED_AS, AUTHOR_URL, AUTHOR_EMAIL, "FAQ", CODE_REPOSITORY, DOWNLOAD_COUNT, SUPPORTED_BY_JAHIA, REVIEWED_BY_JAHIA, PUBLISHED, DELETED, SCREENSHOTS, VIDEO, GROUP_ID);
+        List<String> versionParamKeys = Arrays.asList(REQUIRED_VERSION, VERSION_NUMBER, FILE_DSA_SIGNATURE, CHANGE_LOG, "url");
         Map<String, List<String>> moduleParameters = new HashMap<>();
         Map<String, List<String>> versionParameters = new HashMap<>();
 
@@ -537,7 +562,7 @@ public class CreateEntryFromJar extends Action {
                 if (repository.hasNode(segment)) {
                     repository = repository.getNode(segment);
                 } else {
-                    repository = repository.addNode(segment, "jnt:contentFolder");
+                    repository = repository.addNode(segment, JNT_CONTENT_FOLDER);
                 }
             }
             module = createNode(request, moduleParameters, repository, "jnt:forgeModule", moduleName, false);
@@ -560,7 +585,7 @@ public class CreateEntryFromJar extends Action {
         logger.info("Start adding module version {} of {}", version, title);
 
         if (hasModuleVersions && !hasValidVersionNumber(module, version)) {
-            String error = Messages.getWithArgs(RESOURCES_PRIVATEAPPSTORE, "forge.uploadJar.error.versionNumber", session.getLocale(), moduleName, version);
+            String error = Messages.getWithArgs(RESOURCES_PRIVATEAPPSTORE, ERR_VERSION_NUMBER, session.getLocale(), moduleName, version);
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
         }
 
@@ -569,9 +594,9 @@ public class CreateEntryFromJar extends Action {
         String value = attributes.getValue("Jahia-Depends");
         if (value != null) {
             String[] jahiaDepends = value.split(",");
-            moduleVersion.setProperty("references", jahiaDepends);
+            moduleVersion.setProperty(REFERENCES, jahiaDepends);
         } else {
-            moduleVersion.setProperty("references", EMPTY_REFERENCES);
+            moduleVersion.setProperty(REFERENCES, EMPTY_REFERENCES);
         }
 
         if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
@@ -587,33 +612,18 @@ public class CreateEntryFromJar extends Action {
         String moduleUrl = renderContext.getResponse().encodeURL(module.getUrl());
         String moduleAbsoluteUrl = module.getProvider().getAbsoluteContextPath(request) + moduleUrl;
         session.save();
-        ActionResult uploadResult = new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("successRedirectUrl", moduleUrl).put(
-                "successRedirectAbsoluteUrl", moduleAbsoluteUrl));
+        ActionResult uploadResult = new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(SUCCESS_REDIRECT_URL, moduleUrl).put(
+                SUCCESS_REDIRECT_ABSOLUTE_URL, moduleAbsoluteUrl));
         if (formParams.containsKey(REDIRECT_URL)) {
             String redirectUrl = formParams.get(REDIRECT_URL).get(0);
-            if (isSafeRedirect(redirectUrl)) {
+            if (ActionSecurityUtils.isSafeRedirect(redirectUrl)) {
                 uploadResult.setUrl(redirectUrl);
             } else {
-                logger.warn("CreateEntryFromJar: rejected unsafe redirectURL '{}'", redirectUrl);
+                logger.warn(LOG_UNSAFE_REDIRECT, ActionSecurityUtils.sanitizeForLog(redirectUrl));
             }
         }
 
         return uploadResult;
-    }
-
-    /**
-     * Only allow site-relative redirect targets. Rejects absolute URLs, protocol-relative URLs
-     * and pseudo-schemes (javascript:, data:, ...) to prevent open redirect / XSS after upload.
-     */
-    private static boolean isSafeRedirect(String url) {
-        if (StringUtils.isBlank(url)) {
-            return false;
-        }
-        String lower = url.trim().toLowerCase();
-        return lower.startsWith("/")
-                && !lower.startsWith("//")
-                && !lower.startsWith("/\\")
-                && !lower.contains("://");
     }
 
     public void setMavenExecutable(String mavenExecutable) {
@@ -679,9 +689,9 @@ public class CreateEntryFromJar extends Action {
                     w.write("</password></server></servers></settings>");
                 }
             }
-            JarFile jar = new JarFile(generatedJar);
-            pomFile = PomUtils.extractPomFromJar(jar, groupId, artifactId);
-            jar.close();
+            try (JarFile jar = new JarFile(generatedJar)) {
+                pomFile = PomUtils.extractPomFromJar(jar, groupId, artifactId);
+            }
 
             Model pom;
             try {

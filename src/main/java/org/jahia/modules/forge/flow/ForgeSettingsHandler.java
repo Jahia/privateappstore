@@ -43,14 +43,15 @@ import java.io.Serializable;
 public class ForgeSettingsHandler implements Serializable {
 
     private static final long serialVersionUID = 2762062442866728163L;
+    private static final String JMIX_FORGE_SETTINGS = "jmix:forgeSettings";
 
-    static Logger logger = LoggerFactory.getLogger(ForgeSettingsHandler.class);
+    static final Logger logger = LoggerFactory.getLogger(ForgeSettingsHandler.class);
 
     private ForgeSettings forgeSettings;
 
     public ForgeSettings getForgeSettingsBySite(JCRSiteNode site) {
         try {
-            if (site != null && site.isNodeType("jmix:forgeSettings")) {
+            if (site != null && site.isNodeType(JMIX_FORGE_SETTINGS)) {
                 forgeSettings.setPassword(new String(Base64.decode(site.getProperty("forgeSettingsPassword").getString())));
                 forgeSettings.setUrl(site.getProperty("forgeSettingsUrl").getString());
                 forgeSettings.setId(site.getProperty("forgeSettingsId").getString());
@@ -70,8 +71,8 @@ public class ForgeSettingsHandler implements Serializable {
     public void save(MessageContext messages, JCRSiteNode site) {
         if (site != null) {
             try {
-                if (!site.isNodeType("jmix:forgeSettings")) {
-                    site.addMixin("jmix:forgeSettings");
+                if (!site.isNodeType(JMIX_FORGE_SETTINGS)) {
+                    site.addMixin(JMIX_FORGE_SETTINGS);
                 }
                 if (StringUtils.isNotBlank(forgeSettings.getPassword())) {
                     site.setProperty("forgeSettingsPassword", Base64.encode(forgeSettings.getPassword().getBytes()));

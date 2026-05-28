@@ -46,7 +46,8 @@ import java.util.Map;
  */
 public class AddVideo extends Action {
 
-    private transient static Logger logger = org.slf4j.LoggerFactory.getLogger(AddVideo.class);
+    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AddVideo.class);
+    private static final String ALLOWFULLSCREEN = "allowfullscreen";
 
     @Override
     public ActionResult doExecute(HttpServletRequest req, RenderContext renderContext, Resource resource,
@@ -60,12 +61,12 @@ public class AddVideo extends Action {
         session.checkout(module);
 
         JCRNodeWrapper videoNode = createNode(req, parameters, module, "jnt:videostreaming", "video", false);
-        String allowfullscreen = getParameter(parameters, "allowfullscreen");
+        String allowfullscreen = getParameter(parameters, ALLOWFULLSCREEN);
 
         if (allowfullscreen != null && allowfullscreen.equals("on")) {
-            videoNode.setProperty("allowfullscreen", true);
+            videoNode.setProperty(ALLOWFULLSCREEN, true);
         } else {
-            videoNode.setProperty("allowfullscreen", false);
+            videoNode.setProperty(ALLOWFULLSCREEN, false);
         }
         videoNode.setProperty("html5Player", true);
 
