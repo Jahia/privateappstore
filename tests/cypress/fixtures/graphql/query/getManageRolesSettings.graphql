@@ -1,0 +1,13 @@
+query ManageRolesSettings($siteKey: String!) {
+    manageRolesSettings(siteKey: $siteKey) {
+        siteKey
+        roles {
+            role
+            members {
+                name
+                type
+                displayName
+            }
+        }
+    }
+}

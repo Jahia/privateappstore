@@ -1,0 +1,8 @@
+query GetNodeTypeByName($name: String!) {
+    jcr {
+        nodeTypeByName(name: $name) {
+            name
+            mixin
+        }
+    }
+}

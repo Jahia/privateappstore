@@ -1,0 +1,21 @@
+mutation UpdateForgeSettings(
+    $siteKey: String!
+    $url: String
+    $id: String
+    $user: String
+    $password: String
+) {
+    updateForgeSettings(
+        siteKey: $siteKey
+        url: $url
+        id: $id
+        user: $user
+        password: $password
+    ) {
+        siteKey
+        url
+        id
+        user
+        passwordSet
+    }
+}

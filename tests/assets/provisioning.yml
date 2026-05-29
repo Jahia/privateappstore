@@ -1,0 +1,18 @@
+- karafCommand: "log:log 'START - provisioning'"
+
+- karafCommand: "log:log 'START - Install dependencies'"
+- installBundle:
+      - 'mvn:org.jahia.modules/font-awesome/LATEST'
+      - 'mvn:org.jahia.modules/rating/LATEST'
+      - 'mvn:org.jahia.modules/bootstrap3-core/4.3.0'
+      - 'mvn:org.jahia.modules/bootstrap3-components/4.3.0'
+      - 'mvn:org.jahia.modules/videostreaming/LATEST'
+      - 'mvn:org.jahia.modules/richtext-ckeditor5/LATEST'
+      - 'mvn:org.jahia.modules/skins/LATEST'
+      - 'mvn:org.jahia.community/full-read-only-notifier/LATEST'
+  autoStart: true
+  uninstallPreviousVersion: true
+- karafCommand: "log:log 'END - Install dependencies'"
+
+- karafCommand: "log:log 'END - provisioning'"
+

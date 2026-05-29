@@ -1,0 +1,7 @@
+mutation UpdateForgeCategoryTitles(
+    $siteKey: String!
+    $uuid: String!
+    $titles: [InputForgeCategoryTitle!]!
+) {
+    updateForgeCategoryTitles(siteKey: $siteKey, uuid: $uuid, titles: $titles)
+}

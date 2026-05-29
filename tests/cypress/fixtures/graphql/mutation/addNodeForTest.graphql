@@ -1,0 +1,10 @@
+mutation AddNodeForTest($parentPath: String!, $name: String!, $primaryNodeType: String!) {
+    jcr(workspace: EDIT) {
+        addNode(parentPathOrId: $parentPath, name: $name, primaryNodeType: $primaryNodeType) {
+            node {
+                uuid
+                path
+            }
+        }
+    }
+}
