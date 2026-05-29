@@ -1,0 +1,91 @@
+{
+  "label": {
+    "menu_entry": "Private App Store",
+    "title": "Private App Store settings",
+    "url": "Forge URL",
+    "id": "Forge ID",
+    "user": "User",
+    "password": "Password",
+    "password.unchanged": "Unchanged",
+    "password.newHint": "Enter the password for the remote forge",
+    "password.replaceHint": "Leave blank to keep the existing password",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "loading": "Loading…",
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "revoke": "Revoke"
+  },
+  "success": {
+    "update": "Settings saved."
+  },
+  "errors": {
+    "load": {
+      "failed": "Failed to load settings"
+    },
+    "update": {
+      "failed": "Failed to save settings"
+    }
+  },
+  "categories": {
+    "menu_entry": "App Store categories",
+    "title": "App Store categories",
+    "root": {
+      "heading": "Root category",
+      "none": "No root category configured.",
+      "uuidField": "Root category UUID",
+      "uuidPlaceholder": "Paste the UUID of a JCR category node"
+    },
+    "list": {
+      "heading": "Categories",
+      "empty": "No categories yet — add one below.",
+      "untranslated": "no translations",
+      "usages": "{{count}} usage(s)"
+    },
+    "editor": {
+      "heading": "Edit category titles"
+    },
+    "add": {
+      "heading": "Add a category",
+      "nameField": "Category name",
+      "namePlaceholder": "e.g. portlets"
+    },
+    "delete": {
+      "confirmInUse": "This category is referenced by {{count}} item(s). Delete anyway?"
+    },
+    "success": {
+      "root": "Root category updated.",
+      "add": "Category added.",
+      "titles": "Category titles saved.",
+      "delete": "Category deleted."
+    }
+  },
+  "roles": {
+    "menu_entry": "App Store roles",
+    "title": "App Store roles",
+    "empty": "No members assigned to this role.",
+    "addMember": "Grant role to user or group",
+    "revoke": {
+      "confirm": "Revoke {{role}} from {{principal}}?"
+    },
+    "search": {
+      "label": "Search principal",
+      "placeholder": "Username or group name",
+      "users": "Users",
+      "groups": "Groups",
+      "action": "Search",
+      "noResults": "No matching principals."
+    },
+    "names": {
+      "store-administrator": "Store administrator",
+      "store-developer": "Store developer",
+      "reader": "Reader"
+    },
+    "success": {
+      "granted": "Role granted.",
+      "revoked": "Role revoked."
+    }
+  }
+}

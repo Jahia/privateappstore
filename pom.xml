@@ -24,13 +24,15 @@
     ==========================================================================================
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>jahia-modules</artifactId>
         <groupId>org.jahia.modules</groupId>
         <version>8.2.2.1</version>
     </parent>
+    <groupId>org.jahia.community</groupId>
     <artifactId>privateappstore</artifactId>
     <name>Jahia Private App Store</name>
     <version>4.3.1-SNAPSHOT</version>
@@ -43,13 +45,13 @@
         <tag>HEAD</tag>
     </scm>
     <properties>
+        <jahia-depends>
+            default,facets,rating,siteSettings,videostreaming,graphql-dxm-provider
+        </jahia-depends>
+        <yarn.arguments>build:production</yarn.arguments>
         <require-capability>
-            org.jahia.license;filter:="(key=org.jahia.privateAppStore)",
             osgi.extender;filter:="(osgi.extender=org.jahia.bundles.blueprint.extender.config)"
         </require-capability>
-        <jahia-module-signature>MC4CFQCIgfz3dpw8sYr6qwNpbE3+cHalsAIVAIsX30DQPqvnY1GCyZq6Z+pxJwqQ</jahia-module-signature>
-	<jahia-key>org.jahia.privateAppStore</jahia-key>
-        <jahia.plugin.version>6.10</jahia.plugin.version>
     </properties>
     <distributionManagement>
         <repository>
@@ -109,6 +111,24 @@
             <version>${spring.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-java</artifactId>
+            <version>${graphql-java.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.graphql-java</groupId>
+            <artifactId>graphql-java-annotations</artifactId>
+            <version>${graphql-java-annotations.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jahia.modules</groupId>
+            <artifactId>graphql-dxm-provider</artifactId>
+            <version>3.4.0</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -118,15 +138,47 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Jahia-Depends>
-                            default,facets,rating,siteSettings,videostreaming
-                        </Jahia-Depends>
                         <Jahia-Module-Type>module</Jahia-Module-Type>
                         <Embed-Dependency>*; scope=compile; type=!pom; inline=false</Embed-Dependency>
+                        <_dsannotations>org.jahia.modules.forge.graphql.*</_dsannotations>
                     </instructions>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>1.15.0</version>
+                <executions>
+                    <execution>
+                        <id>install-node-and-yarn</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>install-node-and-yarn</goal>
+                        </goals>
+                        <configuration>
+                            <nodeVersion>v22.6.0</nodeVersion>
+                            <yarnVersion>v1.22.21</yarnVersion>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>yarn-install</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>yarn-build</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>${yarn.arguments}</arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

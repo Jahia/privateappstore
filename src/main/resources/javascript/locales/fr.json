@@ -1,0 +1,91 @@
+{
+  "label": {
+    "menu_entry": "App Store privé",
+    "title": "Paramètres de l'App Store privé",
+    "url": "URL de la forge",
+    "id": "Identifiant de la forge",
+    "user": "Utilisateur",
+    "password": "Mot de passe",
+    "password.unchanged": "Inchangé",
+    "password.newHint": "Saisir le mot de passe de la forge distante",
+    "password.replaceHint": "Laisser vide pour conserver le mot de passe existant",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "cancel": "Annuler",
+    "loading": "Chargement…",
+    "add": "Ajouter",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "revoke": "Révoquer"
+  },
+  "success": {
+    "update": "Paramètres enregistrés."
+  },
+  "errors": {
+    "load": {
+      "failed": "Échec du chargement des paramètres"
+    },
+    "update": {
+      "failed": "Échec de l'enregistrement des paramètres"
+    }
+  },
+  "categories": {
+    "menu_entry": "Catégories App Store",
+    "title": "Catégories App Store",
+    "root": {
+      "heading": "Catégorie racine",
+      "none": "Aucune catégorie racine configurée.",
+      "uuidField": "UUID de la catégorie racine",
+      "uuidPlaceholder": "Coller l'UUID d'un nœud JCR de type catégorie"
+    },
+    "list": {
+      "heading": "Catégories",
+      "empty": "Aucune catégorie — ajoutez-en une ci-dessous.",
+      "untranslated": "aucune traduction",
+      "usages": "{{count}} utilisation(s)"
+    },
+    "editor": {
+      "heading": "Modifier les titres de la catégorie"
+    },
+    "add": {
+      "heading": "Ajouter une catégorie",
+      "nameField": "Nom de la catégorie",
+      "namePlaceholder": "ex. portlets"
+    },
+    "delete": {
+      "confirmInUse": "Cette catégorie est référencée par {{count}} élément(s). Supprimer quand même ?"
+    },
+    "success": {
+      "root": "Catégorie racine mise à jour.",
+      "add": "Catégorie ajoutée.",
+      "titles": "Titres enregistrés.",
+      "delete": "Catégorie supprimée."
+    }
+  },
+  "roles": {
+    "menu_entry": "Rôles App Store",
+    "title": "Rôles App Store",
+    "empty": "Aucun membre pour ce rôle.",
+    "addMember": "Attribuer le rôle",
+    "revoke": {
+      "confirm": "Révoquer {{role}} pour {{principal}} ?"
+    },
+    "search": {
+      "label": "Rechercher",
+      "placeholder": "Nom d'utilisateur ou de groupe",
+      "users": "Utilisateurs",
+      "groups": "Groupes",
+      "action": "Rechercher",
+      "noResults": "Aucun résultat."
+    },
+    "names": {
+      "store-administrator": "Administrateur du store",
+      "store-developer": "Développeur du store",
+      "reader": "Lecteur"
+    },
+    "success": {
+      "granted": "Rôle attribué.",
+      "revoked": "Rôle révoqué."
+    }
+  }
+}
