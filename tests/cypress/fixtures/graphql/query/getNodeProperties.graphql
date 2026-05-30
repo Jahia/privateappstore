@@ -1,0 +1,14 @@
+query GetNodeProperties($path: String!, $names: [String!]) {
+    jcr(workspace: EDIT) {
+        nodeByPath(path: $path) {
+            uuid
+            path
+            name
+            properties(names: $names) {
+                name
+                value
+                values
+            }
+        }
+    }
+}
