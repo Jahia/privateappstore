@@ -155,9 +155,21 @@ describe('Module tabs — content lifecycle', () => {
             .should('equal', 'jnt:forgeScreenshotsList')
     })
 
-    it('Video tab — video child node is reachable on the module', () => {
-        // `+ video (jnt:videostreaming) = jnt:videostreaming`. autocreated for
-        // the default-value variant — assert the path is queryable.
+    it('Video tab — video child node can be added on the module', () => {
+        // Unlike `screenshots`, the CND declares `+ video (jnt:videostreaming)
+        // = jnt:videostreaming` WITHOUT the `autocreated` flag, so the child
+        // node is not created until the developer adds it. Create it via
+        // addNode and verify the resulting primaryType.
+        cy.apollo({
+            mutation: addNodeWithProps,
+            variables: {
+                parentPath: modulePath,
+                name: 'video',
+                primaryNodeType: 'jnt:videostreaming',
+                properties: []
+            }
+        })
+
         cy.apollo({
             query: getNodeProperty,
             variables: {path: `${modulePath}/video`, name: 'jcr:primaryType', language: null},

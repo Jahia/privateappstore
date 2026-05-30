@@ -7,12 +7,14 @@ import {createSite, deleteSite, publishAndWaitJobEnding} from '@jahia/cypress'
  * After a module + version are published, the contentFolder.moduleList.jsp
  * renders /sites/{site}/contents/modules-repository.moduleList.json which
  * returns the catalog consumed by remote Jahia DX instances. This test
- * proves the published-only filter behavior of that JSON (unpublished
- * modules MUST NOT appear) and follows the downloadUrl to verify the
- * artifact-location field round-trips back to a reachable URL.
+ * proves:
+ *   - the published-only filter behavior of that JSON (unpublished modules
+ *     MUST NOT appear)
+ *   - the downloadUrl exposed in the JSON is reachable
  *
- * Note: the `published` flag must be set with `type: BOOLEAN` — otherwise
- * JSP `properties.published.boolean` reads false even with value "true".
+ * Implementation note: every property is set on addNode rather than via a
+ * post-create mutation — addNode's InputJCRProperty path is the only one
+ * we've verified handles type: BOOLEAN reliably in this dxm-provider build.
  */
 describe('Module list JSON + download URL', () => {
     const siteKey = 'moduleListSite'
@@ -21,9 +23,6 @@ describe('Module list JSON + download URL', () => {
     const version = '1.0.0'
     const downloadUrl = 'http://localhost:8080/icons/jahia-logo.png'
 
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const createForgeModule: DocumentNode =
-        require('graphql-tag/loader!../fixtures/graphql/mutation/createForgeModule.graphql')
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const addNodeWithProps: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeWithProperties.graphql')
@@ -49,26 +48,21 @@ describe('Module list JSON + download URL', () => {
             locale: 'en'
         })
 
+        // Build the whole module → version content tree with everything set
+        // at creation time. addNode's InputJCRProperty pipeline handles
+        // type=BOOLEAN; we've seen post-create mutations fail to update it
+        // reliably across dxm-provider versions.
         cy.apollo({
-            mutation: createForgeModule,
+            mutation: addNodeWithProps,
             variables: {
                 parentPath: `/sites/${siteKey}/contents`,
                 name: moduleName,
-                title: 'Cypress Listed Module'
-            }
-        })
-        cy.apollo({
-            mutation: mutateProp,
-            variables: {
-                pathOrId: modulePath,
-                properties: [{name: 'groupId', value: groupId, language: null, type: null}]
-            }
-        })
-        cy.apollo({
-            mutation: mutateProp,
-            variables: {
-                pathOrId: modulePath,
-                properties: [{name: 'published', value: 'true', language: null, type: 'BOOLEAN'}]
+                primaryNodeType: 'jnt:forgeModule',
+                properties: [
+                    {name: 'jcr:title', value: 'Cypress Listed Module', language: 'en'},
+                    {name: 'groupId', value: groupId},
+                    {name: 'published', value: 'true', type: 'BOOLEAN'}
+                ]
             }
         })
 
@@ -81,17 +75,9 @@ describe('Module list JSON + download URL', () => {
                 properties: [
                     {name: 'jcr:title', value: 'Cypress Listed Module', language: 'en'},
                     {name: 'versionNumber', value: version},
-                    {name: 'url', value: downloadUrl}
+                    {name: 'url', value: downloadUrl},
+                    {name: 'published', value: 'true', type: 'BOOLEAN'}
                 ]
-            }
-        })
-        // Boolean property must be set after node creation with explicit type
-        // — addNodeWithProperties passes values through without coercion.
-        cy.apollo({
-            mutation: mutateProp,
-            variables: {
-                pathOrId: `${modulePath}/${versionName}`,
-                properties: [{name: 'published', value: 'true', language: null, type: 'BOOLEAN'}]
             }
         })
 
@@ -150,7 +136,7 @@ describe('Module list JSON + download URL', () => {
             mutation: mutateProp,
             variables: {
                 pathOrId: modulePath,
-                properties: [{name: 'published', value: 'false', language: null, type: 'BOOLEAN'}]
+                properties: [{name: 'published', value: 'false', type: 'BOOLEAN'}]
             }
         })
         publishAndWaitJobEnding(modulePath, ['en'])

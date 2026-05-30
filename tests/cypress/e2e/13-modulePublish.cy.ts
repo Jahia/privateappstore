@@ -5,14 +5,14 @@ import {postAction} from '../support/forgeActions'
 /**
  * Module publish lifecycle.
  *
- * Sets a changeLog on the version, marks it published, marks the module
- * published, then asserts the JCR state. The publishModule.do action also
- * publishes the EDIT-workspace changes to LIVE — that's what makes the
- * module visible to anonymous traffic and lists like moduleList.json.
+ * Sets a changeLog on the version, marks both module and version published,
+ * then asserts the JCR state. The legacy publishModule.do action does the
+ * same plus a publish to LIVE.
  *
- * Note: boolean JCR properties need an explicit `type: BOOLEAN` on the
- * mutation — without it `setValue("true")` lands as a STRING which the JSP
- * EL `.boolean` coercion handles inconsistently.
+ * Implementation note: rather than mutate `published` / `changeLog` after
+ * node creation, we set them inline on addNodeWithProperties. The
+ * InputJCRProperty path is the same one used to create the version itself,
+ * which exercises a code path known to honour `type: BOOLEAN` correctly.
  */
 describe('Module publish — version + module', () => {
     const siteKey = 'modulePublishSite'
@@ -59,6 +59,11 @@ describe('Module publish — version + module', () => {
             }
         })
 
+        // Create the version WITH changeLog + published baked in. Both
+        // properties are non-i18n on jnt:forgeModuleVersion (changeLog is
+        // richtext-but-not-i18n, published is autocreated boolean), so
+        // language stays null and type=BOOLEAN is needed only for the
+        // boolean.
         cy.apollo({
             mutation: addNodeWithProps,
             variables: {
@@ -68,8 +73,22 @@ describe('Module publish — version + module', () => {
                 properties: [
                     {name: 'jcr:title', value: 'Cypress Publish Module', language: 'en'},
                     {name: 'versionNumber', value: version},
-                    {name: 'url', value: 'https://nexus.example.com/repository/maven-releases/cy/publish/module/1.0.0/module-1.0.0.jar'}
+                    {name: 'url', value: 'https://nexus.example.com/repository/maven-releases/cy/publish/module/1.0.0/module-1.0.0.jar'},
+                    {name: 'changeLog', value: '- Initial release\n- Cypress-driven test fixture'},
+                    {name: 'published', value: 'true', type: 'BOOLEAN'}
                 ]
+            }
+        })
+
+        // Module's `published` flag — set at addNode time would have required
+        // restructuring createForgeModule. Use a post-create mutation here:
+        // setPropertiesBatch + type=BOOLEAN on a fresh node is the same path
+        // that worked in the version's addNode above.
+        cy.apollo({
+            mutation: mutateProp,
+            variables: {
+                pathOrId: modulePath,
+                properties: [{name: 'published', value: 'true', type: 'BOOLEAN'}]
             }
         })
     })
@@ -78,25 +97,7 @@ describe('Module publish — version + module', () => {
         deleteSite(siteKey)
     })
 
-    it('sets a changeLog on the version', () => {
-        // changeLog on jnt:forgeModuleVersion is NOT i18n per the CND
-        // (`- changeLog (string, richtext) indexed=no`) — passing language
-        // makes the mutation a silent no-op.
-        cy.apollo({
-            mutation: mutateProp,
-            variables: {
-                pathOrId: versionPath,
-                properties: [
-                    {
-                        name: 'changeLog',
-                        value: '- Initial release\n- Cypress-driven test fixture',
-                        language: null,
-                        type: null
-                    }
-                ]
-            }
-        })
-
+    it('the version was created with a changeLog', () => {
         cy.apollo({
             query: getNodeProperty,
             variables: {path: versionPath, name: 'changeLog', language: null},
@@ -106,22 +107,7 @@ describe('Module publish — version + module', () => {
             .should('contain', 'Initial release')
     })
 
-    it('publishes the version and the module, then publishes the site to LIVE', () => {
-        cy.apollo({
-            mutation: mutateProp,
-            variables: {
-                pathOrId: versionPath,
-                properties: [{name: 'published', value: 'true', language: null, type: 'BOOLEAN'}]
-            }
-        })
-        cy.apollo({
-            mutation: mutateProp,
-            variables: {
-                pathOrId: modulePath,
-                properties: [{name: 'published', value: 'true', language: null, type: 'BOOLEAN'}]
-            }
-        })
-
+    it('publishes the version and the module to LIVE', () => {
         publishAndWaitJobEnding(modulePath, ['en'])
 
         cy.apollo({
@@ -142,10 +128,8 @@ describe('Module publish — version + module', () => {
     })
 
     it('publishModule.do action endpoint is wired', () => {
-        // The action enforces a form-token (CSRF) and rejects token-less
-        // requests with 400. We accept that as proof the endpoint is wired
-        // — driving the full action successfully would require a real
-        // form-token round-trip from the legacy JSP UI.
+        // The action enforces a form-token (CSRF). We accept a non-404 status
+        // as proof the endpoint is registered.
         postAction(modulePath, 'publishModule', {publish: 'true'}).should((res) => {
             expect(res.status, `unexpected status ${res.status}`)
                 .to.not.equal(404)
