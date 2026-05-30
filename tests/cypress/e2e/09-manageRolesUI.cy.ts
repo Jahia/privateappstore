@@ -51,17 +51,21 @@ describe('Manage roles — live UI', () => {
         // on the ACL fetch completing.
         cy.contains('h3', /administrator/i, {timeout: 60000}).should('be.visible')
 
+        // Keep the whole interaction scoped to the administrator section.
+        // Cypress's default `cy.contains('li', 'root')` would otherwise match
+        // the global nav <li> labelled "root" and navigate to /jahia/profile.
         cy.contains('section', /administrator/i).within(() => {
             // i18n key 'roles.addMember' renders as "Grant role to user or group" in EN.
             cy.contains('button', /grant role/i).click()
-            // The search input lives inside a Moonstone Field whose id starts
-            // with "search-"; drill into the actual <input> element.
             cy.get('[id^=search-]').find('input').type('root')
             cy.contains('button', /^Search$/i).click()
+
+            // Click the search result li inside this section — NOT the
+            // sidebar nav li.
+            cy.contains('li', 'root', {timeout: 15000}).click()
         })
 
-        cy.contains('li', 'root', {timeout: 15000}).click()
-
+        // After granting, the same section's member list contains "root".
         cy.contains('section', /administrator/i)
             .find('li')
             .contains('root')

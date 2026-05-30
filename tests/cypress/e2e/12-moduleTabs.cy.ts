@@ -10,13 +10,22 @@ import {createSite, deleteSite} from '@jahia/cypress'
  * brittle to drive from Cypress reliably — so we exercise the data contract
  * with GraphQL mutations and verify the rendered module page reflects them.
  *
- * Tab → property mapping (from forgeModule.*.jsp + jnt:forgeModule mixin):
- *   Information  → jcr:title, description
- *   Install/FAQ  → howToInstall, FAQ
- *   License      → license (on the version)
- *   Screenshots  → screenshots (child folder, here we set the legacy URL list)
- *   Video        → video
- *   Metadata     → authorNameDisplayedAs, authorEmail, authorURL, codeRepository
+ * Tab → JCR mapping (read from META-INF/definitions.cnd jnt:forgeModule block):
+ *   Information  → jcr:title (i18n), description (i18n)
+ *   Install/FAQ  → howToInstall (i18n), FAQ (i18n)
+ *   License      → license (i18n) — lives on the MODULE, not the version
+ *   Screenshots  → autocreated `screenshots` child node (jnt:forgeScreenshotsList)
+ *   Video        → autocreated `video` child node (jnt:videostreaming)
+ *   Metadata     → authorNameDisplayedAs (choicelist!), authorEmail,
+ *                  authorURL, codeRepository (non-i18n strings)
+ *
+ * Notes for future maintainers:
+ * - i18n properties NEED language='en' passed to setPropertiesBatch.
+ * - Non-i18n properties must NOT pass language (the mutation no-ops if you do).
+ * - authorNameDisplayedAs is constrained to 'username'|'fullName'|'organisation'
+ *   — any other value is silently rejected and the default 'username' stays.
+ * - screenshots/video are CHILD NODES, not properties — we assert their
+ *   existence rather than try to set them as scalar properties.
  */
 describe('Module tabs — content lifecycle', () => {
     const siteKey = 'moduleTabsSite'
@@ -125,40 +134,51 @@ describe('Module tabs — content lifecycle', () => {
             .should('contain', 'Where to start')
     })
 
-    it('License tab — license property on the version persists', () => {
-        setProp(versionPath, 'license', 'Apache-2.0')
+    it('License tab — license property on the module persists', () => {
+        // license is i18n on jnt:forgeModule (not on the version!).
+        setProp(modulePath, 'license', 'Apache-2.0', 'en')
 
-        readProp(versionPath, 'license')
+        readProp(modulePath, 'license', 'en')
             .its('data.jcr.nodeByPath.property.value')
             .should('equal', 'Apache-2.0')
     })
 
-    it('Screenshots tab — screenshots URL list persists', () => {
-        setProp(modulePath, 'screenshots',
-            'https://shots.example.com/a.png\nhttps://shots.example.com/b.png')
-
-        readProp(modulePath, 'screenshots')
+    it('Screenshots tab — autocreated screenshots child node exists', () => {
+        // The CND declares `+ screenshots (jnt:forgeScreenshotsList) autocreated hidden`
+        // so the child node should be present immediately after module creation.
+        cy.apollo({
+            query: getNodeProperty,
+            variables: {path: `${modulePath}/screenshots`, name: 'jcr:primaryType', language: null},
+            fetchPolicy: 'no-cache'
+        })
             .its('data.jcr.nodeByPath.property.value')
-            .should('contain', 'shots.example.com')
+            .should('equal', 'jnt:forgeScreenshotsList')
     })
 
-    it('Video tab — video property persists', () => {
-        setProp(modulePath, 'video', 'https://video.example.com/intro.mp4')
-
-        readProp(modulePath, 'video')
+    it('Video tab — video child node is reachable on the module', () => {
+        // `+ video (jnt:videostreaming) = jnt:videostreaming`. autocreated for
+        // the default-value variant — assert the path is queryable.
+        cy.apollo({
+            query: getNodeProperty,
+            variables: {path: `${modulePath}/video`, name: 'jcr:primaryType', language: null},
+            fetchPolicy: 'no-cache'
+        })
             .its('data.jcr.nodeByPath.property.value')
-            .should('equal', 'https://video.example.com/intro.mp4')
+            .should('equal', 'jnt:videostreaming')
     })
 
     it('Metadata tab — author + repo properties persist', () => {
-        setProp(modulePath, 'authorNameDisplayedAs', 'Cypress Author')
+        // authorNameDisplayedAs is a choicelist constrained to
+        // 'username'|'fullName'|'organisation' — using 'Cypress Author' is
+        // rejected silently and leaves the default.
+        setProp(modulePath, 'authorNameDisplayedAs', 'fullName')
         setProp(modulePath, 'authorEmail', 'author@example.com')
         setProp(modulePath, 'authorURL', 'https://example.com/me')
         setProp(modulePath, 'codeRepository', 'https://github.com/example/repo')
 
         readProp(modulePath, 'authorNameDisplayedAs')
             .its('data.jcr.nodeByPath.property.value')
-            .should('equal', 'Cypress Author')
+            .should('equal', 'fullName')
         readProp(modulePath, 'authorEmail')
             .its('data.jcr.nodeByPath.property.value')
             .should('equal', 'author@example.com')

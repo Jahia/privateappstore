@@ -79,6 +79,9 @@ describe('Module publish — version + module', () => {
     })
 
     it('sets a changeLog on the version', () => {
+        // changeLog on jnt:forgeModuleVersion is NOT i18n per the CND
+        // (`- changeLog (string, richtext) indexed=no`) — passing language
+        // makes the mutation a silent no-op.
         cy.apollo({
             mutation: mutateProp,
             variables: {
@@ -87,7 +90,7 @@ describe('Module publish — version + module', () => {
                     {
                         name: 'changeLog',
                         value: '- Initial release\n- Cypress-driven test fixture',
-                        language: 'en',
+                        language: null,
                         type: null
                     }
                 ]
@@ -96,7 +99,7 @@ describe('Module publish — version + module', () => {
 
         cy.apollo({
             query: getNodeProperty,
-            variables: {path: versionPath, name: 'changeLog', language: 'en'},
+            variables: {path: versionPath, name: 'changeLog', language: null},
             fetchPolicy: 'no-cache'
         })
             .its('data.jcr.nodeByPath.property.value')
