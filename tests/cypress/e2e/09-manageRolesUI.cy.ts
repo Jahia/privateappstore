@@ -52,11 +52,12 @@ describe('Manage roles — live UI', () => {
         cy.contains('h3', /administrator/i, {timeout: 60000}).should('be.visible')
 
         cy.contains('section', /administrator/i).within(() => {
-            cy.contains('button', /add member/i).click()
+            // i18n key 'roles.addMember' renders as "Grant role to user or group" in EN.
+            cy.contains('button', /grant role/i).click()
             // The search input lives inside a Moonstone Field whose id starts
             // with "search-"; drill into the actual <input> element.
             cy.get('[id^=search-]').find('input').type('root')
-            cy.contains('button', /search/i).click()
+            cy.contains('button', /^Search$/i).click()
         })
 
         cy.contains('li', 'root', {timeout: 15000}).click()

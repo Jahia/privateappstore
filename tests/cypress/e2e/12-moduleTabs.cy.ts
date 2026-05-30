@@ -86,10 +86,9 @@ describe('Module tabs — content lifecycle', () => {
             mutation: mutateProp,
             variables: {
                 pathOrId,
-                name,
-                value,
-                language: language || null,
-                type: type || null
+                properties: [
+                    {name, value, language: language || null, type: type || null}
+                ]
             }
         })
     }
@@ -97,7 +96,8 @@ describe('Module tabs — content lifecycle', () => {
     function readProp(path: string, name: string, language?: string) {
         return cy.apollo({
             query: getNodeProperty,
-            variables: {path, name, language: language || null}
+            variables: {path, name, language: language || null},
+            fetchPolicy: 'no-cache'
         })
     }
 

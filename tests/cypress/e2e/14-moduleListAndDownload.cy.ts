@@ -59,11 +59,17 @@ describe('Module list JSON + download URL', () => {
         })
         cy.apollo({
             mutation: mutateProp,
-            variables: {pathOrId: modulePath, name: 'groupId', value: groupId, language: null, type: null}
+            variables: {
+                pathOrId: modulePath,
+                properties: [{name: 'groupId', value: groupId, language: null, type: null}]
+            }
         })
         cy.apollo({
             mutation: mutateProp,
-            variables: {pathOrId: modulePath, name: 'published', value: 'true', language: null, type: 'BOOLEAN'}
+            variables: {
+                pathOrId: modulePath,
+                properties: [{name: 'published', value: 'true', language: null, type: 'BOOLEAN'}]
+            }
         })
 
         cy.apollo({
@@ -83,7 +89,10 @@ describe('Module list JSON + download URL', () => {
         // — addNodeWithProperties passes values through without coercion.
         cy.apollo({
             mutation: mutateProp,
-            variables: {pathOrId: `${modulePath}/${versionName}`, name: 'published', value: 'true', language: null, type: 'BOOLEAN'}
+            variables: {
+                pathOrId: `${modulePath}/${versionName}`,
+                properties: [{name: 'published', value: 'true', language: null, type: 'BOOLEAN'}]
+            }
         })
 
         publishAndWaitJobEnding(`/sites/${siteKey}/contents/modules-repository`, ['en'])
@@ -139,7 +148,10 @@ describe('Module list JSON + download URL', () => {
     it('omits the module when published=false', () => {
         cy.apollo({
             mutation: mutateProp,
-            variables: {pathOrId: modulePath, name: 'published', value: 'false', language: null, type: 'BOOLEAN'}
+            variables: {
+                pathOrId: modulePath,
+                properties: [{name: 'published', value: 'false', language: null, type: 'BOOLEAN'}]
+            }
         })
         publishAndWaitJobEnding(modulePath, ['en'])
 

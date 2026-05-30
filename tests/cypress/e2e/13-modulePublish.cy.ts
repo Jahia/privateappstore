@@ -83,16 +83,21 @@ describe('Module publish — version + module', () => {
             mutation: mutateProp,
             variables: {
                 pathOrId: versionPath,
-                name: 'changeLog',
-                value: '- Initial release\n- Cypress-driven test fixture',
-                language: 'en',
-                type: null
+                properties: [
+                    {
+                        name: 'changeLog',
+                        value: '- Initial release\n- Cypress-driven test fixture',
+                        language: 'en',
+                        type: null
+                    }
+                ]
             }
         })
 
         cy.apollo({
             query: getNodeProperty,
-            variables: {path: versionPath, name: 'changeLog', language: 'en'}
+            variables: {path: versionPath, name: 'changeLog', language: 'en'},
+            fetchPolicy: 'no-cache'
         })
             .its('data.jcr.nodeByPath.property.value')
             .should('contain', 'Initial release')
@@ -101,25 +106,33 @@ describe('Module publish — version + module', () => {
     it('publishes the version and the module, then publishes the site to LIVE', () => {
         cy.apollo({
             mutation: mutateProp,
-            variables: {pathOrId: versionPath, name: 'published', value: 'true', language: null, type: 'BOOLEAN'}
+            variables: {
+                pathOrId: versionPath,
+                properties: [{name: 'published', value: 'true', language: null, type: 'BOOLEAN'}]
+            }
         })
         cy.apollo({
             mutation: mutateProp,
-            variables: {pathOrId: modulePath, name: 'published', value: 'true', language: null, type: 'BOOLEAN'}
+            variables: {
+                pathOrId: modulePath,
+                properties: [{name: 'published', value: 'true', language: null, type: 'BOOLEAN'}]
+            }
         })
 
         publishAndWaitJobEnding(modulePath, ['en'])
 
         cy.apollo({
             query: getNodeProperty,
-            variables: {path: modulePath, name: 'published', language: null}
+            variables: {path: modulePath, name: 'published', language: null},
+            fetchPolicy: 'no-cache'
         })
             .its('data.jcr.nodeByPath.property.value')
             .should('equal', 'true')
 
         cy.apollo({
             query: getNodeProperty,
-            variables: {path: versionPath, name: 'published', language: null}
+            variables: {path: versionPath, name: 'published', language: null},
+            fetchPolicy: 'no-cache'
         })
             .its('data.jcr.nodeByPath.property.value')
             .should('equal', 'true')
