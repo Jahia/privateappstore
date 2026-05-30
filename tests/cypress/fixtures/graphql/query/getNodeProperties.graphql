@@ -4,7 +4,7 @@ query GetNodeProperty($path: String!, $name: String!, $language: String) {
             uuid
             path
             name
-            property(name: $name, language: $language) {
+            properties(names: [$name], language: $language) {
                 name
                 value
                 values

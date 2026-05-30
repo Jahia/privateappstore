@@ -95,7 +95,7 @@ describe('Module publish — version + module', () => {
             variables: {path: versionPath, name: 'changeLog', language: 'en'},
             fetchPolicy: 'no-cache'
         })
-            .its('data.jcr.nodeByPath.property.value')
+            .its('data.jcr.nodeByPath.properties[0].value')
             .should('contain', 'Initial release')
     })
 
@@ -107,7 +107,7 @@ describe('Module publish — version + module', () => {
             variables: {path: modulePath, name: 'published', language: 'en'},
             fetchPolicy: 'no-cache'
         })
-            .its('data.jcr.nodeByPath.property.value')
+            .its('data.jcr.nodeByPath.properties[0].value')
             .should('equal', 'true')
 
         cy.apollo({
@@ -115,7 +115,7 @@ describe('Module publish — version + module', () => {
             variables: {path: versionPath, name: 'published', language: 'en'},
             fetchPolicy: 'no-cache'
         })
-            .its('data.jcr.nodeByPath.property.value')
+            .its('data.jcr.nodeByPath.properties[0].value')
             .should('equal', 'true')
     })
 

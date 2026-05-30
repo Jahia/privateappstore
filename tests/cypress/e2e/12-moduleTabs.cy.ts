@@ -114,10 +114,10 @@ describe('Module tabs — content lifecycle', () => {
         setProp(modulePath, 'description', 'Cypress description body', 'en')
 
         readProp(modulePath, 'jcr:title', 'en')
-            .its('data.jcr.nodeByPath.property.value')
+            .its('data.jcr.nodeByPath.properties[0].value')
             .should('equal', 'Updated Title')
         readProp(modulePath, 'description', 'en')
-            .its('data.jcr.nodeByPath.property.value')
+            .its('data.jcr.nodeByPath.properties[0].value')
             .should('equal', 'Cypress description body')
     })
 
@@ -126,10 +126,10 @@ describe('Module tabs — content lifecycle', () => {
         setProp(modulePath, 'FAQ', '## FAQ\n**Q:** Where to start?', 'en')
 
         readProp(modulePath, 'howToInstall', 'en')
-            .its('data.jcr.nodeByPath.property.value')
+            .its('data.jcr.nodeByPath.properties[0].value')
             .should('contain', 'Unzip and deploy')
         readProp(modulePath, 'FAQ', 'en')
-            .its('data.jcr.nodeByPath.property.value')
+            .its('data.jcr.nodeByPath.properties[0].value')
             .should('contain', 'Where to start')
     })
 
@@ -138,7 +138,7 @@ describe('Module tabs — content lifecycle', () => {
         setProp(modulePath, 'license', 'Apache-2.0', 'en')
 
         readProp(modulePath, 'license', 'en')
-            .its('data.jcr.nodeByPath.property.value')
+            .its('data.jcr.nodeByPath.properties[0].value')
             .should('equal', 'Apache-2.0')
     })
 
@@ -150,7 +150,7 @@ describe('Module tabs — content lifecycle', () => {
             variables: {path: `${modulePath}/screenshots`, name: 'jcr:primaryType', language: null},
             fetchPolicy: 'no-cache'
         })
-            .its('data.jcr.nodeByPath.property.value')
+            .its('data.jcr.nodeByPath.properties[0].value')
             .should('equal', 'jnt:forgeScreenshotsList')
     })
 
@@ -174,7 +174,7 @@ describe('Module tabs — content lifecycle', () => {
             variables: {path: `${modulePath}/video`, name: 'jcr:primaryType', language: null},
             fetchPolicy: 'no-cache'
         })
-            .its('data.jcr.nodeByPath.property.value')
+            .its('data.jcr.nodeByPath.properties[0].value')
             .should('equal', 'jnt:videostreaming')
     })
 
@@ -188,16 +188,16 @@ describe('Module tabs — content lifecycle', () => {
         setProp(modulePath, 'codeRepository', 'https://github.com/example/repo')
 
         readProp(modulePath, 'authorNameDisplayedAs')
-            .its('data.jcr.nodeByPath.property.value')
+            .its('data.jcr.nodeByPath.properties[0].value')
             .should('equal', 'fullName')
         readProp(modulePath, 'authorEmail')
-            .its('data.jcr.nodeByPath.property.value')
+            .its('data.jcr.nodeByPath.properties[0].value')
             .should('equal', 'author@example.com')
         readProp(modulePath, 'authorURL')
-            .its('data.jcr.nodeByPath.property.value')
+            .its('data.jcr.nodeByPath.properties[0].value')
             .should('equal', 'https://example.com/me')
         readProp(modulePath, 'codeRepository')
-            .its('data.jcr.nodeByPath.property.value')
+            .its('data.jcr.nodeByPath.properties[0].value')
             .should('equal', 'https://github.com/example/repo')
     })
 
