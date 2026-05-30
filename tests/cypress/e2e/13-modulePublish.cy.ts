@@ -71,8 +71,10 @@ describe('Module publish — version + module', () => {
                 parentPath: modulePath,
                 name: versionName,
                 primaryNodeType: 'jnt:forgeModuleVersion',
+                // No jcr:title — jnt:forgeModuleVersion doesn't define it and
+                // including it throws ConstraintViolationException, failing the
+                // whole addNode.
                 properties: [
-                    {name: 'jcr:title', value: 'Cypress Publish Module', language: 'en'},
                     {name: 'versionNumber', value: version},
                     {name: 'url', value: 'https://nexus.example.com/repository/maven-releases/cy/publish/module/1.0.0/module-1.0.0.jar'}
                 ]

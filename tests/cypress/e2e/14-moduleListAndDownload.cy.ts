@@ -77,8 +77,10 @@ describe('Module list JSON + download URL', () => {
                 parentPath: modulePath,
                 name: versionName,
                 primaryNodeType: 'jnt:forgeModuleVersion',
+                // No jcr:title — jnt:forgeModuleVersion doesn't define it and
+                // including it throws ConstraintViolationException, which would
+                // fail the addNode and leave a phantom version node.
                 properties: [
-                    {name: 'jcr:title', value: 'Cypress Listed Module', language: 'en'},
                     {name: 'versionNumber', value: version},
                     {name: 'url', value: downloadUrl}
                 ]

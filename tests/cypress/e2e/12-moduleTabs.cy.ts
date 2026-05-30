@@ -78,8 +78,10 @@ describe('Module tabs — content lifecycle', () => {
                 parentPath: modulePath,
                 name: versionName,
                 primaryNodeType: 'jnt:forgeModuleVersion',
+                // jnt:forgeModuleVersion has NO jcr:title definition — setting
+                // it throws ConstraintViolationException and fails the whole
+                // addNode, leaving a phantom (non-existent) version node.
                 properties: [
-                    {name: 'jcr:title', value: 'Cypress Tabs Module', language: 'en'},
                     {name: 'versionNumber', value: version}
                 ]
             }
