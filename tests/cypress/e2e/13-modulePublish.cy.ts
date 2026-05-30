@@ -1,5 +1,10 @@
 import {DocumentNode} from 'graphql'
-import {createSite, deleteSite, publishAndWaitJobEnding} from '@jahia/cypress'
+import {
+    createSite,
+    deleteSite,
+    publishAndWaitJobEnding,
+    setNodeProperty
+} from '@jahia/cypress'
 import {postAction} from '../support/forgeActions'
 
 /**
@@ -9,10 +14,14 @@ import {postAction} from '../support/forgeActions'
  * then asserts the JCR state. The legacy publishModule.do action does the
  * same plus a publish to LIVE.
  *
- * Implementation note: rather than mutate `published` / `changeLog` after
- * node creation, we set them inline on addNodeWithProperties. The
- * InputJCRProperty path is the same one used to create the version itself,
- * which exercises a code path known to honour `type: BOOLEAN` correctly.
+ * Implementation note: this spec uses @jahia/cypress's setNodeProperty
+ * helper rather than a hand-written mutation. The helper's underlying
+ * mutation
+ *   mutateProperty(name).setValue(value, language)
+ * is the only write path we've found to reliably persist through to JCR
+ * across i18n / non-i18n / boolean property types in this dxm-provider
+ * build (3.6.1-SNAPSHOT). The `language` argument is required even for
+ * non-i18n properties — JCR ignores it on those.
  */
 describe('Module publish — version + module', () => {
     const siteKey = 'modulePublishSite'
@@ -25,9 +34,6 @@ describe('Module publish — version + module', () => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const addNodeWithProps: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeWithProperties.graphql')
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const mutateProp: DocumentNode =
-        require('graphql-tag/loader!../fixtures/graphql/mutation/mutateNodeProperty.graphql')
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const getNodeProperty: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/query/getNodeProperties.graphql')
@@ -59,11 +65,6 @@ describe('Module publish — version + module', () => {
             }
         })
 
-        // Create the version WITH changeLog + published baked in. Both
-        // properties are non-i18n on jnt:forgeModuleVersion (changeLog is
-        // richtext-but-not-i18n, published is autocreated boolean), so
-        // language stays null and type=BOOLEAN is needed only for the
-        // boolean.
         cy.apollo({
             mutation: addNodeWithProps,
             variables: {
@@ -73,24 +74,15 @@ describe('Module publish — version + module', () => {
                 properties: [
                     {name: 'jcr:title', value: 'Cypress Publish Module', language: 'en'},
                     {name: 'versionNumber', value: version},
-                    {name: 'url', value: 'https://nexus.example.com/repository/maven-releases/cy/publish/module/1.0.0/module-1.0.0.jar'},
-                    {name: 'changeLog', value: '- Initial release\n- Cypress-driven test fixture'},
-                    {name: 'published', value: 'true', type: 'BOOLEAN'}
+                    {name: 'url', value: 'https://nexus.example.com/repository/maven-releases/cy/publish/module/1.0.0/module-1.0.0.jar'}
                 ]
             }
         })
 
-        // Module's `published` flag — set at addNode time would have required
-        // restructuring createForgeModule. Use a post-create mutation here:
-        // setPropertiesBatch + type=BOOLEAN on a fresh node is the same path
-        // that worked in the version's addNode above.
-        cy.apollo({
-            mutation: mutateProp,
-            variables: {
-                pathOrId: modulePath,
-                properties: [{name: 'published', value: 'true', type: 'BOOLEAN'}]
-            }
-        })
+        // Use the @jahia/cypress helper — proven write path.
+        setNodeProperty(versionPath, 'changeLog', '- Initial release\n- Cypress-driven test fixture', 'en')
+        setNodeProperty(versionPath, 'published', 'true', 'en')
+        setNodeProperty(modulePath, 'published', 'true', 'en')
     })
 
     after(() => {
@@ -100,7 +92,7 @@ describe('Module publish — version + module', () => {
     it('the version was created with a changeLog', () => {
         cy.apollo({
             query: getNodeProperty,
-            variables: {path: versionPath, name: 'changeLog', language: null},
+            variables: {path: versionPath, name: 'changeLog', language: 'en'},
             fetchPolicy: 'no-cache'
         })
             .its('data.jcr.nodeByPath.property.value')
@@ -112,7 +104,7 @@ describe('Module publish — version + module', () => {
 
         cy.apollo({
             query: getNodeProperty,
-            variables: {path: modulePath, name: 'published', language: null},
+            variables: {path: modulePath, name: 'published', language: 'en'},
             fetchPolicy: 'no-cache'
         })
             .its('data.jcr.nodeByPath.property.value')
@@ -120,7 +112,7 @@ describe('Module publish — version + module', () => {
 
         cy.apollo({
             query: getNodeProperty,
-            variables: {path: versionPath, name: 'published', language: null},
+            variables: {path: versionPath, name: 'published', language: 'en'},
             fetchPolicy: 'no-cache'
         })
             .its('data.jcr.nodeByPath.property.value')
@@ -128,8 +120,6 @@ describe('Module publish — version + module', () => {
     })
 
     it('publishModule.do action endpoint is wired', () => {
-        // The action enforces a form-token (CSRF). We accept a non-404 status
-        // as proof the endpoint is registered.
         postAction(modulePath, 'publishModule', {publish: 'true'}).should((res) => {
             expect(res.status, `unexpected status ${res.status}`)
                 .to.not.equal(404)

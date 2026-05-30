@@ -1,11 +1,13 @@
 mutation MutateNodeProperty(
     $pathOrId: String!
-    $properties: [InputJCRProperty]!
+    $name: String!
+    $value: String!
+    $language: String!
 ) {
-    jcr(workspace: EDIT) {
+    jcr {
         mutateNode(pathOrId: $pathOrId) {
-            setPropertiesBatch(properties: $properties) {
-                path
+            mutateProperty(name: $name) {
+                setValue(value: $value, language: $language)
             }
         }
     }

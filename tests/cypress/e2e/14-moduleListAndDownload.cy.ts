@@ -1,5 +1,10 @@
 import {DocumentNode} from 'graphql'
-import {createSite, deleteSite, publishAndWaitJobEnding} from '@jahia/cypress'
+import {
+    createSite,
+    deleteSite,
+    publishAndWaitJobEnding,
+    setNodeProperty
+} from '@jahia/cypress'
 
 /**
  * End-to-end module visibility test.
@@ -12,9 +17,9 @@ import {createSite, deleteSite, publishAndWaitJobEnding} from '@jahia/cypress'
  *     MUST NOT appear)
  *   - the downloadUrl exposed in the JSON is reachable
  *
- * Implementation note: every property is set on addNode rather than via a
- * post-create mutation — addNode's InputJCRProperty path is the only one
- * we've verified handles type: BOOLEAN reliably in this dxm-provider build.
+ * Uses @jahia/cypress setNodeProperty (same path as spec 13) — that helper's
+ * underlying mutation is the only write path we've verified to reliably
+ * persist boolean properties through to JCR in this dxm-provider build.
  */
 describe('Module list JSON + download URL', () => {
     const siteKey = 'moduleListSite'
@@ -24,14 +29,15 @@ describe('Module list JSON + download URL', () => {
     const downloadUrl = 'http://localhost:8080/icons/jahia-logo.png'
 
     // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const createForgeModule: DocumentNode =
+        require('graphql-tag/loader!../fixtures/graphql/mutation/createForgeModule.graphql')
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const addNodeWithProps: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeWithProperties.graphql')
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const mutateProp: DocumentNode =
-        require('graphql-tag/loader!../fixtures/graphql/mutation/mutateNodeProperty.graphql')
 
     const modulePath = `/sites/${siteKey}/contents/${moduleName}`
     const versionName = `${moduleName}-${version}`
+    const versionPath = `${modulePath}/${versionName}`
     const jsonUrl = `/sites/${siteKey}/contents/modules-repository.moduleList.json`
 
     before(() => {
@@ -48,21 +54,12 @@ describe('Module list JSON + download URL', () => {
             locale: 'en'
         })
 
-        // Build the whole module → version content tree with everything set
-        // at creation time. addNode's InputJCRProperty pipeline handles
-        // type=BOOLEAN; we've seen post-create mutations fail to update it
-        // reliably across dxm-provider versions.
         cy.apollo({
-            mutation: addNodeWithProps,
+            mutation: createForgeModule,
             variables: {
                 parentPath: `/sites/${siteKey}/contents`,
                 name: moduleName,
-                primaryNodeType: 'jnt:forgeModule',
-                properties: [
-                    {name: 'jcr:title', value: 'Cypress Listed Module', language: 'en'},
-                    {name: 'groupId', value: groupId},
-                    {name: 'published', value: 'true', type: 'BOOLEAN'}
-                ]
+                title: 'Cypress Listed Module'
             }
         })
 
@@ -75,11 +72,14 @@ describe('Module list JSON + download URL', () => {
                 properties: [
                     {name: 'jcr:title', value: 'Cypress Listed Module', language: 'en'},
                     {name: 'versionNumber', value: version},
-                    {name: 'url', value: downloadUrl},
-                    {name: 'published', value: 'true', type: 'BOOLEAN'}
+                    {name: 'url', value: downloadUrl}
                 ]
             }
         })
+
+        setNodeProperty(modulePath, 'groupId', groupId, 'en')
+        setNodeProperty(modulePath, 'published', 'true', 'en')
+        setNodeProperty(versionPath, 'published', 'true', 'en')
 
         publishAndWaitJobEnding(`/sites/${siteKey}/contents/modules-repository`, ['en'])
     })
@@ -132,13 +132,7 @@ describe('Module list JSON + download URL', () => {
     })
 
     it('omits the module when published=false', () => {
-        cy.apollo({
-            mutation: mutateProp,
-            variables: {
-                pathOrId: modulePath,
-                properties: [{name: 'published', value: 'false', type: 'BOOLEAN'}]
-            }
-        })
+        setNodeProperty(modulePath, 'published', 'false', 'en')
         publishAndWaitJobEnding(modulePath, ['en'])
 
         cy.request({url: jsonUrl, failOnStatusCode: false}).then((res) => {

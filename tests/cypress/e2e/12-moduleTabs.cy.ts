@@ -90,15 +90,14 @@ describe('Module tabs — content lifecycle', () => {
         deleteSite(siteKey)
     })
 
-    function setProp(pathOrId: string, name: string, value: string, language?: string, type?: string) {
+    // Single-property setter. The @jahia/cypress setProperty mutation shape
+    // (mutateProperty(name).setValue(value, language)) is the only path we've
+    // found to consistently write through to JCR — language is required even
+    // for non-i18n properties (the JCR-side resolver ignores it for those).
+    function setProp(pathOrId: string, name: string, value: string, language?: string) {
         return cy.apollo({
             mutation: mutateProp,
-            variables: {
-                pathOrId,
-                properties: [
-                    {name, value, language: language || null, type: type || null}
-                ]
-            }
+            variables: {pathOrId, name, value, language: language || 'en'}
         })
     }
 
