@@ -75,20 +75,24 @@ describe('Module upload — UI workflow', () => {
     })
 
     it('creates a forge module via the GraphQL contract used by the upload action', () => {
+        // The real CreateEntryFromJar action creates the module UNDER
+        // modules-repository (resource.getNode() == modules-repository), so
+        // exercise the same parent to faithfully mirror the upload contract.
+        const repositoryPath = `/sites/${siteKey}/contents/modules-repository`
         cy.apollo({
             mutation: createForgeModule,
             variables: {
-                parentPath: `/sites/${siteKey}/contents`,
+                parentPath: repositoryPath,
                 name: moduleName,
                 title: 'Cypress Upload Module'
             }
         })
             .its('data.jcr.addNode.node.path')
-            .should('equal', `/sites/${siteKey}/contents/${moduleName}`)
+            .should('equal', `${repositoryPath}/${moduleName}`)
 
         cy.login()
         cy.request({
-            url: `/cms/edit/default/en/sites/${siteKey}/contents/${moduleName}.html`,
+            url: `/cms/edit/default/en${repositoryPath}/${moduleName}.html`,
             failOnStatusCode: false
         })
             .its('status')

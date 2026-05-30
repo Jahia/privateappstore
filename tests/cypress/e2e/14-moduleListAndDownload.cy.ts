@@ -10,16 +10,22 @@ import {
  * End-to-end module visibility test.
  *
  * After a module + version are published, the contentFolder.moduleList.jsp
- * renders /sites/{site}/contents/modules-repository.moduleList.json which
+ * renders /en/sites/{site}/contents/modules-repository.moduleList.json which
  * returns the catalog consumed by remote Jahia DX instances. This test
  * proves:
- *   - the published-only filter behavior of that JSON (unpublished modules
- *     MUST NOT appear)
+ *   - the module appears in the published catalog with its version + download URL
+ *   - the published-only filter behavior (unpublished modules MUST NOT appear)
  *   - the downloadUrl exposed in the JSON is reachable
  *
- * Uses @jahia/cypress setNodeProperty (same path as spec 13) — that helper's
- * underlying mutation is the only write path we've verified to reliably
- * persist boolean properties through to JCR in this dxm-provider build.
+ * CRITICAL: the JSON renderer walks jcr:getDescendantNodes(modules-repository,
+ * 'jnt:forgeModule'), so the module MUST live UNDER modules-repository — which
+ * is exactly where the real CreateEntryFromJar upload action puts it
+ * (modules-repository/{groupId}/{name}). A module created elsewhere under
+ * contents/ would never appear in this listing.
+ *
+ * Property writes use @jahia/cypress setNodeProperty (the proven write path);
+ * the whole site is published so the /en/ LIVE URL resolves with the
+ * published module in place.
  */
 describe('Module list JSON + download URL', () => {
     const siteKey = 'moduleListSite'
@@ -35,10 +41,12 @@ describe('Module list JSON + download URL', () => {
     const addNodeWithProps: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeWithProperties.graphql')
 
-    const modulePath = `/sites/${siteKey}/contents/${moduleName}`
+    // The module lives under modules-repository — see class comment.
+    const repositoryPath = `/sites/${siteKey}/contents/modules-repository`
+    const modulePath = `${repositoryPath}/${moduleName}`
     const versionName = `${moduleName}-${version}`
     const versionPath = `${modulePath}/${versionName}`
-    const jsonUrl = `/sites/${siteKey}/contents/modules-repository.moduleList.json`
+    const jsonUrl = `/en/sites/${siteKey}/contents/modules-repository.moduleList.json`
 
     before(() => {
         cy.login()
@@ -57,7 +65,7 @@ describe('Module list JSON + download URL', () => {
         cy.apollo({
             mutation: createForgeModule,
             variables: {
-                parentPath: `/sites/${siteKey}/contents`,
+                parentPath: repositoryPath,
                 name: moduleName,
                 title: 'Cypress Listed Module'
             }
@@ -81,7 +89,9 @@ describe('Module list JSON + download URL', () => {
         setNodeProperty(modulePath, 'published', 'true', 'en')
         setNodeProperty(versionPath, 'published', 'true', 'en')
 
-        publishAndWaitJobEnding(`/sites/${siteKey}/contents/modules-repository`, ['en'])
+        // Publish the whole site so the /en/ LIVE URL resolves with the
+        // module + version present and flagged published in LIVE.
+        publishAndWaitJobEnding(`/sites/${siteKey}`, ['en'])
     })
 
     after(() => {

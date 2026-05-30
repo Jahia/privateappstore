@@ -92,7 +92,10 @@ describe('Module publish — version + module', () => {
     it('the version was created with a changeLog', () => {
         cy.apollo({
             query: getNodeProperty,
-            variables: {path: versionPath, name: 'changeLog', language: 'en'},
+            // changeLog is non-i18n — read with language=null. Reading a
+            // non-i18n property with a language returns an empty set in
+            // dxm-provider.
+            variables: {path: versionPath, name: 'changeLog', language: null},
             fetchPolicy: 'no-cache'
         })
             .its('data.jcr.nodeByPath.properties[0].value')
@@ -104,7 +107,7 @@ describe('Module publish — version + module', () => {
 
         cy.apollo({
             query: getNodeProperty,
-            variables: {path: modulePath, name: 'published', language: 'en'},
+            variables: {path: modulePath, name: 'published', language: null},
             fetchPolicy: 'no-cache'
         })
             .its('data.jcr.nodeByPath.properties[0].value')
@@ -112,7 +115,7 @@ describe('Module publish — version + module', () => {
 
         cy.apollo({
             query: getNodeProperty,
-            variables: {path: versionPath, name: 'published', language: 'en'},
+            variables: {path: versionPath, name: 'published', language: null},
             fetchPolicy: 'no-cache'
         })
             .its('data.jcr.nodeByPath.properties[0].value')
