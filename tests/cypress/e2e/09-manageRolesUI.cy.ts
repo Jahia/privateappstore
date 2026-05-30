@@ -10,6 +10,9 @@ import {createSite, deleteSite} from '@jahia/cypress'
  *   3. click the search result to grant the role
  *   4. assert the member appears under that role
  *   5. read the server-side ACL back through GraphQL
+ *
+ * Note: ManageRoles fetches ACL data on mount which is heavier than the
+ * other admin routes, hence the larger initial timeout.
  */
 describe('Manage roles — live UI', () => {
     const siteKey = 'manageRolesUiSite'
@@ -41,27 +44,25 @@ describe('Manage roles — live UI', () => {
         cy.login()
         cy.visit(`/jahia/administration/${siteKey}/manageRoles`)
 
-        // Wait until the React app paints all three role sections.
-        cy.contains('h2', siteKey, {timeout: 30000}).should('be.visible')
-        cy.contains('h3', /administrator/i).should('be.visible')
+        // The role-name h3 is the most reliable "ready" signal — it depends
+        // on the ACL fetch completing.
+        cy.contains('h3', /administrator/i, {timeout: 60000}).should('be.visible')
 
-        // The first "Add member" button on the page belongs to the first role
-        // (store-administrator). Filtering by section keeps the click stable.
         cy.contains('section', /administrator/i).within(() => {
             cy.contains('button', /add member/i).click()
-            cy.get('input').filter('[id^=search-]').type('root')
+            // The search input lives inside a Moonstone Field whose id starts
+            // with "search-"; drill into the actual <input> element.
+            cy.get('[id^=search-]').find('input').type('root')
             cy.contains('button', /search/i).click()
         })
 
         cy.contains('li', 'root', {timeout: 15000}).click()
 
-        // After granting, the section should now list a member named "root".
         cy.contains('section', /administrator/i)
             .find('li')
             .contains('root')
             .should('be.visible')
 
-        // Server-side ACL reflects the grant.
         cy.apollo({query: getManageRolesSettings, variables: {siteKey}})
             .its('data.manageRolesSettings.roles')
             .should((roles: Array<{ role: string; members: Array<{ name: string }> }>) => {

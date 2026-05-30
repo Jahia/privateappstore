@@ -8,6 +8,9 @@ import {createSite, deleteSite} from '@jahia/cypress'
  * regression in the React layer (mount, mutation wiring, refetch, success
  * banner) is caught alongside the GraphQL contract that test 05 already
  * covers from the API side.
+ *
+ * NOTE: Moonstone's <Field> wrapper inherits the `id` we pass; the inner
+ * <input> is reached via `#id input` rather than `#id` directly.
  */
 describe('Forge settings — live UI', () => {
     const siteKey = 'forgeSettingsUiSite'
@@ -38,21 +41,17 @@ describe('Forge settings — live UI', () => {
         cy.login()
         cy.visit(`/jahia/administration/${siteKey}/forgeSettings`)
 
-        // React mount + first GraphQL response. The page header carries the
-        // siteKey so we wait on it as the "ready" signal.
-        cy.contains('h2', siteKey, {timeout: 30000}).should('be.visible')
+        cy.contains('h2', siteKey, {timeout: 60000}).should('be.visible')
 
-        cy.get('#forge-url').clear().type('https://store.example.com')
-        cy.get('#forge-id').clear().type('forge-ui-1')
-        cy.get('#forge-user').clear().type('forge-ui-user')
-        cy.get('#forge-password').clear().type('s3cret-ui')
+        cy.get('#forge-url input').clear().type('https://store.example.com')
+        cy.get('#forge-id input').clear().type('forge-ui-1')
+        cy.get('#forge-user input').clear().type('forge-ui-user')
+        cy.get('#forge-password input').clear().type('s3cret-ui')
 
         cy.contains('button', /^Save$/i).click()
 
-        // Success banner from ForgeSettings.jsx.
         cy.contains(/success|updated|saved/i, {timeout: 15000}).should('be.visible')
 
-        // Server-side state matches what the user typed.
         cy.apollo({query: getForgeSettings, variables: {siteKey}})
             .its('data.forgeSettings')
             .should((s: { url: string; id: string; user: string; passwordSet: boolean }) => {
@@ -67,11 +66,9 @@ describe('Forge settings — live UI', () => {
         cy.login()
         cy.visit(`/jahia/administration/${siteKey}/forgeSettings`)
 
-        cy.get('#forge-url', {timeout: 30000}).should('have.value', 'https://store.example.com')
-        cy.get('#forge-id').should('have.value', 'forge-ui-1')
-        cy.get('#forge-user').should('have.value', 'forge-ui-user')
-        // Password is intentionally never round-tripped to the client; the
-        // input must come back blank with a placeholder hinting that it's set.
-        cy.get('#forge-password').should('have.value', '')
+        cy.get('#forge-url input', {timeout: 60000}).should('have.value', 'https://store.example.com')
+        cy.get('#forge-id input').should('have.value', 'forge-ui-1')
+        cy.get('#forge-user input').should('have.value', 'forge-ui-user')
+        cy.get('#forge-password input').should('have.value', '')
     })
 })

@@ -1,8 +1,14 @@
-mutation MutateNodeProperty($pathOrId: String!, $name: String!, $value: String!, $language: String) {
+mutation MutateNodeProperty(
+    $pathOrId: String!
+    $name: String!
+    $value: String!
+    $language: String
+    $type: PropertyType
+) {
     jcr(workspace: EDIT) {
         mutateNode(pathOrId: $pathOrId) {
             mutateProperty(name: $name) {
-                setValue(value: $value, language: $language)
+                setValue(value: $value, language: $language, type: $type)
             }
         }
     }

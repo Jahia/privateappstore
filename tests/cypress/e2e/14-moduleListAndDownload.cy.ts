@@ -10,14 +10,15 @@ import {createSite, deleteSite, publishAndWaitJobEnding} from '@jahia/cypress'
  * proves the published-only filter behavior of that JSON (unpublished
  * modules MUST NOT appear) and follows the downloadUrl to verify the
  * artifact-location field round-trips back to a reachable URL.
+ *
+ * Note: the `published` flag must be set with `type: BOOLEAN` — otherwise
+ * JSP `properties.published.boolean` reads false even with value "true".
  */
 describe('Module list JSON + download URL', () => {
     const siteKey = 'moduleListSite'
     const moduleName = 'cy-listed-module'
     const groupId = 'org.cypress.test'
     const version = '1.0.0'
-    // Provide a downloadable URL that lives in the LIVE workspace so the JSON
-    // renderer can serve it back. We use an existing static asset on Jahia.
     const downloadUrl = 'http://localhost:8080/icons/jahia-logo.png'
 
     // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -32,7 +33,6 @@ describe('Module list JSON + download URL', () => {
 
     const modulePath = `/sites/${siteKey}/contents/${moduleName}`
     const versionName = `${moduleName}-${version}`
-    const versionPath = `${modulePath}/${versionName}`
     const jsonUrl = `/sites/${siteKey}/contents/modules-repository.moduleList.json`
 
     before(() => {
@@ -59,11 +59,11 @@ describe('Module list JSON + download URL', () => {
         })
         cy.apollo({
             mutation: mutateProp,
-            variables: {pathOrId: modulePath, name: 'groupId', value: groupId, language: null}
+            variables: {pathOrId: modulePath, name: 'groupId', value: groupId, language: null, type: null}
         })
         cy.apollo({
             mutation: mutateProp,
-            variables: {pathOrId: modulePath, name: 'published', value: 'true', language: null}
+            variables: {pathOrId: modulePath, name: 'published', value: 'true', language: null, type: 'BOOLEAN'}
         })
 
         cy.apollo({
@@ -75,10 +75,15 @@ describe('Module list JSON + download URL', () => {
                 properties: [
                     {name: 'jcr:title', value: 'Cypress Listed Module', language: 'en'},
                     {name: 'versionNumber', value: version},
-                    {name: 'url', value: downloadUrl},
-                    {name: 'published', value: 'true'}
+                    {name: 'url', value: downloadUrl}
                 ]
             }
+        })
+        // Boolean property must be set after node creation with explicit type
+        // — addNodeWithProperties passes values through without coercion.
+        cy.apollo({
+            mutation: mutateProp,
+            variables: {pathOrId: `${modulePath}/${versionName}`, name: 'published', value: 'true', language: null, type: 'BOOLEAN'}
         })
 
         publishAndWaitJobEnding(`/sites/${siteKey}/contents/modules-repository`, ['en'])
@@ -94,8 +99,6 @@ describe('Module list JSON + download URL', () => {
             failOnStatusCode: false
         }).then((res) => {
             expect(res.status).to.equal(200)
-            // Renderer wraps the response in a JSON array; the first entry is
-            // the modules-repository node itself with a `modules` array.
             const payload = Array.isArray(res.body) ? res.body[0] : res.body
             expect(payload).to.have.property('modules')
             const found = payload.modules.find(
@@ -115,17 +118,19 @@ describe('Module list JSON + download URL', () => {
             failOnStatusCode: false
         }).then((res) => {
             const payload = Array.isArray(res.body) ? res.body[0] : res.body
-            const v = payload.modules
-                .find((m: { name: string }) => m.name === moduleName)
-                .versions.find((x: { version: string }) => x.version === version)
+            const found = (payload.modules || []).find(
+                (m: { name: string }) => m.name === moduleName
+            )
+            if (!found || !found.versions) {
+                throw new Error('module/version not in listing — see preceding test failure')
+            }
+
+            const v = found.versions.find((x: { version: string }) => x.version === version)
 
             cy.request({
                 url: v.downloadUrl,
                 failOnStatusCode: false
             }).then((download) => {
-                // Treat any non-5xx as "reachable" — the URL itself may be a
-                // Maven coordinate or a static asset depending on how the
-                // module was published.
                 expect(download.status).to.be.lessThan(500)
             })
         })
@@ -134,7 +139,7 @@ describe('Module list JSON + download URL', () => {
     it('omits the module when published=false', () => {
         cy.apollo({
             mutation: mutateProp,
-            variables: {pathOrId: modulePath, name: 'published', value: 'false', language: null}
+            variables: {pathOrId: modulePath, name: 'published', value: 'false', language: null, type: 'BOOLEAN'}
         })
         publishAndWaitJobEnding(modulePath, ['en'])
 

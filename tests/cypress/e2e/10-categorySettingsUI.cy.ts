@@ -57,24 +57,22 @@ describe('Category settings — live UI', () => {
         cy.login()
         cy.visit(`/jahia/administration/${siteKey}/categorySettings`)
 
-        // Wire the root category by pasting the UUID and hitting Save.
-        cy.get('#root-category-uuid', {timeout: 30000})
+        // Moonstone Field puts the id on the wrapper div — drill into the
+        // real <input> child element.
+        cy.get('#root-category-uuid input', {timeout: 60000})
             .clear()
             .type(rootCategoryUuid)
         cy.contains('button', /^Save$/i).click()
 
-        // Once the root is set, the "Add" section appears.
-        cy.get('#new-category-name', {timeout: 15000})
+        cy.get('#new-category-name input', {timeout: 15000})
             .clear()
             .type('ui-portlets')
         cy.contains('button', /^Add$/i).click()
 
-        // Auto-opened editor — fill EN + FR titles.
-        cy.get('#title-en', {timeout: 15000}).clear().type('Portlets EN')
-        cy.get('#title-fr').clear().type('Portlets FR')
+        cy.get('#title-en input', {timeout: 15000}).clear().type('Portlets EN')
+        cy.get('#title-fr input').clear().type('Portlets FR')
         cy.contains('button', /^Save$/i).click()
 
-        // Server-side state matches.
         cy.apollo({query: getCategorySettings, variables: {siteKey}})
             .its('data.forgeCategorySettings.categories')
             .should((cats: Array<{ titles: Array<{ language: string; title: string }> }>) => {

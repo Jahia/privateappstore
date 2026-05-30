@@ -33,7 +33,7 @@ describe('Module tabs — content lifecycle', () => {
     const mutateProp: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/mutation/mutateNodeProperty.graphql')
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const getNodeProps: DocumentNode =
+    const getNodeProperty: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/query/getNodeProperties.graphql')
 
     const modulePath = `/sites/${siteKey}/contents/${moduleName}`
@@ -54,7 +54,6 @@ describe('Module tabs — content lifecycle', () => {
             locale: 'en'
         })
 
-        // Module node.
         cy.apollo({
             mutation: createForgeModule,
             variables: {
@@ -64,8 +63,6 @@ describe('Module tabs — content lifecycle', () => {
             }
         })
 
-        // Version node — uses generic addNode with the properties used by
-        // the JSP renderers (versionNumber, jcr:title).
         cy.apollo({
             mutation: addNodeWithProps,
             variables: {
@@ -84,10 +81,23 @@ describe('Module tabs — content lifecycle', () => {
         deleteSite(siteKey)
     })
 
-    function setProp(pathOrId: string, name: string, value: string, language?: string) {
+    function setProp(pathOrId: string, name: string, value: string, language?: string, type?: string) {
         return cy.apollo({
             mutation: mutateProp,
-            variables: {pathOrId, name, value, language: language || null}
+            variables: {
+                pathOrId,
+                name,
+                value,
+                language: language || null,
+                type: type || null
+            }
+        })
+    }
+
+    function readProp(path: string, name: string, language?: string) {
+        return cy.apollo({
+            query: getNodeProperty,
+            variables: {path, name, language: language || null}
         })
     }
 
@@ -95,42 +105,31 @@ describe('Module tabs — content lifecycle', () => {
         setProp(modulePath, 'jcr:title', 'Updated Title', 'en')
         setProp(modulePath, 'description', 'Cypress description body', 'en')
 
-        cy.apollo({
-            query: getNodeProps,
-            variables: {path: modulePath, names: ['jcr:title', 'description']}
-        })
-            .its('data.jcr.nodeByPath.properties')
-            .should((props: Array<{ name: string; value: string }>) => {
-                const map = Object.fromEntries(props.map(p => [p.name, p.value]))
-                expect(map['jcr:title']).to.equal('Updated Title')
-                expect(map.description).to.equal('Cypress description body')
-            })
+        readProp(modulePath, 'jcr:title', 'en')
+            .its('data.jcr.nodeByPath.property.value')
+            .should('equal', 'Updated Title')
+        readProp(modulePath, 'description', 'en')
+            .its('data.jcr.nodeByPath.property.value')
+            .should('equal', 'Cypress description body')
     })
 
     it('Install / FAQ tab — howToInstall + FAQ persist', () => {
         setProp(modulePath, 'howToInstall', '## Install\nUnzip and deploy.', 'en')
         setProp(modulePath, 'FAQ', '## FAQ\n**Q:** Where to start?', 'en')
 
-        cy.apollo({
-            query: getNodeProps,
-            variables: {path: modulePath, names: ['howToInstall', 'FAQ']}
-        })
-            .its('data.jcr.nodeByPath.properties')
-            .should((props: Array<{ name: string; value: string }>) => {
-                const map = Object.fromEntries(props.map(p => [p.name, p.value]))
-                expect(map.howToInstall).to.contain('Unzip and deploy')
-                expect(map.FAQ).to.contain('Where to start')
-            })
+        readProp(modulePath, 'howToInstall', 'en')
+            .its('data.jcr.nodeByPath.property.value')
+            .should('contain', 'Unzip and deploy')
+        readProp(modulePath, 'FAQ', 'en')
+            .its('data.jcr.nodeByPath.property.value')
+            .should('contain', 'Where to start')
     })
 
     it('License tab — license property on the version persists', () => {
         setProp(versionPath, 'license', 'Apache-2.0')
 
-        cy.apollo({
-            query: getNodeProps,
-            variables: {path: versionPath, names: ['license']}
-        })
-            .its('data.jcr.nodeByPath.properties[0].value')
+        readProp(versionPath, 'license')
+            .its('data.jcr.nodeByPath.property.value')
             .should('equal', 'Apache-2.0')
     })
 
@@ -138,22 +137,16 @@ describe('Module tabs — content lifecycle', () => {
         setProp(modulePath, 'screenshots',
             'https://shots.example.com/a.png\nhttps://shots.example.com/b.png')
 
-        cy.apollo({
-            query: getNodeProps,
-            variables: {path: modulePath, names: ['screenshots']}
-        })
-            .its('data.jcr.nodeByPath.properties[0].value')
+        readProp(modulePath, 'screenshots')
+            .its('data.jcr.nodeByPath.property.value')
             .should('contain', 'shots.example.com')
     })
 
     it('Video tab — video property persists', () => {
         setProp(modulePath, 'video', 'https://video.example.com/intro.mp4')
 
-        cy.apollo({
-            query: getNodeProps,
-            variables: {path: modulePath, names: ['video']}
-        })
-            .its('data.jcr.nodeByPath.properties[0].value')
+        readProp(modulePath, 'video')
+            .its('data.jcr.nodeByPath.property.value')
             .should('equal', 'https://video.example.com/intro.mp4')
     })
 
@@ -163,21 +156,18 @@ describe('Module tabs — content lifecycle', () => {
         setProp(modulePath, 'authorURL', 'https://example.com/me')
         setProp(modulePath, 'codeRepository', 'https://github.com/example/repo')
 
-        cy.apollo({
-            query: getNodeProps,
-            variables: {
-                path: modulePath,
-                names: ['authorNameDisplayedAs', 'authorEmail', 'authorURL', 'codeRepository']
-            }
-        })
-            .its('data.jcr.nodeByPath.properties')
-            .should((props: Array<{ name: string; value: string }>) => {
-                const map = Object.fromEntries(props.map(p => [p.name, p.value]))
-                expect(map.authorNameDisplayedAs).to.equal('Cypress Author')
-                expect(map.authorEmail).to.equal('author@example.com')
-                expect(map.authorURL).to.equal('https://example.com/me')
-                expect(map.codeRepository).to.equal('https://github.com/example/repo')
-            })
+        readProp(modulePath, 'authorNameDisplayedAs')
+            .its('data.jcr.nodeByPath.property.value')
+            .should('equal', 'Cypress Author')
+        readProp(modulePath, 'authorEmail')
+            .its('data.jcr.nodeByPath.property.value')
+            .should('equal', 'author@example.com')
+        readProp(modulePath, 'authorURL')
+            .its('data.jcr.nodeByPath.property.value')
+            .should('equal', 'https://example.com/me')
+        readProp(modulePath, 'codeRepository')
+            .its('data.jcr.nodeByPath.property.value')
+            .should('equal', 'https://github.com/example/repo')
     })
 
     it('Module page renders in EDIT with all content set', () => {
