@@ -1,5 +1,5 @@
 import {DocumentNode} from 'graphql'
-import {createSite, deleteSite} from '@jahia/cypress'
+import {createSite, deleteSite, uploadFile} from '@jahia/cypress'
 
 /**
  * Module-tabs content lifecycle.
@@ -178,6 +178,32 @@ describe('Module tabs — content lifecycle', () => {
         })
             .its('data.jcr.nodeByPath.properties[0].value')
             .should('equal', 'jnt:videostreaming')
+    })
+
+    it('Icon — an uploaded image lands in the module icon folder', () => {
+        // jnt:forgeModule declares `+ icon (jnt:folder)` (not autocreated), so
+        // create the folder first, then upload the image into it — mirroring
+        // what the UpdateModuleIcon action does.
+        cy.apollo({
+            mutation: addNodeWithProps,
+            variables: {
+                parentPath: modulePath,
+                name: 'icon',
+                primaryNodeType: 'jnt:folder',
+                properties: []
+            }
+        })
+
+        // cy.fixture resolves from cypress/fixtures, so step up to tests/assets.
+        uploadFile('../../assets/icon.png', `${modulePath}/icon`, 'icon.png', 'image/png')
+
+        cy.apollo({
+            query: getNodeProperty,
+            variables: {path: `${modulePath}/icon/icon.png`, name: 'jcr:primaryType', language: null},
+            fetchPolicy: 'no-cache'
+        })
+            .its('data.jcr.nodeByPath.properties[0].value')
+            .should('equal', 'jnt:file')
     })
 
     it('Metadata tab — author + repo properties persist', () => {
