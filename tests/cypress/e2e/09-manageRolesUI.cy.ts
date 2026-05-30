@@ -42,7 +42,10 @@ describe('Manage roles — live UI', () => {
 
     it('grants store-administrator to a searched user via the UI', () => {
         cy.login()
-        cy.visit(`/jahia/administration/${siteKey}/manageRoles`)
+        // Route key is "storeRoles" — see ManageRoles/register.jsx. Using
+        // "manageRoles" lands on Jahia's generic admin shell with a blank
+        // right pane (200 status, but no route mount).
+        cy.visit(`/jahia/administration/${siteKey}/storeRoles`)
 
         // The role-name h3 is the most reliable "ready" signal — it depends
         // on the ACL fetch completing.

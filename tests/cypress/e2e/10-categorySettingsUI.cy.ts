@@ -58,20 +58,31 @@ describe('Category settings — live UI', () => {
         cy.visit(`/jahia/administration/${siteKey}/categorySettings`)
 
         // Moonstone Field puts the id on the wrapper div — drill into the
-        // real <input> child element.
+        // real <input> child element. Assert each input value propagated to
+        // React state before clicking the buttons (which are isDisabled-gated
+        // on trimmed input length); without the assertion the click races
+        // the React re-render and lands on a disabled button.
         cy.get('#root-category-uuid input', {timeout: 60000})
             .clear()
             .type(rootCategoryUuid)
-        cy.contains('button', /^Save$/i).click()
+            .should('have.value', rootCategoryUuid)
+        cy.contains('button', /^Save$/i).should('not.be.disabled').click()
 
         cy.get('#new-category-name input', {timeout: 15000})
             .clear()
             .type('ui-portlets')
-        cy.contains('button', /^Add$/i).click()
+            .should('have.value', 'ui-portlets')
+        cy.contains('button', /^Add$/i).should('not.be.disabled').click()
 
-        cy.get('#title-en input', {timeout: 15000}).clear().type('Portlets EN')
-        cy.get('#title-fr input').clear().type('Portlets FR')
-        cy.contains('button', /^Save$/i).click()
+        cy.get('#title-en input', {timeout: 15000})
+            .clear()
+            .type('Portlets EN')
+            .should('have.value', 'Portlets EN')
+        cy.get('#title-fr input')
+            .clear()
+            .type('Portlets FR')
+            .should('have.value', 'Portlets FR')
+        cy.contains('button', /^Save$/i).should('not.be.disabled').click()
 
         cy.apollo({query: getCategorySettings, variables: {siteKey}})
             .its('data.forgeCategorySettings.categories')

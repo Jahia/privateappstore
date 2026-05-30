@@ -7,8 +7,8 @@ mutation MutateNodeProperty(
 ) {
     jcr(workspace: EDIT) {
         mutateNode(pathOrId: $pathOrId) {
-            mutateProperty(name: $name) {
-                setValue(value: $value, language: $language, type: $type)
+            mutateProperty(name: $name, language: $language) {
+                setValue(value: $value, type: $type)
             }
         }
     }
