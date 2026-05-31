@@ -43,30 +43,14 @@ describe('Authoring views (JS module)', () => {
             serverName: 'authoring.local',
             locale: 'en'
         })
-        cy.apollo({
-            mutation: addNodeWithProps,
-            variables: {parentPath: `/sites/${siteKey}/contents`, name: 'modules-repository', primaryNodeType: 'jnt:contentFolder', properties: []}
-        })
+        // The store-template import.xml provides modules-repository + the
+        // home/my-modules page (which hosts the JAR upload form).
         cy.apollo({
             mutation: createForgeModule,
             variables: {parentPath: repo, name: 'widget', title: 'Widget'}
         })
         setNodeProperty(`${repo}/widget`, 'description', '<p>Original description.</p>', 'en')
         setNodeProperty(`${repo}/widget`, 'published', 'true', 'en')
-
-        // A "submit a module" page hosting the JAR upload form.
-        cy.apollo({
-            mutation: addNodeWithProps,
-            variables: {parentPath: `/sites/${siteKey}`, name: 'submit', primaryNodeType: 'jnt:page', properties: [{name: 'j:templateName', value: 'default'}]}
-        })
-        cy.apollo({
-            mutation: addNodeWithProps,
-            variables: {parentPath: `/sites/${siteKey}/submit`, name: 'main', primaryNodeType: 'jnt:contentList', properties: []}
-        })
-        cy.apollo({
-            mutation: addNodeWithProps,
-            variables: {parentPath: `/sites/${siteKey}/submit/main`, name: 'upload', primaryNodeType: 'jnt:fileUpload', properties: []}
-        })
     })
 
     after(() => {
@@ -120,7 +104,7 @@ describe('Authoring views (JS module)', () => {
     })
 
     it('renders the JAR upload form wired to the createEntryFromJar action', () => {
-        cy.visit(`/cms/render/default/en/sites/${siteKey}/submit.html`)
+        cy.visit(`/cms/render/default/en/sites/${siteKey}/home/my-modules.html`)
         cy.get('form[action*="modules-repository"][action$="createEntryFromJar.do"]').should('exist')
         cy.get('input[type="file"][name="file"]').should('exist')
         cy.get('input[type="hidden"][name="redirectURL"]').should('exist')

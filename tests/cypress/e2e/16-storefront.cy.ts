@@ -45,6 +45,8 @@ describe('Storefront read views (JS module)', () => {
         } catch {
             // ignore
         }
+        // The store-template import.xml seeds the home page (+ modules list),
+        // the My-modules / Administration sub-pages and contents/modules-repository.
         createSite(siteKey, {
             languages: 'en',
             templateSet: 'store-template',
@@ -52,9 +54,7 @@ describe('Storefront read views (JS module)', () => {
             locale: 'en'
         })
 
-        addNode(contents, 'modules-repository', 'jnt:contentFolder')
-
-        // Published module with a version
+        // Published module with a version (into the imported modules-repository)
         cy.apollo({
             mutation: createForgeModule,
             variables: {parentPath: repo, name: 'analytics', title: 'Analytics Dashboard'}
@@ -88,16 +88,6 @@ describe('Storefront read views (JS module)', () => {
             mutation: createForgeModule,
             variables: {parentPath: repo, name: 'draft', title: 'Draft Module'}
         })
-
-        // Home page hosting a forge modules list
-        addNode(`/sites/${siteKey}`, 'home', 'jnt:page', [{name: 'j:templateName', value: 'default'}])
-        addNode(`/sites/${siteKey}/home`, 'main', 'jnt:contentList')
-        addNode(`/sites/${siteKey}/home/main`, 'list', 'jnt:forgeModulesList')
-
-        // "My modules" page (lists the current user's own modules, incl. drafts)
-        addNode(`/sites/${siteKey}`, 'mymodules', 'jnt:page', [{name: 'j:templateName', value: 'default'}])
-        addNode(`/sites/${siteKey}/mymodules`, 'main', 'jnt:contentList')
-        addNode(`/sites/${siteKey}/mymodules/main`, 'mine', 'jnt:forgeMyModulesList')
     })
 
     after(() => {
@@ -147,7 +137,7 @@ describe('Storefront read views (JS module)', () => {
     })
 
     it('the "My modules" list shows the user own modules, including drafts', () => {
-        cy.visit(`/cms/render/default/en/sites/${siteKey}/mymodules.html`)
+        cy.visit(`/cms/render/default/en/sites/${siteKey}/home/my-modules.html`)
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('be.visible')
         cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible')
         // Owners see their own unpublished drafts here (unlike the public grid).
