@@ -70,6 +70,15 @@ describe('Storefront read views (JS module)', () => {
             {name: 'changeLog', value: '<ul><li>Initial release</li></ul>'}
         ])
 
+        // A second published module with a different status (for filtering)
+        cy.apollo({
+            mutation: createForgeModule,
+            variables: {parentPath: repo, name: 'seo', title: 'SEO Toolkit'}
+        })
+        setNodeProperty(`${repo}/seo`, 'description', '<p>Meta tags and sitemaps.</p>', 'en')
+        setNodeProperty(`${repo}/seo`, 'status', 'community', 'en')
+        setNodeProperty(`${repo}/seo`, 'published', 'true', 'en')
+
         // Unpublished draft — must NOT appear in the grid
         cy.apollo({
             mutation: createForgeModule,
@@ -93,9 +102,26 @@ describe('Storefront read views (JS module)', () => {
     it('lists published modules and hides the unpublished draft', () => {
         cy.visit(homeRender)
         cy.contains('Analytics Dashboard').should('be.visible')
+        cy.contains('SEO Toolkit').should('be.visible')
         cy.contains('Real-time charts').should('be.visible')
         cy.contains('Supported').should('be.visible')
         cy.contains('Draft Module').should('not.exist')
+    })
+
+    it('filters the grid by status (instant client filter)', () => {
+        cy.visit(homeRender)
+        // The filter island hydrates client-side.
+        cy.get('[data-forge-list] input[type=search]', {timeout: 20000}).should('be.visible')
+        cy.contains('[data-forge-list] button', /^supported$/i).click()
+        cy.contains('[data-forge-card]', 'Analytics Dashboard').should('be.visible')
+        cy.contains('[data-forge-card]', 'SEO Toolkit').should('not.be.visible')
+    })
+
+    it('filters the grid by text', () => {
+        cy.visit(homeRender)
+        cy.get('[data-forge-list] input[type=search]', {timeout: 20000}).should('be.visible').type('seo')
+        cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible')
+        cy.contains('[data-forge-card]', 'Analytics Dashboard').should('not.be.visible')
     })
 
     it('opens a module detail page with version + download', () => {
