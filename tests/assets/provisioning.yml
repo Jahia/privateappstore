@@ -1,5 +1,15 @@
 - karafCommand: "log:log 'START - provisioning'"
 
+# store-template is now a Jahia JavaScript module (SSR React), so the runtime
+# needs the javascript-modules-engine. (The jahia-ee-dev image already ships it,
+# but pin it explicitly so the store-template tgz deploys on any image.)
+- karafCommand: "log:log 'START - Install javascript-modules-engine'"
+- installOrUpgradeBundle:
+      - 'mvn:org.jahia.modules/javascript-modules-engine/1.2.0'
+  autoStart: true
+  uninstallPreviousVersion: true
+- karafCommand: "log:log 'END - Install javascript-modules-engine'"
+
 - karafCommand: "log:log 'START - Install dependencies'"
 - installBundle:
       - 'mvn:org.jahia.modules/font-awesome/LATEST'
