@@ -24,9 +24,9 @@
 - Project key: `org.jahia.community:privateappstore`.
 - Scan: `mvn -B clean install sonar:sonar` (Java 11; parent pins the scanner;
   `sonar` profile in `~/.m2/settings.xml` provides URL + token).
-- `S1075` on `SITES_PATH = "/sites/"` is a **false positive** (`/sites/` is the
-  invariant JCR root). Mark FALSE_POSITIVE in the SonarQube UI (needs an
-  issue-admin token; the analysis token cannot transition issues).
+- Build site JCR paths from platform constants — `JahiaSitesService.SITES_JCR_PATH
+  + FileSystem.SEPARATOR` (jackrabbit) — never hard-code `"/sites/"` or `"/"`
+  (rule `S1075` flags both the URI and the path-delimiter).
 
 ## Standing repo rules
 

@@ -98,11 +98,11 @@ tests/                Cypress E2E (+ env tooling) — see below
 - The gate counts **new-code** issues; keep new Java clean (`SubmitReview` is the
   reference — small focused methods, no generic `throws Exception`, constants over
   literals, no redundant casts).
-- **Known false positive**: `S1075` "get this URI from a customizable parameter"
-  fires on `private static final String SITES_PATH = "/sites/"` in the GraphQL
-  extensions. `/sites/` is Jahia's invariant JCR root for sites — not a
-  configurable URI. Mark these FALSE_POSITIVE in SonarQube (requires a token with
-  issue-admin rights; the analysis token cannot).
+- **Build site JCR paths from platform constants** (rule `S1075`): use
+  `JahiaSitesService.SITES_JCR_PATH + FileSystem.SEPARATOR + siteKey`
+  (`org.apache.jackrabbit.core.fs.FileSystem`), never a hard-coded `"/sites/"` or
+  a bare `"/"` — S1075 flags both the URI literal *and* the path-delimiter literal.
+  `SITES_JCR_PATH` is `"/sites"` (no trailing slash).
 
 ## Conventions & contracts
 
