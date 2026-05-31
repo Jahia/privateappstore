@@ -6,11 +6,13 @@ import graphql.annotations.annotationTypes.GraphQLName;
 import graphql.annotations.annotationTypes.GraphQLNonNull;
 import graphql.annotations.annotationTypes.GraphQLTypeExtension;
 import org.apache.commons.lang.StringUtils;
+import org.apache.jackrabbit.core.fs.FileSystem;
 import org.jahia.modules.graphql.provider.dxm.DXGraphQLProvider;
 import org.jahia.services.content.JCRContentUtils;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.content.JCRSessionWrapper;
+import org.jahia.services.sites.JahiaSitesService;
 import org.jahia.services.content.JCRTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +35,7 @@ public final class ManageRolesQueryExtension {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageRolesQueryExtension.class);
     private static final String PERMISSION = "siteAdminForgeSettings";
-    private static final String SITES_PATH = "/sites/";
+    private static final String SITES_PATH = JahiaSitesService.SITES_JCR_PATH + FileSystem.SEPARATOR;
     private static final String GRANT = "GRANT";
 
     // Roles intentionally exposed by the Private App Store admin UI. Order is
