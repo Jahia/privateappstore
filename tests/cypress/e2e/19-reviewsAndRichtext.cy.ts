@@ -31,7 +31,7 @@ describe('Reviews + rich text (JS module)', () => {
     const repo = `/sites/${siteKey}/contents/modules-repository`
     const moduleEdit = `/cms/render/default/en${repo}/demo.html`
     const moduleLive = `/cms/render/live/en${repo}/demo.html`
-    const liveAction = `/cms/render/live/en${repo}/demo.submitReview.do`
+    const liveAction = `/cms/render/live/en${repo}/demo.SubmitReview.do`
     const reviewer = 'reviewer'
     const reviewerPwd = 'reviewer1234'
 

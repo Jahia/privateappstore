@@ -24,9 +24,9 @@
 package org.jahia.modules.forge.actions;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.jackrabbit.util.Text;
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
-import org.jahia.services.content.JCRContentUtils;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.JCRTemplate;
@@ -40,6 +40,7 @@ import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.jcr.ItemExistsException;
 import javax.jcr.ItemNotFoundException;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -82,15 +83,18 @@ public class SubmitReview extends Action {
     private static final String PROP_RATING = "rating";
     private static final String PROP_CONTENT = "content";
     private static final String PROP_JCR_TITLE = "jcr:title";
-    private static final String PROP_JCR_CREATED_BY = "jcr:createdBy";
     private static final String PROP_SUM_OF_VOTES = "j:sumOfVotes";
     private static final String PROP_NB_OF_VOTES = "j:nbOfVotes";
     private static final int MIN_RATING = 1;
     private static final int MAX_RATING = 5;
+    private static final int MAX_TITLE_LENGTH = 200;
+    private static final int MAX_COMMENT_LENGTH = 4000;
 
     @Activate
     public void activate() {
-        setName("submitReview");
+        // PascalCase to match the sibling actions (AddReview, CreateEntryFromJar, …);
+        // the JS form posts to "<module>.SubmitReview.do".
+        setName("SubmitReview");
         setRequireAuthenticatedUser(true);
         setRequiredMethods("POST");
     }
@@ -109,6 +113,13 @@ public class SubmitReview extends Action {
         final String username = user.getUsername();
         final String title = getParameter(parameters, PROP_JCR_TITLE, getParameter(parameters, "title"));
         final String comment = getParameter(parameters, PROP_CONTENT, getParameter(parameters, "comment"));
+        // The client caps these too, but a direct POST bypasses the form.
+        if (title != null && title.length() > MAX_TITLE_LENGTH) {
+            return error(HttpServletResponse.SC_BAD_REQUEST, "Title is too long");
+        }
+        if (comment != null && comment.length() > MAX_COMMENT_LENGTH) {
+            return error(HttpServletResponse.SC_BAD_REQUEST, "Comment is too long");
+        }
         final String moduleId = resource.getNode().getIdentifier();
         final String workspace = session.getWorkspace().getName();
         final Locale locale = resolveLocale(getParameter(parameters, "language"), resource);
@@ -130,10 +141,19 @@ public class SubmitReview extends Action {
                         }
 
                         final JCRNodeWrapper reviews = reviewsContainer(module);
-                        rejectIfAlreadyReviewed(reviews, username);
 
-                        final String nodeName = JCRContentUtils.findAvailableNodeName(reviews, "review");
-                        final JCRNodeWrapper review = reviews.addNode(nodeName, JNT_REVIEW);
+                        // One review per user, enforced atomically: the review node name is
+                        // derived deterministically from the username, so a second review
+                        // (double-submit or concurrent request) collides on the node name and
+                        // is rejected — no read-then-write race window.
+                        final String nodeName = "review-" + Text.escapeIllegalJcrChars(username);
+                        final JCRNodeWrapper review;
+                        try {
+                            review = reviews.addNode(nodeName, JNT_REVIEW);
+                        } catch (ItemExistsException e) {
+                            throw new ReviewException(HttpServletResponse.SC_CONFLICT,
+                                    "You have already reviewed this module");
+                        }
                         review.setProperty(PROP_RATING, (long) rating);
                         if (StringUtils.isNotBlank(title)) {
                             review.setProperty(PROP_JCR_TITLE, title);
@@ -143,7 +163,7 @@ public class SubmitReview extends Action {
                         }
                         review.grantRoles("u:" + username, Collections.singleton("owner"));
 
-                        final long[] agg = updateAggregateRating(module, rating);
+                        final long[] agg = recomputeAggregateRating(module, reviews);
                         elevated.save();
                         return agg;
                     });
@@ -159,6 +179,16 @@ public class SubmitReview extends Action {
         } catch (ReviewException e) {
             return error(e.getStatus(), e.getMessage());
         } catch (RepositoryException e) {
+            // A ReviewException is a RuntimeException and normally propagates unwrapped, but
+            // unpack defensively in case the template wraps it; also map a save-time
+            // same-name collision (the concurrent-request loser) to the one-per-user conflict.
+            if (e.getCause() instanceof ReviewException) {
+                final ReviewException re = (ReviewException) e.getCause();
+                return error(re.getStatus(), re.getMessage());
+            }
+            if (e instanceof ItemExistsException) {
+                return error(HttpServletResponse.SC_CONFLICT, "You have already reviewed this module");
+            }
             LOGGER.error("Failed to submit review for module {}", moduleId, e);
             return error(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Could not submit the review");
         }
@@ -192,30 +222,28 @@ public class SubmitReview extends Action {
                 : module.addNode(REVIEWS_CHILD, JNT_REVIEWS);
     }
 
-    private static void rejectIfAlreadyReviewed(JCRNodeWrapper reviews, String username) throws RepositoryException {
+    /**
+     * Recompute the module's aggregate rating (jmix:rating) from the review children, rather than
+     * incrementing in place — this is self-healing under concurrent writes (an incremental
+     * read-modify-write loses updates) and after review deletions. Returns
+     * {@code [sumOfVotes, nbOfVotes]}. The detail page derives the displayed average from the
+     * review children directly, so these properties are for legacy/compat consumers.
+     */
+    private static long[] recomputeAggregateRating(JCRNodeWrapper module, JCRNodeWrapper reviews)
+            throws RepositoryException {
+        long sum = 0L;
+        long nb = 0L;
         final NodeIterator it = reviews.getNodes();
         while (it.hasNext()) {
             final Node n = it.nextNode();
-            if (n.isNodeType(JNT_REVIEW)
-                    && n.hasProperty(PROP_JCR_CREATED_BY)
-                    && username.equals(n.getProperty(PROP_JCR_CREATED_BY).getString())) {
-                throw new ReviewException(HttpServletResponse.SC_CONFLICT, "You have already reviewed this module");
+            if (n.isNodeType(JNT_REVIEW) && n.hasProperty(PROP_RATING)) {
+                sum += n.getProperty(PROP_RATING).getLong();
+                nb++;
             }
         }
-    }
-
-    /**
-     * Maintain the module's aggregate rating (jmix:rating). Returns {@code [sumOfVotes, nbOfVotes]}
-     * after the increment.
-     */
-    private static long[] updateAggregateRating(JCRNodeWrapper module, int rating) throws RepositoryException {
         if (!module.isNodeType(JMIX_RATING)) {
             module.addMixin(JMIX_RATING);
         }
-        final long sum = (module.hasProperty(PROP_SUM_OF_VOTES) ? module.getProperty(PROP_SUM_OF_VOTES).getLong() : 0L)
-                + rating;
-        final long nb = (module.hasProperty(PROP_NB_OF_VOTES) ? module.getProperty(PROP_NB_OF_VOTES).getLong() : 0L)
-                + 1L;
         module.setProperty(PROP_SUM_OF_VOTES, sum);
         module.setProperty(PROP_NB_OF_VOTES, nb);
         return new long[]{sum, nb};
