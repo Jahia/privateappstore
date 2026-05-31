@@ -1,5 +1,5 @@
 import {DocumentNode} from 'graphql'
-import {createSite, deleteSite, setNodeProperty} from '@jahia/cypress'
+import {createSite, deleteSite, setNodeProperty, uploadFile} from '@jahia/cypress'
 
 /**
  * Authoring views (store-template JS module) — Phase 3.
@@ -83,5 +83,34 @@ describe('Authoring views (JS module)', () => {
         cy.reload()
         cy.get('h1', {timeout: 20000}).should('contain.text', 'Widget Pro')
         cy.contains('a', 'https://github.com/acme/widget').should('exist')
+    })
+
+    it('owner can reorder and delete screenshots (jcr mutations)', () => {
+        // Two screenshots in the module's (autocreated) screenshots node.
+        uploadFile('../../assets/screenshot.png', `${repo}/widget/screenshots`, 'shot-a.png', 'image/png')
+        uploadFile('../../assets/screenshot.png', `${repo}/widget/screenshots`, 'shot-b.png', 'image/png')
+
+        cy.intercept('POST', '/modules/graphql').as('gql')
+        cy.visit(moduleRender)
+        cy.get('[data-screenshots-ready]', {timeout: 20000})
+        cy.get('[data-screenshot-name]').then(($els) => {
+            expect($els.eq(0).attr('data-screenshot-name')).to.eq('shot-a.png')
+            expect($els.eq(1).attr('data-screenshot-name')).to.eq('shot-b.png')
+        })
+
+        // Move the first screenshot down -> order becomes b, a (persisted via reorderChildren).
+        cy.get('[data-screenshot-name="shot-a.png"]').find('button[aria-label="Move down"]').click()
+        cy.wait('@gql')
+        cy.reload()
+        cy.get('[data-screenshots-ready]', {timeout: 20000})
+        cy.get('[data-screenshot-name]').first().should('have.attr', 'data-screenshot-name', 'shot-b.png')
+
+        // Delete the (now first) screenshot -> only shot-a.png remains.
+        cy.get('[data-screenshot-name="shot-b.png"]').find('button[aria-label="Delete screenshot"]').click()
+        cy.wait('@gql')
+        cy.reload()
+        cy.get('[data-screenshots-ready]', {timeout: 20000})
+        cy.get('[data-screenshot-name="shot-b.png"]').should('not.exist')
+        cy.get('[data-screenshot-name="shot-a.png"]').should('exist')
     })
 })
