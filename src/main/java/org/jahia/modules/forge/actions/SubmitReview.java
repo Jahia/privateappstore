@@ -34,6 +34,7 @@ import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.URLResolver;
 import org.jahia.services.usermanager.JahiaUser;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -92,8 +93,9 @@ public class SubmitReview extends Action {
 
     @Activate
     public void activate() {
-        // PascalCase to match the sibling actions (AddReview, CreateEntryFromJar, …);
-        // the JS form posts to "<module>.SubmitReview.do".
+        // Named in PascalCase so it matches the sibling actions such as AddReview and
+        // CreateEntryFromJar. The JavaScript form posts to the module URL suffixed with
+        // dot SubmitReview dot do.
         setName("SubmitReview");
         setRequireAuthenticatedUser(true);
         setRequiredMethods("POST");
@@ -128,70 +130,97 @@ public class SubmitReview extends Action {
             // System session impersonating the caller, in the page's own workspace: an
             // ACL-bypassing write attributed to the real user.
             final long[] aggregate = JCRTemplate.getInstance().doExecuteWithSystemSessionAsUser(
-                    user, workspace, locale, elevated -> {
-                        final JCRNodeWrapper module;
-                        try {
-                            module = elevated.getNodeByIdentifier(moduleId);
-                        } catch (ItemNotFoundException e) {
-                            throw new ReviewException(HttpServletResponse.SC_NOT_FOUND, "Module not found");
-                        }
-                        if (!module.isNodeType(JMIX_FORGE_ELEMENT)) {
-                            throw new ReviewException(HttpServletResponse.SC_BAD_REQUEST,
-                                    "Not a reviewable forge element");
-                        }
-
-                        final JCRNodeWrapper reviews = reviewsContainer(module);
-
-                        // One review per user, enforced atomically: the review node name is
-                        // derived deterministically from the username, so a second review
-                        // (double-submit or concurrent request) collides on the node name and
-                        // is rejected — no read-then-write race window.
-                        final String nodeName = "review-" + Text.escapeIllegalJcrChars(username);
-                        final JCRNodeWrapper review;
-                        try {
-                            review = reviews.addNode(nodeName, JNT_REVIEW);
-                        } catch (ItemExistsException e) {
-                            throw new ReviewException(HttpServletResponse.SC_CONFLICT,
-                                    "You have already reviewed this module");
-                        }
-                        review.setProperty(PROP_RATING, (long) rating);
-                        if (StringUtils.isNotBlank(title)) {
-                            review.setProperty(PROP_JCR_TITLE, title);
-                        }
-                        if (StringUtils.isNotBlank(comment)) {
-                            review.setProperty(PROP_CONTENT, comment);
-                        }
-                        review.grantRoles("u:" + username, Collections.singleton("owner"));
-
-                        final long[] agg = recomputeAggregateRating(module, reviews);
-                        elevated.save();
-                        return agg;
-                    });
-
-            final long count = aggregate[1];
-            final double average = count > 0 ? (double) aggregate[0] / (double) count : 0d;
-            final JSONObject json = new JSONObject();
-            json.put("author", username);
-            json.put("rating", rating);
-            json.put("reviewCount", count);
-            json.put("averageRating", average);
-            return new ActionResult(HttpServletResponse.SC_OK, null, json);
+                    user, workspace, locale,
+                    elevated -> writeReview(elevated, moduleId, username, rating, title, comment));
+            return success(username, rating, aggregate);
         } catch (ReviewException e) {
             return error(e.getStatus(), e.getMessage());
         } catch (RepositoryException e) {
-            // A ReviewException is a RuntimeException and normally propagates unwrapped, but
-            // unpack defensively in case the template wraps it; also map a save-time
-            // same-name collision (the concurrent-request loser) to the one-per-user conflict.
-            if (e.getCause() instanceof ReviewException) {
-                final ReviewException re = (ReviewException) e.getCause();
-                return error(re.getStatus(), re.getMessage());
-            }
-            if (e instanceof ItemExistsException) {
-                return error(HttpServletResponse.SC_CONFLICT, "You have already reviewed this module");
-            }
-            LOGGER.error("Failed to submit review for module {}", moduleId, e);
-            return error(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Could not submit the review");
+            return mapRepositoryException(e, moduleId);
         }
+    }
+
+    /**
+     * The privileged write, run inside the system session: resolve and validate the module,
+     * create the per-user review node, set its properties, and refresh the aggregate rating.
+     * Returns {@code [sumOfVotes, nbOfVotes]}.
+     */
+    private static long[] writeReview(JCRSessionWrapper elevated, String moduleId, String username,
+                                      int rating, String title, String comment) throws RepositoryException {
+        final JCRNodeWrapper module = findReviewableModule(elevated, moduleId);
+        final JCRNodeWrapper reviews = reviewsContainer(module);
+        final JCRNodeWrapper review = addReviewNode(reviews, username);
+        review.setProperty(PROP_RATING, rating);
+        if (StringUtils.isNotBlank(title)) {
+            review.setProperty(PROP_JCR_TITLE, title);
+        }
+        if (StringUtils.isNotBlank(comment)) {
+            review.setProperty(PROP_CONTENT, comment);
+        }
+        review.grantRoles("u:" + username, Collections.singleton("owner"));
+        final long[] aggregate = recomputeAggregateRating(module, reviews);
+        elevated.save();
+        return aggregate;
+    }
+
+    /** Resolve the target node by id and ensure it is a reviewable forge element. */
+    private static JCRNodeWrapper findReviewableModule(JCRSessionWrapper elevated, String moduleId)
+            throws RepositoryException {
+        final JCRNodeWrapper module;
+        try {
+            module = elevated.getNodeByIdentifier(moduleId);
+        } catch (ItemNotFoundException e) {
+            throw new ReviewException(HttpServletResponse.SC_NOT_FOUND, "Module not found");
+        }
+        if (!module.isNodeType(JMIX_FORGE_ELEMENT)) {
+            throw new ReviewException(HttpServletResponse.SC_BAD_REQUEST, "Not a reviewable forge element");
+        }
+        return module;
+    }
+
+    /**
+     * One review per user, enforced atomically: the review node name is derived deterministically
+     * from the username, so a second review (double-submit or concurrent request) collides on the
+     * node name and is rejected — no read-then-write race window.
+     */
+    private static JCRNodeWrapper addReviewNode(JCRNodeWrapper reviews, String username)
+            throws RepositoryException {
+        final String nodeName = "review-" + Text.escapeIllegalJcrChars(username);
+        try {
+            return reviews.addNode(nodeName, JNT_REVIEW);
+        } catch (ItemExistsException e) {
+            throw new ReviewException(HttpServletResponse.SC_CONFLICT, "You have already reviewed this module");
+        }
+    }
+
+    /** Build the success payload (author, rating and refreshed aggregate) for the client. */
+    private static ActionResult success(String username, int rating, long[] aggregate) throws JSONException {
+        final long count = aggregate[1];
+        final double average = count > 0 ? (double) aggregate[0] / (double) count : 0d;
+        final JSONObject json = new JSONObject();
+        json.put("author", username);
+        json.put(PROP_RATING, rating);
+        json.put("reviewCount", count);
+        json.put("averageRating", average);
+        return new ActionResult(HttpServletResponse.SC_OK, null, json);
+    }
+
+    /**
+     * Map a repository failure to a client response. A ReviewException is a RuntimeException and
+     * normally propagates unwrapped, but unpack defensively in case the template wraps it; also map
+     * a save-time same-name collision (the concurrent-request loser) to the one-per-user conflict.
+     */
+    private static ActionResult mapRepositoryException(RepositoryException e, String moduleId)
+            throws JSONException {
+        if (e.getCause() instanceof ReviewException) {
+            final ReviewException re = (ReviewException) e.getCause();
+            return error(re.getStatus(), re.getMessage());
+        }
+        if (e instanceof ItemExistsException) {
+            return error(HttpServletResponse.SC_CONFLICT, "You have already reviewed this module");
+        }
+        LOGGER.error("Failed to submit review for module {}", moduleId, e);
+        return error(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Could not submit the review");
     }
 
     private static int parseRating(String raw) {
@@ -249,7 +278,7 @@ public class SubmitReview extends Action {
         return new long[]{sum, nb};
     }
 
-    private static ActionResult error(int status, String message) throws Exception {
+    private static ActionResult error(int status, String message) throws JSONException {
         final JSONObject json = new JSONObject();
         json.put("error", message);
         return new ActionResult(status, null, json);
