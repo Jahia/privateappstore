@@ -85,9 +85,15 @@ tests/                Cypress E2E (+ env tooling) — see below
   (docker-compose); `ci.build.sh` copies the locally-built `privateappstore` JAR
   *and* the sibling `store-template` `.tgz` into `tests/artifacts/`;
   `assets/provisioning.yml` installs the `javascript-modules-engine` + deps.
-  Run: `cd tests && npx cypress run` (`baseUrl` localhost:8080). Suite = 19 specs,
+  Run: `cd tests && npx cypress run` (`baseUrl` localhost:8080). Suite = 20 specs,
   must stay green. Credentials come from `tests/.env` via `set-env.sh` (do not
   print or commit secrets).
+  - **Accessibility gate** (`20-accessibility.cy.ts`): runs axe-core (cypress-axe)
+    against the store-template pages (home grid, module detail, my-modules,
+    in-site admin) at the full WCAG ladder up to **AAA** + landmark/region best
+    practices. This is the enforced version of what used to be a manual EqualWeb
+    audit — keep it green, and treat new AAA failures as real (the empty home
+    page hides card/detail issues that only surface with seeded content).
 
 ## SonarQube
 

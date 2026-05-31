@@ -16,6 +16,7 @@
 // Import commands.js using ES2015 syntax:
 
 import './commands';
+import 'cypress-axe';
 import addContext from 'mochawesome/addContext';
 import {jsErrorsLogger} from '@jahia/cypress';
 

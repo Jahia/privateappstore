@@ -2731,6 +2731,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axe-core@npm:^4.10.0":
+  version: 4.11.4
+  resolution: "axe-core@npm:4.11.4"
+  checksum: 10/49095daa422d05d99a90b39301a3b5c971e234a4593403dfd6701df637a3e550bcfd7bd096709c5643564dd069208513247791f367790e0605d15386fb2a7bfe
+  languageName: node
+  linkType: hard
+
 "axios@npm:^1.16.0":
   version: 1.16.0
   resolution: "axios@npm:1.16.0"
@@ -3437,6 +3444,16 @@ __metadata:
   version: 0.0.2
   resolution: "crypt@npm:0.0.2"
   checksum: 10/2c72768de3d28278c7c9ffd81a298b26f87ecdfe94415084f339e6632f089b43fe039f2c93f612bcb5ffe447238373d93b2e8c90894cba6cfb0ac7a74616f8b9
+  languageName: node
+  linkType: hard
+
+"cypress-axe@npm:^1.6.0":
+  version: 1.7.0
+  resolution: "cypress-axe@npm:1.7.0"
+  peerDependencies:
+    axe-core: ^3 || ^4
+    cypress: ^10 || ^11 || ^12 || ^13 || ^14 || ^15
+  checksum: 10/f37620c4c17b315d8ec34e1a51d798b91739ecbd868ac7ee1dc1f47bc7e7412d0e0ad942e13e2e25d397f2d4aa487ce485a86d4aa66fc022bf7d1239576f42a1
   languageName: node
   linkType: hard
 
@@ -7313,11 +7330,13 @@ __metadata:
     "@jahia/eslint-config": "npm:^2.1.2"
     "@typescript-eslint/eslint-plugin": "npm:^5.2.0"
     "@typescript-eslint/parser": "npm:^5.2.0"
+    axe-core: "npm:^4.10.0"
     babel-loader: "npm:^8.3.0"
     babel-plugin-istanbul: "npm:^6.1.1"
     compare-versions: "npm:^6.1.1"
     cross-fetch: "npm:3.1.6"
     cypress: "npm:15.13.1"
+    cypress-axe: "npm:^1.6.0"
     cypress-file-upload: "npm:^5.0.8"
     cypress-iframe: "npm:^1.0.1"
     cypress-mailpit: "npm:^1.4.0"
