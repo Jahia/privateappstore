@@ -72,6 +72,14 @@ describe('In-site Store Administration (JS module)', () => {
         cy.login()
     })
 
+    it('wraps the page in the store chrome (header + search + footer)', () => {
+        cy.visit(renderUrl)
+        cy.get('header').should('be.visible')
+        cy.get('header a').first().should('exist') // brand link
+        cy.get('input[name="src_terms"]').should('exist') // header search
+        cy.contains('footer', /all rights reserved/i).should('exist')
+    })
+
     it('renders three admin tabs and hydrates the Forge settings form', () => {
         cy.visit(renderUrl)
         cy.contains('h1', /store administration/i).should('be.visible')
