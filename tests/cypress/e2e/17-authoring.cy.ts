@@ -53,6 +53,20 @@ describe('Authoring views (JS module)', () => {
         })
         setNodeProperty(`${repo}/widget`, 'description', '<p>Original description.</p>', 'en')
         setNodeProperty(`${repo}/widget`, 'published', 'true', 'en')
+
+        // A "submit a module" page hosting the JAR upload form.
+        cy.apollo({
+            mutation: addNodeWithProps,
+            variables: {parentPath: `/sites/${siteKey}`, name: 'submit', primaryNodeType: 'jnt:page', properties: [{name: 'j:templateName', value: 'default'}]}
+        })
+        cy.apollo({
+            mutation: addNodeWithProps,
+            variables: {parentPath: `/sites/${siteKey}/submit`, name: 'main', primaryNodeType: 'jnt:contentList', properties: []}
+        })
+        cy.apollo({
+            mutation: addNodeWithProps,
+            variables: {parentPath: `/sites/${siteKey}/submit/main`, name: 'upload', primaryNodeType: 'jnt:fileUpload', properties: []}
+        })
     })
 
     after(() => {
@@ -83,6 +97,33 @@ describe('Authoring views (JS module)', () => {
         cy.reload()
         cy.get('h1', {timeout: 20000}).should('contain.text', 'Widget Pro')
         cy.contains('a', 'https://github.com/acme/widget').should('exist')
+    })
+
+    it('displays reviews and the average rating', () => {
+        cy.apollo({
+            mutation: addNodeWithProps,
+            variables: {
+                parentPath: `${repo}/widget/reviews`,
+                name: 'r1',
+                primaryNodeType: 'jnt:review',
+                properties: [
+                    {name: 'rating', value: '5'},
+                    {name: 'jcr:title', value: 'Excellent module', language: 'en'},
+                    {name: 'content', value: 'Works great for us.', language: 'en'}
+                ]
+            }
+        })
+        cy.visit(moduleRender)
+        cy.contains('h2', /reviews/i).should('be.visible')
+        cy.contains('Excellent module').should('be.visible')
+        cy.contains('Works great for us.').should('be.visible')
+    })
+
+    it('renders the JAR upload form wired to the createEntryFromJar action', () => {
+        cy.visit(`/cms/render/default/en/sites/${siteKey}/submit.html`)
+        cy.get('form[action*="modules-repository"][action$="createEntryFromJar.do"]').should('exist')
+        cy.get('input[type="file"][name="file"]').should('exist')
+        cy.get('input[type="hidden"][name="redirectURL"]').should('exist')
     })
 
     it('owner can reorder and delete screenshots (jcr mutations)', () => {
