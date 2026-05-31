@@ -6,9 +6,12 @@ if [[ -e ../target ]]; then
   cp -R ../target/*-SNAPSHOT.jar ./artifacts/ 2>/dev/null || true
 fi
 
-# Pull store-template JAR if it has been built locally in a sibling repo
+# Pull the store-template artifact built locally in a sibling repo.
+# store-template is now a Jahia JavaScript module: 'mvn package' produces a .tgz
+# (the engine's js: handler installs it; @jahia/cypress env.provision installs
+# *-SNAPSHOT.tgz after the .jar modules + the engine).
 if [[ -e ../../store-template/target ]]; then
-  cp -R ../../store-template/target/*-SNAPSHOT.jar ./artifacts/ 2>/dev/null || true
+  cp -R ../../store-template/target/*-SNAPSHOT.tgz ./artifacts/ 2>/dev/null || true
 fi
 
 version=$(node -p "require('./package.json').devDependencies['@jahia/cypress']")
