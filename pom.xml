@@ -140,7 +140,12 @@
                     <instructions>
                         <Jahia-Module-Type>module</Jahia-Module-Type>
                         <Embed-Dependency>*; scope=compile; type=!pom; inline=false</Embed-Dependency>
-                        <_dsannotations>org.jahia.modules.forge.graphql.*</_dsannotations>
+                        <!-- Process DS @Component annotations for both the GraphQL extensions
+                             and the actions package (AddReview/CreateEntryFromJar/SubmitReview/…).
+                             Scoping this to graphql.* alone silently un-registered every
+                             @Component(service=Action.class), so action URLs resolved to
+                             "Couldn't resolve action named […]". -->
+                        <_dsannotations>org.jahia.modules.forge.graphql.*,org.jahia.modules.forge.actions.*</_dsannotations>
                     </instructions>
                 </configuration>
             </plugin>
