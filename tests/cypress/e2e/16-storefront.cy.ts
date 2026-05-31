@@ -69,6 +69,10 @@ describe('Storefront read views (JS module)', () => {
             {name: 'url', value: 'https://store.example.com/analytics-1.0.0.jar'},
             {name: 'changeLog', value: '<ul><li>Initial release</li></ul>'}
         ])
+        addNode(`${repo}/analytics`, 'video', 'jnt:videostreaming', [
+            {name: 'provider', value: 'youtube'},
+            {name: 'identifier', value: 'dQw4w9WgXcQ'}
+        ])
 
         // A second published module with a different status (for filtering)
         cy.apollo({
@@ -89,6 +93,11 @@ describe('Storefront read views (JS module)', () => {
         addNode(`/sites/${siteKey}`, 'home', 'jnt:page', [{name: 'j:templateName', value: 'default'}])
         addNode(`/sites/${siteKey}/home`, 'main', 'jnt:contentList')
         addNode(`/sites/${siteKey}/home/main`, 'list', 'jnt:forgeModulesList')
+
+        // "My modules" page (lists the current user's own modules, incl. drafts)
+        addNode(`/sites/${siteKey}`, 'mymodules', 'jnt:page', [{name: 'j:templateName', value: 'default'}])
+        addNode(`/sites/${siteKey}/mymodules`, 'main', 'jnt:contentList')
+        addNode(`/sites/${siteKey}/mymodules/main`, 'mine', 'jnt:forgeMyModulesList')
     })
 
     after(() => {
@@ -124,7 +133,7 @@ describe('Storefront read views (JS module)', () => {
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('not.be.visible')
     })
 
-    it('opens a module detail page with version + download', () => {
+    it('opens a module detail page with version, video + download', () => {
         cy.visit(detailRender)
         cy.contains('h1', 'Analytics Dashboard').should('be.visible')
         cy.contains('Versions').should('be.visible')
@@ -132,5 +141,14 @@ describe('Storefront read views (JS module)', () => {
         cy.contains('a', 'Download')
             .should('have.attr', 'href')
             .and('contain', 'analytics-1.0.0.jar')
+        cy.get('iframe[src*="youtube.com/embed/dQw4w9WgXcQ"]').should('exist')
+    })
+
+    it('the "My modules" list shows the user own modules, including drafts', () => {
+        cy.visit(`/cms/render/default/en/sites/${siteKey}/mymodules.html`)
+        cy.contains('[data-forge-card]', 'Analytics Dashboard').should('be.visible')
+        cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible')
+        // Owners see their own unpublished drafts here (unlike the public grid).
+        cy.contains('[data-forge-card]', 'Draft Module').should('be.visible')
     })
 })
