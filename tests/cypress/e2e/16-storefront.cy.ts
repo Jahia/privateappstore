@@ -119,8 +119,9 @@ describe('Storefront read views (JS module)', () => {
 
     it('filters the grid by status (instant client filter)', () => {
         cy.visit(homeRender)
-        // The filter island hydrates client-side.
-        cy.get('[data-forge-list] input[type=search]', {timeout: 20000}).should('be.visible')
+        // Wait for the filter island to hydrate (it marks itself ready after its
+        // first pass) before clicking a facet.
+        cy.get('[data-filter-ready]', {timeout: 20000})
         cy.contains('[data-forge-list] button', /^supported$/i).click()
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('be.visible')
         cy.contains('[data-forge-card]', 'SEO Toolkit').should('not.be.visible')
@@ -128,7 +129,8 @@ describe('Storefront read views (JS module)', () => {
 
     it('filters the grid by text', () => {
         cy.visit(homeRender)
-        cy.get('[data-forge-list] input[type=search]', {timeout: 20000}).should('be.visible').type('seo')
+        cy.get('[data-filter-ready]', {timeout: 20000})
+        cy.get('[data-forge-list] input[type=search]').type('seo')
         cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible')
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('not.be.visible')
     })
