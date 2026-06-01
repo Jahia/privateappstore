@@ -18,6 +18,9 @@ describe('Authoring views (JS module)', () => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const createForgeModule: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/mutation/createForgeModule.graphql')
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const addNodeWithProps: DocumentNode =
+        require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeWithProperties.graphql')
 
     const islandBundle = '/modules/store-template/dist/client/admin/AdminApp.client.tsx.js'
 
@@ -48,6 +51,20 @@ describe('Authoring views (JS module)', () => {
         })
         setNodeProperty(`${repo}/widget`, 'description', '<p>Original description.</p>', 'en')
         setNodeProperty(`${repo}/widget`, 'published', 'true', 'en')
+        // An unpublished version, so the per-version publish control has something
+        // to flip (the module's own published flag starts true).
+        cy.apollo({
+            mutation: addNodeWithProps,
+            variables: {
+                parentPath: `${repo}/widget`,
+                name: 'widget-1.0.0',
+                primaryNodeType: 'jnt:forgeModuleVersion',
+                properties: [
+                    {name: 'versionNumber', value: '1.0.0'},
+                    {name: 'published', value: 'false'}
+                ]
+            }
+        })
     })
 
     after(() => {
@@ -78,6 +95,31 @@ describe('Authoring views (JS module)', () => {
         cy.reload()
         cy.get('h1', {timeout: 20000}).should('contain.text', 'Widget Pro')
         cy.contains('a', 'https://github.com/acme/widget').should('exist')
+    })
+
+    it('owner publishes / unpublishes the module via the publish control', () => {
+        cy.visit(moduleRender)
+        // widget was seeded published=true; the control reflects it once hydrated.
+        cy.get('[data-publish-scope="module"][data-publish-ready="true"]', {timeout: 20000})
+            .should('have.attr', 'data-published', 'true')
+        cy.get('[data-publish-scope="module"] button').click()
+        cy.get('[data-publish-scope="module"]').should('have.attr', 'data-published', 'false')
+        // Persisted (setValue on the rendered workspace), survives reload.
+        cy.reload()
+        cy.get('[data-publish-scope="module"][data-publish-ready="true"]', {timeout: 20000})
+            .should('have.attr', 'data-published', 'false')
+    })
+
+    it('owner publishes a specific version via the version publish control', () => {
+        cy.visit(moduleRender)
+        // The seeded version starts unpublished.
+        cy.get('[data-forge-version] [data-publish-scope="version"][data-publish-ready="true"]', {timeout: 20000})
+            .should('have.attr', 'data-published', 'false')
+        cy.get('[data-forge-version] [data-publish-scope="version"] button').click()
+        cy.get('[data-forge-version] [data-publish-scope="version"]').should('have.attr', 'data-published', 'true')
+        cy.reload()
+        cy.get('[data-forge-version] [data-publish-scope="version"][data-publish-ready="true"]', {timeout: 20000})
+            .should('have.attr', 'data-published', 'true')
     })
 
     it('renders the JAR upload form wired to the createEntryFromJar action', () => {
