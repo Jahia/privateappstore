@@ -110,12 +110,13 @@ describe('Storefront read views (JS module)', () => {
         cy.contains('Draft Module').should('not.exist')
     })
 
-    it('filters the grid by status (instant client filter)', () => {
+    it('filters the grid by status (instant sidebar facet)', () => {
         cy.visit(homeRender)
         // Wait for the filter island to hydrate (it marks itself ready after its
-        // first pass) before clicking a facet.
+        // first pass) before toggling a facet.
         cy.get('[data-filter-ready]', {timeout: 20000})
-        cy.contains('[data-forge-list] button', /^supported$/i).click()
+        // The Status facets are multi-select checkboxes in the sidebar.
+        cy.contains('[data-forge-list] label', /supported/i).find('input[type=checkbox]').check()
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('be.visible')
         cy.contains('[data-forge-card]', 'SEO Toolkit').should('not.be.visible')
     })
@@ -175,9 +176,22 @@ describe('Storefront read views (JS module)', () => {
         cy.get('#login-username').type('root')
         cy.get('#login-password').type(`${Cypress.env('SUPER_USER_PASSWORD')}{enter}`)
         // A successful form login redirects back to the page, now authenticated:
-        // the header shows the account menu (logout), not the sign-in form.
-        cy.contains(/log out/i, {timeout: 20000}).should('be.visible')
+        // the header shows the account menu with a real Log out *button* (not a link).
+        cy.get('header').contains('button', /log out/i, {timeout: 20000}).should('be.visible')
         cy.contains('root').should('be.visible')
+    })
+
+    it('gates the "My modules" nav entry by login + Store role', () => {
+        cy.login()
+        publishAndWaitJobEnding(`/sites/${siteKey}`, ['en'])
+        // root holds every permission → the entry is shown.
+        cy.visit(homeRender)
+        cy.contains('nav a', /my modules/i).should('be.visible')
+        // Anonymous visitor on the live site → the entry is hidden.
+        cy.logout()
+        cy.visit(`/cms/render/live/en/sites/${siteKey}/home.html`)
+        cy.get('nav', {timeout: 20000}).should('exist')
+        cy.contains('nav a', /my modules/i).should('not.exist')
     })
 
     it('renders the configured logo in the header (DAM reference)', () => {

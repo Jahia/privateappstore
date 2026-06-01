@@ -100,6 +100,23 @@ describe('Authoring views (JS module)', () => {
         cy.contains('a', 'https://github.com/acme/widget').should('exist')
     })
 
+    it('edits status + tags on the General tab and persists them', () => {
+        cy.visit(moduleRender)
+        cy.get('[data-editor-ready]', {timeout: 20000})
+        cy.contains('button', /edit module/i).click()
+        // Status (choicelist) + tags (j:tagList) are on the General tab. They use
+        // the same non-i18n setValue / multi-value setValues paths as category.
+        cy.get('#edit-status', {timeout: 10000}).select('legacy')
+        cy.get('#edit-tags').type('analytics{enter}charts{enter}')
+        cy.contains('button', /^Save$/).click()
+        cy.contains(/saved/i, {timeout: 20000}).should('be.visible')
+        cy.reload()
+        // The status badge + the Details tag list reflect the saved values.
+        cy.contains('h1', 'Widget')
+        cy.contains(/legacy/i).should('be.visible')
+        cy.get('[data-tag-list]').should('contain.text', 'analytics').and('contain.text', 'charts')
+    })
+
     it('keyboard-navigates the editor tabs (roving tabindex)', () => {
         cy.visit(moduleRender)
         cy.get('[data-editor-ready]', {timeout: 20000})
@@ -121,6 +138,9 @@ describe('Authoring views (JS module)', () => {
         cy.get('[data-ckeditor-state="ready"]', {timeout: 30000}).should('exist')
         cy.get('.ck-editor__editable', {timeout: 10000}).should('be.visible')
         cy.get('.ck-toolbar button').its('length').should('be.greaterThan', 0)
+        // The federated `.` entry ships no CSS, so the storefront injects the
+        // matching CKEditor 5 stylesheet itself — without it the editor is unstyled.
+        cy.get('head style[data-ckeditor5-styles]').should('exist')
     })
 
     it('uploads a module icon (base64 over GraphQL)', () => {
