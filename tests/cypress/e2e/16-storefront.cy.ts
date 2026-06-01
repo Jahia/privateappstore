@@ -1,5 +1,5 @@
 import {DocumentNode} from 'graphql'
-import {createSite, deleteSite, setNodeProperty, uploadFile} from '@jahia/cypress'
+import {createSite, deleteSite, publishAndWaitJobEnding, setNodeProperty, uploadFile} from '@jahia/cypress'
 
 /**
  * Storefront read views (store-template JS module): the module list grid and
@@ -162,6 +162,22 @@ describe('Storefront read views (JS module)', () => {
         cy.get('footer')
             .contains('a', /privacy/i)
             .should('have.attr', 'href', 'https://acme.example.com/privacy')
+    })
+
+    it('signs in via the header login form (posts to /cms/login)', () => {
+        // Publish the site so the LIVE home exists (anonymous can only see LIVE),
+        // then go anonymous — the header then shows the sign-in form.
+        publishAndWaitJobEnding(`/sites/${siteKey}`, ['en'])
+        cy.logout()
+        cy.visit(`/cms/render/live/en/sites/${siteKey}/home.html`)
+        // Open the login panel (the toggle button), then fill + submit the form.
+        cy.contains('button', /log in/i).click()
+        cy.get('#login-username').type('root')
+        cy.get('#login-password').type(`${Cypress.env('SUPER_USER_PASSWORD')}{enter}`)
+        // A successful form login redirects back to the page, now authenticated:
+        // the header shows the account menu (logout), not the sign-in form.
+        cy.contains(/log out/i, {timeout: 20000}).should('be.visible')
+        cy.contains('root').should('be.visible')
     })
 
     it('renders the configured logo in the header (DAM reference)', () => {
