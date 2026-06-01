@@ -92,6 +92,12 @@ public class CreateEntryFromJar extends Action {
     private static final String REQUIRED_VERSION = "requiredVersion";
     private static final String VERSION_NUMBER = "versionNumber";
     private static final String VERSION_PREFIX = "version-";
+    /**
+     * Path of the {@link org.jahia.modules.forge.proxy.MavenProxy} servlet, relative to the Jahia
+     * context root. The proxy is an OSGi HttpServlet (alias=/mavenproxy) and is therefore served
+     * under /modules — NOT under /cms (the render servlet). Download URLs must use this prefix.
+     */
+    private static final String MAVENPROXY_PATH = "/modules/mavenproxy/";
     private static final String DESCRIPTION = "description";
     private static final String AUTHOR_URL = "authorURL";
     private static final String ERROR = "error";
@@ -234,14 +240,13 @@ public class CreateEntryFromJar extends Action {
         moduleParams.put(Constants.JCR_TITLE, Arrays.asList(moduleName));
         moduleParams.put(VERSION_NUMBER, Arrays.asList(version));
 
-        final String forgeUrl = StringUtils.substringBefore(request.getRequestURL().toString(), "/render");
         final String reqVersionAttribute = jahiaJsonObject.getString("required-version");
         final String requiredVersion = VERSION_PREFIX + reqVersionAttribute;
         if (StringUtils.isEmpty(moduleName) || StringUtils.isEmpty(groupId) || StringUtils.isEmpty(reqVersionAttribute)) {
             return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
         }
         final String moduleRelPath = groupId.replace(".", "/") + "/" + moduleName;
-        moduleParams.put("url", Arrays.asList(forgeUrl + "/mavenproxy/" + site.getName() + "/" + moduleRelPath + "/" + version + "/" + moduleName + "-" + version + "." + extension));
+        moduleParams.put("url", Arrays.asList(buildMavenProxyUrl(request, site.getName(), moduleRelPath, version, moduleName, extension)));
 
         final JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
         moduleParams.put(REQUIRED_VERSION, Arrays.asList(versions.getNode(requiredVersion).getIdentifier()));
@@ -423,14 +428,13 @@ public class CreateEntryFromJar extends Action {
         moduleParams.put(VERSION_NUMBER, Arrays.asList(version));
 
 
-        String forgeUrl = StringUtils.substringBefore(request.getRequestURL().toString(), "/render");
         String reqVersionAttribute = attributes.getValue("Jahia-Required-Version");
         final String requiredVersion = VERSION_PREFIX + reqVersionAttribute;
         if (StringUtils.isEmpty(moduleName) || StringUtils.isEmpty(groupId) || StringUtils.isEmpty(reqVersionAttribute)) {
             return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
         }
         String moduleRelPath = groupId.replace(".", "/") + "/" + moduleName;
-        moduleParams.put("url", Arrays.asList(forgeUrl + "/mavenproxy/" + site.getName() + "/" + moduleRelPath + "/" + version + "/" + moduleName + "-" + version + "." + extension));
+        moduleParams.put("url", Arrays.asList(buildMavenProxyUrl(request, site.getName(), moduleRelPath, version, moduleName, extension)));
 
         JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
         moduleParams.put(REQUIRED_VERSION, Arrays.asList(versions.getNode(requiredVersion).getIdentifier()));
@@ -552,6 +556,20 @@ public class CreateEntryFromJar extends Action {
                 versionTarget.put(key, value);
             }
         }
+    }
+
+    /**
+     * Build the artifact download URL served by the {@link org.jahia.modules.forge.proxy.MavenProxy}
+     * servlet. The proxy lives under the Jahia context root at {@link #MAVENPROXY_PATH} (the OSGi
+     * /modules context), so the URL is derived by stripping the render servlet path (/cms/...) off
+     * the current request and appending the proxy path. Using /cms here (as the legacy code did)
+     * would route the download to the render servlet and 404.
+     */
+    private static String buildMavenProxyUrl(HttpServletRequest request, String siteName, String moduleRelPath,
+                                             String version, String moduleName, String extension) {
+        String contextRoot = StringUtils.substringBefore(request.getRequestURL().toString(), "/cms");
+        return contextRoot + MAVENPROXY_PATH + siteName + "/" + moduleRelPath + "/" + version + "/"
+                + moduleName + "-" + version + "." + extension;
     }
 
     private JCRNodeWrapper upsertModuleNode(HttpServletRequest request, JCRNodeWrapper repositoryStart,
