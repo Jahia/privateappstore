@@ -6,14 +6,14 @@ import {createSite, deleteSite, setNodeProperty} from '@jahia/cypress'
  * Accessibility gate (store-template JS module) — enforces the module's
  * WCAG 2.2 Level AAA conformance target with axe-core.
  *
- * Seeds a store-template site (home grid + a module detail + my-modules) plus a
- * site-admin page, then runs axe on each rendered page against the full WCAG
- * ladder up to AAA, plus the landmark/region best-practice rules. Any violation
- * fails the spec — this replaces the previously-manual EqualWeb/axe audit with
- * an automated gate.
+ * Seeds a store-template site (home grid + a module detail + my-modules), then
+ * runs axe on each rendered page against the full WCAG ladder up to AAA, plus the
+ * landmark/region best-practice rules. Any violation fails the spec — this
+ * replaces the previously-manual EqualWeb/axe audit with an automated gate.
  *
- * Requires the JS build of store-template (it provides the forge views/templates
- * and the admin island). Skips gracefully on the legacy JSP build.
+ * (Store administration is no longer in-site; it lives in the Jahia site
+ * administration / jContent.) Requires the JS build of store-template. Skips
+ * gracefully on the legacy JSP build.
  */
 describe('Accessibility — WCAG 2.2 AAA gate (JS module)', () => {
     const siteKey = 'a11y'
@@ -21,7 +21,6 @@ describe('Accessibility — WCAG 2.2 AAA gate (JS module)', () => {
     const repo = `${contents}/modules-repository`
     const render = (path: string) => `/cms/render/default/en/sites/${siteKey}${path}.html`
     const detailRender = `/cms/render/default/en${repo}/analytics.html`
-    const adminRender = `/cms/render/default/en/sites/${siteKey}/admin.html`
 
     // Full WCAG ladder up to AAA + the landmark/region best practices that the
     // manual audit flagged (duplicate/nested <main>, unique landmarks).
@@ -59,7 +58,7 @@ describe('Accessibility — WCAG 2.2 AAA gate (JS module)', () => {
     const addNodeWithProps: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeWithProperties.graphql')
 
-    const islandBundle = '/modules/store-template/dist/client/admin/AdminApp.client.tsx.js'
+    const islandBundle = '/modules/store-template/dist/client/components/forge/ModuleEditor.client.tsx.js'
 
     before(function () {
         cy.request({url: islandBundle, failOnStatusCode: false}).then((res) => {
@@ -114,17 +113,6 @@ describe('Accessibility — WCAG 2.2 AAA gate (JS module)', () => {
         setNodeProperty(`${repo}/seo`, 'description', '<p>Meta tags and sitemaps.</p>', 'en')
         setNodeProperty(`${repo}/seo`, 'status', 'community', 'en')
         setNodeProperty(`${repo}/seo`, 'published', 'true', 'en')
-
-        // A page using the in-site admin template.
-        cy.apollo({
-            mutation: addNodeWithProps,
-            variables: {
-                parentPath: `/sites/${siteKey}`,
-                name: 'admin',
-                primaryNodeType: 'jnt:page',
-                properties: [{name: 'j:templateName', value: 'site-admin'}]
-            }
-        })
     })
 
     after(() => {
@@ -152,13 +140,6 @@ describe('Accessibility — WCAG 2.2 AAA gate (JS module)', () => {
     it('"My modules" page has no WCAG 2.2 AAA violations', () => {
         cy.visit(render('/home/my-modules'))
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('be.visible')
-        audit()
-    })
-
-    it('in-site administration page has no WCAG 2.2 AAA violations', () => {
-        cy.visit(adminRender)
-        // Audit the hydrated island, not the SSR "Loading…" placeholder.
-        cy.get('#forge-url', {timeout: 30000}).should('be.visible')
         audit()
     })
 })

@@ -1,0 +1,13 @@
+mutation UpdateForgeBranding(
+    $siteKey: String!
+    $logo: String
+    $copyright: String
+    $privacyUrl: String
+) {
+    updateForgeSettings(siteKey: $siteKey, logo: $logo, copyright: $copyright, privacyUrl: $privacyUrl) {
+        siteKey
+        copyright
+        privacyUrl
+        logoPath
+    }
+}

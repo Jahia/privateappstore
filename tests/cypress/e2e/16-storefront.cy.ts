@@ -1,5 +1,5 @@
 import {DocumentNode} from 'graphql'
-import {createSite, deleteSite, setNodeProperty} from '@jahia/cypress'
+import {createSite, deleteSite, setNodeProperty, uploadFile} from '@jahia/cypress'
 
 /**
  * Storefront read views (store-template JS module): the module list grid and
@@ -26,8 +26,11 @@ describe('Storefront read views (JS module)', () => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const addNodeWithProps: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeWithProperties.graphql')
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const updateForgeBranding: DocumentNode =
+        require('graphql-tag/loader!../fixtures/graphql/mutation/updateForgeBranding.graphql')
 
-    const islandBundle = '/modules/store-template/dist/client/admin/AdminApp.client.tsx.js'
+    const islandBundle = '/modules/store-template/dist/client/components/forge/ModuleEditor.client.tsx.js'
 
     const addNode = (parentPath: string, name: string, primaryNodeType: string, properties: object[] = []) =>
         cy.apollo({mutation: addNodeWithProps, variables: {parentPath, name, primaryNodeType, properties}})
@@ -46,7 +49,7 @@ describe('Storefront read views (JS module)', () => {
             // ignore
         }
         // The store-template import.xml seeds the home page (+ modules list),
-        // the My-modules / Administration sub-pages and contents/modules-repository.
+        // the My-modules sub-page and contents/modules-repository.
         createSite(siteKey, {
             languages: 'en',
             templateSet: 'store-template',
@@ -142,5 +145,35 @@ describe('Storefront read views (JS module)', () => {
         cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible')
         // Owners see their own unpublished drafts here (unlike the public grid).
         cy.contains('[data-forge-card]', 'Draft Module').should('be.visible')
+    })
+
+    it('renders the configured footer (copyright + privacy link) from forge settings', () => {
+        // Configure branding via the same mutation the Settings screen uses.
+        cy.apollo({
+            mutation: updateForgeBranding,
+            variables: {
+                siteKey,
+                copyright: '© 2026 ACME Store',
+                privacyUrl: 'https://acme.example.com/privacy'
+            }
+        })
+        cy.visit(homeRender)
+        cy.contains('footer', '© 2026 ACME Store').should('be.visible')
+        cy.get('footer')
+            .contains('a', /privacy/i)
+            .should('have.attr', 'href', 'https://acme.example.com/privacy')
+    })
+
+    it('renders the configured logo in the header (DAM reference)', () => {
+        // Upload an image into the site media library, then point the logo at it.
+        uploadFile('../../assets/icon.png', `/sites/${siteKey}/files`, 'store-logo.png', 'image/png')
+        cy.apollo({
+            mutation: updateForgeBranding,
+            variables: {siteKey, logo: `/sites/${siteKey}/files/store-logo.png`}
+        })
+        cy.visit(homeRender)
+        cy.get('header img', {timeout: 20000})
+            .should('have.attr', 'src')
+            .and('include', 'store-logo.png')
     })
 })

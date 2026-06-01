@@ -84,4 +84,22 @@ describe('Forge settings — live UI', () => {
         cy.get('#forge-user input').should('have.value', 'forge-ui-user')
         cy.get('#forge-password input').should('have.value', '')
     })
+
+    it('edits the branding/footer fields and reloads them', () => {
+        cy.login()
+        cy.visit(`/jahia/administration/${siteKey}/forgeSettings`)
+        cy.contains('h2', siteKey, {timeout: 60000}).should('be.visible')
+
+        // The logo picker + footer section are part of the Settings screen now.
+        cy.contains(/^Logo$/).should('be.visible')
+        cy.get('#forge-copyright input').clear().type('© 2026 ACME Store')
+        cy.get('#forge-privacyUrl input').clear().type('https://acme.example.com/privacy')
+
+        cy.contains('button', /^Save$/i).click()
+        cy.contains(/success|updated|saved/i, {timeout: 15000}).should('be.visible')
+
+        cy.reload()
+        cy.get('#forge-copyright input', {timeout: 60000}).should('have.value', '© 2026 ACME Store')
+        cy.get('#forge-privacyUrl input').should('have.value', 'https://acme.example.com/privacy')
+    })
 })

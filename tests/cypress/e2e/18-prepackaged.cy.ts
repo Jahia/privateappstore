@@ -24,7 +24,7 @@ describe('Prepackaged store site (JS module)', () => {
     const getNodeByPath: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/query/getNodeByPath.graphql')
 
-    const islandBundle = '/modules/store-template/dist/client/admin/AdminApp.client.tsx.js'
+    const islandBundle = '/modules/store-template/dist/client/components/forge/ModuleEditor.client.tsx.js'
 
     before(function () {
         cy.request({url: islandBundle, failOnStatusCode: false}).then((res) => {
@@ -64,15 +64,14 @@ describe('Prepackaged store site (JS module)', () => {
         cy.contains(/no published modules/i).should('be.visible')
     })
 
-    it('provisions the My modules and Administration sub-pages', () => {
+    it('provisions the My modules sub-page', () => {
         cy.visit(`/cms/render/default/en/sites/${siteKey}/home/my-modules.html`)
         // Upload form present (now an XHR island; the createEntryFromJar action URL
         // is carried in its hydration props rather than a <form action>).
         cy.get('input[type="file"][name="file"]').should('exist')
         cy.get('body').should(($b) => expect($b.html()).to.contain('createEntryFromJar.do'))
-
-        cy.visit(`/cms/render/default/en/sites/${siteKey}/home/administration.html`)
-        cy.get('[role="tab"]', {timeout: 20000}).should('have.length', 3)
+        // Store administration is no longer an in-site page — it lives in the Jahia
+        // site administration (jContent), covered by specs 08/09/10.
     })
 
     it('provisions the content folders the upload action needs (modules-repository + modules-required-versions)', () => {

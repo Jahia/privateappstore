@@ -22,7 +22,7 @@ describe('Authoring views (JS module)', () => {
     const addNodeWithProps: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeWithProperties.graphql')
 
-    const islandBundle = '/modules/store-template/dist/client/admin/AdminApp.client.tsx.js'
+    const islandBundle = '/modules/store-template/dist/client/components/forge/ModuleEditor.client.tsx.js'
 
     before(function () {
         cy.request({url: islandBundle, failOnStatusCode: false}).then((res) => {
