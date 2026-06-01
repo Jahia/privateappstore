@@ -80,13 +80,16 @@ describe('Authoring views (JS module)', () => {
         cy.contains('button', /edit module/i, {timeout: 20000}).should('be.visible')
     })
 
-    it('edits module metadata and persists via GraphQL', () => {
+    it('edits module metadata across tabs and persists via GraphQL', () => {
         cy.visit(moduleRender)
         // Wait for the editor island to hydrate before clicking (the SSR button
         // is visible before its handler is attached).
         cy.get('[data-editor-ready]', {timeout: 20000})
         cy.contains('button', /edit module/i).click()
+        // General tab is active by default — the title lives here.
         cy.get('#edit-jcr-title', {timeout: 10000}).should('have.value', 'Widget').clear().type('Widget Pro')
+        // Code repository is on the Author & links tab.
+        cy.contains('[role="tab"]', /author/i).click()
         cy.get('#edit-codeRepository').clear().type('https://github.com/acme/widget')
         cy.contains('button', /^Save$/).click()
         // Deterministic success state (no auto-reload race), then a
@@ -95,6 +98,43 @@ describe('Authoring views (JS module)', () => {
         cy.reload()
         cy.get('h1', {timeout: 20000}).should('contain.text', 'Widget Pro')
         cy.contains('a', 'https://github.com/acme/widget').should('exist')
+    })
+
+    it('keyboard-navigates the editor tabs (roving tabindex)', () => {
+        cy.visit(moduleRender)
+        cy.get('[data-editor-ready]', {timeout: 20000})
+        cy.contains('button', /edit module/i).click()
+        // The active tab is the only one in the tab order; ArrowRight moves + selects.
+        cy.get('[role="tab"][aria-selected="true"]', {timeout: 10000}).should('contain.text', 'General')
+        cy.get('[role="tab"][aria-selected="true"]').type('{rightarrow}')
+        cy.get('[role="tab"][aria-selected="true"]').should('contain.text', 'Description')
+        cy.get('[role="tabpanel"]').should('have.attr', 'aria-labelledby', 'tab-description')
+    })
+
+    it('mounts CKEditor 5 (from richtext-ckeditor5) for richtext fields', () => {
+        cy.visit(moduleRender)
+        cy.get('[data-editor-ready]', {timeout: 20000})
+        cy.contains('button', /edit module/i).click()
+        cy.contains('[role="tab"]', /^Description$/).click()
+        // The federated CKEditor build is loaded from the deployed richtext-ckeditor5
+        // module and instantiated on the live page (allow time for the remote fetch).
+        cy.get('[data-ckeditor-state="ready"]', {timeout: 30000}).should('exist')
+        cy.get('.ck-editor__editable', {timeout: 10000}).should('be.visible')
+        cy.get('.ck-toolbar button').its('length').should('be.greaterThan', 0)
+    })
+
+    it('uploads a module icon (base64 over GraphQL)', () => {
+        cy.visit(moduleRender)
+        cy.get('[data-editor-ready]', {timeout: 20000})
+        cy.contains('button', /edit module/i).click()
+        // Icon upload lives on the (default) General tab.
+        cy.get('[data-icon-input]', {timeout: 10000}).selectFile('assets/icon.png', {force: true})
+        cy.contains('button', /upload icon/i).click()
+        cy.get('[data-icon-status="uploaded"]', {timeout: 20000}).should('exist')
+        // Persisted: the module header renders an icon <img> after reload (the
+        // placeholder is a <span>, so its presence proves the file node was created).
+        cy.reload()
+        cy.get('header img', {timeout: 20000}).should('have.attr', 'src').and('match', /\S/)
     })
 
     it('owner publishes / unpublishes the module via the publish control', () => {

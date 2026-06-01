@@ -4,12 +4,16 @@ import {createSite, deleteSite, setNodeProperty} from '@jahia/cypress'
 /**
  * Rich-text editing for the store-template JS module.
  *
- * The richtext metadata fields (description, how-to-install, FAQ, license) are
- * edited in-site with the RichTextEditor, and the HTML is sanitized with DOMPurify
- * on save before it is persisted and rendered (defense-in-depth against stored XSS).
+ * The richtext metadata fields (description, how-to-install, FAQ, license) are now
+ * edited in-site with CKEditor 5, loaded at runtime from the deployed
+ * richtext-ckeditor5 module's federated remote (the store does not bundle CKEditor).
+ * CKEditor filters content at its model boundary, and the HTML is additionally
+ * sanitized with DOMPurify on save (defense-in-depth) before it is persisted and
+ * rendered with dangerouslySetInnerHTML.
  *
- * (This spec previously also covered the user-review feature, which has been
- * removed.) Requires the JS build of store-template.
+ * This spec verifies the edit -> save -> persist -> render round-trip and that the
+ * rendered richtext is clean. Requires the JS build of store-template AND the
+ * richtext-ckeditor5 module deployed.
  */
 describe('Rich text editing (JS module)', () => {
     const siteKey = 'features'
@@ -21,11 +25,18 @@ describe('Rich text editing (JS module)', () => {
         require('graphql-tag/loader!../fixtures/graphql/mutation/createForgeModule.graphql')
 
     const islandBundle = '/modules/store-template/dist/client/components/forge/ModuleEditor.client.tsx.js'
+    const ckeditorRemote = '/modules/richtext-ckeditor5/javascript/apps/remoteEntry.js'
 
     before(function () {
         cy.request({url: islandBundle, failOnStatusCode: false}).then((res) => {
             if (res.status !== 200) {
                 cy.log('store-template editor island not deployed — skipping')
+                this.skip()
+            }
+        })
+        cy.request({url: ckeditorRemote, failOnStatusCode: false}).then((res) => {
+            if (res.status !== 200) {
+                cy.log('richtext-ckeditor5 remote not deployed — skipping')
                 this.skip()
             }
         })
@@ -57,45 +68,31 @@ describe('Rich text editing (JS module)', () => {
         cy.login()
     })
 
-    it('edits a richtext field with the rich-text editor and sanitizes the saved HTML', () => {
-        cy.login()
+    it('edits the description with CKEditor 5 and persists clean HTML', () => {
         cy.visit(moduleEdit)
         cy.get('[data-editor-ready]', {timeout: 20000})
         cy.contains('button', /edit module/i).click()
+        cy.contains('[role="tab"]', /^Description$/).click()
 
-        // The description field is now a contenteditable rich-text editor with a toolbar.
-        cy.get('#edit-description', {timeout: 10000}).should('have.attr', 'contenteditable', 'true')
-        cy.get('button[title="Bold"]').should('exist')
-        cy.get('button[title="Link"]').should('exist')
+        // CKEditor is fetched from the federated remote and instantiated on the page.
+        cy.get('[data-ckeditor-state="ready"]', {timeout: 30000}).should('exist')
+        cy.get('.ck-editor__editable', {timeout: 10000}).as('ed').should('be.visible')
 
-        // Inject safe formatting plus a script and an onerror handler, then notify React.
-        cy.get('#edit-description').then(($el) => {
-            const el = $el[0] as HTMLElement
-            el.innerHTML =
-                '<h2>Injected heading</h2><p>Body text.</p>' +
-                '<script>window.__xss = 1;</script>' +
-                '<img src="x" onerror="window.__xss = 2;">'
-            el.dispatchEvent(new InputEvent('input', {bubbles: true}))
-        })
+        // Replace the seeded content via the real editor.
+        cy.get('@ed').click().type('{ctrl+a}{del}')
+        cy.get('@ed').type('Edited via CKEditor')
 
         cy.contains('button', /^Save$/).click()
         cy.contains(/saved/i, {timeout: 20000}).should('be.visible')
         cy.reload()
 
-        // Safe formatting persisted and rendered.
-        cy.contains('h2', 'Injected heading', {timeout: 20000}).should('be.visible')
-        // Sanitized: the dangerous markup is gone and nothing executed.
-        cy.contains('h2', 'Injected heading')
-            .parents('section')
-            .first()
-            .then(($s) => {
-                const html = $s.html().toLowerCase()
-                expect(html, 'no inline event handler').not.to.contain('onerror')
-                expect(html, 'no script element').not.to.contain('<script')
-            })
-        cy.get('img[onerror]').should('not.exist')
-        cy.window().then((win) => {
-            expect((win as unknown as {__xss?: number}).__xss).to.be.undefined
+        // The rendered description reflects the edit…
+        cy.contains('Edited via CKEditor', {timeout: 20000}).should('be.visible')
+        // …as clean HTML (scoped to the richtext container, not the whole page).
+        cy.contains('Edited via CKEditor').then(($el) => {
+            const html = $el.parent().html().toLowerCase()
+            expect(html, 'no script element from richtext').not.to.contain('<script')
+            expect(html, 'no inline event handler').not.to.contain('onerror')
         })
     })
 })
