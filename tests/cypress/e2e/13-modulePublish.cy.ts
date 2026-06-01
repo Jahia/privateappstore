@@ -5,14 +5,14 @@ import {
     publishAndWaitJobEnding,
     setNodeProperty
 } from '@jahia/cypress'
-import {postAction} from '../support/forgeActions'
 
 /**
  * Module publish lifecycle.
  *
  * Sets a changeLog on the version, marks both module and version published,
- * then asserts the JCR state. The legacy publishModule.do action does the
- * same plus a publish to LIVE.
+ * then asserts the JCR state. Publishing is now driven by the store-template
+ * owner UI through a GraphQL setValue on `published` (the legacy
+ * publishModule.do action was removed with the JSP storefront).
  *
  * Implementation note: this spec uses @jahia/cypress's setNodeProperty
  * helper rather than a hand-written mutation. The helper's underlying
@@ -122,12 +122,5 @@ describe('Module publish — version + module', () => {
         })
             .its('data.jcr.nodeByPath.properties[0].value')
             .should('equal', 'true')
-    })
-
-    it('publishModule.do action endpoint is wired', () => {
-        postAction(modulePath, 'publishModule', {publish: 'true'}).should((res) => {
-            expect(res.status, `unexpected status ${res.status}`)
-                .to.not.equal(404)
-        })
     })
 })
