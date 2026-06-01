@@ -20,7 +20,23 @@
             <jcr:jqom var="result" statement="SELECT * FROM [jnt:forgeModuleVersion] as module WHERE ISDESCENDANTNODE(module,'${currentNode.path}') ORDER BY module.[jcr:lastModified] DESC"/>
             <c:forEach items="${result.nodes}" var="version">
                 <c:if test="${version.properties.published.boolean}">
-                    <c:set var="downloadUrl" value="${version.properties.url.string}"/>
+                    <c:set var="module" value="${version.parent}"/>
+                    <c:set var="files" value="${jcr:getChildrenOfType(version, 'jnt:file')}"/>
+                    <c:choose>
+                        <c:when test="${not empty files}">
+                            <c:forEach var="file" items="${files}">
+                                <c:url var="downloadUrl" value="${url.server}${url.context}${url.files}${file.path}" context="/"/>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
+                            <%-- No attached artifact: the module was deployed to the site's Maven
+                                 repository, so the download is served by the MavenProxy servlet at
+                                 /modules/mavenproxy. Generate the URL from the request server + the
+                                 module coordinates (matching moduleList.json) rather than storing an
+                                 absolute URL on the node. --%>
+                            <c:set var="downloadUrl" value="${url.server}${url.context}/modules/mavenproxy/${currentNode.resolveSite.siteKey}/${fn:replace(module.properties['groupId'].string, '.', '/')}/${module.name}/${version.properties.versionNumber.string}/${module.name}-${version.properties.versionNumber.string}.jar"/>
+                        </c:otherwise>
+                    </c:choose>
                 <item>
                     <title>${version.name}, ${version.properties['versionNumber']}</title>
                     <link>${fn:escapeXml(downloadUrl)}</link>
