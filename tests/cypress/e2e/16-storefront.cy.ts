@@ -132,23 +132,28 @@ describe('Storefront read views (JS module)', () => {
     it('opens a module detail page with version, video + download', () => {
         cy.visit(detailRender)
         cy.contains('h1', 'Analytics Dashboard').should('be.visible')
-        cy.contains('Versions').should('be.visible')
+        // Video is in the default Overview tab.
+        cy.get('iframe[src*="youtube.com/embed/dQw4w9WgXcQ"]').should('exist')
+        // Versions live behind the Versions tab.
+        cy.get('[data-detail-tabs-ready]', {timeout: 20000})
+        cy.contains('[role="tab"]', /versions/i).click()
         cy.contains('1.0.0').should('be.visible')
         cy.contains('a', 'Download')
             .should('have.attr', 'href')
             .and('contain', 'analytics-1.0.0.jar')
-        cy.get('iframe[src*="youtube.com/embed/dQw4w9WgXcQ"]').should('exist')
     })
 
     it('shows the store.jahia.com-style Information panel + header download', () => {
         cy.visit(detailRender)
-        cy.contains('h2', /information/i).should('be.visible')
-        cy.contains('dt', 'Module ID').next('dd').should('contain.text', 'analytics')
-        cy.contains('dt', /status/i).next('dd').should('contain.text', 'supported')
-        // Prominent latest-version download in the title area (like the reference).
+        // The latest-version download CTA is always in the title area.
         cy.get('[data-latest-download]')
             .should('have.attr', 'href')
             .and('contain', 'analytics-1.0.0.jar')
+        // Module metadata lives behind the Information tab.
+        cy.get('[data-detail-tabs-ready]', {timeout: 20000})
+        cy.contains('[role="tab"]', /information/i).click()
+        cy.contains('dt', 'Module ID').next('dd').should('contain.text', 'analytics')
+        cy.contains('dt', /status/i).next('dd').should('contain.text', 'supported')
     })
 
     it('the "My modules" list shows the user own modules, including drafts', () => {

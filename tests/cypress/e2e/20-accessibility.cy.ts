@@ -134,6 +134,8 @@ describe('Accessibility — WCAG 2.2 AAA gate (JS module)', () => {
     it('module detail page has no WCAG 2.2 AAA violations', () => {
         cy.visit(detailRender)
         cy.contains('h1', 'Analytics Dashboard').should('be.visible')
+        // Let the section tabs initialise (only the active panel is then visible).
+        cy.get('[data-detail-tabs-ready]', {timeout: 20000})
         audit()
     })
 

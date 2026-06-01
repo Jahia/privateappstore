@@ -135,11 +135,14 @@ describe('Authoring views (JS module)', () => {
         cy.visit(moduleRender)
         cy.get('[data-editor-ready]', {timeout: 20000})
         cy.contains('button', /edit module/i).click()
+        // Scope to the editor's tablist ("Module fields") — the detail page now also
+        // has a section tablist ("Module sections"), so a bare [role=tab] is ambiguous.
+        cy.get('[aria-label="Module fields"]', {timeout: 10000}).as('editorTabs')
         // The active tab is the only one in the tab order; ArrowRight moves + selects.
-        cy.get('[role="tab"][aria-selected="true"]', {timeout: 10000}).should('contain.text', 'General')
-        cy.get('[role="tab"][aria-selected="true"]').type('{rightarrow}')
-        cy.get('[role="tab"][aria-selected="true"]').should('contain.text', 'Description')
-        cy.get('[role="tabpanel"]').should('have.attr', 'aria-labelledby', 'tab-description')
+        cy.get('@editorTabs').find('[role="tab"][aria-selected="true"]').should('contain.text', 'General')
+        cy.get('@editorTabs').find('[role="tab"][aria-selected="true"]').type('{rightarrow}')
+        cy.get('@editorTabs').find('[role="tab"][aria-selected="true"]').should('contain.text', 'Description')
+        cy.get('#panel-description').should('have.attr', 'aria-labelledby', 'tab-description')
     })
 
     it('mounts CKEditor 5 (from richtext-ckeditor5) for richtext fields', () => {
@@ -197,13 +200,20 @@ describe('Authoring views (JS module)', () => {
     })
 
     it('owner publishes a specific version via the version publish control', () => {
+        // Version controls live in the Versions tab.
+        const openVersionsTab = () => {
+            cy.get('[data-detail-tabs-ready]', {timeout: 20000})
+            cy.contains('[role="tab"]', /versions/i).click()
+        }
         cy.visit(moduleRender)
+        openVersionsTab()
         // The seeded version starts unpublished.
         cy.get('[data-forge-version] [data-publish-scope="version"][data-publish-ready="true"]', {timeout: 20000})
             .should('have.attr', 'data-published', 'false')
         cy.get('[data-forge-version] [data-publish-scope="version"] button').click()
         cy.get('[data-forge-version] [data-publish-scope="version"]').should('have.attr', 'data-published', 'true')
         cy.reload()
+        openVersionsTab()
         cy.get('[data-forge-version] [data-publish-scope="version"][data-publish-ready="true"]', {timeout: 20000})
             .should('have.attr', 'data-published', 'true')
     })
