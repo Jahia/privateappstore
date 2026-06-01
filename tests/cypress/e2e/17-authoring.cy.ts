@@ -82,6 +82,32 @@ describe('Authoring views (JS module)', () => {
                 ]
             }
         })
+
+        // A second module with TWO versions, dedicated to the delete-version test —
+        // so widget keeps exactly one version (the publish-control test relies on a
+        // single [data-forge-version] being unambiguous).
+        cy.apollo({
+            mutation: createForgeModule,
+            variables: {parentPath: repo, name: 'multiver', title: 'Multi Version'}
+        })
+        setNodeProperty(`${repo}/multiver`, 'published', 'true', 'en')
+        ;[
+            {name: 'multiver-1.0.0', num: '1.0.0'},
+            {name: 'multiver-2.0.0', num: '2.0.0'}
+        ].forEach((v) => {
+            cy.apollo({
+                mutation: addNodeWithProps,
+                variables: {
+                    parentPath: `${repo}/multiver`,
+                    name: v.name,
+                    primaryNodeType: 'jnt:forgeModuleVersion',
+                    properties: [
+                        {name: 'versionNumber', value: v.num},
+                        {name: 'published', value: 'true'}
+                    ]
+                }
+            })
+        })
     })
 
     after(() => {
@@ -216,6 +242,40 @@ describe('Authoring views (JS module)', () => {
         openVersionsTab()
         cy.get('[data-forge-version] [data-publish-scope="version"][data-publish-ready="true"]', {timeout: 20000})
             .should('have.attr', 'data-published', 'true')
+    })
+
+    it('owner removes a version via the version delete control (with confirm)', () => {
+        const multiRender = `/cms/render/default/en${repo}/multiver.html`
+        const openVersionsTab = () => {
+            cy.get('[data-detail-tabs-ready]', {timeout: 20000})
+            cy.contains('[role="tab"]', /versions/i).click()
+        }
+        cy.visit(multiRender)
+        openVersionsTab()
+        // Both seeded versions are listed.
+        cy.contains('[data-forge-version]', '2.0.0').should('be.visible')
+        cy.contains('[data-forge-version]', '1.0.0').should('be.visible')
+
+        // In the 1.0.0 card: open the inline confirm, then confirm the deletion. A
+        // successful delete reloads the page, so stamp window before the confirm
+        // click and wait for the stamp to vanish (reload-safe, like saveAndWaitReload).
+        const v1 = () => cy.contains('[data-forge-version]', '1.0.0')
+        v1().find('[data-version-delete-scope="version"][data-version-delete-ready="true"]', {timeout: 20000})
+            .should('exist')
+        v1().contains('button', /remove version/i).click()
+        cy.window().then((w) => {
+            ;(w as unknown as {__preDelete?: boolean}).__preDelete = true
+        })
+        v1().contains('button', /^Delete$/).click()
+        cy.window({timeout: 20000}).should((w) => {
+            expect((w as unknown as {__preDelete?: boolean}).__preDelete).to.be.undefined
+        })
+
+        // After the reload: 2.0.0 remains, 1.0.0 is gone.
+        openVersionsTab()
+        cy.contains('[data-forge-version]', '2.0.0').should('be.visible')
+        cy.get('[data-forge-version]').should('have.length', 1)
+        cy.contains('[data-forge-version]', '1.0.0').should('not.exist')
     })
 
     it('renders the JAR upload form wired to the createEntryFromJar action', () => {
