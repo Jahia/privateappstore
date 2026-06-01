@@ -20,6 +20,9 @@ describe('Prepackaged store site (JS module)', () => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const createForgeModule: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/mutation/createForgeModule.graphql')
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const getNodeByPath: DocumentNode =
+        require('graphql-tag/loader!../fixtures/graphql/query/getNodeByPath.graphql')
 
     const islandBundle = '/modules/store-template/dist/client/admin/AdminApp.client.tsx.js'
 
@@ -63,10 +66,28 @@ describe('Prepackaged store site (JS module)', () => {
 
     it('provisions the My modules and Administration sub-pages', () => {
         cy.visit(`/cms/render/default/en/sites/${siteKey}/home/my-modules.html`)
-        cy.get('form[action$="createEntryFromJar.do"]').should('exist')
+        // Upload form present (now an XHR island; the createEntryFromJar action URL
+        // is carried in its hydration props rather than a <form action>).
+        cy.get('input[type="file"][name="file"]').should('exist')
+        cy.get('body').should(($b) => expect($b.html()).to.contain('createEntryFromJar.do'))
 
         cy.visit(`/cms/render/default/en/sites/${siteKey}/home/administration.html`)
         cy.get('[role="tab"]', {timeout: 20000}).should('have.length', 3)
+    })
+
+    it('provisions the content folders the upload action needs (modules-repository + modules-required-versions)', () => {
+        // The createEntryFromJar action reads <site>/contents/modules-required-versions
+        // (auto-creating the per-Jahia-version child on upload) and writes modules under
+        // modules-repository. Both must be seeded by import.xml or the upload throws
+        // PathNotFoundException.
+        for (const folder of ['modules-repository', 'modules-required-versions']) {
+            cy.apollo({
+                query: getNodeByPath,
+                variables: {path: `/sites/${siteKey}/contents/${folder}`}
+            })
+                .its('data.jcr.nodeByPath.primaryNodeType.name')
+                .should('equal', 'jnt:contentFolder')
+        }
     })
 
     it('shows a published module dropped into the imported modules-repository', () => {

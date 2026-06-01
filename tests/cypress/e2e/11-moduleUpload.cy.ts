@@ -98,4 +98,31 @@ describe('Module upload — UI workflow', () => {
             .its('status')
             .should('be.oneOf', [200, 302])
     })
+
+    it('renders the upload form as a hydrated XHR island that intercepts submit', function () {
+        // Needs the JS build (island bundle). Skip on the legacy JSP build.
+        cy.request({
+            url: '/modules/store-template/dist/client/admin/AdminApp.client.tsx.js',
+            failOnStatusCode: false
+        }).then((res) => {
+            if (res.status !== 200) {
+                this.skip()
+            }
+        })
+        cy.login()
+        cy.visit(`/cms/render/default/en/sites/${siteKey}/home/my-modules.html`)
+
+        // Hydration marker proves the island mounted and the submit is JS-handled.
+        // The old plain <form> had no marker and did a full-page navigation to the
+        // .do (which is what broke CSRF). XHR posts let CsrfGuard inject the token.
+        cy.get('[data-upload-ready="true"]', {timeout: 20000}).should('exist')
+        cy.get('input[type="file"][name="file"]').should('exist')
+
+        // Submitting with no file must be intercepted (no navigation to the .do) and
+        // surface an inline message instead of landing the user on a blank page.
+        cy.get('[data-upload-ready] button[type="submit"]').click()
+        cy.contains('[role="alert"]', 'choose a module package').should('be.visible')
+        cy.location('pathname').should('include', 'my-modules.html')
+        cy.location('pathname').should('not.include', 'createEntryFromJar')
+    })
 })

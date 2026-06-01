@@ -105,9 +105,12 @@ describe('Authoring views (JS module)', () => {
 
     it('renders the JAR upload form wired to the createEntryFromJar action', () => {
         cy.visit(`/cms/render/default/en/sites/${siteKey}/home/my-modules.html`)
-        cy.get('form[action*="modules-repository"][action$="createEntryFromJar.do"]').should('exist')
+        // The upload form is a client island that posts via XHR (so Jahia's CsrfGuard
+        // attaches its token — a plain <form> POST is rejected). The createEntryFromJar
+        // action URL now rides in the island's hydration props, not a <form action>.
         cy.get('input[type="file"][name="file"]').should('exist')
-        cy.get('input[type="hidden"][name="redirectURL"]').should('exist')
+        cy.get('[data-upload-ready="true"]', {timeout: 20000}).should('exist')
+        cy.get('body').should(($b) => expect($b.html()).to.contain('createEntryFromJar.do'))
     })
 
     it('owner can reorder and delete screenshots (jcr mutations)', () => {
