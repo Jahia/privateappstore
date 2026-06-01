@@ -26,6 +26,8 @@ describe('Category settings admin (React + GraphQL)', () => {
     const deleteForgeCategory: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/deleteForgeCategory.graphql')
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const addNode: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeForTest.graphql')
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const getNodeProperty: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/query/getNodeProperties.graphql')
 
     // Used by the helper that creates a root category node we can use as the
     // site's rootCategory. Kept separate from the production GraphQL fixtures.
@@ -135,6 +137,41 @@ describe('Category settings admin (React + GraphQL)', () => {
             cy.apollo({query: getCategorySettings, variables: {siteKey}})
                 .its('data.forgeCategorySettings.categories')
                 .should('have.length', 0)
+        })
+    })
+
+    it('refuses to delete a category outside the site root category (scope guard, SECURITY-571)', () => {
+        // A real jnt:category, but a SIBLING of the configured root category — i.e.
+        // outside the subtree this site administrator manages. The site-scoped
+        // permission gate must NOT let it be deleted by UUID (the work runs in a
+        // system session that bypasses ACLs).
+        const outsiderPath = `/sites/${siteKey}/cy-outsider-category`
+        let outsiderUuid: string
+        cy.apollo({
+            mutation: addNode,
+            variables: {parentPath: `/sites/${siteKey}`, name: 'cy-outsider-category', primaryNodeType: 'jnt:category'}
+        }).then((result) => {
+            outsiderUuid = (result.data as {jcr: {addNode: {node: {uuid: string}}}}).jcr.addNode.node.uuid
+        })
+
+        cy.then(() => {
+            // deleteForgeCategory must be REJECTED. cy.apollo catches GraphQL errors and
+            // yields the ApolloError (it does not throw), so a successful call would carry
+            // data.deleteForgeCategory; a rejected one carries graphQLErrors and no data.
+            cy.apollo({mutation: deleteForgeCategory, variables: {siteKey, uuid: outsiderUuid}}).then((r) => {
+                const res = r as {data?: {deleteForgeCategory?: boolean}; graphQLErrors?: unknown[]}
+                expect(res.data?.deleteForgeCategory, 'no deletion performed').to.not.equal(true)
+                expect(res.graphQLErrors, 'rejected with a GraphQL error').to.exist
+            })
+
+            // The category must still exist (uuid unchanged) — the delete was a no-op.
+            cy.apollo({
+                query: getNodeProperty,
+                variables: {path: outsiderPath, name: 'jcr:primaryType', language: null},
+                fetchPolicy: 'no-cache'
+            })
+                .its('data.jcr.nodeByPath.uuid')
+                .should('equal', outsiderUuid)
         })
     })
 

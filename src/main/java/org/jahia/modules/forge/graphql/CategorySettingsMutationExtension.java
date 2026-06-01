@@ -17,7 +17,7 @@ import org.jahia.services.content.JCRTemplate;
 import org.jahia.services.sites.JahiaSitesService;
 
 import javax.jcr.AccessDeniedException;
-import javax.jcr.Node;
+import javax.jcr.ItemNotFoundException;
 import javax.jcr.RepositoryException;
 import java.util.List;
 import java.util.Locale;
@@ -52,7 +52,10 @@ public final class CategorySettingsMutationExtension {
                 site.addMixin(JMIX_FORGE_SETTINGS);
             }
 
-            final Node category = session.getNodeByIdentifier(rootCategoryUuid);
+            // Validate the target is an actual category: the work runs in a system
+            // session that bypasses ACLs, so an unvalidated UUID could point the
+            // site's root at any node in the repository.
+            final JCRNodeWrapper category = resolveCategory(session, rootCategoryUuid);
             site.setProperty(ROOT_CATEGORY, category);
             session.save();
             return Boolean.TRUE;
@@ -91,6 +94,9 @@ public final class CategorySettingsMutationExtension {
             @GraphQLName("uuid") @GraphQLNonNull final String uuid,
             @GraphQLName("titles") @GraphQLNonNull final List<InputCategoryTitle> titles) {
         return execute(siteKey, session -> {
+            // Confine titling to a category within THIS site's root-category subtree
+            // (the gate is site-scoped; validate the caller-supplied UUID).
+            assertManagedBySite(session.getNode(SITES_PATH + siteKey), resolveCategory(session, uuid));
             for (InputCategoryTitle title : titles) {
                 applyTitle(uuid, title);
             }
@@ -127,11 +133,53 @@ public final class CategorySettingsMutationExtension {
             @GraphQLName("siteKey") @GraphQLNonNull final String siteKey,
             @GraphQLName("uuid") @GraphQLNonNull final String uuid) {
         return execute(siteKey, session -> {
-            final JCRNodeWrapper node = session.getNodeByIdentifier(uuid);
+            // Confine deletion to a category within THIS site's root-category subtree.
+            // The gate authorizes against the site, but the system session bypasses
+            // ACLs — without this a site admin could delete any node by UUID.
+            final JCRNodeWrapper node = resolveCategory(session, uuid);
+            assertManagedBySite(session.getNode(SITES_PATH + siteKey), node);
             node.remove();
             session.save();
             return Boolean.TRUE;
         });
+    }
+
+    /**
+     * Resolve a caller-supplied category UUID, rejecting anything that is not an
+     * existing jnt:category. The mutation gate authorizes against the SITE, but the
+     * work then runs in a system session that bypasses JCR ACLs — so a UUID argument
+     * must be validated or a site administrator could target arbitrary repository
+     * nodes by id (SECURITY-571).
+     */
+    private static JCRNodeWrapper resolveCategory(JCRSessionWrapper session, String uuid) throws RepositoryException {
+        final JCRNodeWrapper node;
+        try {
+            node = session.getNodeByIdentifier(uuid);
+        } catch (ItemNotFoundException e) {
+            throw new AccessDeniedException("No such category: " + uuid);
+        }
+        if (!node.isNodeType(JNT_CATEGORY)) {
+            throw new AccessDeniedException("Not a category: " + uuid);
+        }
+        return node;
+    }
+
+    /**
+     * Enforce that a category lives within the site's configured root-category
+     * subtree — i.e. one this site administrator actually manages — never the root
+     * itself nor a node outside it. Without this a site admin could edit or delete
+     * another site's categories (or arbitrary nodes) by passing their own siteKey
+     * plus a foreign UUID.
+     */
+    private static void assertManagedBySite(JCRNodeWrapper site, JCRNodeWrapper category) throws RepositoryException {
+        if (!site.hasProperty(ROOT_CATEGORY)) {
+            throw new AccessDeniedException("No root category configured for site " + site.getName());
+        }
+        final JCRNodeWrapper root = (JCRNodeWrapper) site.getProperty(ROOT_CATEGORY).getNode();
+        if (!category.getPath().startsWith(root.getPath() + "/")) {
+            throw new AccessDeniedException(
+                    "Category " + category.getPath() + " is not within the site's root category");
+        }
     }
 
     private static <T> T execute(String siteKey, JCRCallback<T> work) {
