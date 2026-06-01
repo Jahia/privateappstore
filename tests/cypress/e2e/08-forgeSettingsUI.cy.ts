@@ -84,6 +84,12 @@ describe('Forge settings — live UI', () => {
         cy.get('#forge-id input').should('have.value', 'forge-ui-1')
         cy.get('#forge-user input').should('have.value', 'forge-ui-user')
         cy.get('#forge-password input').should('have.value', '')
+
+        // A password is set here, so the replace hint shows. It must be the
+        // translated text, not a raw i18n key (label.password.* must be flat
+        // single-segment keys — dotted sub-keys don't nest under the `password` leaf).
+        cy.contains(/leave blank to keep the existing password/i).should('be.visible')
+        cy.contains('label.password').should('not.exist')
     })
 
     it('edits the branding/footer fields and reloads them', () => {

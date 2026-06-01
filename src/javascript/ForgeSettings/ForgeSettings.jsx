@@ -183,11 +183,11 @@ export function ForgeSettings({siteKey}) {
                             id="forge-password"
                             type="password"
                             value={password}
-                            placeholder={passwordSet ? t('label.password.unchanged') : ''}
+                            placeholder={passwordSet ? t('label.passwordUnchanged') : ''}
                             onChange={e => setPassword(e.target.value)}
                         />
                         <div className={styles.forge_password_hint}>
-                            {passwordSet ? t('label.password.replaceHint') : t('label.password.newHint')}
+                            {passwordSet ? t('label.passwordReplaceHint') : t('label.passwordNewHint')}
                         </div>
                     </Field>
 
