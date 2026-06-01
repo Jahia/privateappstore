@@ -45,6 +45,9 @@ describe('Module list JSON + download', () => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const addNodeWithProps: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeWithProperties.graphql')
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const updateForgeSettings: DocumentNode =
+        require('graphql-tag/loader!../fixtures/graphql/mutation/updateForgeSettings.graphql')
 
     const repositoryPath = `/sites/${siteKey}/contents/modules-repository`
     const modulePath = `${repositoryPath}/${moduleName}`
@@ -202,6 +205,70 @@ describe('Module list JSON + download', () => {
             // render servlet under /cms (a /cms/mavenproxy URL 404s — SECURITY-571).
             expect(v!.downloadUrl).to.contain('/modules/mavenproxy/')
             expect(v!.downloadUrl, 'must not use the render-servlet (/cms) path').to.not.contain('/cms/mavenproxy/')
+        })
+    })
+
+    it('the /modules/mavenproxy download servlet is registered (reachable, not 404)', () => {
+        // MavenProxy is an OSGi DS @Component served at /modules/mavenproxy. If its
+        // package isn't scanned by bnd's _dsannotations the servlet is never registered
+        // and EVERY module download 404s (SECURITY-571). Assert the endpoint reaches the
+        // servlet — not a 404. (No forge settings on this site, so the authenticated
+        // request then errors reading them; the point is the servlet RUNS, proving it
+        // is registered. A 404 here means the registration regressed.)
+        cy.login()
+        cy.request({
+            url: `/modules/mavenproxy/${siteKey}/org/jahia/modules/x/1.0.0/x-1.0.0.jar`,
+            failOnStatusCode: false
+        }).then((res) => {
+            expect(res.status, 'mavenproxy servlet must be registered (404 ⇒ unregistered)').to.not.equal(404)
+        })
+    })
+
+    it('streams a Maven-deployed artifact through the /modules/mavenproxy servlet', () => {
+        // The proxy fetches the artifact from the site's configured Maven repo, forwarding
+        // the stored credentials. Point the site's forge repo at the stack's Nexus (the
+        // proxy runs INSIDE the Jahia container, so it must use the container hostname),
+        // drop a real artifact into Nexus, then download it through the proxy.
+        const forgeRepo = 'http://nexus:8081/repository/maven-releases' // Jahia (container) view
+        const nexusUser = Cypress.env('NEXUS_USERNAME') || 'admin'
+        const nexusPass = Cypress.env('NEXUS_PASSWORD') || 'admin123'
+        // Where the Cypress runner reaches Nexus (host: localhost:8081; container: nexus:8081).
+        const putRepo = Cypress.env('NEXUS_URL')
+            ? `${Cypress.env('NEXUS_URL')}/repository/maven-releases`
+            : forgeRepo
+        const relPath = 'org/jahia/modules/proxytest/1.0.0/proxytest-1.0.0.jar'
+
+        cy.login()
+        // updateForgeSettings base64-encodes the password; the proxy base64-decodes it.
+        cy.apollo({
+            mutation: updateForgeSettings,
+            variables: {siteKey, url: forgeRepo, id: 'remote-repository', user: nexusUser, password: nexusPass}
+        })
+
+        // Deploy a real artifact into Nexus at the Maven-layout path the proxy will fetch.
+        // failOnStatusCode:false: release repos are immutable, so a re-run's PUT is a no-op
+        // (4xx) but the artifact is already present.
+        cy.fixture(artifactFixture, 'binary').then((bin) => {
+            const bytes = Uint8Array.from(bin as unknown as string, (c) => c.charCodeAt(0))
+            cy.request({
+                method: 'PUT',
+                url: `${putRepo}/${relPath}`,
+                auth: {user: nexusUser, pass: nexusPass},
+                headers: {'Content-Type': 'application/java-archive'},
+                body: bytes.buffer,
+                failOnStatusCode: false
+            })
+        })
+
+        // Download through the proxy → it streams the artifact from Nexus.
+        cy.login()
+        cy.request({
+            url: `/modules/mavenproxy/${siteKey}/${relPath}`,
+            encoding: 'binary',
+            failOnStatusCode: false
+        }).then((res) => {
+            expect(res.status, 'proxy download status').to.equal(200)
+            expect(res.body.length, 'streamed artifact is non-empty').to.be.greaterThan(100)
         })
     })
 
