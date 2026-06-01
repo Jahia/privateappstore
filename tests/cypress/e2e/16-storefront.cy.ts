@@ -29,6 +29,9 @@ describe('Storefront read views (JS module)', () => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const updateForgeBranding: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/mutation/updateForgeBranding.graphql')
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const deleteNode: DocumentNode =
+        require('graphql-tag/loader!../fixtures/graphql/mutation/deleteNode.graphql')
 
     const islandBundle = '/modules/store-template/dist/client/components/forge/ModuleEditor.client.tsx.js'
 
@@ -223,5 +226,22 @@ describe('Storefront read views (JS module)', () => {
         cy.get('header img', {timeout: 20000})
             .should('have.attr', 'src')
             .and('include', 'store-logo.png')
+    })
+
+    // Destructive (removes the My-modules list node), so it runs LAST. The site is
+    // torn down in after(), so nothing else depends on the deletion.
+    it('keeps "My modules" hidden from anonymous even when the list content is invisible', () => {
+        // Regression for the fail-open nav gate: the gate used to detect which page
+        // to hide by querying for the jnt:forgeMyModulesList with the visitor's own
+        // session. Delete that list node so the content-type query finds nothing —
+        // the conventional-page-name safety net must still keep the entry hidden for
+        // anonymous visitors (the page node itself is published and in the nav).
+        cy.login()
+        cy.apollo({mutation: deleteNode, variables: {path: `/sites/${siteKey}/home/my-modules/main/mine`}})
+        publishAndWaitJobEnding(`/sites/${siteKey}`, ['en'])
+        cy.logout()
+        cy.visit(`/cms/render/live/en/sites/${siteKey}/home.html`)
+        cy.get('nav', {timeout: 20000}).should('exist')
+        cy.contains('nav a', /my modules/i).should('not.exist')
     })
 })
