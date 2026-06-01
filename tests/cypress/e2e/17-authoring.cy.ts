@@ -143,7 +143,7 @@ describe('Authoring views (JS module)', () => {
         cy.get('head style[data-ckeditor5-styles]').should('exist')
     })
 
-    it('uploads a module icon (base64 over GraphQL)', () => {
+    it('uploads a module icon (GraphQL multipart) and stores real image bytes', () => {
         cy.visit(moduleRender)
         cy.get('[data-editor-ready]', {timeout: 20000})
         cy.contains('button', /edit module/i).click()
@@ -155,6 +155,18 @@ describe('Authoring views (JS module)', () => {
         // placeholder is a <span>, so its presence proves the file node was created).
         cy.reload()
         cy.get('header img', {timeout: 20000}).should('have.attr', 'src').and('match', /\S/)
+        // Guard the multipart-upload bug: the stored binary must be the real PNG,
+        // not a stringified servlet Part ("org.apache.catalina...ApplicationPart@…",
+        // which was served as image/png but only ~49 bytes of ASCII).
+        cy.get('header img').invoke('attr', 'src').then((src) => {
+            cy.request({url: src as string, encoding: 'binary'}).then((resp) => {
+                expect(resp.status).to.eq(200)
+                // Real image bytes — the corrupt value was a ~49-byte ASCII string.
+                expect(resp.body.length, 'icon byte size').to.be.greaterThan(100)
+                expect(resp.body, 'not a stringified servlet Part')
+                    .not.to.contain('ApplicationPart')
+            })
+        })
     })
 
     it('owner publishes / unpublishes the module via the publish control', () => {
