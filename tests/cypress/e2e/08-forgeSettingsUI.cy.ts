@@ -62,6 +62,19 @@ describe('Forge settings — live UI', () => {
             })
     })
 
+    it('nests Settings/Categories/Roles under a "Store administration" group', () => {
+        cy.login()
+        // Landing on a child auto-opens its parent group in the admin tree, so all
+        // three leaves and the group header are visible together.
+        cy.visit(`/jahia/administration/${siteKey}/forgeSettings`)
+        cy.contains('h2', siteKey, {timeout: 60000}).should('be.visible')
+
+        cy.contains(/store administration/i, {timeout: 15000}).should('be.visible')
+        cy.contains(/private app store/i).should('be.visible')
+        cy.contains(/app store categories/i).should('be.visible')
+        cy.contains(/app store roles/i).should('be.visible')
+    })
+
     it('reloads the saved state after a page refresh', () => {
         cy.login()
         cy.visit(`/jahia/administration/${siteKey}/forgeSettings`)

@@ -1,4 +1,7 @@
 {
+  "administration": {
+    "menu_entry": "Store administration"
+  },
   "label": {
     "menu_entry": "Private App Store",
     "title": "Private App Store settings",

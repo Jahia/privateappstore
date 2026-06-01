@@ -11,6 +11,16 @@ export default function () {
             await i18next.loadNamespaces('privateappstore', () => {
                 console.debug('%c privateappstore: i18n namespace loaded', 'color: #463CBA');
             });
+            // Non-selectable parent that groups Settings / Categories / Roles under a
+            // single "Store administration" entry in the site administration menu.
+            // The three leaves below target this route (forgeAdministration:NN).
+            registry.add('adminRoute', 'forgeAdministration', {
+                targets: ['administration-sites:998'],
+                icon: window.jahia.moonstone.toIconComponent('Apps'),
+                label: 'privateappstore:administration.menu_entry',
+                requiredPermission: 'siteAdminForgeSettings',
+                isSelectable: false
+            });
             registerForgeSettings();
             registerCategorySettings();
             registerManageRoles();

@@ -17,7 +17,7 @@ function ManageRolesRoute(props) {
 export default () => {
     registry.add('adminRoute', 'storeRoles', {
         icon: window.jahia.moonstone.toIconComponent('User'),
-        targets: ['administration-sites:1001'],
+        targets: ['administration-sites-forgeAdministration:30'],
         requiredPermission: 'siteAdminForgeSettings',
         label: 'privateappstore:roles.menu_entry',
         isSelectable: true,

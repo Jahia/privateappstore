@@ -17,7 +17,7 @@ function CategorySettingsRoute(props) {
 export default () => {
     registry.add('adminRoute', 'categorySettings', {
         icon: window.jahia.moonstone.toIconComponent('Tag'),
-        targets: ['administration-sites:1000'],
+        targets: ['administration-sites-forgeAdministration:20'],
         requiredPermission: 'siteAdminForgeSettings',
         label: 'privateappstore:categories.menu_entry',
         isSelectable: true,

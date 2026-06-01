@@ -17,7 +17,7 @@ function ForgeSettingsRoute(props) {
 export default () => {
     registry.add('adminRoute', 'forgeSettings', {
         icon: window.jahia.moonstone.toIconComponent('Settings'),
-        targets: ['administration-sites:999'],
+        targets: ['administration-sites-forgeAdministration:10'],
         requiredPermission: 'siteAdminForgeSettings',
         label: 'privateappstore:label.menu_entry',
         isSelectable: true,
