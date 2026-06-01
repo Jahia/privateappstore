@@ -6,12 +6,26 @@
     "menu_entry": "Private App Store",
     "title": "Private App Store settings",
     "url": "Forge URL",
+    "urlPlaceholder": "Full URL of a deployable Maven repository (e.g. /repository/maven-releases/)",
     "id": "Forge ID",
     "user": "User",
     "password": "Password",
     "password.unchanged": "Unchanged",
     "password.newHint": "Enter the password for the remote forge",
     "password.replaceHint": "Leave blank to keep the existing password",
+    "logo": "Logo",
+    "logoNone": "No logo configured",
+    "logoRemove": "Remove",
+    "logoPick": "Pick a logo from the site media",
+    "logoNoImages": "No images in this site's media library yet — add some in jContent first.",
+    "copyright": "Copyright",
+    "privacyUrl": "Privacy policy link",
+    "termsUrl": "Terms of use link",
+    "cookiesUrl": "Cookie policy link",
+    "facebookUrl": "Facebook link",
+    "linkedinUrl": "LinkedIn link",
+    "twitterUrl": "Twitter/X link",
+    "youtubeUrl": "YouTube link",
     "save": "Save",
     "saving": "Saving…",
     "cancel": "Cancel",
@@ -20,6 +34,12 @@
     "edit": "Edit",
     "delete": "Delete",
     "revoke": "Revoke"
+  },
+  "branding": {
+    "title": "Branding"
+  },
+  "footer": {
+    "title": "Footer"
   },
   "success": {
     "update": "Settings saved."

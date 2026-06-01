@@ -15,6 +15,15 @@ contract.
   `org.jahia.modules:jahia-modules`). Packaging: OSGi bundle (JAR).
 - Java source level is **below 16** — no `instanceof` pattern matching, no
   records in this module. Use classic `instanceof` + cast.
+- This module ALSO ships the **jContent admin app** (`src/javascript/`,
+  React 18 + Moonstone + Apollo, a webpack Module-Federation remote built by the
+  `frontend-maven-plugin`). It registers the **Store administration** entry in the
+  Jahia site administration with Settings / Categories / Roles nested under it.
+  ⚠️ jContent composes a child admin route's target as **`<section>-<parentRoute>`**:
+  the parent `forgeAdministration` targets `administration-sites:998`
+  (`isSelectable:false`), and the three leaves target
+  `administration-sites-forgeAdministration:NN` — NOT `forgeAdministration:NN`
+  (which silently orphans them). Route *keys* (and thus admin URLs) are unchanged.
 
 ## Component model (how things get registered)
 
@@ -66,6 +75,13 @@ authenticated users are denied (`GqlAccessDeniedException`). This shapes the API
 - `jnt:post` carries `jcr:title` + `content`.
 - No same-name siblings — `addNode` with an existing name throws
   `ItemExistsException` (used for atomic per-user dedup).
+- **`jmix:forgeSettings`** (mixin on the site node) holds the forge connection
+  (`forgeSettingsUrl`/`Id`/`User`/`Password` base64 + `rootCategory`) AND the site
+  branding read by the store-template chrome: `forgeSettingsLogo` (weakreference to
+  a media image) plus footer strings `forgeSettingsCopyright` / `*PrivacyUrl` /
+  `*TermsUrl` / `*CookiesUrl` / `*FacebookUrl` / `*LinkedinUrl` / `*TwitterUrl` /
+  `*YoutubeUrl`. Exposed/edited via the `forgeSettings` query + `updateForgeSettings`
+  mutation (shared `ForgeSettingsReader`; `GqlForgeSettings` uses a builder).
 
 ## Directory map
 

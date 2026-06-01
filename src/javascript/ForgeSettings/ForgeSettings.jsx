@@ -3,7 +3,24 @@ import {useMutation, useQuery} from '@apollo/client';
 import {useTranslation} from 'react-i18next';
 import {Button, Field, Input} from '@jahia/moonstone';
 import styles from './ForgeSettings.scss';
-import {GET_FORGE_SETTINGS, UPDATE_FORGE_SETTINGS} from './ForgeSettings.gql';
+import {GET_FORGE_SETTINGS, GET_SITE_IMAGES, UPDATE_FORGE_SETTINGS} from './ForgeSettings.gql';
+
+/** Edit-workspace file URL for a media node path (jContent renders the default workspace). */
+function fileUrl(path) {
+    return encodeURI('/files/default' + path);
+}
+
+// Footer link fields rendered as a list (key = i18n label, state field, GraphQL var).
+const FOOTER_FIELDS = [
+    {name: 'copyright', label: 'label.copyright'},
+    {name: 'privacyUrl', label: 'label.privacyUrl'},
+    {name: 'termsUrl', label: 'label.termsUrl'},
+    {name: 'cookiesUrl', label: 'label.cookiesUrl'},
+    {name: 'facebookUrl', label: 'label.facebookUrl'},
+    {name: 'linkedinUrl', label: 'label.linkedinUrl'},
+    {name: 'twitterUrl', label: 'label.twitterUrl'},
+    {name: 'youtubeUrl', label: 'label.youtubeUrl'}
+];
 
 export function ForgeSettings({siteKey}) {
     const {t} = useTranslation('privateappstore');
@@ -13,6 +30,8 @@ export function ForgeSettings({siteKey}) {
     const [user, setUser] = useState('');
     const [password, setPassword] = useState('');
     const [passwordSet, setPasswordSet] = useState(false);
+    const [logoPath, setLogoPath] = useState('');
+    const [footer, setFooter] = useState({});
     const [saveStatus, setSaveStatus] = useState(null);
 
     useEffect(() => {
@@ -28,6 +47,20 @@ export function ForgeSettings({siteKey}) {
         fetchPolicy: 'network-only'
     });
 
+    // Site media images for the logo picker (tolerate a site with no media library yet).
+    const {data: imagesData} = useQuery(GET_SITE_IMAGES, {
+        variables: {path: `/sites/${siteKey}/files`},
+        fetchPolicy: 'network-only',
+        errorPolicy: 'all'
+    });
+    const images =
+        (imagesData &&
+            imagesData.jcr &&
+            imagesData.jcr.nodeByPath &&
+            imagesData.jcr.nodeByPath.descendants &&
+            imagesData.jcr.nodeByPath.descendants.nodes) ||
+        [];
+
     const [updateForgeSettings, {loading: saving}] = useMutation(UPDATE_FORGE_SETTINGS, {
         refetchQueries: [{query: GET_FORGE_SETTINGS, variables: {siteKey}}]
     });
@@ -38,6 +71,17 @@ export function ForgeSettings({siteKey}) {
         setUser(s.user || '');
         setPassword('');
         setPasswordSet(Boolean(s.passwordSet));
+        setLogoPath(s.logoPath || '');
+        setFooter({
+            copyright: s.copyright || '',
+            privacyUrl: s.privacyUrl || '',
+            termsUrl: s.termsUrl || '',
+            cookiesUrl: s.cookiesUrl || '',
+            facebookUrl: s.facebookUrl || '',
+            linkedinUrl: s.linkedinUrl || '',
+            twitterUrl: s.twitterUrl || '',
+            youtubeUrl: s.youtubeUrl || ''
+        });
     };
 
     useEffect(() => {
@@ -45,6 +89,8 @@ export function ForgeSettings({siteKey}) {
             syncFromSettings(data.forgeSettings);
         }
     }, [data]);
+
+    const setFooterField = (name, value) => setFooter(prev => ({...prev, [name]: value}));
 
     const handleSubmit = async () => {
         setSaveStatus('saving');
@@ -55,9 +101,18 @@ export function ForgeSettings({siteKey}) {
                     url: url || null,
                     id: id || null,
                     user: user || null,
-                    // Blank password = keep existing. Mutation interprets blank
-                    // as "leave alone" to match the legacy flow's behavior.
-                    password: password || null
+                    // Blank password = keep existing (matches the legacy flow's behavior).
+                    password: password || null,
+                    // Blank logo clears it; footer blanks clear those fields.
+                    logo: logoPath || '',
+                    copyright: footer.copyright || null,
+                    privacyUrl: footer.privacyUrl || null,
+                    termsUrl: footer.termsUrl || null,
+                    cookiesUrl: footer.cookiesUrl || null,
+                    facebookUrl: footer.facebookUrl || null,
+                    linkedinUrl: footer.linkedinUrl || null,
+                    twitterUrl: footer.twitterUrl || null,
+                    youtubeUrl: footer.youtubeUrl || null
                 }
             });
             setSaveStatus(result.data && result.data.updateForgeSettings ? 'success' : 'error');
@@ -110,25 +165,17 @@ export function ForgeSettings({siteKey}) {
                         <Input
                             id="forge-url"
                             value={url}
-                            placeholder="https://store.jahia.com"
+                            placeholder={t('label.urlPlaceholder')}
                             onChange={e => setUrl(e.target.value)}
                         />
                     </Field>
 
                     <Field label={t('label.id')} id="forge-id">
-                        <Input
-                            id="forge-id"
-                            value={id}
-                            onChange={e => setId(e.target.value)}
-                        />
+                        <Input id="forge-id" value={id} onChange={e => setId(e.target.value)}/>
                     </Field>
 
                     <Field label={t('label.user')} id="forge-user">
-                        <Input
-                            id="forge-user"
-                            value={user}
-                            onChange={e => setUser(e.target.value)}
-                        />
+                        <Input id="forge-user" value={user} onChange={e => setUser(e.target.value)}/>
                     </Field>
 
                     <Field label={t('label.password')} id="forge-password">
@@ -143,6 +190,63 @@ export function ForgeSettings({siteKey}) {
                             {passwordSet ? t('label.password.replaceHint') : t('label.password.newHint')}
                         </div>
                     </Field>
+
+                    <h3 className={styles.forge_section}>{t('branding.title')}</h3>
+
+                    <Field label={t('label.logo')} id="forge-logo">
+                        <div className={styles.forge_logo_current} data-logo-path={logoPath}>
+                            {logoPath ? (
+                                <img className={styles.forge_logo_preview} src={fileUrl(logoPath)} alt=""/>
+                            ) : (
+                                <span className={styles.forge_logo_none}>{t('label.logoNone')}</span>
+                            )}
+                            {logoPath && (
+                                <Button
+                                    type="button"
+                                    size="small"
+                                    variant="ghost"
+                                    label={t('label.logoRemove')}
+                                    onClick={() => setLogoPath('')}
+                                />
+                            )}
+                        </div>
+                        {images.length === 0 ? (
+                            <div className={styles.forge_password_hint}>{t('label.logoNoImages')}</div>
+                        ) : (
+                            <div className={styles.forge_logo_grid} role="listbox" aria-label={t('label.logoPick')}>
+                                {images.map(img => (
+                                    <button
+                                        key={img.uuid}
+                                        type="button"
+                                        role="option"
+                                        aria-selected={img.path === logoPath}
+                                        title={img.name}
+                                        data-image-path={img.path}
+                                        className={
+                                            img.path === logoPath
+                                                ? `${styles.forge_logo_choice} ${styles.selected}`
+                                                : styles.forge_logo_choice
+                                        }
+                                        onClick={() => setLogoPath(img.path)}
+                                    >
+                                        <img src={fileUrl(img.path)} alt={img.name}/>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </Field>
+
+                    <h3 className={styles.forge_section}>{t('footer.title')}</h3>
+
+                    {FOOTER_FIELDS.map(f => (
+                        <Field key={f.name} label={t(f.label)} id={`forge-${f.name}`}>
+                            <Input
+                                id={`forge-${f.name}`}
+                                value={footer[f.name] || ''}
+                                onChange={e => setFooterField(f.name, e.target.value)}
+                            />
+                        </Field>
+                    ))}
 
                     <div className={styles.forge_actions}>
                         <Button
