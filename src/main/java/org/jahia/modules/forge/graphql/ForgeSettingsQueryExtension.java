@@ -51,24 +51,15 @@ public final class ForgeSettingsQueryExtension {
 
                     final JCRNodeWrapper site = session.getNode(sitePath);
                     if (!site.isNodeType(JMIX_FORGE_SETTINGS)) {
-                        return new GqlForgeSettings(siteKey, null, null, null, false);
+                        return GqlForgeSettings.builder(siteKey).build();
                     }
 
-                    return new GqlForgeSettings(
-                            siteKey,
-                            getStringProp(site, "forgeSettingsUrl"),
-                            getStringProp(site, "forgeSettingsId"),
-                            getStringProp(site, "forgeSettingsUser"),
-                            site.hasProperty("forgeSettingsPassword"));
+                    return ForgeSettingsReader.read(site, siteKey);
                 }
             });
         } catch (RepositoryException e) {
             LOGGER.error("Error reading forge settings for site {}", siteKey, e);
             return null;
         }
-    }
-
-    private static String getStringProp(JCRNodeWrapper node, String name) throws RepositoryException {
-        return node.hasProperty(name) ? node.getProperty(name).getString() : null;
     }
 }

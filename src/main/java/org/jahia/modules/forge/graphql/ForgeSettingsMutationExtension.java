@@ -40,7 +40,16 @@ public final class ForgeSettingsMutationExtension {
             @GraphQLName("url") final String url,
             @GraphQLName("id") final String id,
             @GraphQLName("user") final String user,
-            @GraphQLName("password") final String password) {
+            @GraphQLName("password") final String password,
+            @GraphQLName("logo") @GraphQLDescription("UUID or path of the logo image node; blank clears it") final String logo,
+            @GraphQLName("copyright") final String copyright,
+            @GraphQLName("privacyUrl") final String privacyUrl,
+            @GraphQLName("termsUrl") final String termsUrl,
+            @GraphQLName("cookiesUrl") final String cookiesUrl,
+            @GraphQLName("facebookUrl") final String facebookUrl,
+            @GraphQLName("linkedinUrl") final String linkedinUrl,
+            @GraphQLName("twitterUrl") final String twitterUrl,
+            @GraphQLName("youtubeUrl") final String youtubeUrl) {
         try {
             return JCRTemplate.getInstance().doExecuteWithSystemSession(new JCRCallback<GqlForgeSettings>() {
                 @Override
@@ -75,14 +84,21 @@ public final class ForgeSettingsMutationExtension {
                                 Base64.encode(password.getBytes(StandardCharsets.UTF_8)));
                     }
 
+                    // Branding / footer. Blank clears these (they are plain editable text,
+                    // unlike the write-only password). The logo is a weakreference.
+                    setLogoRef(session, site, logo);
+                    setStringProp(site, "forgeSettingsCopyright", copyright);
+                    setStringProp(site, "forgeSettingsPrivacyUrl", privacyUrl);
+                    setStringProp(site, "forgeSettingsTermsUrl", termsUrl);
+                    setStringProp(site, "forgeSettingsCookiesUrl", cookiesUrl);
+                    setStringProp(site, "forgeSettingsFacebookUrl", facebookUrl);
+                    setStringProp(site, "forgeSettingsLinkedinUrl", linkedinUrl);
+                    setStringProp(site, "forgeSettingsTwitterUrl", twitterUrl);
+                    setStringProp(site, "forgeSettingsYoutubeUrl", youtubeUrl);
+
                     session.save();
 
-                    return new GqlForgeSettings(
-                            siteKey,
-                            url,
-                            id,
-                            user,
-                            site.hasProperty("forgeSettingsPassword"));
+                    return ForgeSettingsReader.read(site, siteKey);
                 }
             });
         } catch (RepositoryException e) {
@@ -98,5 +114,25 @@ public final class ForgeSettingsMutationExtension {
         } else if (node.hasProperty(name)) {
             node.getProperty(name).remove();
         }
+    }
+
+    /**
+     * Set (or clear, when blank) the logo weakreference. The value is the picked
+     * media node's UUID or absolute path; an unresolvable value is ignored so a
+     * bad reference can never wipe a previously configured logo silently — the
+     * mutation simply leaves it untouched.
+     */
+    private static void setLogoRef(JCRSessionWrapper session, JCRNodeWrapper site, String logo)
+            throws RepositoryException {
+        if (StringUtils.isBlank(logo)) {
+            if (site.hasProperty("forgeSettingsLogo")) {
+                site.getProperty("forgeSettingsLogo").remove();
+            }
+            return;
+        }
+        final JCRNodeWrapper target = logo.startsWith("/")
+                ? session.getNode(logo)
+                : (JCRNodeWrapper) session.getNodeByIdentifier(logo);
+        site.setProperty("forgeSettingsLogo", target);
     }
 }
