@@ -288,6 +288,20 @@ describe('Authoring views (JS module)', () => {
         cy.get('body').should(($b) => expect($b.html()).to.contain('createEntryFromJar.do'))
     })
 
+    it('owner can add a version from the module page (upload form in the Versions tab)', () => {
+        cy.visit(moduleRender)
+        cy.get('[data-detail-tabs-ready]', {timeout: 20000})
+        cy.contains('[role="tab"]', /versions/i).click()
+        // The owner-only "Upload a new version" form lives in the Versions tab and
+        // posts to the SAME createEntryFromJar action (which upserts: it appends the
+        // version to the existing module). A real upload needs a Maven repo, so —
+        // like the my-modules upload test — assert the form is present and wired.
+        cy.get('[data-add-version]', {timeout: 20000}).should('be.visible')
+        cy.get('[data-add-version] input[type="file"][name="file"]').should('exist')
+        cy.get('[data-add-version] [data-upload-ready="true"]', {timeout: 20000}).should('exist')
+        cy.get('body').should(($b) => expect($b.html()).to.contain('createEntryFromJar.do'))
+    })
+
     it('owner can reorder and delete screenshots (jcr mutations)', () => {
         // Two screenshots in the module's (autocreated) screenshots node.
         uploadFile('../../assets/screenshot.png', `${repo}/widget/screenshots`, 'shot-a.png', 'image/png')
