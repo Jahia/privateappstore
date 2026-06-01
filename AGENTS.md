@@ -43,24 +43,27 @@ authenticated users are denied (`GqlAccessDeniedException`). This shapes the API
 - **Any authenticated user operations** must be **Jahia Actions**
   (`org.jahia.bin.Action`, `@Component(service=Action.class)`), invoked through
   the render servlet at `…/<node>.<ActionName>.do`.
-  - The flagship example is **`SubmitReview`** (`actions/SubmitReview.java`): any
-    user can review any module they don't own. It writes under
-    `JCRTemplate.doExecuteWithSystemSessionAsUser(user, …)` — a system session
-    *impersonating the caller*, so it bypasses the module ACL while keeping
-    `jcr:createdBy` correct. One review per user is enforced **atomically** via a
-    deterministic node name (`review-<escaped user>` → `ItemExistsException`→409),
-    and the aggregate rating is recomputed from the review children (self-healing).
+  - The flagship example is **`CreateEntryFromJar`** (`actions/CreateEntryFromJar.java`):
+    an authenticated user uploads a module JAR/WAR/TGZ; the action runs a Maven
+    `deploy:deploy-file` to the site's forge URL, then creates the `jnt:forgeModule`
+    + `jnt:forgeModuleVersion` nodes under `modules-repository` and grants the
+    uploader the `owner` role. It runs in the workspace the `.do` is posted from
+    (live, if posted from the public site). **`PublishModule`** (`.PublishModule.do`)
+    flips a module's `published` flag once `CalculateCompletion.isPublishable`
+    passes, and auto-publishes the latest version.
   - **CSRF**: Action `.do` POSTs are protected by OWASP CSRFGuard, which patches
-    **XMLHttpRequest only**. The `store-template` client posts reviews via XHR; a
-    `fetch` POST would be rejected "Required Token is missing".
+    **XMLHttpRequest only** (not `fetch`, not plain `<form>` posts). The
+    `store-template` client posts to actions via XHR; a `fetch`/form POST is
+    rejected ("Required Token is missing" / "Request Token does not match Page
+    Token"). The `/modules/graphql` endpoint is not CSRF-gated.
 
 ## JCR content model (essentials)
 
 - `jnt:forgeModule` / `jnt:forgePackage` extend `jnt:post`, are `jmix:forgeElement`,
-  and mix in `jmix:reviews` (autocreates a `reviews` child) and `jmix:rating`
-  (`j:sumOfVotes` / `j:nbOfVotes`).
-- `jnt:review` extends `jnt:post` with a mandatory `rating` (long); `jnt:post`
-  carries `jcr:title` + `content`.
+  and carry a `published` (boolean) flag. They still **declare** the legacy
+  `jmix:reviews` / `jmix:rating` mixins in the CND, but the **review feature was
+  removed** (no UI, no actions) — those mixins and `jnt:review*` are now dormant.
+- `jnt:post` carries `jcr:title` + `content`.
 - No same-name siblings — `addNode` with an existing name throws
   `ItemExistsException` (used for atomic per-user dedup).
 
@@ -68,7 +71,7 @@ authenticated users are denied (`GqlAccessDeniedException`). This shapes the API
 
 ```
 src/main/java/org/jahia/modules/forge/
-  actions/     Jahia Actions (SubmitReview, CreateEntryFromJar, AddVideo, …)
+  actions/     Jahia Actions (CreateEntryFromJar, PublishModule, AddVideo, …)
   graphql/     GraphQL extensions (ForgeSettings, CategorySettings, ManageRoles)
   filters/     render filters (blueprint extender)
   job/         scheduled jobs (blueprint extender)
@@ -101,8 +104,8 @@ tests/                Cypress E2E (+ env tooling) — see below
 - Scan: `mvn -B clean install sonar:sonar` — the `jahia-modules` parent pins a
   Java-11-compatible scanner, so this runs on the host's default Java 11. The
   `sonar` profile (host `~/.m2/settings.xml`) supplies the URL + token.
-- The gate counts **new-code** issues; keep new Java clean (`SubmitReview` is the
-  reference — small focused methods, no generic `throws Exception`, constants over
+- The gate counts **new-code** issues; keep new Java clean (`PublishModule` /
+  `CreateEntryFromJar` are the reference — small focused methods, constants over
   literals, no redundant casts).
 - **Build site JCR paths from platform constants** (rule `S1075`): use
   `JahiaSitesService.SITES_JCR_PATH + FileSystem.SEPARATOR + siteKey`

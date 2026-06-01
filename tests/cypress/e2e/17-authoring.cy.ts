@@ -18,9 +18,6 @@ describe('Authoring views (JS module)', () => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const createForgeModule: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/mutation/createForgeModule.graphql')
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const addNodeWithProps: DocumentNode =
-        require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeWithProperties.graphql')
 
     const islandBundle = '/modules/store-template/dist/client/admin/AdminApp.client.tsx.js'
 
@@ -81,26 +78,6 @@ describe('Authoring views (JS module)', () => {
         cy.reload()
         cy.get('h1', {timeout: 20000}).should('contain.text', 'Widget Pro')
         cy.contains('a', 'https://github.com/acme/widget').should('exist')
-    })
-
-    it('displays reviews and the average rating', () => {
-        cy.apollo({
-            mutation: addNodeWithProps,
-            variables: {
-                parentPath: `${repo}/widget/reviews`,
-                name: 'r1',
-                primaryNodeType: 'jnt:review',
-                properties: [
-                    {name: 'rating', value: '5'},
-                    {name: 'jcr:title', value: 'Excellent module', language: 'en'},
-                    {name: 'content', value: 'Works great for us.', language: 'en'}
-                ]
-            }
-        })
-        cy.visit(moduleRender)
-        cy.contains('h2', /reviews/i).should('be.visible')
-        cy.contains('Excellent module').should('be.visible')
-        cy.contains('Works great for us.').should('be.visible')
     })
 
     it('renders the JAR upload form wired to the createEntryFromJar action', () => {

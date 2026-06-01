@@ -10,12 +10,13 @@
   Narrowing it silently un-registers every `@Component(service=Action.class)`.
   After any pom change, verify the generated `OSGI-INF/*.xml` descriptors exist
   for the actions.
-- **Any-user write features = Jahia Action, not GraphQL.** `/modules/graphql` is
-  permission-gated (ordinary users denied). See `actions/SubmitReview.java`:
-  system-session-as-user write (ACL-bypass + correct `jcr:createdBy`), atomic
-  one-per-user via deterministic node name, recomputed aggregate rating.
+- **Write features with a Java side = Jahia Action, not GraphQL.** `/modules/graphql`
+  is permission-gated (ordinary users denied). See `actions/CreateEntryFromJar.java`
+  (module-JAR upload: Maven deploy + node creation, runs in the posting workspace)
+  and `actions/PublishModule.java` (publish gate + auto-publish latest version).
 - **Action `.do` POSTs need CSRF via XMLHttpRequest** (CSRFGuard patches XHR, not
-  `fetch`). The `store-template` client already does this.
+  `fetch`, not plain `<form>` posts). The `store-template` client already does this.
+  `/modules/graphql` is not CSRF-gated.
 - **Java source level < 16**: no `instanceof` pattern matching, no records.
 - **Don't break the `moduleList.json` contract** consumed by `store-template`.
 
