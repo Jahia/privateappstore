@@ -140,6 +140,17 @@ describe('Storefront read views (JS module)', () => {
         cy.get('iframe[src*="youtube.com/embed/dQw4w9WgXcQ"]').should('exist')
     })
 
+    it('shows the store.jahia.com-style Information panel + header download', () => {
+        cy.visit(detailRender)
+        cy.contains('h2', /information/i).should('be.visible')
+        cy.contains('dt', 'Module ID').next('dd').should('contain.text', 'analytics')
+        cy.contains('dt', /status/i).next('dd').should('contain.text', 'supported')
+        // Prominent latest-version download in the title area (like the reference).
+        cy.get('[data-latest-download]')
+            .should('have.attr', 'href')
+            .and('contain', 'analytics-1.0.0.jar')
+    })
+
     it('the "My modules" list shows the user own modules, including drafts', () => {
         cy.visit(`/cms/render/default/en/sites/${siteKey}/home/my-modules.html`)
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('be.visible')
