@@ -90,6 +90,9 @@ describe('Accessibility — WCAG 2.2 AAA gate (JS module)', () => {
         setNodeProperty(`${repo}/analytics`, 'status', 'supported', 'en')
         setNodeProperty(`${repo}/analytics`, 'published', 'true', 'en')
         setNodeProperty(`${repo}/analytics`, 'supportedByJahia', 'true', 'en')
+        // groupId drives the generated (mavenproxy) download URL, so the audit covers
+        // the rendered download links too.
+        setNodeProperty(`${repo}/analytics`, 'groupId', 'org.cypress.test', 'en')
         cy.apollo({
             mutation: addNodeWithProps,
             variables: {
@@ -99,7 +102,6 @@ describe('Accessibility — WCAG 2.2 AAA gate (JS module)', () => {
                 properties: [
                     {name: 'versionNumber', value: '1.0.0'},
                     {name: 'published', value: 'true'},
-                    {name: 'url', value: 'https://store.example.com/analytics-1.0.0.jar'},
                     {name: 'changeLog', value: '<ul><li>Initial release</li></ul>'}
                 ]
             }

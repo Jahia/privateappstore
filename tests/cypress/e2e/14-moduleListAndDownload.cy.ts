@@ -55,21 +55,20 @@ describe('Module list JSON + download', () => {
     const versionPath = `${modulePath}/${versionName}`
     const jsonUrl = `/en/sites/${siteKey}/contents/modules-repository.moduleList.json`
 
-    // A second module whose version carries NO jnt:file — only a `url` property,
-    // exactly like a JAR module deployed to the site's Maven repo. The moduleList
-    // JSP then advertises that `url` verbatim as downloadUrl (the branch JS module
-    // versions never hit). The url MUST point at the MavenProxy servlet, which is
-    // an OSGi HttpServlet served under /modules — NOT under /cms (the render
-    // servlet). A /cms/mavenproxy URL falls through to the renderer and 404s.
+    // A second module whose version carries NO jnt:file and NO stored `url` — like a
+    // JAR module deployed to the site's Maven repo. The moduleList JSP GENERATES the
+    // downloadUrl from the module coordinates + the request server (the URL is no
+    // longer stored on the node, so it adapts to scheme/host/port/site), pointing at
+    // the MavenProxy servlet under /modules — never /cms (the render servlet → 404).
     const proxyModuleName = 'cy-proxy-module'
     const proxyGroupId = 'org.cypress.proxy'
     const proxyVersion = '2.0.0'
     const proxyModulePath = `${repositoryPath}/${proxyModuleName}`
     const proxyVersionPath = `${proxyModulePath}/${proxyModuleName}-${proxyVersion}`
-    // The shape CreateEntryFromJar.buildMavenProxyUrl must produce:
-    // <contextRoot>/modules/mavenproxy/<site>/<groupPath>/<module>/<version>/<artifact>
-    const proxyDownloadUrl =
-        `http://localhost:8080/modules/mavenproxy/${siteKey}/` +
+    // The path the JSP must generate (the host comes from the request's server):
+    // <server>/modules/mavenproxy/<site>/<groupPath>/<module>/<version>/<artifact>
+    const proxyDownloadPath =
+        `/modules/mavenproxy/${siteKey}/` +
         `${proxyGroupId.replace(/\./g, '/')}/${proxyModuleName}/${proxyVersion}/` +
         `${proxyModuleName}-${proxyVersion}.jar`
 
@@ -129,9 +128,9 @@ describe('Module list JSON + download', () => {
                 parentPath: proxyModulePath,
                 name: `${proxyModuleName}-${proxyVersion}`,
                 primaryNodeType: 'jnt:forgeModuleVersion',
+                // No `url` property — the catalog JSP generates the download URL.
                 properties: [
-                    {name: 'versionNumber', value: proxyVersion},
-                    {name: 'url', value: proxyDownloadUrl}
+                    {name: 'versionNumber', value: proxyVersion}
                 ]
             }
         })
@@ -188,7 +187,7 @@ describe('Module list JSON + download', () => {
         })
     })
 
-    it('advertises a jnt:file-less version via the /modules/mavenproxy path (not /cms)', () => {
+    it('generates a jnt:file-less version downloadUrl via /modules/mavenproxy (not /cms, not stored)', () => {
         cy.request({url: jsonUrl, failOnStatusCode: false}).then((res) => {
             expect(res.status).to.equal(200)
             const payload = Array.isArray(res.body) ? res.body[0] : res.body
@@ -199,10 +198,12 @@ describe('Module list JSON + download', () => {
             expect(proxyModule, `module ${proxyModuleName} present in modules[]`).to.not.be.undefined
             const v = proxyModule!.versions.find(ver => ver.version === proxyVersion)
             expect(v, `version ${proxyVersion} listed`).to.not.be.undefined
-            // With no jnt:file the JSP advertises the stored `url` verbatim...
-            expect(v!.downloadUrl).to.equal(proxyDownloadUrl)
-            // ...which must target the MavenProxy servlet under /modules, never the
-            // render servlet under /cms (a /cms/mavenproxy URL 404s — SECURITY-571).
+            // No `url` was stored on the node: the JSP GENERATED an absolute URL from the
+            // request server + module coordinates, ending in the proxy path...
+            expect(v!.downloadUrl, 'generated mavenproxy download path').to.contain(proxyDownloadPath)
+            expect(v!.downloadUrl).to.match(/^https?:\/\//)
+            // ...targeting the MavenProxy servlet under /modules, never the render
+            // servlet under /cms (a /cms/mavenproxy URL 404s — SECURITY-571).
             expect(v!.downloadUrl).to.contain('/modules/mavenproxy/')
             expect(v!.downloadUrl, 'must not use the render-servlet (/cms) path').to.not.contain('/cms/mavenproxy/')
         })

@@ -66,10 +66,12 @@ describe('Storefront read views (JS module)', () => {
         setNodeProperty(`${repo}/analytics`, 'status', 'supported', 'en')
         setNodeProperty(`${repo}/analytics`, 'published', 'true', 'en')
         setNodeProperty(`${repo}/analytics`, 'supportedByJahia', 'true', 'en')
+        // groupId is intrinsic to a JAR module; the version download URL is GENERATED
+        // from it (+ name/version/site), not stored on the version node.
+        setNodeProperty(`${repo}/analytics`, 'groupId', 'org.cypress.test', 'en')
         addNode(`${repo}/analytics`, 'v100', 'jnt:forgeModuleVersion', [
             {name: 'versionNumber', value: '1.0.0'},
             {name: 'published', value: 'true'},
-            {name: 'url', value: 'https://store.example.com/analytics-1.0.0.jar'},
             {name: 'changeLog', value: '<ul><li>Initial release</li></ul>'}
         ])
         addNode(`${repo}/analytics`, 'video', 'jnt:videostreaming', [

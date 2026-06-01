@@ -92,12 +92,6 @@ public class CreateEntryFromJar extends Action {
     private static final String REQUIRED_VERSION = "requiredVersion";
     private static final String VERSION_NUMBER = "versionNumber";
     private static final String VERSION_PREFIX = "version-";
-    /**
-     * Path of the {@link org.jahia.modules.forge.proxy.MavenProxy} servlet, relative to the Jahia
-     * context root. The proxy is an OSGi HttpServlet (alias=/mavenproxy) and is therefore served
-     * under /modules — NOT under /cms (the render servlet). Download URLs must use this prefix.
-     */
-    private static final String MAVENPROXY_PATH = "/modules/mavenproxy/";
     private static final String DESCRIPTION = "description";
     private static final String AUTHOR_URL = "authorURL";
     private static final String ERROR = "error";
@@ -172,12 +166,12 @@ public class CreateEntryFromJar extends Action {
         }
         Map<String, List<String>> formParameters = fu.getParameterMap();
         if (extension.endsWith("tgz")) {
-            return handleTgzUpload(uploadedFile, extension, request, renderContext, resource, session, formParameters);
+            return handleTgzUpload(uploadedFile, request, renderContext, resource, session, formParameters);
         }
         return handleJarUpload(uploadedFile, extension, request, renderContext, resource, session, formParameters);
     }
 
-    private ActionResult handleTgzUpload(DiskFileItem uploadedFile, String extension, HttpServletRequest request,
+    private ActionResult handleTgzUpload(DiskFileItem uploadedFile, HttpServletRequest request,
                                          RenderContext renderContext, Resource resource, JCRSessionWrapper session,
                                          Map<String, List<String>> formParameters) throws Exception {
         try (InputStream fileInputStream = new FileInputStream(uploadedFile.getStoreLocation());
@@ -194,7 +188,7 @@ public class CreateEntryFromJar extends Action {
                     return errorResult(session, ERR_UNABLE_READ_FILE);
                 }
                 final JSONObject jsonObject = new JSONObject(IOUtils.toString(tarInputStream, "UTF-8"));
-                return createJavascriptModule(uploadedFile, jsonObject, request, renderContext, resource, session, extension, formParameters);
+                return createJavascriptModule(uploadedFile, jsonObject, request, renderContext, resource, session, formParameters);
             }
             return errorResult(session, "forge.uploadJar.error.unable.read.manifest");
         } catch (IOException ex) {
@@ -226,14 +220,13 @@ public class CreateEntryFromJar extends Action {
         }
     }
     
-    private ActionResult createJavascriptModule(DiskFileItem uploadedFile, JSONObject jsonObject, HttpServletRequest request, RenderContext renderContext, Resource resource, JCRSessionWrapper session, String extension, Map<String, List<String>> formParams) throws Exception {
+    private ActionResult createJavascriptModule(DiskFileItem uploadedFile, JSONObject jsonObject, HttpServletRequest request, RenderContext renderContext, Resource resource, JCRSessionWrapper session, Map<String, List<String>> formParams) throws Exception {
         JCRNodeWrapper repository = resource.getNode();
         final String version = jsonObject.getString("version");
         final String moduleName = jsonObject.getString("name");
         final JSONObject jahiaJsonObject = jsonObject.getJSONObject("jahia");
         final JSONObject mavenJsonObject = jahiaJsonObject.getJSONObject("maven");
         final String groupId = mavenJsonObject.getString(GROUP_ID);
-        final JCRSiteNode site = resource.getNode().getResolveSite();
         final Map<String, List<String>> moduleParams = new HashMap<>();
         moduleParams.put(MODULE_NAME, Arrays.asList(moduleName));
         moduleParams.put(GROUP_ID, Arrays.asList(groupId));
@@ -246,13 +239,12 @@ public class CreateEntryFromJar extends Action {
             return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
         }
         final String moduleRelPath = groupId.replace(".", "/") + "/" + moduleName;
-        moduleParams.put("url", Arrays.asList(buildMavenProxyUrl(request, site.getName(), moduleRelPath, version, moduleName, extension)));
 
         final JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
         moduleParams.put(REQUIRED_VERSION, Arrays.asList(versions.getNode(requiredVersion).getIdentifier()));
 
         final List<String> moduleParamKeys = Arrays.asList(DESCRIPTION, CATEGORY, "icon", AUTHOR_NAME_DISPLAYED_AS, AUTHOR_URL, AUTHOR_EMAIL, "FAQ", CODE_REPOSITORY, DOWNLOAD_COUNT, SUPPORTED_BY_JAHIA, REVIEWED_BY_JAHIA, PUBLISHED, DELETED, SCREENSHOTS, VIDEO, GROUP_ID);
-        final List<String> versionParamKeys = Arrays.asList(REQUIRED_VERSION, VERSION_NUMBER, FILE_DSA_SIGNATURE, CHANGE_LOG, "url");
+        final List<String> versionParamKeys = Arrays.asList(REQUIRED_VERSION, VERSION_NUMBER, FILE_DSA_SIGNATURE, CHANGE_LOG);
         final Map<String, List<String>> moduleParameters = new HashMap<>();
         final Map<String, List<String>> versionParameters = new HashMap<>();
 
@@ -434,7 +426,6 @@ public class CreateEntryFromJar extends Action {
             return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
         }
         String moduleRelPath = groupId.replace(".", "/") + "/" + moduleName;
-        moduleParams.put("url", Arrays.asList(buildMavenProxyUrl(request, site.getName(), moduleRelPath, version, moduleName, extension)));
 
         JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
         moduleParams.put(REQUIRED_VERSION, Arrays.asList(versions.getNode(requiredVersion).getIdentifier()));
@@ -445,7 +436,7 @@ public class CreateEntryFromJar extends Action {
         }
 
         List<String> moduleParamKeys = Arrays.asList(DESCRIPTION, CATEGORY, "icon", AUTHOR_NAME_DISPLAYED_AS, AUTHOR_URL, AUTHOR_EMAIL, "FAQ", CODE_REPOSITORY, DOWNLOAD_COUNT, SUPPORTED_BY_JAHIA, REVIEWED_BY_JAHIA, PUBLISHED, DELETED, SCREENSHOTS, VIDEO, GROUP_ID);
-        List<String> versionParamKeys = Arrays.asList(REQUIRED_VERSION, VERSION_NUMBER, FILE_DSA_SIGNATURE, CHANGE_LOG, "url");
+        List<String> versionParamKeys = Arrays.asList(REQUIRED_VERSION, VERSION_NUMBER, FILE_DSA_SIGNATURE, CHANGE_LOG);
         Map<String, List<String>> moduleParameters = new HashMap<>();
         Map<String, List<String>> versionParameters = new HashMap<>();
 
@@ -556,20 +547,6 @@ public class CreateEntryFromJar extends Action {
                 versionTarget.put(key, value);
             }
         }
-    }
-
-    /**
-     * Build the artifact download URL served by the {@link org.jahia.modules.forge.proxy.MavenProxy}
-     * servlet. The proxy lives under the Jahia context root at {@link #MAVENPROXY_PATH} (the OSGi
-     * /modules context), so the URL is derived by stripping the render servlet path (/cms/...) off
-     * the current request and appending the proxy path. Using /cms here (as the legacy code did)
-     * would route the download to the render servlet and 404.
-     */
-    private static String buildMavenProxyUrl(HttpServletRequest request, String siteName, String moduleRelPath,
-                                             String version, String moduleName, String extension) {
-        String contextRoot = StringUtils.substringBefore(request.getRequestURL().toString(), "/cms");
-        return contextRoot + MAVENPROXY_PATH + siteName + "/" + moduleRelPath + "/" + version + "/"
-                + moduleName + "-" + version + "." + extension;
     }
 
     private JCRNodeWrapper upsertModuleNode(HttpServletRequest request, JCRNodeWrapper repositoryStart,
