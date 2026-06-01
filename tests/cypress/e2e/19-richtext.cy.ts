@@ -1,6 +1,18 @@
 import {DocumentNode} from 'graphql'
 import {createSite, deleteSite, setNodeProperty} from '@jahia/cypress'
 
+/** Click Save and wait for the full-page reload the editor triggers (reload-safe
+ *  via a window stamp — see 17-authoring for the rationale). */
+const saveAndWaitReload = (saveLabel: RegExp = /^Save$/): void => {
+    cy.window().then((w) => {
+        ;(w as unknown as {__preSave?: boolean}).__preSave = true
+    })
+    cy.contains('button', saveLabel).click()
+    cy.window({timeout: 20000}).should((w) => {
+        expect((w as unknown as {__preSave?: boolean}).__preSave).to.be.undefined
+    })
+}
+
 /**
  * Rich-text editing for the store-template JS module.
  *
@@ -82,9 +94,8 @@ describe('Rich text editing (JS module)', () => {
         cy.get('@ed').click().type('{ctrl+a}{del}')
         cy.get('@ed').type('Edited via CKEditor')
 
-        cy.contains('button', /^Save$/).click()
-        cy.contains(/saved/i, {timeout: 20000}).should('be.visible')
-        cy.reload()
+        // Saving reloads the page; wait for that reload before asserting.
+        saveAndWaitReload()
 
         // The rendered description reflects the edit…
         cy.contains('Edited via CKEditor', {timeout: 20000}).should('be.visible')

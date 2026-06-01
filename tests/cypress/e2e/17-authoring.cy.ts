@@ -2,6 +2,23 @@ import {DocumentNode} from 'graphql'
 import {createSite, deleteSite, setNodeProperty, uploadFile} from '@jahia/cypress'
 
 /**
+ * Click the editor's Save and wait for the full-page reload it triggers (the
+ * editor reloads so the SSR'd values refresh without a manual refresh). Stamping
+ * `window` before the click and waiting for the stamp to vanish is reload-safe —
+ * a window object doesn't "detach" like a DOM element would mid-navigation, so no
+ * assertion ends up straddling the reload.
+ */
+const saveAndWaitReload = (saveLabel: RegExp = /^Save$/): void => {
+    cy.window().then((w) => {
+        ;(w as unknown as {__preSave?: boolean}).__preSave = true
+    })
+    cy.contains('button', saveLabel).click()
+    cy.window({timeout: 20000}).should((w) => {
+        expect((w as unknown as {__preSave?: boolean}).__preSave).to.be.undefined
+    })
+}
+
+/**
  * Authoring views (store-template JS module) — Phase 3.
  *
  * Covers in-site editing of module metadata via the ModuleEditor island, which
@@ -91,11 +108,9 @@ describe('Authoring views (JS module)', () => {
         // Code repository is on the Author & links tab.
         cy.contains('[role="tab"]', /author/i).click()
         cy.get('#edit-codeRepository').clear().type('https://github.com/acme/widget')
-        cy.contains('button', /^Save$/).click()
-        // Deterministic success state (no auto-reload race), then a
-        // Cypress-controlled reload to confirm persistence.
-        cy.contains(/saved/i, {timeout: 20000}).should('be.visible')
-        cy.reload()
+        // Saving reloads the page so the SSR'd values refresh immediately (no manual
+        // refresh); wait for that reload, then assert the persisted values.
+        saveAndWaitReload()
         cy.get('h1', {timeout: 20000}).should('contain.text', 'Widget Pro')
         cy.contains('a', 'https://github.com/acme/widget').should('exist')
     })
@@ -108,12 +123,11 @@ describe('Authoring views (JS module)', () => {
         // the same non-i18n setValue / multi-value setValues paths as category.
         cy.get('#edit-status', {timeout: 10000}).select('legacy')
         cy.get('#edit-tags').type('analytics{enter}charts{enter}')
-        cy.contains('button', /^Save$/).click()
-        cy.contains(/saved/i, {timeout: 20000}).should('be.visible')
-        cy.reload()
-        // The status badge + the Details tag list reflect the saved values.
-        cy.contains('h1', 'Widget')
-        cy.contains(/legacy/i).should('be.visible')
+        // Wait for the save-triggered reload before asserting — so /legacy/ matches
+        // the rendered status badge on the fresh page, not the (now-gone) open
+        // <select>'s <option>.
+        saveAndWaitReload()
+        cy.contains(/legacy/i, {timeout: 20000}).should('be.visible')
         cy.get('[data-tag-list]').should('contain.text', 'analytics').and('contain.text', 'charts')
     })
 
