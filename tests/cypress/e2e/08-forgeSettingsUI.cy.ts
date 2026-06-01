@@ -70,9 +70,10 @@ describe('Forge settings — live UI', () => {
         cy.contains('h2', siteKey, {timeout: 60000}).should('be.visible')
 
         cy.contains(/store administration/i, {timeout: 15000}).should('be.visible')
-        cy.contains(/private app store/i).should('be.visible')
-        cy.contains(/app store categories/i).should('be.visible')
-        cy.contains(/app store roles/i).should('be.visible')
+        // Exact labels (the screen heading "…settings" and "Site roles" must not match).
+        cy.contains(/^Settings$/).should('be.visible')
+        cy.contains(/^Categories$/).should('be.visible')
+        cy.contains(/^Roles$/).should('be.visible')
     })
 
     it('reloads the saved state after a page refresh', () => {

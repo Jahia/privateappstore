@@ -3,7 +3,7 @@
     "menu_entry": "Store administration"
   },
   "label": {
-    "menu_entry": "Private App Store",
+    "menu_entry": "Settings",
     "title": "Private App Store settings",
     "url": "Forge URL",
     "urlPlaceholder": "Full URL of a deployable Maven repository (e.g. /repository/maven-releases/)",
@@ -53,7 +53,7 @@
     }
   },
   "categories": {
-    "menu_entry": "App Store categories",
+    "menu_entry": "Categories",
     "title": "App Store categories",
     "root": {
       "heading": "Root category",
@@ -86,7 +86,7 @@
     }
   },
   "roles": {
-    "menu_entry": "App Store roles",
+    "menu_entry": "Roles",
     "title": "App Store roles",
     "empty": "No members assigned to this role.",
     "addMember": "Grant role to user or group",
