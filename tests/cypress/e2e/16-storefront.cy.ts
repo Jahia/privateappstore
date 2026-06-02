@@ -115,23 +115,37 @@ describe('Storefront read views (JS module)', () => {
         cy.contains('Draft Module').should('not.exist');
     });
 
-    it('filters the grid by status (instant sidebar facet)', () => {
+    it('filters the grid by status (server-side facet)', () => {
         cy.visit(homeRender);
-        // Wait for the filter island to hydrate (it marks itself ready after its
-        // first pass) before toggling a facet.
-        cy.get('[data-filter-ready]', {timeout: 20000});
-        // The Status facets are multi-select checkboxes in the sidebar.
-        cy.contains('[data-forge-list] label', /supported/i).find('input[type=checkbox]').check();
+        // Server-side filtering: check a Status facet and submit the GET form; the page
+        // reloads showing only matching modules (non-matching are absent, not just hidden).
+        cy.get('[data-forge-filter] input[name="status"][value="supported"]', {timeout: 20000}).check();
+        cy.get('[data-forge-filter] button[type="submit"]').click();
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('be.visible');
-        cy.contains('[data-forge-card]', 'SEO Toolkit').should('not.be.visible');
+        cy.contains('[data-forge-card]', 'SEO Toolkit').should('not.exist');
     });
 
-    it('filters the grid by text', () => {
+    it('filters the grid by text (server-side)', () => {
         cy.visit(homeRender);
-        cy.get('[data-filter-ready]', {timeout: 20000});
-        cy.get('[data-forge-list] input[type=search]').type('seo');
+        cy.get('[data-forge-filter] input[name="src_terms"]', {timeout: 20000}).clear().type('seo');
+        cy.get('[data-forge-filter] button[type="submit"]').click();
         cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible');
-        cy.contains('[data-forge-card]', 'Analytics Dashboard').should('not.be.visible');
+        cy.contains('[data-forge-card]', 'Analytics Dashboard').should('not.exist');
+    });
+
+    it('paginates the grid when modules exceed the page size', () => {
+        const listNode = `/sites/${siteKey}/home/main/store-modules`;
+        // Two published modules; shrink the page size to 1 so there are two pages.
+        setNodeProperty(listNode, 'nbOfModulePerPage', '1', 'en');
+        cy.visit(homeRender);
+        cy.get('[data-forge-pagination]', {timeout: 20000}).should('exist');
+        cy.get('[data-page-info]').should('contain.text', 'Page 1 of 2');
+        cy.get('[data-forge-card]').should('have.length', 1);
+        cy.get('[data-page-next]').click();
+        cy.get('[data-page-info]').should('contain.text', 'Page 2 of 2');
+        cy.get('[data-forge-card]').should('have.length', 1);
+        // Restore the default so later tests see the full grid.
+        setNodeProperty(listNode, 'nbOfModulePerPage', '9', 'en');
     });
 
     it('opens a module detail page with version, video + download', () => {
