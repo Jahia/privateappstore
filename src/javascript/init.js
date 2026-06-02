@@ -5,11 +5,11 @@ import registerManageRoles from './ManageRoles/register';
 import i18next from 'i18next';
 
 export default function () {
-    registry.add('callback', 'privateappstore', {
+    registry.add('callback', 'jahia-store', {
         targets: ['jahiaApp-init:50'],
         callback: async () => {
-            await i18next.loadNamespaces('privateappstore', () => {
-                console.debug('%c privateappstore: i18n namespace loaded', 'color: #463CBA');
+            await i18next.loadNamespaces('jahia-store', () => {
+                console.debug('%c jahia-store: i18n namespace loaded', 'color: #463CBA');
             });
             // Non-selectable parent that groups Settings / Categories / Roles under a
             // single "Store administration" entry in the site administration menu.
@@ -17,14 +17,14 @@ export default function () {
             registry.add('adminRoute', 'forgeAdministration', {
                 targets: ['administration-sites:998'],
                 icon: window.jahia.moonstone.toIconComponent('Apps'),
-                label: 'privateappstore:administration.menu_entry',
+                label: 'jahia-store:administration.menu_entry',
                 requiredPermission: 'siteAdminForgeSettings',
                 isSelectable: false
             });
             registerForgeSettings();
             registerCategorySettings();
             registerManageRoles();
-            console.debug('%c privateappstore: activation completed', 'color: #463CBA');
+            console.debug('%c jahia-store: activation completed', 'color: #463CBA');
         }
     });
 }

@@ -23,7 +23,7 @@ const FOOTER_FIELDS = [
 ];
 
 export function ForgeSettings({siteKey}) {
-    const {t} = useTranslation('privateappstore');
+    const {t} = useTranslation('jahia-store');
 
     const [url, setUrl] = useState('');
     const [id, setId] = useState('');

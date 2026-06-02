@@ -19,7 +19,7 @@ export default () => {
         icon: window.jahia.moonstone.toIconComponent('Setting'),
         targets: ['administration-sites-forgeAdministration:10'],
         requiredPermission: 'siteAdminForgeSettings',
-        label: 'privateappstore:label.menu_entry',
+        label: 'jahia-store:label.menu_entry',
         isSelectable: true,
         render: () => React.createElement(ForgeSettingsRoute)
     });

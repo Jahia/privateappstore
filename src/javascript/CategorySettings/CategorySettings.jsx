@@ -12,7 +12,7 @@ import {
 } from './CategorySettings.gql';
 
 export function CategorySettings({siteKey}) {
-    const {t} = useTranslation('privateappstore');
+    const {t} = useTranslation('jahia-store');
 
     const [rootCategoryInput, setRootCategoryInput] = useState('');
     const [newCategoryName, setNewCategoryName] = useState('');

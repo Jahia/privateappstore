@@ -98,7 +98,7 @@ public class CreateEntryFromJar extends Action {
     private static final String PACKAGES = "packages";
     private static final String OWNER = "owner";
     private static final String MODULES_LIST = "modulesList";
-    private static final String RESOURCES_PRIVATEAPPSTORE = "resources.jahia-store";
+    private static final String RESOURCES_JAHIA_STORE = "resources.jahia-store";
     private static final String GROUP_ID = "groupId";
     private static final String MODULE_NAME = "moduleName";
     private static final String CATEGORY = "category";
@@ -265,7 +265,7 @@ public class CreateEntryFromJar extends Action {
         logger.info("Start adding module version {} of {}", version, title);
 
         if (hasModuleVersions && !hasValidVersionNumber(module, version)) {
-            String error = Messages.getWithArgs(RESOURCES_PRIVATEAPPSTORE, ERR_VERSION_NUMBER, session.getLocale(), moduleName, version);
+            String error = Messages.getWithArgs(RESOURCES_JAHIA_STORE, ERR_VERSION_NUMBER, session.getLocale(), moduleName, version);
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
         }
 
@@ -341,7 +341,7 @@ public class CreateEntryFromJar extends Action {
         logger.info("Start adding package version {} of {}", version, title);
 
         if (hasPackageVersions && !hasValidVersionNumber(modulesPackage, version)) {
-            String error = Messages.getWithArgs(RESOURCES_PRIVATEAPPSTORE, ERR_VERSION_NUMBER, session.getLocale(), packageName, version);
+            String error = Messages.getWithArgs(RESOURCES_JAHIA_STORE, ERR_VERSION_NUMBER, session.getLocale(), packageName, version);
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
         }
 
@@ -457,7 +457,7 @@ public class CreateEntryFromJar extends Action {
         logger.info("Start adding module version {} of {}", version, title);
 
         if (hasModuleVersions && !hasValidVersionNumber(module, version)) {
-            String error = Messages.getWithArgs(RESOURCES_PRIVATEAPPSTORE, ERR_VERSION_NUMBER, session.getLocale(), moduleName, version);
+            String error = Messages.getWithArgs(RESOURCES_JAHIA_STORE, ERR_VERSION_NUMBER, session.getLocale(), moduleName, version);
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
         }
 
@@ -509,7 +509,7 @@ public class CreateEntryFromJar extends Action {
     }
 
     private static ActionResult errorResult(JCRSessionWrapper session, String messageKey) throws JSONException {
-        String error = Messages.get(RESOURCES_PRIVATEAPPSTORE, messageKey, session.getLocale());
+        String error = Messages.get(RESOURCES_JAHIA_STORE, messageKey, session.getLocale());
         return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
     }
 

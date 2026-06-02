@@ -19,7 +19,7 @@ export default () => {
         icon: window.jahia.moonstone.toIconComponent('Person'),
         targets: ['administration-sites-forgeAdministration:30'],
         requiredPermission: 'siteAdminForgeSettings',
-        label: 'privateappstore:roles.menu_entry',
+        label: 'jahia-store:roles.menu_entry',
         isSelectable: true,
         render: () => React.createElement(ManageRolesRoute)
     });

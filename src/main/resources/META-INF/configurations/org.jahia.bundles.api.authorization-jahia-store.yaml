@@ -1,4 +1,4 @@
-access-privateappstore-json-views:
+access-jahia-store-json-views:
   auto_apply:
     - always: true
   grants:

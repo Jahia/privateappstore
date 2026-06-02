@@ -11,7 +11,7 @@ import {
 } from './ManageRoles.gql';
 
 export function ManageRoles({siteKey}) {
-    const {t} = useTranslation('privateappstore');
+    const {t} = useTranslation('jahia-store');
 
     const [openRole, setOpenRole] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');

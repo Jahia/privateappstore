@@ -19,7 +19,7 @@ export default () => {
         icon: window.jahia.moonstone.toIconComponent('Tag'),
         targets: ['administration-sites-forgeAdministration:20'],
         requiredPermission: 'siteAdminForgeSettings',
-        label: 'privateappstore:categories.menu_entry',
+        label: 'jahia-store:categories.menu_entry',
         isSelectable: true,
         render: () => React.createElement(CategorySettingsRoute)
     });

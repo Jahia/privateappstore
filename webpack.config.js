@@ -13,7 +13,7 @@ module.exports = (env, argv) => {
         },
         output: {
             path: path.resolve(__dirname, 'src/main/resources/javascript/apps/'),
-            filename: 'privateappstore.bundle.js',
+            filename: 'jahia-store.bundle.js',
             chunkFilename: '[name].jahia.[chunkhash:6].js'
         },
         resolve: {
@@ -60,7 +60,8 @@ module.exports = (env, argv) => {
         },
         plugins: [
             new ModuleFederationPlugin(getModuleFederationConfig(packageJson, {
-                library: {type: 'assign', name: 'appShell.remotes.privateappstore'},
+                // library name is derived from package.json name:
+                // camelCase('jahia-store') -> appShell.remotes.jahiaStore
                 remotes: {
                     '@jahia/jcontent': 'appShell.remotes.jcontent'
                 }

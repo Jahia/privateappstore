@@ -1,6 +1,6 @@
 {
-  "name": "@jahia/privateappstore",
-  "version": "4.3.1-SNAPSHOT",
+  "name": "@jahia/jahia-store",
+  "version": "5.0.0-SNAPSHOT",
   "scripts": {
     "build": "yarn webpack",
     "webpack": "webpack",
