@@ -240,10 +240,8 @@ public class CreateEntryFromJar extends Action {
 
         final String reqVersionAttribute = jahiaJsonObject.getString("required-version");
         final String requiredVersion = VERSION_PREFIX + reqVersionAttribute;
-        if (StringUtils.isEmpty(moduleName) || StringUtils.isEmpty(groupId) || StringUtils.isEmpty(reqVersionAttribute)) {
-            return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
-        }
-        if (!isSafeCoordinate(groupId, moduleName)) {
+        if (StringUtils.isEmpty(moduleName) || StringUtils.isEmpty(groupId)
+                || StringUtils.isEmpty(reqVersionAttribute) || !isSafeCoordinate(groupId, moduleName)) {
             return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
         }
         final String moduleRelPath = groupId.replace(".", "/") + "/" + moduleName;
@@ -429,10 +427,8 @@ public class CreateEntryFromJar extends Action {
 
         String reqVersionAttribute = attributes.getValue("Jahia-Required-Version");
         final String requiredVersion = VERSION_PREFIX + reqVersionAttribute;
-        if (StringUtils.isEmpty(moduleName) || StringUtils.isEmpty(groupId) || StringUtils.isEmpty(reqVersionAttribute)) {
-            return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
-        }
-        if (!isSafeCoordinate(groupId, moduleName)) {
+        if (StringUtils.isEmpty(moduleName) || StringUtils.isEmpty(groupId)
+                || StringUtils.isEmpty(reqVersionAttribute) || !isSafeCoordinate(groupId, moduleName)) {
             return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
         }
         String moduleRelPath = groupId.replace(".", "/") + "/" + moduleName;
@@ -495,7 +491,7 @@ public class CreateEntryFromJar extends Action {
 
     private ActionResult deployArtifact(DiskFileItem uploadedFile, JCRSiteNode site, String extension,
                                         String groupId, String moduleName,
-                                        JCRSessionWrapper session) throws RepositoryException, JSONException {
+                                        JCRSessionWrapper session) throws JSONException {
         // Connection settings now live in per-site OSGi config (see ForgeSettingsService).
         final ForgeSettings settings = forgeSettingsService.get(site.getSiteKey());
 
