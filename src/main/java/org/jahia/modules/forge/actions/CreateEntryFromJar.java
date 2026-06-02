@@ -98,7 +98,7 @@ public class CreateEntryFromJar extends Action {
     private static final String PACKAGES = "packages";
     private static final String OWNER = "owner";
     private static final String MODULES_LIST = "modulesList";
-    private static final String RESOURCES_PRIVATEAPPSTORE = "resources.privateappstore";
+    private static final String RESOURCES_PRIVATEAPPSTORE = "resources.jahia-store";
     private static final String GROUP_ID = "groupId";
     private static final String MODULE_NAME = "moduleName";
     private static final String CATEGORY = "category";

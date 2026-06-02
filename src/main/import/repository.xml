@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <content xmlns:j="http://www.jahia.org/jahia/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0">
     <modules jcr:primaryType="jnt:modules">
-        <privateappstore
+        <jahia-store
                 j:dependencies="default facets rating siteSettings videostreaming"
-                j:installedModules="privateappstore"
+                j:installedModules="jahia-store"
                 j:modulePriority="0"
                 j:moduleType="module"
-                j:title="Jahia Private App Store"
+                j:title="Jahia Store"
                 jcr:primaryType="jnt:module">
 
             <portlets jcr:primaryType="jnt:portletFolder"/>
@@ -84,7 +84,7 @@
                 <contents jcr:primaryType="jnt:contentFolder"/>
             </templates>
 
-        </privateappstore>
+        </jahia-store>
     </modules>
 
 </content>
