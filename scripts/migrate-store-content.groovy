@@ -17,7 +17,9 @@
  *      the `requiredVersion` weakreference)
  *   2. contents/modules-repository         (the uploaded modules/packages, their
  *      versions, files, icon, screenshots, reviews, tags, categories, changelog,
- *      i18n descriptions/FAQ/howToInstall/license)
+ *      i18n descriptions/FAQ/howToInstall/license). Each module is copied in a session AS
+ *      its original author so jcr:createdBy (the developer shown on the card) is preserved
+ *      rather than becoming 'system' (it falls back to system if that user no longer exists).
  *
  * What it does NOT migrate: forge settings (Nexus URL/credentials, branding/footer, logo,
  * root category). As of jahia-store 5.0.0 those live in per-site OSGi configuration, not
@@ -69,6 +71,7 @@ import org.jahia.services.content.JCRSessionWrapper
 import org.jahia.services.content.JCRNodeWrapper
 import org.jahia.services.content.JCRCallback
 import org.jahia.services.content.JCRPublicationService
+import org.jahia.services.usermanager.JahiaUserManagerService
 import org.jahia.api.Constants
 import javax.jcr.RepositoryException
 
@@ -86,6 +89,7 @@ def LANGUAGES         = null             // null = all site languages; or e.g. [
 def REPO              = '/contents/modules-repository'
 def REQUIRED_VERSIONS = '/contents/modules-required-versions'
 def VERSION_TYPES     = ['jnt:forgeModuleVersion', 'jnt:forgePackageVersion'] as Set
+def MODULE_TYPES      = ['jnt:forgeModule', 'jnt:forgePackage'] as Set
 
 def report = new StringBuilder()
 def stats  = [modulesCopied: 0, modulesSkipped: 0, versionsRemapped: 0, urlsDropped: 0, reqVersionsCopied: 0, warnings: 0]
@@ -114,6 +118,42 @@ JCRTemplate.getInstance().doExecuteWithSystemSession(null, WORKSPACE, { JCRSessi
         if (types.contains(node.getPrimaryNodeTypeName())) acc.add(node)
         node.getNodes().each { collect(it, types, acc) }
         acc
+    }
+
+    // Copy one module subtree into the target modules-repository, recreating the intermediate
+    // group folders. jcr:createdBy is a PROTECTED property set at node creation from the SESSION
+    // user (it cannot be set afterwards), so a plain system-session copy would stamp every
+    // migrated module as 'system'. We therefore run the copy in a session AS the module's author.
+    def doCopy = { JCRSessionWrapper s, String srcModPath, String tgtRepoPath, String relPath ->
+        JCRNodeWrapper srcMod = s.getNode(srcModPath)
+        JCRNodeWrapper parent = s.getNode(tgtRepoPath)
+        final int slash = relPath.lastIndexOf('/')
+        if (slash > 0) {
+            relPath.substring(0, slash).split('/').each { seg ->
+                parent = parent.hasNode(seg) ? parent.getNode(seg) : parent.addNode(seg, 'jnt:contentFolder')
+            }
+        }
+        final String name = srcMod.getName()
+        if (parent.hasNode(name)) parent.getNode(name).remove()
+        srcMod.copy(parent, name, false)
+        s.save()
+        return null
+    }
+    def copyAsAuthor = { String srcModPath, String tgtRepoPath, String relPath, String author ->
+        def userNode = author ? JahiaUserManagerService.getInstance().lookupUser(author) : null
+        if (userNode != null) {
+            try {
+                JCRTemplate.getInstance().doExecuteWithSystemSessionAsUser(userNode.getJahiaUser(), WORKSPACE, null,
+                        { JCRSessionWrapper s -> doCopy(s, srcModPath, tgtRepoPath, relPath) } as JCRCallback)
+                return
+            } catch (Exception e) {
+                warn("as-author copy failed for ${relPath} (author=${author}): ${e.message}; copying as system")
+            }
+        } else if (author) {
+            warn("author '${author}' not found; copying ${relPath} as system")
+        }
+        JCRTemplate.getInstance().doExecuteWithSystemSession(null, WORKSPACE,
+                { JCRSessionWrapper s -> doCopy(s, srcModPath, tgtRepoPath, relPath) } as JCRCallback)
     }
 
     // ---- validate -------------------------------------------------------
@@ -159,24 +199,25 @@ JCRTemplate.getInstance().doExecuteWithSystemSession(null, WORKSPACE, { JCRSessi
         warn("source has no modules-required-versions; requiredVersion refs may not resolve")
     }
 
-    // ---- 2) modules-repository -----------------------------------------
-    log("\n[2] modules-repository")
+    // ---- 2) modules-repository (per module, preserving its author) ------
+    // Copy each module individually IN A SESSION AS its original author (jcr:createdBy) so the
+    // migrated module + version + file nodes keep that author instead of 'system'. (A bulk
+    // system-session copy stamps every node 'system' because jcr:createdBy is protected and set
+    // from the session user at creation.) Group folders are recreated as needed.
+    log("\n[2] modules-repository (preserving author)")
     JCRNodeWrapper srcRepo = session.getNode(srcPath + REPO)
     JCRNodeWrapper tgtRepo = ensureChild(tgtContents, 'modules-repository', 'jnt:contentFolder')
-    srcRepo.getNodes().each { JCRNodeWrapper child ->
-        def name = child.getName()
-        if (tgtRepo.hasNode(name)) {
-            if (REPLACE_EXISTING) {
-                log("  ~ replace: ${name} (${child.getPrimaryNodeTypeName()})")
-                if (!DRY_RUN) { tgtRepo.getNode(name).remove(); child.copy(tgtRepo, name, false) }
-                stats.modulesCopied++
-            } else {
-                log("  = skip (exists): ${name}")
-                stats.modulesSkipped++
-            }
+    final String srcRepoPath = srcRepo.getPath()
+    final String tgtRepoPath = tgtRepo.getPath()
+    collect(srcRepo, MODULE_TYPES, []).each { JCRNodeWrapper srcMod ->
+        final String relPath = srcMod.getPath().substring(srcRepoPath.length() + 1)  // e.g. org/foo/mymod
+        final String author = srcMod.hasProperty('jcr:createdBy') ? srcMod.getProperty('jcr:createdBy').getString() : null
+        if (session.nodeExists(tgtRepoPath + '/' + relPath) && !REPLACE_EXISTING) {
+            log("  = skip (exists): ${relPath}")
+            stats.modulesSkipped++
         } else {
-            log("  + copy:   ${name} (${child.getPrimaryNodeTypeName()})")
-            if (!DRY_RUN) child.copy(tgtRepo, name, false)
+            log("  + copy:   ${relPath} (author=${author ?: 'system'})")
+            if (!DRY_RUN) copyAsAuthor(srcMod.getPath(), tgtRepoPath, relPath, author)
             stats.modulesCopied++
         }
     }
