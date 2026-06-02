@@ -1,6 +1,8 @@
 package org.jahia.modules.forge.settings;
 
+import org.apache.jackrabbit.core.fs.FileSystem;
 import org.jahia.services.content.DefaultEventListener;
+import org.jahia.services.sites.JahiaSitesService;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -21,7 +23,8 @@ import javax.jcr.observation.EventIterator;
 public class ForgeSiteDeletionListener extends DefaultEventListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ForgeSiteDeletionListener.class);
-    private static final String SITES_PREFIX = "/sites/";
+    private static final String SITES_ROOT = JahiaSitesService.SITES_JCR_PATH;
+    private static final String SITES_PREFIX = SITES_ROOT + FileSystem.SEPARATOR;
 
     private final ForgeSettingsService settingsService;
 
@@ -37,7 +40,7 @@ public class ForgeSiteDeletionListener extends DefaultEventListener {
 
     @Override
     public String getPath() {
-        return "/sites";
+        return SITES_ROOT;
     }
 
     @Override

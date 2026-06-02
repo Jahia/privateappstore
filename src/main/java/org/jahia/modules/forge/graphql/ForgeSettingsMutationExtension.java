@@ -5,6 +5,7 @@ import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 import graphql.annotations.annotationTypes.GraphQLNonNull;
 import graphql.annotations.annotationTypes.GraphQLTypeExtension;
+import org.apache.jackrabbit.core.fs.FileSystem;
 import org.jahia.modules.forge.settings.ForgeSettings;
 import org.jahia.modules.forge.settings.ForgeSettingsService;
 import org.jahia.modules.graphql.provider.dxm.DXGraphQLProvider;
@@ -12,9 +13,11 @@ import org.jahia.osgi.BundleUtils;
 import org.jahia.services.cache.CacheHelper;
 import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.content.JCRSessionWrapper;
+import org.jahia.services.sites.JahiaSitesService;
 
 import javax.jcr.AccessDeniedException;
 import javax.jcr.RepositoryException;
+import java.util.regex.Pattern;
 
 @GraphQLTypeExtension(DXGraphQLProvider.Mutation.class)
 @GraphQLName("ForgeSettingsMutations")
@@ -22,6 +25,9 @@ import javax.jcr.RepositoryException;
 public final class ForgeSettingsMutationExtension {
 
     private static final String PERMISSION = "siteAdminForgeSettings";
+    private static final String SITES_PATH = JahiaSitesService.SITES_JCR_PATH + FileSystem.SEPARATOR;
+    /** A siteKey is concatenated into a JCR site path; only a simple identifier is allowed. */
+    private static final Pattern SAFE_SITE_KEY = Pattern.compile("[A-Za-z0-9._-]+");
 
     private ForgeSettingsMutationExtension() {
     }
@@ -32,7 +38,8 @@ public final class ForgeSettingsMutationExtension {
     public static GqlForgeSettings updateForgeSettings(
             @GraphQLName("siteKey") @GraphQLNonNull final String siteKey,
             @GraphQLName("settings") @GraphQLNonNull @GraphQLDescription("Connection + branding fields") final ForgeSettingsInput settings) {
-        final String sitePath = "/sites/" + siteKey;
+        validateSiteKey(siteKey);
+        final String sitePath = SITES_PATH + siteKey;
         try {
             assertCanManage(sitePath);
         } catch (RepositoryException e) {
@@ -84,5 +91,16 @@ public final class ForgeSettingsMutationExtension {
             throw new ForgeSettingsException("ForgeSettingsService is not available", null);
         }
         return service;
+    }
+
+    /**
+     * Reject a siteKey that is not a simple identifier before it is concatenated into a JCR
+     * site path, so the permission gate cannot be sidestepped with a path-traversal value
+     * (e.g. "../.." resolving to "/"). Mirrors {@code MavenProxy.isValidSiteName} (SECURITY-571).
+     */
+    static void validateSiteKey(String siteKey) {
+        if (siteKey == null || !SAFE_SITE_KEY.matcher(siteKey).matches()) {
+            throw new ForgeSettingsException("Invalid site key: " + siteKey, null);
+        }
     }
 }

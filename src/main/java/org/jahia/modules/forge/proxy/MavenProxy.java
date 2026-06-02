@@ -155,6 +155,11 @@ public class MavenProxy extends HttpServlet {
                 trySendError(response, httpResponse.getCode());
                 return;
             }
+            // Force a download and forbid MIME sniffing: the proxy serves anonymous callers and
+            // mirrors the upstream Content-Type, so a compromised/misconfigured Nexus returning
+            // text/html with a script body must not be rendered in the Jahia origin (stored XSS).
+            response.setHeader("Content-Disposition", "attachment");
+            response.setHeader("X-Content-Type-Options", "nosniff");
             response.setContentType(httpResponse.getEntity().getContentType());
             try {
                 IOUtils.copy(httpResponse.getEntity().getContent(), response.getOutputStream());

@@ -243,6 +243,9 @@ public class CreateEntryFromJar extends Action {
         if (StringUtils.isEmpty(moduleName) || StringUtils.isEmpty(groupId) || StringUtils.isEmpty(reqVersionAttribute)) {
             return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
         }
+        if (!isSafeCoordinate(groupId, moduleName)) {
+            return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
+        }
         final String moduleRelPath = groupId.replace(".", "/") + "/" + moduleName;
 
         final JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
@@ -429,6 +432,9 @@ public class CreateEntryFromJar extends Action {
         if (StringUtils.isEmpty(moduleName) || StringUtils.isEmpty(groupId) || StringUtils.isEmpty(reqVersionAttribute)) {
             return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
         }
+        if (!isSafeCoordinate(groupId, moduleName)) {
+            return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
+        }
         String moduleRelPath = groupId.replace(".", "/") + "/" + moduleName;
 
         JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
@@ -553,6 +559,18 @@ public class CreateEntryFromJar extends Action {
         }
     }
 
+    /**
+     * Reject archive-supplied coordinates that could traverse the JCR tree. groupId and
+     * moduleName come from the uploaded package.json / MANIFEST.MF and are concatenated into a
+     * JCR relative path (groupId-as-folders + "/" + moduleName); a ".." segment or a backslash
+     * could escape the modules repository. Dotted groupIds and scoped (@scope/name) module names
+     * remain valid — only parent-traversal and path escapes are rejected (SECURITY-571).
+     */
+    private static boolean isSafeCoordinate(String groupId, String moduleName) {
+        return !groupId.contains("..") && !groupId.contains("\\")
+                && !moduleName.contains("..") && !moduleName.contains("\\");
+    }
+
     private JCRNodeWrapper upsertModuleNode(HttpServletRequest request, JCRNodeWrapper repositoryStart,
                                             String moduleRelPath, String groupId, String moduleName,
                                             Map<String, List<String>> moduleParameters) throws RepositoryException {
@@ -670,8 +688,9 @@ public class CreateEntryFromJar extends Action {
 
             if (ret > 0) {
                 String s = getMavenError(out.toString());
-                logger.error("Maven archetype call returned {}", ret);
-                logger.error("Maven out : {}", out);
+                // Log only the filtered [ERROR] lines, not the full Maven output: the latter echoes
+                // the configured Nexus URL ("Uploading to ...") into the application log (SECURITY-571).
+                logger.error("Maven deployment failed (exit {}): {}", ret, s);
                 throw new IOException("Maven invocation failed\n" + s);
             }
         } finally {

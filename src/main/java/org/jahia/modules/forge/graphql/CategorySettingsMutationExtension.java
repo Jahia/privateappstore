@@ -184,6 +184,7 @@ public final class CategorySettingsMutationExtension {
     }
 
     private static <T> T execute(String siteKey, JCRCallback<T> work) {
+        ForgeSettingsMutationExtension.validateSiteKey(siteKey);
         try {
             return JCRTemplate.getInstance().doExecuteWithSystemSession(session -> {
                 final String sitePath = SITES_PATH + siteKey;
