@@ -26,12 +26,14 @@ package org.jahia.modules.forge.proxy;
 import java.io.IOException;
 import java.net.URI;
 import org.apache.commons.lang.StringUtils;
+import org.apache.jackrabbit.core.fs.FileSystem;
 import org.apache.xerces.impl.dv.util.Base64;
 import org.jahia.api.Constants;
 import org.jahia.data.templates.ModuleReleaseInfo;
 import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.decorator.JCRSiteNode;
+import org.jahia.services.sites.JahiaSitesService;
 
 import javax.jcr.RepositoryException;
 import javax.servlet.Servlet;
@@ -59,6 +61,8 @@ public class MavenProxy extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(MavenProxy.class);
+    private static final String SITES_PATH = JahiaSitesService.SITES_JCR_PATH + FileSystem.SEPARATOR;
+    private static final String MODULES_REPOSITORY = "/contents/modules-repository";
 
     private final HttpClientService httpClientService;
 
@@ -86,19 +90,23 @@ public class MavenProxy extends HttpServlet {
             String path = "/" + StringUtils.substringAfter(pathInfo, "/");
 
             // Reject path traversal and absolute-URL injection to prevent SSRF: the caller must
-            // not be able to escape the configured repository root or point at another host.
-            if (path.contains("..") || path.contains("\\") || path.contains("://") || path.contains("\n") || path.contains("\r")) {
-                LOGGER.warn("MavenProxy: rejected suspicious path '{}'", path);
+            // not be able to escape the configured repository root or point at another host. The
+            // siteName segment is validated separately (it is concatenated into a JCR path).
+            if (isSuspicious(path) || !isValidSiteName(siteName)) {
+                LOGGER.warn("MavenProxy: rejected suspicious request site='{}' path='{}'", siteName, path);
                 trySendError(response, HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
 
-            // Authorization: the proxy forwards the site's STORED Maven credentials, so it must
-            // only ever do so on behalf of a caller who can actually read that site's module
-            // catalogue. The site node and its forgeSettings* properties are commonly world-
-            // readable, but modules-repository is jmix:accessControlled — reading it through the
-            // caller's own session enforces the site's content ACLs and prevents a user of site A
-            // from coercing the proxy into using site B's credentials (SECURITY-571).
+            // Authorization (SECURITY-571 B1): the proxy forwards the site's STORED Maven
+            // credentials, so it must only do so for a caller who can read that site's module
+            // repository in their OWN session. The site node + forgeSettings* properties are
+            // commonly world-readable, but modules-repository is jmix:accessControlled, so a
+            // PRIVATE site (restrictive inherited ACL) blocks a foreign caller here. NOTE: the
+            // proxy intentionally serves raw Maven coordinates (not only catalogued modules), so
+            // the gate is repository-level, not artifact-level. Residual: a site whose catalogue
+            // is PUBLIC but whose artifacts must stay private needs a restrictive ACL on its
+            // modules-repository node (operational prerequisite).
             if (!callerCanAccessRepository(session, siteName)) {
                 LOGGER.warn("MavenProxy: user '{}' is not authorized for site '{}' module repository",
                         session.getUser().getName(), siteName);
@@ -162,21 +170,29 @@ public class MavenProxy extends HttpServlet {
         }
     }
 
+    private static boolean isSuspicious(String path) {
+        return path.contains("..") || path.contains("\\") || path.contains("://")
+                || path.contains("\n") || path.contains("\r");
+    }
+
+    /** A site key is a simple identifier; reject anything that could alter the JCR path. */
+    private static boolean isValidSiteName(String siteName) {
+        return StringUtils.isNotBlank(siteName) && siteName.matches("[A-Za-z0-9._-]+");
+    }
+
     /**
      * True when the caller's own session can read the site's (access-controlled) module
      * repository node — the prerequisite for using that site's stored Maven credentials.
      * {@code nodeExists} returns false both when the node is absent and when the caller
-     * lacks read access, which is exactly the gate we want.
+     * lacks read access, which is exactly the gate we want for a private site.
      */
-    private static boolean callerCanAccessRepository(final JCRSessionWrapper session, final String siteName) throws RepositoryException {
-        if (StringUtils.isBlank(siteName)) {
-            return false;
-        }
-        return session.nodeExists("/sites/" + siteName + "/contents/modules-repository");
+    private static boolean callerCanAccessRepository(final JCRSessionWrapper session, final String siteName)
+            throws RepositoryException {
+        return session.nodeExists(SITES_PATH + siteName + MODULES_REPOSITORY);
     }
 
     private ModuleReleaseInfo getModuleReleaseInfo(final JCRSessionWrapper session, final String siteName) throws RepositoryException {
-        JCRSiteNode siteNode = (JCRSiteNode) session.getNode("/sites/" + siteName);
+        JCRSiteNode siteNode = (JCRSiteNode) session.getNode(SITES_PATH + siteName);
         String forgeSettingsUrl = siteNode.getProperty("forgeSettingsUrl").getString();
         String user = siteNode.getProperty("forgeSettingsUser").getString();
         String password = new String(Base64.decode(siteNode.getProperty("forgeSettingsPassword").getString()));
