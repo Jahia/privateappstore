@@ -141,13 +141,14 @@
                         <Jahia-Module-Type>module</Jahia-Module-Type>
                         <Embed-Dependency>*; scope=compile; type=!pom; inline=false</Embed-Dependency>
                         <!-- Process DS @Component annotations for the GraphQL extensions, the
-                             actions package (AddReview/CreateEntryFromJar/SubmitReview/…) and the
-                             proxy package (MavenProxy). A package omitted here has its @Component
-                             silently skipped: scoping to graphql.* alone un-registered every
-                             @Component(service=Action.class) ("Couldn't resolve action named […]"),
-                             and leaving out proxy.* left MavenProxy (the artifact-download servlet,
-                             alias=/mavenproxy → /modules/mavenproxy) unregistered, so every module
-                             download 404'd. -->
+                             actions package (CreateEntryFromJar — the module-JAR upload action)
+                             and the proxy package (MavenProxy). A package omitted here has its
+                             @Component silently skipped: scoping to graphql.* alone un-registered
+                             every @Component(service=Action.class) ("Couldn't resolve action named
+                             […]"), and leaving out proxy.* left MavenProxy (the artifact-download
+                             servlet, alias=/mavenproxy → /modules/mavenproxy) unregistered, so every
+                             module download 404'd. NB: a @Component added in a NEW package (e.g. a
+                             scheduled-job package) must be added here too, or it never activates. -->
                         <_dsannotations>org.jahia.modules.forge.graphql.*,org.jahia.modules.forge.actions.*,org.jahia.modules.forge.proxy.*</_dsannotations>
                     </instructions>
                 </configuration>
