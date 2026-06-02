@@ -1,5 +1,5 @@
-import {DocumentNode} from 'graphql'
-import {createSite, deleteSite} from '@jahia/cypress'
+import {DocumentNode} from 'graphql';
+import {createSite, deleteSite} from '@jahia/cypress';
 
 /**
  * Module-upload workflow check.
@@ -17,50 +17,50 @@ import {createSite, deleteSite} from '@jahia/cypress'
  *      upload action ultimately walks.
  */
 describe('Module upload — UI workflow', () => {
-    const siteKey = 'moduleUploadUiSite'
-    const moduleName = 'cy-upload-module'
+    const siteKey = 'moduleUploadUiSite';
+    const moduleName = 'cy-upload-module';
 
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const updateForgeSettings: DocumentNode =
-        require('graphql-tag/loader!../fixtures/graphql/mutation/updateForgeSettings.graphql')
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+        require('graphql-tag/loader!../fixtures/graphql/mutation/updateForgeSettings.graphql');
+
     const createForgeModule: DocumentNode =
-        require('graphql-tag/loader!../fixtures/graphql/mutation/createForgeModule.graphql')
+        require('graphql-tag/loader!../fixtures/graphql/mutation/createForgeModule.graphql');
 
     before(() => {
-        cy.login()
+        cy.login();
         try {
-            deleteSite(siteKey)
+            deleteSite(siteKey);
         } catch {
             // ignore
         }
+
         createSite(siteKey, {
             languages: 'en',
             templateSet: 'store-template',
             serverName: 'localhost',
             locale: 'en'
-        })
-    })
+        });
+    });
 
     after(() => {
-        deleteSite(siteKey)
-    })
+        deleteSite(siteKey);
+    });
 
     it('the createEntryFromJar.do endpoint is wired once forge settings are configured', () => {
         cy.apollo({
             mutation: updateForgeSettings,
             variables: {
                 siteKey,
-                url: Cypress.env('NEXUS_URL')
-                    ? `${Cypress.env('NEXUS_URL')}/repository/maven-releases/`
-                    : 'http://nexus:8081/repository/maven-releases/',
+                url: Cypress.env('NEXUS_URL') ?
+                    `${Cypress.env('NEXUS_URL')}/repository/maven-releases/` :
+                    'http://nexus:8081/repository/maven-releases/',
                 id: 'remote-repository',
                 user: Cypress.env('NEXUS_USERNAME') || 'admin',
                 password: Cypress.env('NEXUS_PASSWORD') || 'admin123'
             }
-        })
+        });
 
-        cy.login()
+        cy.login();
         // POST without a multipart body — the Action will reject with an
         // error JSON, but the fact we get a 200-class response with an error
         // body (not a 404) proves the .do is registered.
@@ -68,17 +68,17 @@ describe('Module upload — UI workflow', () => {
             method: 'POST',
             url: `/sites/${siteKey}/contents/modules-repository.createEntryFromJar.do`,
             failOnStatusCode: false
-        }).then((res) => {
+        }).then(res => {
             expect(res.status, `${res.status} ${typeof res.body === 'string' ? res.body.slice(0, 120) : ''}`)
-                .to.not.equal(404)
-        })
-    })
+                .to.not.equal(404);
+        });
+    });
 
     it('creates a forge module via the GraphQL contract used by the upload action', () => {
         // The real CreateEntryFromJar action creates the module UNDER
         // modules-repository (resource.getNode() == modules-repository), so
         // exercise the same parent to faithfully mirror the upload contract.
-        const repositoryPath = `/sites/${siteKey}/contents/modules-repository`
+        const repositoryPath = `/sites/${siteKey}/contents/modules-repository`;
         cy.apollo({
             mutation: createForgeModule,
             variables: {
@@ -88,41 +88,41 @@ describe('Module upload — UI workflow', () => {
             }
         })
             .its('data.jcr.addNode.node.path')
-            .should('equal', `${repositoryPath}/${moduleName}`)
+            .should('equal', `${repositoryPath}/${moduleName}`);
 
-        cy.login()
+        cy.login();
         cy.request({
             url: `/cms/edit/default/en${repositoryPath}/${moduleName}.html`,
             failOnStatusCode: false
         })
             .its('status')
-            .should('be.oneOf', [200, 302])
-    })
+            .should('be.oneOf', [200, 302]);
+    });
 
     it('renders the upload form as a hydrated XHR island that intercepts submit', function () {
         // Needs the JS build (island bundle). Skip on the legacy JSP build.
         cy.request({
             url: '/modules/store-template/dist/client/components/forge/ModuleEditor.client.tsx.js',
             failOnStatusCode: false
-        }).then((res) => {
+        }).then(res => {
             if (res.status !== 200) {
-                this.skip()
+                this.skip();
             }
-        })
-        cy.login()
-        cy.visit(`/cms/render/default/en/sites/${siteKey}/home/my-modules.html`)
+        });
+        cy.login();
+        cy.visit(`/cms/render/default/en/sites/${siteKey}/home/my-modules.html`);
 
         // Hydration marker proves the island mounted and the submit is JS-handled.
         // The old plain <form> had no marker and did a full-page navigation to the
         // .do (which is what broke CSRF). XHR posts let CsrfGuard inject the token.
-        cy.get('[data-upload-ready="true"]', {timeout: 20000}).should('exist')
-        cy.get('input[type="file"][name="file"]').should('exist')
+        cy.get('[data-upload-ready="true"]', {timeout: 20000}).should('exist');
+        cy.get('input[type="file"][name="file"]').should('exist');
 
         // Submitting with no file must be intercepted (no navigation to the .do) and
         // surface an inline message instead of landing the user on a blank page.
-        cy.get('[data-upload-ready] button[type="submit"]').click()
-        cy.contains('[role="alert"]', 'choose a module package').should('be.visible')
-        cy.location('pathname').should('include', 'my-modules.html')
-        cy.location('pathname').should('not.include', 'createEntryFromJar')
-    })
-})
+        cy.get('[data-upload-ready] button[type="submit"]').click();
+        cy.contains('[role="alert"]', 'choose a module package').should('be.visible');
+        cy.location('pathname').should('include', 'my-modules.html');
+        cy.location('pathname').should('not.include', 'createEntryFromJar');
+    });
+});

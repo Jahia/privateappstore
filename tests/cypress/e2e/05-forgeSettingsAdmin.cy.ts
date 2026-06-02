@@ -1,5 +1,5 @@
-import {DocumentNode} from 'graphql'
-import {createSite, deleteSite} from '@jahia/cypress'
+import {DocumentNode} from 'graphql';
+import {createSite, deleteSite} from '@jahia/cypress';
 
 /**
  * Verifies the React + GraphQL replacement for the old forgeSettings.flow:
@@ -9,41 +9,41 @@ import {createSite, deleteSite} from '@jahia/cypress'
  *   4. The admin route /jahia/administration/{siteKey}/forgeSettings responds.
  */
 describe('Forge settings admin (React + GraphQL)', () => {
-    const siteKey = 'forgeSettingsSite'
+    const siteKey = 'forgeSettingsSite';
 
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const getForgeSettings: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/query/getForgeSettings.graphql')
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const updateForgeSettings: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/updateForgeSettings.graphql')
+    const getForgeSettings: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/query/getForgeSettings.graphql');
+
+    const updateForgeSettings: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/updateForgeSettings.graphql');
 
     before(() => {
-        cy.login()
+        cy.login();
         try {
-            deleteSite(siteKey)
+            deleteSite(siteKey);
         } catch {
             // ignore
         }
+
         createSite(siteKey, {
             languages: 'en',
             templateSet: 'store-template',
             serverName: 'localhost',
             locale: 'en'
-        })
-    })
+        });
+    });
 
     after(() => {
-        deleteSite(siteKey)
-    })
+        deleteSite(siteKey);
+    });
 
     it('returns an empty settings payload before any save', () => {
         cy.apollo({query: getForgeSettings, variables: {siteKey}})
             .its('data.forgeSettings')
             .should((settings: { siteKey: string; url: string | null; passwordSet: boolean }) => {
-                expect(settings.siteKey).to.equal(siteKey)
-                expect(settings.url).to.be.null
-                expect(settings.passwordSet).to.equal(false)
-            })
-    })
+                expect(settings.siteKey).to.equal(siteKey);
+                expect(settings.url).to.be.null;
+                expect(settings.passwordSet).to.equal(false);
+            });
+    });
 
     it('persists settings via updateForgeSettings and reads them back', () => {
         cy.apollo({
@@ -58,19 +58,19 @@ describe('Forge settings admin (React + GraphQL)', () => {
         })
             .its('data.updateForgeSettings')
             .should((settings: { url: string; passwordSet: boolean }) => {
-                expect(settings.url).to.equal('https://store.example.com')
-                expect(settings.passwordSet).to.equal(true)
-            })
+                expect(settings.url).to.equal('https://store.example.com');
+                expect(settings.passwordSet).to.equal(true);
+            });
 
         cy.apollo({query: getForgeSettings, variables: {siteKey}})
             .its('data.forgeSettings')
             .should((settings: { url: string; id: string; user: string; passwordSet: boolean }) => {
-                expect(settings.url).to.equal('https://store.example.com')
-                expect(settings.id).to.equal('forge-1')
-                expect(settings.user).to.equal('forge-admin')
-                expect(settings.passwordSet).to.equal(true)
-            })
-    })
+                expect(settings.url).to.equal('https://store.example.com');
+                expect(settings.id).to.equal('forge-1');
+                expect(settings.user).to.equal('forge-admin');
+                expect(settings.passwordSet).to.equal(true);
+            });
+    });
 
     it('keeps the existing password when mutation password is blank', () => {
         cy.apollo({
@@ -84,16 +84,16 @@ describe('Forge settings admin (React + GraphQL)', () => {
             }
         })
             .its('data.updateForgeSettings.passwordSet')
-            .should('equal', true)
-    })
+            .should('equal', true);
+    });
 
     it('serves the admin route', () => {
-        cy.login()
+        cy.login();
         cy.request({
             url: `/jahia/administration/${siteKey}/forgeSettings`,
             failOnStatusCode: false
         })
             .its('status')
-            .should('be.oneOf', [200, 302])
-    })
-})
+            .should('be.oneOf', [200, 302]);
+    });
+});

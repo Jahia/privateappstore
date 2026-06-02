@@ -1,4 +1,4 @@
-import { DocumentNode } from 'graphql'
+import {DocumentNode} from 'graphql';
 
 /**
  * Smoke tests: confirm both modules under test are deployed and ACTIVE.
@@ -17,27 +17,26 @@ import { DocumentNode } from 'graphql'
  * is an independent confirmation that the module reached ACTIVE state.
  */
 describe('Modules deployed', () => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const getNodeTypeByName: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/query/getNodeTypeByName.graphql')
+    const getNodeTypeByName: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/query/getNodeTypeByName.graphql');
 
     const auth = {
         username: 'root',
-        password: (Cypress.env('SUPER_USER_PASSWORD') as string) || 'root1234',
-    }
+        password: (Cypress.env('SUPER_USER_PASSWORD') as string) || 'root1234'
+    };
 
-    const toOsgiVersion = (mavenVersion: string): string => mavenVersion.replace(/-SNAPSHOT$/, '.SNAPSHOT')
+    const toOsgiVersion = (mavenVersion: string): string => mavenVersion.replace(/-SNAPSHOT$/, '.SNAPSHOT');
 
     const bundleKey = (symbolicName: string, mavenVersion: string): string =>
-        `${symbolicName}/${toOsgiVersion(mavenVersion)}`
+        `${symbolicName}/${toOsgiVersion(mavenVersion)}`;
 
     const expectBundleActive = (symbolicName: string, mavenVersion: string) => {
-        const key = bundleKey(symbolicName, mavenVersion)
+        const key = bundleKey(symbolicName, mavenVersion);
         cy.request({
             url: `/modules/api/bundles/${key}/_info`,
             auth,
-            failOnStatusCode: false,
-        }).then((response) => {
-            expect(response.status, `GET _info for ${key}`).to.equal(200)
+            failOnStatusCode: false
+        }).then(response => {
+            expect(response.status, `GET _info for ${key}`).to.equal(200);
             // Response shape: { "<clusterNodeId>": { type, osgiState, moduleState } }.
             // On a single-node stack there's exactly one entry; in a cluster
             // every entry must report ACTIVE/STARTED.
@@ -45,33 +44,33 @@ describe('Modules deployed', () => {
                 osgiState?: string
                 moduleState?: string
                 type?: string
-            }>
-            expect(entries, `info payload for ${key}`).to.have.length.greaterThan(0)
+            }>;
+            expect(entries, `info payload for ${key}`).to.have.length.greaterThan(0);
             entries.forEach((info, idx) => {
-                expect(info.osgiState, `osgiState[${idx}] for ${key}`).to.equal('ACTIVE')
-                expect(info.moduleState, `moduleState[${idx}] for ${key}`).to.equal('STARTED')
-            })
-        })
-    }
+                expect(info.osgiState, `osgiState[${idx}] for ${key}`).to.equal('ACTIVE');
+                expect(info.moduleState, `moduleState[${idx}] for ${key}`).to.equal('STARTED');
+            });
+        });
+    };
 
     before(() => {
-        cy.login()
-    })
+        cy.login();
+    });
 
     it('privateappstore bundle is ACTIVE', () => {
-        expectBundleActive('privateappstore', Cypress.env('PRIVATEAPPSTORE_VERSION') as string)
-    })
+        expectBundleActive('privateappstore', Cypress.env('PRIVATEAPPSTORE_VERSION') as string);
+    });
 
     it('store-template bundle is ACTIVE', () => {
-        expectBundleActive('store-template', Cypress.env('STORE_TEMPLATE_VERSION') as string)
-    })
+        expectBundleActive('store-template', Cypress.env('STORE_TEMPLATE_VERSION') as string);
+    });
 
     it('privateappstore CND is registered (jnt:forgeModule resolves)', () => {
-        cy.apollo({ query: getNodeTypeByName, variables: { name: 'jnt:forgeModule' } })
+        cy.apollo({query: getNodeTypeByName, variables: {name: 'jnt:forgeModule'}})
             .its('data.jcr.nodeTypeByName')
             .should((nodeType: { name: string } | null) => {
-                expect(nodeType, 'jnt:forgeModule should be registered').to.not.be.null
-                expect(nodeType?.name).to.equal('jnt:forgeModule')
-            })
-    })
-})
+                expect(nodeType, 'jnt:forgeModule should be registered').to.not.be.null;
+                expect(nodeType?.name).to.equal('jnt:forgeModule');
+            });
+    });
+});

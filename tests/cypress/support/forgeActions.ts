@@ -13,11 +13,11 @@ interface ActionResponse {
     body: unknown
 }
 
-const SUPER_USER = 'root'
+const SUPER_USER = 'root';
 
 function basicAuth(): string {
-    const password = Cypress.env('SUPER_USER_PASSWORD') || 'root1234'
-    return `Basic ${btoa(`${SUPER_USER}:${password}`)}`
+    const password = Cypress.env('SUPER_USER_PASSWORD') || 'root1234';
+    return `Basic ${btoa(`${SUPER_USER}:${password}`)}`;
 }
 
 export function postAction(
@@ -27,7 +27,7 @@ export function postAction(
 ): Cypress.Chainable<ActionResponse> {
     const formBody = Object.entries(body)
         .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
-        .join('&')
+        .join('&');
 
     return cy
         .request({
@@ -41,5 +41,5 @@ export function postAction(
             body: formBody,
             failOnStatusCode: false
         })
-        .then((res) => ({ status: res.status, body: res.body }))
+        .then(res => ({status: res.status, body: res.body}));
 }

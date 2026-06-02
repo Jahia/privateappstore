@@ -13,7 +13,11 @@
     "rules": {
         "react/boolean-prop-naming": ["error", { "rule": "^((is|has)[A-Z]([A-Za-z0-9]?)+|disabled|readOnly|autoFocus)"}],
         "@typescript-eslint/no-shadow": ["error"],
-        "no-warning-comments": ["error", { "terms": ["fixme"] }]
+        "no-warning-comments": ["error", { "terms": ["fixme"] }],
+        "@typescript-eslint/no-var-requires": "off",
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "cypress/unsafe-to-chain-command": "off",
+        "max-nested-callbacks": ["error", 5]
     },
     "root": true
 }

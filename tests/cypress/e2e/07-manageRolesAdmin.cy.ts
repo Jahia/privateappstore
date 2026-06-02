@@ -1,5 +1,5 @@
-import {DocumentNode} from 'graphql'
-import {createSite, deleteSite} from '@jahia/cypress'
+import {DocumentNode} from 'graphql';
+import {createSite, deleteSite} from '@jahia/cypress';
 
 /**
  * Verifies the React + GraphQL replacement for manageRoles.store.flow:
@@ -10,46 +10,46 @@ import {createSite, deleteSite} from '@jahia/cypress'
  *   - The admin route /jahia/administration/{siteKey}/storeRoles responds
  */
 describe('Manage roles admin (React + GraphQL)', () => {
-    const siteKey = 'manageRolesSite'
-    const rootPrincipal = 'root'
+    const siteKey = 'manageRolesSite';
+    const rootPrincipal = 'root';
 
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const getManageRolesSettings: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/query/getManageRolesSettings.graphql')
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const searchForgePrincipals: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/query/searchForgePrincipals.graphql')
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const grantSiteRole: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/grantSiteRole.graphql')
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const revokeSiteRole: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/revokeSiteRole.graphql')
+    const getManageRolesSettings: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/query/getManageRolesSettings.graphql');
+
+    const searchForgePrincipals: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/query/searchForgePrincipals.graphql');
+
+    const grantSiteRole: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/grantSiteRole.graphql');
+
+    const revokeSiteRole: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/revokeSiteRole.graphql');
 
     before(() => {
-        cy.login()
+        cy.login();
         try {
-            deleteSite(siteKey)
+            deleteSite(siteKey);
         } catch {
             // ignore
         }
+
         createSite(siteKey, {
             languages: 'en',
             templateSet: 'store-template',
             serverName: 'localhost',
             locale: 'en'
-        })
-    })
+        });
+    });
 
     after(() => {
-        deleteSite(siteKey)
-    })
+        deleteSite(siteKey);
+    });
 
     it('returns the curated role list with no direct grants on a fresh site', () => {
         cy.apollo({query: getManageRolesSettings, variables: {siteKey}})
             .its('data.manageRolesSettings')
             .should((s: { roles: Array<{ role: string; members: unknown[] }> }) => {
-                const roleNames = s.roles.map(r => r.role)
-                expect(roleNames).to.deep.equal(['store-administrator', 'store-developer', 'reader'])
-                s.roles.forEach(r => expect(r.members).to.have.length(0))
-            })
-    })
+                const roleNames = s.roles.map(r => r.role);
+                expect(roleNames).to.deep.equal(['store-administrator', 'store-developer', 'reader']);
+                s.roles.forEach(r => expect(r.members).to.have.length(0));
+            });
+    });
 
     it('finds the root user via searchForgePrincipals', () => {
         cy.apollo({
@@ -58,10 +58,10 @@ describe('Manage roles admin (React + GraphQL)', () => {
         })
             .its('data.searchForgePrincipals')
             .should((results: Array<{ name: string; type: string }>) => {
-                expect(results.length).to.be.greaterThan(0)
-                expect(results.some(p => p.name === rootPrincipal && p.type === 'USER')).to.be.true
-            })
-    })
+                expect(results.length).to.be.greaterThan(0);
+                expect(results.some(p => p.name === rootPrincipal && p.type === 'USER')).to.be.true;
+            });
+    });
 
     it('grants store-administrator to root, sees the grant, then revokes it', () => {
         cy.apollo({
@@ -74,15 +74,15 @@ describe('Manage roles admin (React + GraphQL)', () => {
             }
         })
             .its('data.grantSiteRole')
-            .should('equal', true)
+            .should('equal', true);
 
         cy.apollo({query: getManageRolesSettings, variables: {siteKey}})
             .its('data.manageRolesSettings.roles')
             .should((roles: Array<{ role: string; members: Array<{ name: string; type: string }> }>) => {
-                const admin = roles.find(r => r.role === 'store-administrator')
-                expect(admin, 'store-administrator role present').to.not.be.undefined
-                expect(admin!.members.some(m => m.name === rootPrincipal && m.type === 'USER')).to.be.true
-            })
+                const admin = roles.find(r => r.role === 'store-administrator');
+                expect(admin, 'store-administrator role present').to.not.be.undefined;
+                expect(admin!.members.some(m => m.name === rootPrincipal && m.type === 'USER')).to.be.true;
+            });
 
         cy.apollo({
             mutation: revokeSiteRole,
@@ -94,23 +94,23 @@ describe('Manage roles admin (React + GraphQL)', () => {
             }
         })
             .its('data.revokeSiteRole')
-            .should('equal', true)
+            .should('equal', true);
 
         cy.apollo({query: getManageRolesSettings, variables: {siteKey}})
             .its('data.manageRolesSettings.roles')
             .should((roles: Array<{ role: string; members: unknown[] }>) => {
-                const admin = roles.find(r => r.role === 'store-administrator')
-                expect(admin!.members).to.have.length(0)
-            })
-    })
+                const admin = roles.find(r => r.role === 'store-administrator');
+                expect(admin!.members).to.have.length(0);
+            });
+    });
 
     it('serves the admin route', () => {
-        cy.login()
+        cy.login();
         cy.request({
             url: `/jahia/administration/${siteKey}/storeRoles`,
             failOnStatusCode: false
         })
             .its('status')
-            .should('be.oneOf', [200, 302])
-    })
-})
+            .should('be.oneOf', [200, 302]);
+    });
+});

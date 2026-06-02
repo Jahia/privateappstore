@@ -1,5 +1,5 @@
-import { DocumentNode } from 'graphql'
-import { createSite, deleteSite } from '@jahia/cypress'
+import {DocumentNode} from 'graphql';
+import {createSite, deleteSite} from '@jahia/cypress';
 
 /**
  * End-to-end content lifecycle test against the combined module surface:
@@ -10,39 +10,39 @@ import { createSite, deleteSite } from '@jahia/cypress'
  *   4. Clean up.
  */
 describe('Forge module content lifecycle', () => {
-    const siteKey = 'forgeContentSite'
-    const moduleName = 'cy-test-module'
-    const modulePath = `/sites/${siteKey}/contents/${moduleName}`
+    const siteKey = 'forgeContentSite';
+    const moduleName = 'cy-test-module';
+    const modulePath = `/sites/${siteKey}/contents/${moduleName}`;
 
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const createForgeModule: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/createForgeModule.graphql')
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const getNodeByPath: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/query/getNodeByPath.graphql')
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const deleteNode: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/deleteNode.graphql')
+    const createForgeModule: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/createForgeModule.graphql');
+
+    const getNodeByPath: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/query/getNodeByPath.graphql');
+
+    const deleteNode: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/deleteNode.graphql');
 
     before(() => {
-        cy.login()
+        cy.login();
         try {
-            deleteSite(siteKey)
+            deleteSite(siteKey);
         } catch {
             // ignore
         }
+
         createSite(siteKey, {
             languages: 'en',
             templateSet: 'store-template',
             serverName: 'localhost',
-            locale: 'en',
-        })
-    })
+            locale: 'en'
+        });
+    });
 
     after(() => {
-        cy.login()
-        cy.apollo({ mutation: deleteNode, variables: { path: modulePath } }).then(() => {
+        cy.login();
+        cy.apollo({mutation: deleteNode, variables: {path: modulePath}}).then(() => {
             // ignore — best effort cleanup before site deletion
-        })
-        deleteSite(siteKey)
-    })
+        });
+        deleteSite(siteKey);
+    });
 
     it('creates and reads back a jnt:forgeModule node', () => {
         cy.apollo({
@@ -50,20 +50,20 @@ describe('Forge module content lifecycle', () => {
             variables: {
                 parentPath: `/sites/${siteKey}/contents`,
                 name: moduleName,
-                title: 'Cypress Test Module',
-            },
+                title: 'Cypress Test Module'
+            }
         })
             .its('data.jcr.addNode.node')
             .should((node: { path: string; uuid: string }) => {
-                expect(node.path).to.equal(modulePath)
-                expect(node.uuid).to.be.a('string').and.not.empty
-            })
+                expect(node.path).to.equal(modulePath);
+                expect(node.uuid).to.be.a('string').and.not.empty;
+            });
 
-        cy.apollo({ query: getNodeByPath, variables: { path: modulePath } })
+        cy.apollo({query: getNodeByPath, variables: {path: modulePath}})
             .its('data.jcr.nodeByPath')
             .should((node: { name: string; primaryNodeType: { name: string } }) => {
-                expect(node.name).to.equal(moduleName)
-                expect(node.primaryNodeType.name).to.equal('jnt:forgeModule')
-            })
-    })
-})
+                expect(node.name).to.equal(moduleName);
+                expect(node.primaryNodeType.name).to.equal('jnt:forgeModule');
+            });
+    });
+});

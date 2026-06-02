@@ -1,17 +1,17 @@
-import {DocumentNode} from 'graphql'
-import {createSite, deleteSite, setNodeProperty} from '@jahia/cypress'
+import {DocumentNode} from 'graphql';
+import {createSite, deleteSite, setNodeProperty} from '@jahia/cypress';
 
 /** Click Save and wait for the full-page reload the editor triggers (reload-safe
  *  via a window stamp — see 17-authoring for the rationale). */
-const saveAndWaitReload = (saveLabel: RegExp = /^Save$/): void => {
-    cy.window().then((w) => {
-        ;(w as unknown as {__preSave?: boolean}).__preSave = true
-    })
-    cy.contains('button', saveLabel).click()
-    cy.window({timeout: 20000}).should((w) => {
-        expect((w as unknown as {__preSave?: boolean}).__preSave).to.be.undefined
-    })
-}
+const saveAndWaitReload = (saveLabel = /^Save$/): void => {
+    cy.window().then(w => {
+        (w as unknown as {__preSave?: boolean}).__preSave = true;
+    });
+    cy.contains('button', saveLabel).click();
+    cy.window({timeout: 20000}).should(w => {
+        expect((w as unknown as {__preSave?: boolean}).__preSave).to.be.undefined;
+    });
+};
 
 /**
  * Rich-text editing for the store-template JS module.
@@ -28,82 +28,82 @@ const saveAndWaitReload = (saveLabel: RegExp = /^Save$/): void => {
  * richtext-ckeditor5 module deployed.
  */
 describe('Rich text editing (JS module)', () => {
-    const siteKey = 'features'
-    const repo = `/sites/${siteKey}/contents/modules-repository`
-    const moduleEdit = `/cms/render/default/en${repo}/demo.html`
+    const siteKey = 'features';
+    const repo = `/sites/${siteKey}/contents/modules-repository`;
+    const moduleEdit = `/cms/render/default/en${repo}/demo.html`;
 
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const createForgeModule: DocumentNode =
-        require('graphql-tag/loader!../fixtures/graphql/mutation/createForgeModule.graphql')
+        require('graphql-tag/loader!../fixtures/graphql/mutation/createForgeModule.graphql');
 
-    const islandBundle = '/modules/store-template/dist/client/components/forge/ModuleEditor.client.tsx.js'
-    const ckeditorRemote = '/modules/richtext-ckeditor5/javascript/apps/remoteEntry.js'
+    const islandBundle = '/modules/store-template/dist/client/components/forge/ModuleEditor.client.tsx.js';
+    const ckeditorRemote = '/modules/richtext-ckeditor5/javascript/apps/remoteEntry.js';
 
     before(function () {
-        cy.request({url: islandBundle, failOnStatusCode: false}).then((res) => {
+        cy.request({url: islandBundle, failOnStatusCode: false}).then(res => {
             if (res.status !== 200) {
-                cy.log('store-template editor island not deployed — skipping')
-                this.skip()
+                cy.log('store-template editor island not deployed — skipping');
+                this.skip();
             }
-        })
-        cy.request({url: ckeditorRemote, failOnStatusCode: false}).then((res) => {
+        });
+        cy.request({url: ckeditorRemote, failOnStatusCode: false}).then(res => {
             if (res.status !== 200) {
-                cy.log('richtext-ckeditor5 remote not deployed — skipping')
-                this.skip()
+                cy.log('richtext-ckeditor5 remote not deployed — skipping');
+                this.skip();
             }
-        })
-        cy.login()
+        });
+        cy.login();
         try {
-            deleteSite(siteKey)
+            deleteSite(siteKey);
         } catch {
             // ignore
         }
+
         createSite(siteKey, {
             languages: 'en',
             templateSet: 'store-template',
             serverName: 'features.local',
             locale: 'en'
-        })
+        });
         cy.apollo({
             mutation: createForgeModule,
             variables: {parentPath: repo, name: 'demo', title: 'Demo Module'}
-        })
-        setNodeProperty(`${repo}/demo`, 'description', '<p>Original description.</p>', 'en')
-        setNodeProperty(`${repo}/demo`, 'published', 'true', 'en')
-    })
+        });
+        setNodeProperty(`${repo}/demo`, 'description', '<p>Original description.</p>', 'en');
+        setNodeProperty(`${repo}/demo`, 'published', 'true', 'en');
+    });
 
     after(() => {
-        deleteSite(siteKey)
-    })
+        deleteSite(siteKey);
+    });
 
     beforeEach(() => {
-        cy.login()
-    })
+        cy.login();
+    });
 
     it('edits the description with CKEditor 5 and persists clean HTML', () => {
-        cy.visit(moduleEdit)
-        cy.get('[data-editor-ready]', {timeout: 20000})
-        cy.contains('button', /edit module/i).click()
-        cy.contains('[role="tab"]', /^Description$/).click()
+        cy.visit(moduleEdit);
+        cy.get('[data-editor-ready]', {timeout: 20000});
+        cy.contains('button', /edit module/i).click();
+        cy.contains('[role="tab"]', /^Description$/).click();
 
         // CKEditor is fetched from the federated remote and instantiated on the page.
-        cy.get('[data-ckeditor-state="ready"]', {timeout: 30000}).should('exist')
-        cy.get('.ck-editor__editable', {timeout: 10000}).as('ed').should('be.visible')
+        cy.get('[data-ckeditor-state="ready"]', {timeout: 30000}).should('exist');
+        cy.get('.ck-editor__editable', {timeout: 10000}).as('ed').should('be.visible');
 
         // Replace the seeded content via the real editor.
-        cy.get('@ed').click().type('{ctrl+a}{del}')
-        cy.get('@ed').type('Edited via CKEditor')
+        cy.get('@ed').click().type('{ctrl+a}{del}');
+        cy.get('@ed').type('Edited via CKEditor');
 
         // Saving reloads the page; wait for that reload before asserting.
-        saveAndWaitReload()
+        saveAndWaitReload();
 
         // The rendered description reflects the edit…
-        cy.contains('Edited via CKEditor', {timeout: 20000}).should('be.visible')
+        cy.contains('Edited via CKEditor', {timeout: 20000}).should('be.visible');
         // …as clean HTML (scoped to the richtext container, not the whole page).
-        cy.contains('Edited via CKEditor').then(($el) => {
-            const html = $el.parent().html().toLowerCase()
-            expect(html, 'no script element from richtext').not.to.contain('<script')
-            expect(html, 'no inline event handler').not.to.contain('onerror')
-        })
-    })
-})
+        cy.contains('Edited via CKEditor').then($el => {
+            const html = $el.parent().html().toLowerCase();
+            expect(html, 'no script element from richtext').not.to.contain('<script');
+            expect(html, 'no inline event handler').not.to.contain('onerror');
+        });
+    });
+});

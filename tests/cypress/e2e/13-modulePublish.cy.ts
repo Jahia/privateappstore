@@ -1,10 +1,10 @@
-import {DocumentNode} from 'graphql'
+import {DocumentNode} from 'graphql';
 import {
     createSite,
     deleteSite,
     publishAndWaitJobEnding,
     setNodeProperty
-} from '@jahia/cypress'
+} from '@jahia/cypress';
 
 /**
  * Module publish lifecycle.
@@ -24,37 +24,37 @@ import {
  * non-i18n properties — JCR ignores it on those.
  */
 describe('Module publish — version + module', () => {
-    const siteKey = 'modulePublishSite'
-    const moduleName = 'cy-publish-module'
-    const version = '1.0.0'
+    const siteKey = 'modulePublishSite';
+    const moduleName = 'cy-publish-module';
+    const version = '1.0.0';
 
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const createForgeModule: DocumentNode =
-        require('graphql-tag/loader!../fixtures/graphql/mutation/createForgeModule.graphql')
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const addNodeWithProps: DocumentNode =
-        require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeWithProperties.graphql')
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const getNodeProperty: DocumentNode =
-        require('graphql-tag/loader!../fixtures/graphql/query/getNodeProperties.graphql')
+        require('graphql-tag/loader!../fixtures/graphql/mutation/createForgeModule.graphql');
 
-    const modulePath = `/sites/${siteKey}/contents/${moduleName}`
-    const versionName = `${moduleName}-${version}`
-    const versionPath = `${modulePath}/${versionName}`
+    const addNodeWithProps: DocumentNode =
+        require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeWithProperties.graphql');
+
+    const getNodeProperty: DocumentNode =
+        require('graphql-tag/loader!../fixtures/graphql/query/getNodeProperties.graphql');
+
+    const modulePath = `/sites/${siteKey}/contents/${moduleName}`;
+    const versionName = `${moduleName}-${version}`;
+    const versionPath = `${modulePath}/${versionName}`;
 
     before(() => {
-        cy.login()
+        cy.login();
         try {
-            deleteSite(siteKey)
+            deleteSite(siteKey);
         } catch {
             // ignore
         }
+
         createSite(siteKey, {
             languages: 'en',
             templateSet: 'store-template',
             serverName: 'localhost',
             locale: 'en'
-        })
+        });
 
         cy.apollo({
             mutation: createForgeModule,
@@ -63,7 +63,7 @@ describe('Module publish — version + module', () => {
                 name: moduleName,
                 title: 'Cypress Publish Module'
             }
-        })
+        });
 
         cy.apollo({
             mutation: addNodeWithProps,
@@ -79,33 +79,33 @@ describe('Module publish — version + module', () => {
                     {name: 'url', value: 'https://nexus.example.com/repository/maven-releases/cy/publish/module/1.0.0/module-1.0.0.jar'}
                 ]
             }
-        })
+        });
 
         // Use the @jahia/cypress helper — proven write path.
-        setNodeProperty(versionPath, 'changeLog', '- Initial release\n- Cypress-driven test fixture', 'en')
-        setNodeProperty(versionPath, 'published', 'true', 'en')
-        setNodeProperty(modulePath, 'published', 'true', 'en')
-    })
+        setNodeProperty(versionPath, 'changeLog', '- Initial release\n- Cypress-driven test fixture', 'en');
+        setNodeProperty(versionPath, 'published', 'true', 'en');
+        setNodeProperty(modulePath, 'published', 'true', 'en');
+    });
 
     after(() => {
-        deleteSite(siteKey)
-    })
+        deleteSite(siteKey);
+    });
 
     it('the version was created with a changeLog', () => {
         cy.apollo({
             query: getNodeProperty,
-            // changeLog is non-i18n — read with language=null. Reading a
+            // ChangeLog is non-i18n — read with language=null. Reading a
             // non-i18n property with a language returns an empty set in
             // dxm-provider.
             variables: {path: versionPath, name: 'changeLog', language: null},
             fetchPolicy: 'no-cache'
         })
             .its('data.jcr.nodeByPath.properties[0].value')
-            .should('contain', 'Initial release')
-    })
+            .should('contain', 'Initial release');
+    });
 
     it('publishes the version and the module to LIVE', () => {
-        publishAndWaitJobEnding(modulePath, ['en'])
+        publishAndWaitJobEnding(modulePath, ['en']);
 
         cy.apollo({
             query: getNodeProperty,
@@ -113,7 +113,7 @@ describe('Module publish — version + module', () => {
             fetchPolicy: 'no-cache'
         })
             .its('data.jcr.nodeByPath.properties[0].value')
-            .should('equal', 'true')
+            .should('equal', 'true');
 
         cy.apollo({
             query: getNodeProperty,
@@ -121,6 +121,6 @@ describe('Module publish — version + module', () => {
             fetchPolicy: 'no-cache'
         })
             .its('data.jcr.nodeByPath.properties[0].value')
-            .should('equal', 'true')
-    })
-})
+            .should('equal', 'true');
+    });
+});
