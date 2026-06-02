@@ -27,7 +27,7 @@ describe('Forge settings — live UI', () => {
 
         createSite(siteKey, {
             languages: 'en',
-            templateSet: 'store-template',
+            templateSet: 'jahia-store-template',
             serverName: 'localhost',
             locale: 'en'
         });

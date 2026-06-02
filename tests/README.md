@@ -1,6 +1,6 @@
 # Tests
 
-End-to-end Cypress tests for the **Jahia Private App Store** (`privateappstore`) module and the **Jahia Store Template** (`store-template`) module.
+End-to-end Cypress tests for the **Jahia Store** (`jahia-store`) module and the **Jahia Store Template** (`jahia-store-template`) module.
 
 Two options are available to run the tests, you can either run everything in Docker or only run Jahia in Docker and run the tests using your local node.
 
@@ -11,12 +11,12 @@ The Docker stack brings up three services on a shared network (`stack`):
 | Service  | Image                        | Purpose                                                                                  |
 |----------|------------------------------|------------------------------------------------------------------------------------------|
 | `nexus`  | `sonatype/nexus3:3.70.1`     | Maven repository backing the private app store. Default creds: `admin` / `admin123`.     |
-| `jahia`  | `${JAHIA_IMAGE}`             | Jahia instance with `privateappstore` + `store-template` provisioned. Waits for Nexus.   |
+| `jahia`  | `${JAHIA_IMAGE}`             | Jahia instance with `jahia-store` + `jahia-store-template` provisioned. Waits for Nexus.   |
 | `cypress`| `${TESTS_IMAGE}`             | Runs the Cypress specs against the Jahia instance.                                       |
 
 The provisioning manifest installs Jahia plus:
-- `privateappstore` — the backend module being tested (taken from `../target/*-SNAPSHOT.jar` when present, otherwise from Nexus).
-- `store-template` — the front-end templates set, pulled from a local sibling checkout at `../../store-template/target/*-SNAPSHOT.jar` when present, otherwise from Nexus (see `provisioning-manifest-snapshot.yml`).
+- `jahia-store` — the backend module being tested (taken from `../target/*-SNAPSHOT.jar` when present, otherwise from Nexus).
+- `jahia-store-template` — the front-end templates set, pulled from a local sibling checkout at `../../store-template/target/*-SNAPSHOT.tgz` when present, otherwise from Nexus (see `provisioning-manifest-snapshot.yml`). The on-disk folder keeps its `store-template/` name.
 
 Nexus is reachable from inside the network at `http://nexus:8081` (Jahia / Cypress) and from the host at `http://localhost:8081`. The forge module's per-site `jnt:forgeSettings` should point at the internal URL when configured by a test, using the credentials exposed via the `NEXUS_USERNAME` / `NEXUS_PASSWORD` environment variables.
 

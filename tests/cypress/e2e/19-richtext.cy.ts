@@ -14,7 +14,7 @@ const saveAndWaitReload = (saveLabel = /^Save$/): void => {
 };
 
 /**
- * Rich-text editing for the store-template JS module.
+ * Rich-text editing for the jahia-store-template JS module.
  *
  * The richtext metadata fields (description, how-to-install, FAQ, license) are now
  * edited in-site with CKEditor 5, loaded at runtime from the deployed
@@ -24,7 +24,7 @@ const saveAndWaitReload = (saveLabel = /^Save$/): void => {
  * rendered with dangerouslySetInnerHTML.
  *
  * This spec verifies the edit -> save -> persist -> render round-trip and that the
- * rendered richtext is clean. Requires the JS build of store-template AND the
+ * rendered richtext is clean. Requires the JS build of jahia-store-template AND the
  * richtext-ckeditor5 module deployed.
  */
 describe('Rich text editing (JS module)', () => {
@@ -35,13 +35,13 @@ describe('Rich text editing (JS module)', () => {
     const createForgeModule: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/mutation/createForgeModule.graphql');
 
-    const islandBundle = '/modules/store-template/dist/client/components/forge/ModuleEditor.client.tsx.js';
+    const islandBundle = '/modules/jahia-store-template/dist/client/components/forge/ModuleEditor.client.tsx.js';
     const ckeditorRemote = '/modules/richtext-ckeditor5/javascript/apps/remoteEntry.js';
 
     before(function () {
         cy.request({url: islandBundle, failOnStatusCode: false}).then(res => {
             if (res.status !== 200) {
-                cy.log('store-template editor island not deployed — skipping');
+                cy.log('jahia-store-template editor island not deployed — skipping');
                 this.skip();
             }
         });
@@ -60,7 +60,7 @@ describe('Rich text editing (JS module)', () => {
 
         createSite(siteKey, {
             languages: 'en',
-            templateSet: 'store-template',
+            templateSet: 'jahia-store-template',
             serverName: 'features.local',
             locale: 'en'
         });

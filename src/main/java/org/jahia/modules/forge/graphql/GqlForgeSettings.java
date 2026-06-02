@@ -13,7 +13,7 @@ public class GqlForgeSettings {
     private final String id;
     private final String user;
     private final boolean passwordSet;
-    // Branding / footer (rendered by the store-template chrome).
+    // Branding / footer (rendered by the jahia-store-template chrome).
     private final String logoPath;
     private final String copyright;
     private final String privacyUrl;

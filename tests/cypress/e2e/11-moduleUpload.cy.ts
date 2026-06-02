@@ -36,7 +36,7 @@ describe('Module upload — UI workflow', () => {
 
         createSite(siteKey, {
             languages: 'en',
-            templateSet: 'store-template',
+            templateSet: 'jahia-store-template',
             serverName: 'localhost',
             locale: 'en'
         });
@@ -102,7 +102,7 @@ describe('Module upload — UI workflow', () => {
     it('renders the upload form as a hydrated XHR island that intercepts submit', function () {
         // Needs the JS build (island bundle). Skip on the legacy JSP build.
         cy.request({
-            url: '/modules/store-template/dist/client/components/forge/ModuleEditor.client.tsx.js',
+            url: '/modules/jahia-store-template/dist/client/components/forge/ModuleEditor.client.tsx.js',
             failOnStatusCode: false
         }).then(res => {
             if (res.status !== 200) {

@@ -32,7 +32,7 @@ describe('Module list JSON + download', () => {
     const moduleName = 'cy-listed-module';
     const groupId = 'org.cypress.test';
     const version = '1.0.0';
-    // A real module JAR (a copy of the privateappstore module under test),
+    // A real module JAR (a copy of the jahia-store module under test),
     // shipped as a fixture under tests/assets with a version-agnostic name so
     // it does not drift with the build. cy.fixture resolves from
     // cypress/fixtures, so step up to tests/assets.
@@ -81,7 +81,7 @@ describe('Module list JSON + download', () => {
 
         createSite(siteKey, {
             languages: 'en',
-            templateSet: 'store-template',
+            templateSet: 'jahia-store-template',
             serverName: 'localhost',
             locale: 'en'
         });

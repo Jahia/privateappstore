@@ -9,13 +9,14 @@ source ./set-env.sh
 rm -rf ./artifacts
 mkdir -p ./artifacts
 
-# Pull privateappstore JAR built locally (sibling target/)
+# Pull the jahia-store JAR built locally (sibling target/)
 if [[ -e ../target ]]; then
   cp -R ../target/*-SNAPSHOT.jar ./artifacts/ 2>/dev/null || true
 fi
 
-# Pull the store-template artifact built locally in a sibling repo.
-# store-template is now a Jahia JavaScript module: 'mvn package' produces a .tgz
+# Pull the jahia-store-template artifact built locally in the sibling store-template/ repo
+# (the on-disk folder keeps its name; the artifact is jahia-store-template-*.tgz).
+# It is a Jahia JavaScript module: 'mvn package' produces a .tgz
 # (the engine's js: handler installs it; @jahia/cypress env.provision installs
 # *-SNAPSHOT.tgz after the .jar modules + the engine).
 if [[ -e ../../store-template/target ]]; then

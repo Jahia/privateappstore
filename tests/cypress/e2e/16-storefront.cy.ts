@@ -2,16 +2,16 @@ import {DocumentNode} from 'graphql';
 import {createSite, deleteSite, publishAndWaitJobEnding, setNodeProperty, uploadFile} from '@jahia/cypress';
 
 /**
- * Storefront read views (store-template JS module): the module list grid and
+ * Storefront read views (jahia-store-template JS module): the module list grid and
  * the module detail page.
  *
- * Seeds a store-template site with a modules-repository, two published modules
+ * Seeds a jahia-store-template site with a modules-repository, two published modules
  * (one with a version) and one unpublished draft, plus a home page hosting a
  * forgeModulesList, then asserts:
  *   - the grid lists published entries and hides the unpublished draft
  *   - a module detail page renders title, description, version + download
  *
- * Requires the JS build of store-template (provides the forge views/templates).
+ * Requires the JS build of jahia-store-template (provides the forge views/templates).
  */
 describe('Storefront read views (JS module)', () => {
     const siteKey = 'storefront';
@@ -32,7 +32,7 @@ describe('Storefront read views (JS module)', () => {
     const deleteNode: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/mutation/deleteNode.graphql');
 
-    const islandBundle = '/modules/store-template/dist/client/components/forge/ModuleEditor.client.tsx.js';
+    const islandBundle = '/modules/jahia-store-template/dist/client/components/forge/ModuleEditor.client.tsx.js';
 
     const addNode = (parentPath: string, name: string, primaryNodeType: string, properties: object[] = []) =>
         cy.apollo({mutation: addNodeWithProps, variables: {parentPath, name, primaryNodeType, properties}});
@@ -40,7 +40,7 @@ describe('Storefront read views (JS module)', () => {
     before(function () {
         cy.request({url: islandBundle, failOnStatusCode: false}).then(res => {
             if (res.status !== 200) {
-                cy.log('store-template JS module not deployed — skipping storefront spec');
+                cy.log('jahia-store-template JS module not deployed — skipping storefront spec');
                 this.skip();
             }
         });
@@ -51,11 +51,11 @@ describe('Storefront read views (JS module)', () => {
             // ignore
         }
 
-        // The store-template import.xml seeds the home page (+ modules list),
+        // The jahia-store-template import.xml seeds the home page (+ modules list),
         // the My-modules sub-page and contents/modules-repository.
         createSite(siteKey, {
             languages: 'en',
-            templateSet: 'store-template',
+            templateSet: 'jahia-store-template',
             serverName: 'storefront.local',
             locale: 'en'
         });

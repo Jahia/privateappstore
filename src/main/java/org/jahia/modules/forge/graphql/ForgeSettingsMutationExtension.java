@@ -97,7 +97,7 @@ public final class ForgeSettingsMutationExtension {
 
                     session.save();
 
-                    // The store-template chrome renders the logo, copyright and footer links from
+                    // The jahia-store-template chrome renders the logo, copyright and footer links from
                     // these jmix:forgeSettings properties via SSR, and Jahia caches that rendered
                     // HTML. Flush the site's output cache (whole subtree) so the change is visible
                     // immediately instead of serving stale chrome until the cache expires.

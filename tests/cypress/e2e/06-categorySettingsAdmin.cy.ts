@@ -44,7 +44,7 @@ describe('Category settings admin (React + GraphQL)', () => {
 
         createSite(siteKey, {
             languages: 'en,fr',
-            templateSet: 'store-template',
+            templateSet: 'jahia-store-template',
             serverName: 'localhost',
             locale: 'en'
         });

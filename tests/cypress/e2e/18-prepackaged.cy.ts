@@ -2,15 +2,15 @@ import {DocumentNode} from 'graphql';
 import {createSite, deleteSite, setNodeProperty} from '@jahia/cypress';
 
 /**
- * Prepackaged site (store-template JS module).
+ * Prepackaged site (jahia-store-template JS module).
  *
  * Verifies the template set's settings/import.xml: creating a site with the
- * store-template template set — with NO manual seeding — yields a working store
+ * jahia-store-template template set — with NO manual seeding — yields a working store
  * entirely on the JS templates: a home page rendering the modules grid, a
  * "My modules" page, a site-administration page, and a modules-repository
  * folder. Then a published module dropped into that repository shows on home.
  *
- * Requires the JS build of store-template.
+ * Requires the JS build of jahia-store-template.
  */
 describe('Prepackaged store site (JS module)', () => {
     const siteKey = 'prepkg';
@@ -23,12 +23,12 @@ describe('Prepackaged store site (JS module)', () => {
     const getNodeByPath: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/query/getNodeByPath.graphql');
 
-    const islandBundle = '/modules/store-template/dist/client/components/forge/ModuleEditor.client.tsx.js';
+    const islandBundle = '/modules/jahia-store-template/dist/client/components/forge/ModuleEditor.client.tsx.js';
 
     before(function () {
         cy.request({url: islandBundle, failOnStatusCode: false}).then(res => {
             if (res.status !== 200) {
-                cy.log('store-template JS module not deployed — skipping prepackaged spec');
+                cy.log('jahia-store-template JS module not deployed — skipping prepackaged spec');
                 this.skip();
             }
         });
@@ -42,7 +42,7 @@ describe('Prepackaged store site (JS module)', () => {
         // No content seeding here — the template set's import.xml provides it.
         createSite(siteKey, {
             languages: 'en',
-            templateSet: 'store-template',
+            templateSet: 'jahia-store-template',
             serverName: 'prepkg.local',
             locale: 'en'
         });

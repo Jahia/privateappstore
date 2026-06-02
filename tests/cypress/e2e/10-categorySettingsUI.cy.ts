@@ -36,7 +36,7 @@ describe('Category settings — live UI', () => {
 
         createSite(siteKey, {
             languages: 'en,fr',
-            templateSet: 'store-template',
+            templateSet: 'jahia-store-template',
             serverName: 'localhost',
             locale: 'en'
         });

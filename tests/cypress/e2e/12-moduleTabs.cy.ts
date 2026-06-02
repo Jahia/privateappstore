@@ -57,7 +57,7 @@ describe('Module tabs — content lifecycle', () => {
 
         createSite(siteKey, {
             languages: 'en',
-            templateSet: 'store-template',
+            templateSet: 'jahia-store-template',
             serverName: 'localhost',
             locale: 'en'
         });
@@ -182,7 +182,7 @@ describe('Module tabs — content lifecycle', () => {
     it('Icon — an uploaded image lands in the module icon folder', () => {
         // Jnt:forgeModule declares `+ icon (jnt:folder)` (not autocreated), so
         // create the folder first, then upload the image into it — mirroring
-        // what the store-template owner UI does via GraphQL (the icon upload now
+        // what the jahia-store-template owner UI does via GraphQL (the icon upload now
         // goes through a GraphQL multipart mutation, not a Jahia action).
         cy.apollo({
             mutation: addNodeWithProps,

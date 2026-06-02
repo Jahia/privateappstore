@@ -10,7 +10,7 @@ import javax.jcr.RepositoryException;
  * Builds a {@link GqlForgeSettings} from a site node's {@code jmix:forgeSettings}
  * properties. Shared by the query (read) and the mutation (re-read after save) so
  * the property/field mapping lives in one place. The logo is stored as a
- * weakreference; we expose its resolved JCR path (the store-template chrome
+ * weakreference; we expose its resolved JCR path (the jahia-store-template chrome
  * resolves the reference itself to render the image).
  */
 final class ForgeSettingsReader {

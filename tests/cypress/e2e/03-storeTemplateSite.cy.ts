@@ -1,12 +1,12 @@
 import {createSite, deleteSite, publishAndWaitJobEnding} from '@jahia/cypress';
 
 /**
- * Provision a site that uses the store-template templates set and verify that
+ * Provision a site that uses the jahia-store-template templates set and verify that
  * the resulting home page renders. createSite() will fail if the templates set
- * is not deployed, so this test exercises store-template + privateappstore
- * together (privateappstore's CND is a transitive dependency of the templates).
+ * is not deployed, so this test exercises jahia-store-template + jahia-store
+ * together (jahia-store's CND is a transitive dependency of the templates).
  */
-describe('store-template site provisioning', () => {
+describe('jahia-store-template site provisioning', () => {
     const siteKey = 'storeTestSite';
 
     before(() => {
@@ -20,7 +20,7 @@ describe('store-template site provisioning', () => {
 
         createSite(siteKey, {
             languages: 'en',
-            templateSet: 'store-template',
+            templateSet: 'jahia-store-template',
             serverName: 'localhost',
             locale: 'en'
         });
@@ -44,7 +44,7 @@ describe('store-template site provisioning', () => {
         });
     });
 
-    it('exposes the privateappstore admin entry point for the site', () => {
+    it('exposes the jahia-store admin entry point for the site', () => {
         cy.login();
         cy.request({
             url: `/jahia/administration/${siteKey}`,

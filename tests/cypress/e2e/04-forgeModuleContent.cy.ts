@@ -3,9 +3,9 @@ import {createSite, deleteSite} from '@jahia/cypress';
 
 /**
  * End-to-end content lifecycle test against the combined module surface:
- *   1. Create a site with the store-template templates set.
+ *   1. Create a site with the jahia-store-template templates set.
  *   2. Create a jnt:forgeModule node under the site contents.
- *   3. Read it back, verifying the node type registered by privateappstore
+ *   3. Read it back, verifying the node type registered by jahia-store
  *      is usable for actual content creation (not just registered in the CND).
  *   4. Clean up.
  */
@@ -30,7 +30,7 @@ describe('Forge module content lifecycle', () => {
 
         createSite(siteKey, {
             languages: 'en',
-            templateSet: 'store-template',
+            templateSet: 'jahia-store-template',
             serverName: 'localhost',
             locale: 'en'
         });

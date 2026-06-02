@@ -12,7 +12,7 @@ import {DocumentNode} from 'graphql';
  * the same substitution so tests can be parameterized with the Maven
  * version coming straight from the .env file.
  *
- * In addition, we probe one of privateappstore's CND-defined node types
+ * In addition, we probe one of jahia-store's CND-defined node types
  * via JCR — CND registration happens during bundle activation, so a hit
  * is an independent confirmation that the module reached ACTIVE state.
  */
@@ -57,15 +57,15 @@ describe('Modules deployed', () => {
         cy.login();
     });
 
-    it('privateappstore bundle is ACTIVE', () => {
-        expectBundleActive('privateappstore', Cypress.env('PRIVATEAPPSTORE_VERSION') as string);
+    it('jahia-store bundle is ACTIVE', () => {
+        expectBundleActive('jahia-store', Cypress.env('PRIVATEAPPSTORE_VERSION') as string);
     });
 
-    it('store-template bundle is ACTIVE', () => {
-        expectBundleActive('store-template', Cypress.env('STORE_TEMPLATE_VERSION') as string);
+    it('jahia-store-template bundle is ACTIVE', () => {
+        expectBundleActive('jahia-store-template', Cypress.env('STORE_TEMPLATE_VERSION') as string);
     });
 
-    it('privateappstore CND is registered (jnt:forgeModule resolves)', () => {
+    it('jahia-store CND is registered (jnt:forgeModule resolves)', () => {
         cy.apollo({query: getNodeTypeByName, variables: {name: 'jnt:forgeModule'}})
             .its('data.jcr.nodeTypeByName')
             .should((nodeType: { name: string } | null) => {

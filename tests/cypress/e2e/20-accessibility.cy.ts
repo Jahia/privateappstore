@@ -3,16 +3,16 @@ import {Result} from 'axe-core';
 import {createSite, deleteSite, setNodeProperty} from '@jahia/cypress';
 
 /**
- * Accessibility gate (store-template JS module) — enforces the module's
+ * Accessibility gate (jahia-store-template JS module) — enforces the module's
  * WCAG 2.2 Level AAA conformance target with axe-core.
  *
- * Seeds a store-template site (home grid + a module detail + my-modules), then
+ * Seeds a jahia-store-template site (home grid + a module detail + my-modules), then
  * runs axe on each rendered page against the full WCAG ladder up to AAA, plus the
  * landmark/region best-practice rules. Any violation fails the spec — this
  * replaces the previously-manual EqualWeb/axe audit with an automated gate.
  *
  * (Store administration is no longer in-site; it lives in the Jahia site
- * administration / jContent.) Requires the JS build of store-template. Skips
+ * administration / jContent.) Requires the JS build of jahia-store-template. Skips
  * gracefully on the legacy JSP build.
  */
 describe('Accessibility — WCAG 2.2 AAA gate (JS module)', () => {
@@ -61,12 +61,12 @@ describe('Accessibility — WCAG 2.2 AAA gate (JS module)', () => {
     const addNodeWithProps: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeWithProperties.graphql');
 
-    const islandBundle = '/modules/store-template/dist/client/components/forge/ModuleEditor.client.tsx.js';
+    const islandBundle = '/modules/jahia-store-template/dist/client/components/forge/ModuleEditor.client.tsx.js';
 
     before(function () {
         cy.request({url: islandBundle, failOnStatusCode: false}).then(res => {
             if (res.status !== 200) {
-                cy.log('store-template JS module not deployed — skipping accessibility spec');
+                cy.log('jahia-store-template JS module not deployed — skipping accessibility spec');
                 this.skip();
             }
         });
@@ -79,7 +79,7 @@ describe('Accessibility — WCAG 2.2 AAA gate (JS module)', () => {
 
         createSite(siteKey, {
             languages: 'en',
-            templateSet: 'store-template',
+            templateSet: 'jahia-store-template',
             serverName: 'a11y.local',
             locale: 'en'
         });

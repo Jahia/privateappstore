@@ -10,7 +10,7 @@ import {
  * Module publish lifecycle.
  *
  * Sets a changeLog on the version, marks both module and version published,
- * then asserts the JCR state. Publishing is now driven by the store-template
+ * then asserts the JCR state. Publishing is now driven by the jahia-store-template
  * owner UI through a GraphQL setValue on `published` (the legacy
  * publishModule.do action was removed with the JSP storefront).
  *
@@ -51,7 +51,7 @@ describe('Module publish — version + module', () => {
 
         createSite(siteKey, {
             languages: 'en',
-            templateSet: 'store-template',
+            templateSet: 'jahia-store-template',
             serverName: 'localhost',
             locale: 'en'
         });

@@ -31,7 +31,7 @@ describe('Manage roles admin (React + GraphQL)', () => {
 
         createSite(siteKey, {
             languages: 'en',
-            templateSet: 'store-template',
+            templateSet: 'jahia-store-template',
             serverName: 'localhost',
             locale: 'en'
         });

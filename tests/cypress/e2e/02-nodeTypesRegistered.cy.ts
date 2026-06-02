@@ -1,7 +1,7 @@
 import {DocumentNode} from 'graphql';
 
 /**
- * Verify that the JCR node types declared in privateappstore's definitions.cnd
+ * Verify that the JCR node types declared in jahia-store's definitions.cnd
  * are actually registered after the module is started. If the CND failed to
  * load (e.g. malformed definition, missing dependency) the bundle may still
  * be ACTIVE but its types will be silently missing — which is why this is a

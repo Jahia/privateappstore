@@ -1,7 +1,7 @@
 {
   "name": "privateappstore-cypress",
   "version": "1.0.0",
-  "description": "Cypress tests for the Jahia Private App Store module and the Store Template module",
+  "description": "Cypress tests for the Jahia Store module (jahia-store) and the Jahia Store Template module (jahia-store-template)",
   "devDependencies": {
     "@apollo/client": "^3.14.0",
     "@babel/core": "^7.25.2",

@@ -19,13 +19,13 @@ const saveAndWaitReload = (saveLabel = /^Save$/): void => {
 };
 
 /**
- * Authoring views (store-template JS module) — Phase 3.
+ * Authoring views (jahia-store-template JS module) — Phase 3.
  *
  * Covers in-site editing of module metadata via the ModuleEditor island, which
  * saves through the generic jcr GraphQL mutations (session-authenticated, JCR
  * ACLs apply — no custom Java action).
  *
- * Requires the JS build of store-template.
+ * Requires the JS build of jahia-store-template.
  */
 describe('Authoring views (JS module)', () => {
     const siteKey = 'authoring';
@@ -38,12 +38,12 @@ describe('Authoring views (JS module)', () => {
     const addNodeWithProps: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeWithProperties.graphql');
 
-    const islandBundle = '/modules/store-template/dist/client/components/forge/ModuleEditor.client.tsx.js';
+    const islandBundle = '/modules/jahia-store-template/dist/client/components/forge/ModuleEditor.client.tsx.js';
 
     before(function () {
         cy.request({url: islandBundle, failOnStatusCode: false}).then(res => {
             if (res.status !== 200) {
-                cy.log('store-template JS module not deployed — skipping authoring spec');
+                cy.log('jahia-store-template JS module not deployed — skipping authoring spec');
                 this.skip();
             }
         });
@@ -56,11 +56,11 @@ describe('Authoring views (JS module)', () => {
 
         createSite(siteKey, {
             languages: 'en',
-            templateSet: 'store-template',
+            templateSet: 'jahia-store-template',
             serverName: 'authoring.local',
             locale: 'en'
         });
-        // The store-template import.xml provides modules-repository + the
+        // The jahia-store-template import.xml provides modules-repository + the
         // home/my-modules page (which hosts the JAR upload form).
         cy.apollo({
             mutation: createForgeModule,
