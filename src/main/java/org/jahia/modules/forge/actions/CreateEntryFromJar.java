@@ -267,38 +267,21 @@ public class CreateEntryFromJar extends Action {
         JCRNodeWrapper module = upsertModuleNode(request, repository, moduleRelPath, groupId, moduleName, moduleParameters);
         grantOwnerRole(session, module);
 
-        boolean hasModuleVersions = JCRTagUtils.hasChildrenOfType(module, JNT_FORGEMODULEVERSION);
         logger.info("Start adding module version {} of {}", version, title);
-
-        if (hasModuleVersions && !hasValidVersionNumber(module, version)) {
-            String error = Messages.getWithArgs(RESOURCES_JAHIA_STORE, ERR_VERSION_NUMBER, session.getLocale(), moduleName, version);
-            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
+        final ActionResult conflict = versionConflict(module, version, moduleName, session);
+        if (conflict != null) {
+            return conflict;
         }
-
-        JCRNodeWrapper moduleVersion = createNode(request, versionParameters, module, JNT_FORGEMODULEVERSION, module.getName() + "-" + version, false);
-
-        String value = jahiaJsonObject.getString("module-dependencies");
-        if (value != null) {
-            moduleVersion.setProperty(REFERENCES, value.split(","));
-        } else {
-            moduleVersion.setProperty(REFERENCES, EMPTY_REFERENCES);
-        }
-        grantOwnerRole(session, moduleVersion);
+        final JCRNodeWrapper moduleVersion = createModuleVersion(request, module, versionParameters, version,
+                jahiaJsonObject.getString("module-dependencies"), session);
 
         logger.info("Javascript Module version {} of {} successfully added", version, title);
         logger.info("Private App Store Javascript Module {} successfully created and added to repository {}", moduleName, repository.getPath());
 
-        final String moduleUrl = renderContext.getResponse().encodeURL(module.getUrl());
-        final String moduleAbsoluteUrl = module.getProvider().getAbsoluteContextPath(request) + moduleUrl;
         session.save();
         moduleVersion.uploadFile(uploadedFile.getName(), uploadedFile.getInputStream(), uploadedFile.getContentType());
         session.save();
-
-        final ActionResult uploadResult = new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(SUCCESS_REDIRECT_URL, moduleUrl).put(
-                SUCCESS_REDIRECT_ABSOLUTE_URL, moduleAbsoluteUrl));
-        applySafeRedirect(uploadResult, formParams);
-
-        return uploadResult;
+        return buildUploadResult(request, renderContext, module, formParams);
     }
 
     private ActionResult createPackage(DiskFileItem uploadedFile, JarFile jar, Attributes attributes, HttpServletRequest request, RenderContext renderContext, Resource resource, JCRSessionWrapper session, Map<String, List<String>> formParams) throws RepositoryException, JSONException, IOException {
@@ -459,34 +442,18 @@ public class CreateEntryFromJar extends Action {
         JCRNodeWrapper module = upsertModuleNode(request, repository, moduleRelPath, groupId, moduleName, moduleParameters);
         grantOwnerRole(session, module);
 
-        boolean hasModuleVersions = JCRTagUtils.hasChildrenOfType(module, JNT_FORGEMODULEVERSION);
         logger.info("Start adding module version {} of {}", version, title);
-
-        if (hasModuleVersions && !hasValidVersionNumber(module, version)) {
-            String error = Messages.getWithArgs(RESOURCES_JAHIA_STORE, ERR_VERSION_NUMBER, session.getLocale(), moduleName, version);
-            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
+        final ActionResult conflict = versionConflict(module, version, moduleName, session);
+        if (conflict != null) {
+            return conflict;
         }
-
-        JCRNodeWrapper moduleVersion = createNode(request, versionParameters, module, JNT_FORGEMODULEVERSION, module.getName() + "-" + version, false);
-
-        String value = attributes.getValue("Jahia-Depends");
-        if (value != null) {
-            moduleVersion.setProperty(REFERENCES, value.split(","));
-        } else {
-            moduleVersion.setProperty(REFERENCES, EMPTY_REFERENCES);
-        }
-        grantOwnerRole(session, moduleVersion);
+        createModuleVersion(request, module, versionParameters, version, attributes.getValue("Jahia-Depends"), session);
 
         logger.info("Module version {} of {} successfully added", version, title);
         logger.info("Private App Store Module {} successfully created and added to repository {}", moduleName, module.getParent().getPath());
 
-        String moduleUrl = renderContext.getResponse().encodeURL(module.getUrl());
-        String moduleAbsoluteUrl = module.getProvider().getAbsoluteContextPath(request) + moduleUrl;
         session.save();
-        ActionResult uploadResult = new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(SUCCESS_REDIRECT_URL, moduleUrl).put(
-                SUCCESS_REDIRECT_ABSOLUTE_URL, moduleAbsoluteUrl));
-        applySafeRedirect(uploadResult, formParams);
-        return uploadResult;
+        return buildUploadResult(request, renderContext, module, formParams);
     }
 
     private ActionResult deployArtifact(DiskFileItem uploadedFile, JCRSiteNode site, String extension,
@@ -565,6 +532,39 @@ public class CreateEntryFromJar extends Action {
     private static boolean isSafeCoordinate(String groupId, String moduleName) {
         return !groupId.contains("..") && !groupId.contains("\\")
                 && !moduleName.contains("..") && !moduleName.contains("\\");
+    }
+
+    /** The "version already exists" error result, or null when {@code version} may be added. */
+    private ActionResult versionConflict(JCRNodeWrapper module, String version, String moduleName,
+                                         JCRSessionWrapper session) throws RepositoryException, JSONException {
+        if (JCRTagUtils.hasChildrenOfType(module, JNT_FORGEMODULEVERSION) && !hasValidVersionNumber(module, version)) {
+            final String error = Messages.getWithArgs(RESOURCES_JAHIA_STORE, ERR_VERSION_NUMBER,
+                    session.getLocale(), moduleName, version);
+            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
+        }
+        return null;
+    }
+
+    /** Create the version node under a module, set its dependency references, and grant the owner role. */
+    private JCRNodeWrapper createModuleVersion(HttpServletRequest request, JCRNodeWrapper module,
+                                               Map<String, List<String>> versionParameters, String version,
+                                               String dependencies, JCRSessionWrapper session) throws RepositoryException {
+        final JCRNodeWrapper moduleVersion = createNode(request, versionParameters, module,
+                JNT_FORGEMODULEVERSION, module.getName() + "-" + version, false);
+        moduleVersion.setProperty(REFERENCES, dependencies != null ? dependencies.split(",") : EMPTY_REFERENCES);
+        grantOwnerRole(session, moduleVersion);
+        return moduleVersion;
+    }
+
+    /** Build the success result (module URLs + safe redirect) shared by both upload paths. */
+    private ActionResult buildUploadResult(HttpServletRequest request, RenderContext renderContext,
+                                           JCRNodeWrapper module, Map<String, List<String>> formParams) throws JSONException {
+        final String moduleUrl = renderContext.getResponse().encodeURL(module.getUrl());
+        final String moduleAbsoluteUrl = module.getProvider().getAbsoluteContextPath(request) + moduleUrl;
+        final ActionResult uploadResult = new ActionResult(HttpServletResponse.SC_OK, null,
+                new JSONObject().put(SUCCESS_REDIRECT_URL, moduleUrl).put(SUCCESS_REDIRECT_ABSOLUTE_URL, moduleAbsoluteUrl));
+        applySafeRedirect(uploadResult, formParams);
+        return uploadResult;
     }
 
     private JCRNodeWrapper upsertModuleNode(HttpServletRequest request, JCRNodeWrapper repositoryStart,
