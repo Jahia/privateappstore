@@ -17,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jcr.AccessDeniedException;
+import javax.jcr.ItemNotFoundException;
+import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
 import java.nio.charset.StandardCharsets;
 
@@ -64,9 +66,15 @@ public final class ForgeSettingsMutationExtension {
                     setStringProp(site, "forgeSettingsUser", settings.getUser());
 
                     // Password handling preserves the previous Spring Web Flow behavior:
-                    // store as base64 (obfuscation only — not encryption), blank input
+                    // store as base64 (obfuscation only — NOT encryption), blank input
                     // leaves the existing value alone so the UI can omit the field for
                     // already-configured sites without wiping it.
+                    // SECURITY (SECURITY-571 review, accepted risk): the Nexus credential is
+                    // stored reversibly. It is never returned to clients (GqlForgeSettings only
+                    // exposes isPasswordSet) and never logged, and MavenProxy now restricts its
+                    // use to callers who can read the site's module repository. A follow-up should
+                    // move it to the platform credential store / a secret manager and exclude the
+                    // forgeSettingsPassword property from cross-environment JCR exports.
                     final String password = settings.getPassword();
                     if (StringUtils.isNotBlank(password)) {
                         site.setProperty(
@@ -92,8 +100,11 @@ public final class ForgeSettingsMutationExtension {
                 }
             });
         } catch (RepositoryException e) {
+            // Surface as a structured error (mirroring CategorySettings/ManageRoles) instead of
+            // swallowing to null — a null return is indistinguishable from "succeeded but empty"
+            // and hides access-denied / site-not-found from the caller.
             LOGGER.error("Error updating forge settings for site {}", siteKey, e);
-            return null;
+            throw new ForgeSettingsException("Forge settings update failed for site " + siteKey, e);
         }
     }
 
@@ -120,9 +131,17 @@ public final class ForgeSettingsMutationExtension {
             }
             return;
         }
-        final JCRNodeWrapper target = logo.startsWith("/")
-                ? session.getNode(logo)
-                : (JCRNodeWrapper) session.getNodeByIdentifier(logo);
+        final JCRNodeWrapper target;
+        try {
+            target = logo.startsWith("/")
+                    ? session.getNode(logo)
+                    : (JCRNodeWrapper) session.getNodeByIdentifier(logo);
+        } catch (PathNotFoundException | ItemNotFoundException e) {
+            // Unresolvable reference: leave any previously configured logo untouched rather than
+            // aborting the whole mutation, matching this method's documented contract.
+            LOGGER.warn("Ignoring unresolvable forge settings logo reference '{}'", logo);
+            return;
+        }
         site.setProperty(FORGE_SETTINGS_LOGO, target);
     }
 }
