@@ -26,4 +26,11 @@ public interface ForgeSettingsService {
      * value replaces it. All other blank fields clear their stored value.
      */
     void save(String siteKey, ForgeSettings settings);
+
+    /**
+     * Remove a site's settings configuration. Called when a site is deleted so its config does
+     * not outlive it (and a recreated same-key site does not inherit stale settings). No-op when
+     * the site has no configuration.
+     */
+    void delete(String siteKey);
 }

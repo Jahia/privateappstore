@@ -104,6 +104,18 @@ public class ForgeSettingsServiceImpl implements ForgeSettingsService {
         }
     }
 
+    @Override
+    public void delete(String siteKey) {
+        try {
+            final Configuration cfg = findConfig(siteKey);
+            if (cfg != null) {
+                cfg.delete();
+            }
+        } catch (IOException e) {
+            LOGGER.error("Unable to delete forge settings for site {}", siteKey, e);
+        }
+    }
+
     /** Find the single configuration instance for a site, or null when none exists yet. */
     private Configuration findConfig(String siteKey) throws IOException {
         try {
