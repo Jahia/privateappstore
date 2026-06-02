@@ -89,46 +89,15 @@ public class GqlForgeSettings {
         return copyright;
     }
 
+    // Footer legal + social links are exposed as a nested object so the READ shape
+    // mirrors the WRITE input (updateForgeSettings: settings.footerLinks{…}). The flat
+    // fields are kept internally so ForgeSettingsReader's builder stays unchanged.
     @GraphQLField
-    @GraphQLDescription("Footer privacy-policy link")
-    public String getPrivacyUrl() {
-        return privacyUrl;
-    }
-
-    @GraphQLField
-    @GraphQLDescription("Footer terms-of-use link")
-    public String getTermsUrl() {
-        return termsUrl;
-    }
-
-    @GraphQLField
-    @GraphQLDescription("Footer cookie-policy link")
-    public String getCookiesUrl() {
-        return cookiesUrl;
-    }
-
-    @GraphQLField
-    @GraphQLDescription("Footer Facebook link")
-    public String getFacebookUrl() {
-        return facebookUrl;
-    }
-
-    @GraphQLField
-    @GraphQLDescription("Footer LinkedIn link")
-    public String getLinkedinUrl() {
-        return linkedinUrl;
-    }
-
-    @GraphQLField
-    @GraphQLDescription("Footer Twitter/X link")
-    public String getTwitterUrl() {
-        return twitterUrl;
-    }
-
-    @GraphQLField
-    @GraphQLDescription("Footer YouTube link")
-    public String getYoutubeUrl() {
-        return youtubeUrl;
+    @GraphQLName("footerLinks")
+    @GraphQLDescription("Footer legal + social links")
+    public GqlForgeFooterLinks getFooterLinks() {
+        return new GqlForgeFooterLinks(privacyUrl, termsUrl, cookiesUrl,
+                facebookUrl, linkedinUrl, twitterUrl, youtubeUrl);
     }
 
     /** Many-optional-field builder (keeps the read/write call sites safe and readable). */

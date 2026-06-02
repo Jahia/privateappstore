@@ -10,13 +10,15 @@ export const GET_FORGE_SETTINGS = gql`
             passwordSet
             logoPath
             copyright
-            privacyUrl
-            termsUrl
-            cookiesUrl
-            facebookUrl
-            linkedinUrl
-            twitterUrl
-            youtubeUrl
+            footerLinks {
+                privacyUrl
+                termsUrl
+                cookiesUrl
+                facebookUrl
+                linkedinUrl
+                twitterUrl
+                youtubeUrl
+            }
         }
     }
 `;
@@ -65,13 +67,15 @@ export const UPDATE_FORGE_SETTINGS = gql`
             passwordSet
             logoPath
             copyright
-            privacyUrl
-            termsUrl
-            cookiesUrl
-            facebookUrl
-            linkedinUrl
-            twitterUrl
-            youtubeUrl
+            footerLinks {
+                privacyUrl
+                termsUrl
+                cookiesUrl
+                facebookUrl
+                linkedinUrl
+                twitterUrl
+                youtubeUrl
+            }
         }
     }
 `;

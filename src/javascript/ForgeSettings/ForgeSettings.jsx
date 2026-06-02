@@ -72,15 +72,16 @@ export function ForgeSettings({siteKey}) {
         setPassword('');
         setPasswordSet(Boolean(s.passwordSet));
         setLogoPath(s.logoPath || '');
+        const links = s.footerLinks || {};
         setFooter({
             copyright: s.copyright || '',
-            privacyUrl: s.privacyUrl || '',
-            termsUrl: s.termsUrl || '',
-            cookiesUrl: s.cookiesUrl || '',
-            facebookUrl: s.facebookUrl || '',
-            linkedinUrl: s.linkedinUrl || '',
-            twitterUrl: s.twitterUrl || '',
-            youtubeUrl: s.youtubeUrl || ''
+            privacyUrl: links.privacyUrl || '',
+            termsUrl: links.termsUrl || '',
+            cookiesUrl: links.cookiesUrl || '',
+            facebookUrl: links.facebookUrl || '',
+            linkedinUrl: links.linkedinUrl || '',
+            twitterUrl: links.twitterUrl || '',
+            youtubeUrl: links.youtubeUrl || ''
         });
     };
 
@@ -117,8 +118,9 @@ export function ForgeSettings({siteKey}) {
             });
             setSaveStatus(result.data && result.data.updateForgeSettings ? 'success' : 'error');
             setPassword('');
-        } catch (err) {
-            console.error('Failed to update forge settings:', err);
+        } catch {
+            // The failure is surfaced to the user via the 'error' save status; avoid
+            // console logging in production (consistent with the store-template islands).
             setSaveStatus('error');
         }
     };
