@@ -33,7 +33,11 @@
                                  repository, so the download is served by the MavenProxy servlet at
                                  /modules/mavenproxy. Generate the URL from the request server + the
                                  module coordinates (matching moduleList.json) rather than storing an
-                                 absolute URL on the node. --%>
+                                 absolute URL on the node.
+                                 CANONICAL MAVENPROXY GRAMMAR (keep in sync — see the note in
+                                 json/contentFolder.moduleList.jsp; MavenProxy.java parses it back):
+                                 {server}{context}/modules/mavenproxy/{siteKey}/{groupId-as-path}/
+                                 {name}/{version}/{name}-{version}.jar --%>
                             <c:set var="downloadUrl" value="${url.server}${url.context}/modules/mavenproxy/${currentNode.resolveSite.siteKey}/${fn:replace(module.properties['groupId'].string, '.', '/')}/${module.name}/${version.properties.versionNumber.string}/${module.name}-${version.properties.versionNumber.string}.jar"/>
                         </c:otherwise>
                     </c:choose>

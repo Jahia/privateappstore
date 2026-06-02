@@ -64,7 +64,12 @@
                                                      repository, so the download is served by the MavenProxy servlet at
                                                      /modules/mavenproxy. Generate the URL from the request server + the
                                                      module coordinates instead of storing an absolute URL on the node,
-                                                     so it adapts to the request's scheme / host / port / site. --%>
+                                                     so it adapts to the request's scheme / host / port / site.
+                                                     CANONICAL MAVENPROXY GRAMMAR (keep these three in sync; MavenProxy.java
+                                                     parses it back): {server}{context}/modules/mavenproxy/{siteKey}/
+                                                     {groupId-with-dots-as-slashes}/{name}/{version}/{name}-{version}.jar
+                                                     Also implemented in rss/contentFolder.moduleList.jsp and, root-relative
+                                                     for the browser, in store-template src/components/forge/versions.ts. --%>
                                                 <c:set var="downloadUrl" value="${url.server}${url.context}/modules/mavenproxy/${currentNode.resolveSite.siteKey}/${fn:replace(groupID, '.', '/')}/${child.name}/${version.properties.versionNumber.string}/${child.name}-${version.properties.versionNumber.string}.jar"/>
                                             </c:if>
                                             <c:if test="${not empty files}">
