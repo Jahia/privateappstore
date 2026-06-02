@@ -324,8 +324,11 @@ describe('Authoring views (JS module)', () => {
         cy.get('[data-screenshots-ready]', {timeout: 20000});
         cy.get('[data-screenshot-name]').first().should('have.attr', 'data-screenshot-name', 'shot-b.png');
 
-        // Delete the (now first) screenshot -> only shot-a.png remains.
+        // Delete the (now first) screenshot -> only shot-a.png remains. Deletion is
+        // irreversible, so it now requires confirming an inline prompt: the first click
+        // reveals Confirm/Cancel, the "Delete" confirm button performs the deletion.
         cy.get('[data-screenshot-name="shot-b.png"]').find('button[aria-label="Delete screenshot"]').click();
+        cy.get('[data-screenshot-name="shot-b.png"]').contains('button', 'Delete').click();
         cy.wait('@gql');
         cy.reload();
         cy.get('[data-screenshots-ready]', {timeout: 20000});

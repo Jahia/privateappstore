@@ -7,7 +7,9 @@ mutation UpdateForgeBranding(
     updateForgeSettings(siteKey: $siteKey, settings: {logo: $logo, copyright: $copyright, footerLinks: {privacyUrl: $privacyUrl}}) {
         siteKey
         copyright
-        privacyUrl
+        footerLinks {
+            privacyUrl
+        }
         logoPath
     }
 }
