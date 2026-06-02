@@ -40,8 +40,10 @@ public final class ManageRolesQueryExtension {
 
     // Roles intentionally exposed by the Private App Store admin UI. Order is
     // preserved in the response so the screen renders them top-to-bottom in
-    // the order admins expect to see them.
-    private static final List<String> FORGE_ROLES = Arrays.asList(
+    // the order admins expect to see them. Package-private so the grant mutation
+    // can reuse it as its allowlist (one source of truth — the set of roles the
+    // store admin may assign can never drift from the set the UI renders).
+    static final List<String> FORGE_ROLES = Arrays.asList(
             "store-administrator",
             "store-developer",
             "reader");

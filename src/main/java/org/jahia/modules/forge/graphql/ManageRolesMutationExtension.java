@@ -41,6 +41,13 @@ public final class ManageRolesMutationExtension {
             @GraphQLName("role") @GraphQLNonNull final String role,
             @GraphQLName("principalName") @GraphQLNonNull final String principalName,
             @GraphQLName("principalType") @GraphQLNonNull final PrincipalType principalType) {
+        // Only the store-managed roles may be granted through this gate. Without this an admin
+        // with siteAdminForgeSettings could pass an arbitrary role name and create ACL entries
+        // beyond the store's intended set (SECURITY-571). The allowlist is the same set the
+        // admin UI renders (ManageRolesQueryExtension.FORGE_ROLES).
+        if (!ManageRolesQueryExtension.FORGE_ROLES.contains(role)) {
+            throw new ForgeSettingsException("Role not permitted: " + role, null);
+        }
         return execute(siteKey, session -> {
             final JCRNodeWrapper site = session.getNode(SITES_PATH + siteKey);
             site.grantRoles(principalType.toPrincipalKey(principalName),
