@@ -29,9 +29,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.core.fs.FileSystem;
 import org.apache.xerces.impl.dv.util.Base64;
 import org.jahia.data.templates.ModuleReleaseInfo;
+import org.jahia.modules.forge.settings.ForgeSettings;
+import org.jahia.modules.forge.settings.ForgeSettingsService;
 import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.content.JCRSessionWrapper;
-import org.jahia.services.content.decorator.JCRSiteNode;
 import org.jahia.services.sites.JahiaSitesService;
 
 import javax.jcr.RepositoryException;
@@ -64,10 +65,13 @@ public class MavenProxy extends HttpServlet {
     private static final String MODULES_REPOSITORY = "/contents/modules-repository";
 
     private final HttpClientService httpClientService;
+    private final ForgeSettingsService forgeSettingsService;
 
     @Activate
-    public MavenProxy(@Reference HttpClientService httpClientService) {
+    public MavenProxy(@Reference HttpClientService httpClientService,
+                      @Reference ForgeSettingsService forgeSettingsService) {
         this.httpClientService = httpClientService;
+        this.forgeSettingsService = forgeSettingsService;
     }
 
     @Override
@@ -113,7 +117,7 @@ public class MavenProxy extends HttpServlet {
                 return;
             }
 
-            ModuleReleaseInfo releaseInfo = getModuleReleaseInfo(session, siteName);
+            ModuleReleaseInfo releaseInfo = getModuleReleaseInfo(siteName);
 
             String repositoryUrl = releaseInfo.getRepositoryUrl();
             if (StringUtils.isBlank(repositoryUrl)) {
@@ -196,15 +200,13 @@ public class MavenProxy extends HttpServlet {
         return session.nodeExists(SITES_PATH + siteName + MODULES_REPOSITORY);
     }
 
-    private ModuleReleaseInfo getModuleReleaseInfo(final JCRSessionWrapper session, final String siteName) throws RepositoryException {
-        JCRSiteNode siteNode = (JCRSiteNode) session.getNode(SITES_PATH + siteName);
-        String forgeSettingsUrl = siteNode.getProperty("forgeSettingsUrl").getString();
-        String user = siteNode.getProperty("forgeSettingsUser").getString();
-        String password = new String(Base64.decode(siteNode.getProperty("forgeSettingsPassword").getString()));
+    /** Build the upstream Maven coordinates + credentials from the site's OSGi-config settings. */
+    private ModuleReleaseInfo getModuleReleaseInfo(final String siteName) {
+        final ForgeSettings settings = forgeSettingsService.get(siteName);
         ModuleReleaseInfo info = new ModuleReleaseInfo();
-        info.setRepositoryUrl(forgeSettingsUrl);
-        info.setUsername(user);
-        info.setPassword(password);
+        info.setRepositoryUrl(settings.getUrl());
+        info.setUsername(settings.getUser());
+        info.setPassword(settings.getPassword());
         return info;
     }
 }

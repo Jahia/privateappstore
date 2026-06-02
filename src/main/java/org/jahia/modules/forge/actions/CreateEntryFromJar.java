@@ -29,7 +29,6 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.model.Model;
-import org.apache.xerces.impl.dv.util.Base64;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.jahia.api.Constants;
 import org.jahia.bin.Action;
@@ -37,6 +36,8 @@ import org.jahia.bin.ActionResult;
 import org.jahia.commons.Version;
 import org.jahia.data.templates.ModuleReleaseInfo;
 import org.jahia.data.templates.ModulesPackage;
+import org.jahia.modules.forge.settings.ForgeSettings;
+import org.jahia.modules.forge.settings.ForgeSettingsService;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.decorator.JCRSiteNode;
@@ -52,6 +53,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,6 +129,9 @@ public class CreateEntryFromJar extends Action {
     private static final long MAX_TAR_ENTRY_SIZE_BYTES = 10L * 1024 * 1024;
 
     String mavenExecutable;
+
+    @Reference
+    private ForgeSettingsService forgeSettingsService;
 
     @Activate
     public void activate() {
@@ -409,7 +414,6 @@ public class CreateEntryFromJar extends Action {
         }
         groupId = attributes.getValue("Jahia-GroupId");
         JCRSiteNode site = resource.getNode().getResolveSite();
-        String forgeSettingsUrl = site.getProperty("forgeSettingsUrl").getString();
 
         moduleParams.put(MODULE_NAME, Arrays.asList(moduleName));
         moduleParams.put(GROUP_ID, Arrays.asList(groupId));
@@ -430,7 +434,7 @@ public class CreateEntryFromJar extends Action {
         JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
         moduleParams.put(REQUIRED_VERSION, Arrays.asList(versions.getNode(requiredVersion).getIdentifier()));
 
-        ActionResult deployFailure = deployArtifact(uploadedFile, site, extension, groupId, moduleName, forgeSettingsUrl, session);
+        ActionResult deployFailure = deployArtifact(uploadedFile, site, extension, groupId, moduleName, session);
         if (deployFailure != null) {
             return deployFailure;
         }
@@ -484,10 +488,10 @@ public class CreateEntryFromJar extends Action {
     }
 
     private ActionResult deployArtifact(DiskFileItem uploadedFile, JCRSiteNode site, String extension,
-                                        String groupId, String moduleName, String forgeSettingsUrl,
+                                        String groupId, String moduleName,
                                         JCRSessionWrapper session) throws RepositoryException, JSONException {
-        String user = site.getProperty("forgeSettingsUser").getString();
-        String password = new String(Base64.decode(site.getProperty("forgeSettingsPassword").getString()));
+        // Connection settings now live in per-site OSGi config (see ForgeSettingsService).
+        final ForgeSettings settings = forgeSettingsService.get(site.getSiteKey());
 
         File artifact = null;
         try {
@@ -496,9 +500,9 @@ public class CreateEntryFromJar extends Action {
 
             ModuleReleaseInfo moduleReleaseInfo = new ModuleReleaseInfo();
             moduleReleaseInfo.setRepositoryId("remote-repository");
-            moduleReleaseInfo.setRepositoryUrl(forgeSettingsUrl);
-            moduleReleaseInfo.setUsername(user);
-            moduleReleaseInfo.setPassword(password);
+            moduleReleaseInfo.setRepositoryUrl(settings.getUrl());
+            moduleReleaseInfo.setUsername(settings.getUser());
+            moduleReleaseInfo.setPassword(settings.getPassword());
             deployToMaven(groupId, moduleName, moduleReleaseInfo, artifact);
             return null;
         } catch (IOException e) {
