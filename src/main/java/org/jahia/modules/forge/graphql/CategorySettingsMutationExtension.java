@@ -98,36 +98,34 @@ public final class CategorySettingsMutationExtension {
             // (the gate is site-scoped; validate the caller-supplied UUID).
             assertManagedBySite(session.getNode(SITES_PATH + siteKey), resolveCategory(session, uuid));
             for (InputCategoryTitle title : titles) {
-                applyTitle(uuid, title);
+                applyTitle(siteKey, uuid, title);
             }
 
             return Boolean.TRUE;
         });
     }
 
-    private static void applyTitle(String uuid, InputCategoryTitle title) throws RepositoryException {
+    private static void applyTitle(String siteKey, String uuid, InputCategoryTitle title) throws RepositoryException {
         if (title == null || StringUtils.isBlank(title.getLanguage())) {
             return;
         }
 
-        // Write through a localized SYSTEM session in the default workspace. Using the system
-        // session (not a second user session) keeps the write under the same trust context that
-        // assertManagedBySite already validated against — eliminating the session-split window
-        // where the node could be relocated outside the site's subtree between the scope check
-        // and the write. Locale.forLanguageTag avoids the deprecated Locale(String) constructor.
-        JCRTemplate.getInstance().doExecuteWithSystemSession(null, WORKSPACE_DEFAULT,
-                Locale.forLanguageTag(title.getLanguage()), localized -> {
-                    final JCRNodeWrapper node = localized.getNodeByIdentifier(uuid);
-                    if (StringUtils.isBlank(title.getTitle())) {
-                        if (node.hasProperty(JCR_TITLE)) {
-                            node.getProperty(JCR_TITLE).remove();
-                        }
-                    } else {
-                        node.setProperty(JCR_TITLE, title.getTitle());
-                    }
-                    localized.save();
-                    return null;
-                });
+        // Resolve, re-validate scope, and write in the SAME localized session, closing the
+        // check-then-write window (the node could otherwise be relocated outside the site's
+        // subtree between a separate scope check and the write). The user session also enforces
+        // JCR ACLs on the write. Locale.forLanguageTag avoids the deprecated Locale(String) ctor.
+        final JCRSessionWrapper localized = JCRSessionFactory.getInstance()
+                .getCurrentUserSession(WORKSPACE_DEFAULT, Locale.forLanguageTag(title.getLanguage()));
+        final JCRNodeWrapper node = resolveCategory(localized, uuid);
+        assertManagedBySite(localized.getNode(SITES_PATH + siteKey), node);
+        if (StringUtils.isBlank(title.getTitle())) {
+            if (node.hasProperty(JCR_TITLE)) {
+                node.getProperty(JCR_TITLE).remove();
+            }
+        } else {
+            node.setProperty(JCR_TITLE, title.getTitle());
+        }
+        localized.save();
     }
 
     @GraphQLField

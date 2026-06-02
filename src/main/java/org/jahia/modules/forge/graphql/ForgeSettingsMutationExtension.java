@@ -102,8 +102,8 @@ public final class ForgeSettingsMutationExtension {
         } catch (RepositoryException e) {
             // Surface as a structured error (mirroring CategorySettings/ManageRoles) instead of
             // swallowing to null — a null return is indistinguishable from "succeeded but empty"
-            // and hides access-denied / site-not-found from the caller.
-            LOGGER.error("Error updating forge settings for site {}", siteKey, e);
+            // and hides access-denied / site-not-found from the caller. The cause is preserved,
+            // so the GraphQL error layer logs it once (don't log-and-rethrow).
             throw new ForgeSettingsException("Forge settings update failed for site " + siteKey, e);
         }
     }
