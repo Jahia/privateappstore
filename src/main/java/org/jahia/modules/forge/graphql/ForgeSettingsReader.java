@@ -1,56 +1,34 @@
 package org.jahia.modules.forge.graphql;
 
-import org.jahia.services.content.JCRNodeWrapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.jcr.RepositoryException;
+import org.jahia.modules.forge.settings.ForgeSettings;
 
 /**
- * Builds a {@link GqlForgeSettings} from a site node's {@code jmix:forgeSettings}
- * properties. Shared by the query (read) and the mutation (re-read after save) so
- * the property/field mapping lives in one place. The logo is stored as a
- * weakreference; we expose its resolved JCR path (the jahia-store-template chrome
- * resolves the reference itself to render the image).
+ * Maps a {@link ForgeSettings} value object (loaded from per-site OSGi config) to the
+ * {@link GqlForgeSettings} GraphQL type. Shared by the query (read) and the mutation
+ * (re-read after save) so the field mapping lives in one place. The logo is stored as a
+ * plain JCR path string; the {@code jahia-store-template} chrome resolves it to a
+ * {@code /files/...} URL itself. The password is never exposed — only {@code passwordSet}.
  */
 final class ForgeSettingsReader {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ForgeSettingsReader.class);
 
     private ForgeSettingsReader() {
     }
 
-    static GqlForgeSettings read(JCRNodeWrapper site, String siteKey) throws RepositoryException {
+    static GqlForgeSettings from(ForgeSettings s, String siteKey) {
         return GqlForgeSettings.builder(siteKey)
-                .url(getStringProp(site, "forgeSettingsUrl"))
-                .id(getStringProp(site, "forgeSettingsId"))
-                .user(getStringProp(site, "forgeSettingsUser"))
-                .passwordSet(site.hasProperty("forgeSettingsPassword"))
-                .logoPath(getLogoPath(site))
-                .copyright(getStringProp(site, "forgeSettingsCopyright"))
-                .privacyUrl(getStringProp(site, "forgeSettingsPrivacyUrl"))
-                .termsUrl(getStringProp(site, "forgeSettingsTermsUrl"))
-                .cookiesUrl(getStringProp(site, "forgeSettingsCookiesUrl"))
-                .facebookUrl(getStringProp(site, "forgeSettingsFacebookUrl"))
-                .linkedinUrl(getStringProp(site, "forgeSettingsLinkedinUrl"))
-                .twitterUrl(getStringProp(site, "forgeSettingsTwitterUrl"))
-                .youtubeUrl(getStringProp(site, "forgeSettingsYoutubeUrl"))
+                .url(s.getUrl())
+                .id(s.getId())
+                .user(s.getUser())
+                .passwordSet(s.isPasswordSet())
+                .logoPath(s.getLogoPath())
+                .copyright(s.getCopyright())
+                .privacyUrl(s.getPrivacyUrl())
+                .termsUrl(s.getTermsUrl())
+                .cookiesUrl(s.getCookiesUrl())
+                .facebookUrl(s.getFacebookUrl())
+                .linkedinUrl(s.getLinkedinUrl())
+                .twitterUrl(s.getTwitterUrl())
+                .youtubeUrl(s.getYoutubeUrl())
                 .build();
-    }
-
-    private static String getStringProp(JCRNodeWrapper node, String name) throws RepositoryException {
-        return node.hasProperty(name) ? node.getProperty(name).getString() : null;
-    }
-
-    /** Resolve the logo weakreference to a JCR path; tolerate a dangling reference. */
-    private static String getLogoPath(JCRNodeWrapper site) {
-        try {
-            if (site.hasProperty("forgeSettingsLogo")) {
-                return site.getProperty("forgeSettingsLogo").getNode().getPath();
-            }
-        } catch (RepositoryException e) {
-            LOGGER.debug("Dangling forgeSettingsLogo reference on {}", site, e);
-        }
-        return null;
     }
 }

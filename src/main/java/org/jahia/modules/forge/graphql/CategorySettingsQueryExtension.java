@@ -5,6 +5,7 @@ import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 import graphql.annotations.annotationTypes.GraphQLNonNull;
 import graphql.annotations.annotationTypes.GraphQLTypeExtension;
+import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.graphql.provider.dxm.DXGraphQLProvider;
 import org.jahia.services.content.JCRCallback;
 import org.jahia.services.content.JCRNodeIteratorWrapper;
@@ -35,7 +36,6 @@ public final class CategorySettingsQueryExtension {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CategorySettingsQueryExtension.class);
     private static final String PERMISSION = "siteAdminForgeSettings";
-    private static final String ROOT_CATEGORY = "rootCategory";
     private static final String JCR_TITLE = "jcr:title";
     private static final String JNT_CATEGORY = "jnt:category";
     private static final String WORKSPACE_DEFAULT = "default";
@@ -70,16 +70,18 @@ public final class CategorySettingsQueryExtension {
                         siteLanguages.add(locale.getLanguage());
                     }
 
-                    if (!site.hasProperty(ROOT_CATEGORY)) {
+                    // The root-category reference now lives in per-site OSGi config.
+                    final String rootUuid = ForgeSettingsMutationExtension.service().get(siteKey).getRootCategoryUuid();
+                    if (StringUtils.isBlank(rootUuid)) {
                         return new GqlForgeCategorySettings(siteKey, null, null, null,
                                 siteLanguages, Collections.emptyList());
                     }
 
                     final JCRNodeWrapper root;
                     try {
-                        root = (JCRNodeWrapper) site.getProperty(ROOT_CATEGORY).getNode();
+                        root = session.getNodeByIdentifier(rootUuid);
                     } catch (ItemNotFoundException e) {
-                        LOGGER.warn("rootCategory property points at a missing node for site {}", siteKey);
+                        LOGGER.warn("rootCategory points at a missing node for site {}", siteKey);
                         return new GqlForgeCategorySettings(siteKey, null, null, null,
                                 siteLanguages, Collections.emptyList());
                     }

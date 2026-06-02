@@ -7,6 +7,7 @@ import graphql.annotations.annotationTypes.GraphQLNonNull;
 import graphql.annotations.annotationTypes.GraphQLTypeExtension;
 import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.core.fs.FileSystem;
+import org.jahia.modules.forge.settings.ForgeSettingsService;
 import org.jahia.modules.graphql.provider.dxm.DXGraphQLProvider;
 import org.jahia.services.content.JCRCallback;
 import org.jahia.services.content.JCRContentUtils;
@@ -29,10 +30,8 @@ public final class CategorySettingsMutationExtension {
 
     private static final String PERMISSION = "siteAdminForgeSettings";
     private static final String SITES_PATH = JahiaSitesService.SITES_JCR_PATH + FileSystem.SEPARATOR;
-    private static final String ROOT_CATEGORY = "rootCategory";
     private static final String JCR_TITLE = "jcr:title";
     private static final String JNT_CATEGORY = "jnt:category";
-    private static final String JMIX_FORGE_SETTINGS = "jmix:forgeSettings";
     private static final String WORKSPACE_DEFAULT = "default";
 
     private CategorySettingsMutationExtension() {
@@ -45,19 +44,16 @@ public final class CategorySettingsMutationExtension {
             @GraphQLName("siteKey") @GraphQLNonNull final String siteKey,
             @GraphQLName("rootCategoryUuid") @GraphQLNonNull final String rootCategoryUuid) {
         return execute(siteKey, session -> {
-            final JCRNodeWrapper site = session.getNode(SITES_PATH + siteKey);
-            // rootCategory is declared on jmix:forgeSettings — the site must
-            // carry that mixin before the setProperty call will persist.
-            if (!site.isNodeType(JMIX_FORGE_SETTINGS)) {
-                site.addMixin(JMIX_FORGE_SETTINGS);
-            }
-
-            // Validate the target is an actual category: the work runs in a system
-            // session that bypasses ACLs, so an unvalidated UUID could point the
-            // site's root at any node in the repository.
+            // Validate the target is an actual category before storing it: the gate runs in a
+            // system session that bypasses ACLs, so an unvalidated UUID could point the site's
+            // root at any node in the repository.
             final JCRNodeWrapper category = resolveCategory(session, rootCategoryUuid);
-            site.setProperty(ROOT_CATEGORY, category);
-            session.save();
+            // The root reference now lives in per-site OSGi config (not jmix:forgeSettings),
+            // preserving the connection/branding fields written by ForgeSettings.
+            final ForgeSettingsService service = ForgeSettingsMutationExtension.service();
+            service.save(siteKey, service.get(siteKey).toBuilder()
+                    .rootCategoryUuid(category.getIdentifier())
+                    .build());
             return Boolean.TRUE;
         });
     }
@@ -73,12 +69,7 @@ public final class CategorySettingsMutationExtension {
         }
 
         return execute(siteKey, session -> {
-            final JCRNodeWrapper site = session.getNode(SITES_PATH + siteKey);
-            if (!site.hasProperty(ROOT_CATEGORY)) {
-                throw new RepositoryException("No root category configured for site " + siteKey);
-            }
-
-            final JCRNodeWrapper root = (JCRNodeWrapper) site.getProperty(ROOT_CATEGORY).getNode();
+            final JCRNodeWrapper root = resolveRoot(session, siteKey);
             final String safeName = JCRContentUtils.findAvailableNodeName(root, name);
             final JCRNodeWrapper category = root.addNode(safeName, JNT_CATEGORY);
             session.save();
@@ -96,7 +87,7 @@ public final class CategorySettingsMutationExtension {
         return execute(siteKey, session -> {
             // Confine titling to a category within THIS site's root-category subtree
             // (the gate is site-scoped; validate the caller-supplied UUID).
-            assertManagedBySite(session.getNode(SITES_PATH + siteKey), resolveCategory(session, uuid));
+            assertManagedBySite(session, siteKey, resolveCategory(session, uuid));
             for (InputCategoryTitle title : titles) {
                 applyTitle(siteKey, uuid, title);
             }
@@ -117,7 +108,7 @@ public final class CategorySettingsMutationExtension {
         final JCRSessionWrapper localized = JCRSessionFactory.getInstance()
                 .getCurrentUserSession(WORKSPACE_DEFAULT, Locale.forLanguageTag(title.getLanguage()));
         final JCRNodeWrapper node = resolveCategory(localized, uuid);
-        assertManagedBySite(localized.getNode(SITES_PATH + siteKey), node);
+        assertManagedBySite(localized, siteKey, node);
         if (StringUtils.isBlank(title.getTitle())) {
             if (node.hasProperty(JCR_TITLE)) {
                 node.getProperty(JCR_TITLE).remove();
@@ -139,7 +130,7 @@ public final class CategorySettingsMutationExtension {
             // The gate authorizes against the site, but the system session bypasses
             // ACLs — without this a site admin could delete any node by UUID.
             final JCRNodeWrapper node = resolveCategory(session, uuid);
-            assertManagedBySite(session.getNode(SITES_PATH + siteKey), node);
+            assertManagedBySite(session, siteKey, node);
             node.remove();
             session.save();
             return Boolean.TRUE;
@@ -166,18 +157,26 @@ public final class CategorySettingsMutationExtension {
         return node;
     }
 
+    /** Resolve the site's configured root category (UUID stored in per-site OSGi config). */
+    private static JCRNodeWrapper resolveRoot(JCRSessionWrapper session, String siteKey) throws RepositoryException {
+        final String rootUuid = ForgeSettingsMutationExtension.service().get(siteKey).getRootCategoryUuid();
+        if (StringUtils.isBlank(rootUuid)) {
+            throw new RepositoryException("No root category configured for site " + siteKey);
+        }
+        return resolveCategory(session, rootUuid);
+    }
+
     /**
      * Enforce that a category lives within the site's configured root-category
      * subtree — i.e. one this site administrator actually manages — never the root
      * itself nor a node outside it. Without this a site admin could edit or delete
      * another site's categories (or arbitrary nodes) by passing their own siteKey
-     * plus a foreign UUID.
+     * plus a foreign UUID. The root is resolved in {@code category}'s own session so
+     * the path comparison is within one workspace.
      */
-    private static void assertManagedBySite(JCRNodeWrapper site, JCRNodeWrapper category) throws RepositoryException {
-        if (!site.hasProperty(ROOT_CATEGORY)) {
-            throw new AccessDeniedException("No root category configured for site " + site.getName());
-        }
-        final JCRNodeWrapper root = (JCRNodeWrapper) site.getProperty(ROOT_CATEGORY).getNode();
+    private static void assertManagedBySite(JCRSessionWrapper session, String siteKey, JCRNodeWrapper category)
+            throws RepositoryException {
+        final JCRNodeWrapper root = resolveRoot(session, siteKey);
         if (!category.getPath().startsWith(root.getPath() + "/")) {
             throw new AccessDeniedException(
                     "Category " + category.getPath() + " is not within the site's root category");

@@ -6,11 +6,8 @@ import graphql.annotations.annotationTypes.GraphQLName;
 import graphql.annotations.annotationTypes.GraphQLNonNull;
 import graphql.annotations.annotationTypes.GraphQLTypeExtension;
 import org.jahia.modules.graphql.provider.dxm.DXGraphQLProvider;
-import org.jahia.services.content.JCRCallback;
-import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.content.JCRSessionWrapper;
-import org.jahia.services.content.JCRTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +20,6 @@ import javax.jcr.RepositoryException;
 public final class ForgeSettingsQueryExtension {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ForgeSettingsQueryExtension.class);
-    private static final String JMIX_FORGE_SETTINGS = "jmix:forgeSettings";
     private static final String PERMISSION = "siteAdminForgeSettings";
 
     private ForgeSettingsQueryExtension() {
@@ -34,32 +30,19 @@ public final class ForgeSettingsQueryExtension {
     @GraphQLDescription("Read the forge settings for a site")
     public static GqlForgeSettings getForgeSettings(
             @GraphQLName("siteKey") @GraphQLNonNull final String siteKey) {
+        final String sitePath = "/sites/" + siteKey;
         try {
-            return JCRTemplate.getInstance().doExecuteWithSystemSession(new JCRCallback<GqlForgeSettings>() {
-                @Override
-                public GqlForgeSettings doInJCR(JCRSessionWrapper session) throws RepositoryException {
-                    final String sitePath = "/sites/" + siteKey;
-                    if (!session.nodeExists(sitePath)) {
-                        return null;
-                    }
-
-                    final JCRSessionWrapper callerSession = JCRSessionFactory.getInstance().getCurrentUserSession();
-                    if (!callerSession.nodeExists(sitePath)
-                            || !callerSession.getNode(sitePath).hasPermission(PERMISSION)) {
-                        throw new AccessDeniedException(PERMISSION);
-                    }
-
-                    final JCRNodeWrapper site = session.getNode(sitePath);
-                    if (!site.isNodeType(JMIX_FORGE_SETTINGS)) {
-                        return GqlForgeSettings.builder(siteKey).build();
-                    }
-
-                    return ForgeSettingsReader.read(site, siteKey);
-                }
-            });
+            final JCRSessionWrapper caller = JCRSessionFactory.getInstance().getCurrentUserSession();
+            if (!caller.nodeExists(sitePath)) {
+                return null;
+            }
+            if (!caller.getNode(sitePath).hasPermission(PERMISSION)) {
+                throw new AccessDeniedException(PERMISSION);
+            }
         } catch (RepositoryException e) {
             LOGGER.error("Error reading forge settings for site {}", siteKey, e);
             return null;
         }
+        return ForgeSettingsReader.from(ForgeSettingsMutationExtension.service().get(siteKey), siteKey);
     }
 }
