@@ -93,14 +93,35 @@ public class MavenProxy extends HttpServlet {
                 return;
             }
 
+            // Authorization: the proxy forwards the site's STORED Maven credentials, so it must
+            // only ever do so on behalf of a caller who can actually read that site's module
+            // catalogue. The site node and its forgeSettings* properties are commonly world-
+            // readable, but modules-repository is jmix:accessControlled — reading it through the
+            // caller's own session enforces the site's content ACLs and prevents a user of site A
+            // from coercing the proxy into using site B's credentials (SECURITY-571).
+            if (!callerCanAccessRepository(session, siteName)) {
+                LOGGER.warn("MavenProxy: user '{}' is not authorized for site '{}' module repository",
+                        session.getUser().getName(), siteName);
+                trySendError(response, HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+
             ModuleReleaseInfo releaseInfo = getModuleReleaseInfo(session, siteName);
 
             String repositoryUrl = releaseInfo.getRepositoryUrl();
-            String url = repositoryUrl + path;
+            if (StringUtils.isBlank(repositoryUrl)) {
+                LOGGER.warn("MavenProxy: site '{}' has no configured repository URL", siteName);
+                trySendError(response, HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
+            // Normalize the root to a single trailing slash so the boundary check below cannot be
+            // satisfied by a sibling-prefix host (e.g. root ".../foo" must not accept ".../foobar").
+            final String repositoryRoot = StringUtils.removeEnd(repositoryUrl, "/") + "/";
+            String url = StringUtils.removeEnd(repositoryUrl, "/") + path;
             // Canonicalize and confirm the resolved URL still lives under the repository root.
             final URI resolvedUri = UriComponentsBuilder.fromHttpUrl(url).build(false).toUri().normalize();
-            if (repositoryUrl == null || !resolvedUri.toString().startsWith(repositoryUrl)) {
-                LOGGER.warn("MavenProxy: resolved URL '{}' escapes repository root '{}'", resolvedUri, repositoryUrl);
+            if (!resolvedUri.toString().startsWith(repositoryRoot)) {
+                LOGGER.warn("MavenProxy: resolved URL '{}' escapes repository root '{}'", resolvedUri, repositoryRoot);
                 trySendError(response, HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
@@ -139,6 +160,19 @@ public class MavenProxy extends HttpServlet {
         } catch (IOException ex) {
             LOGGER.warn("MavenProxy: failed to send error {} to client", code, ex);
         }
+    }
+
+    /**
+     * True when the caller's own session can read the site's (access-controlled) module
+     * repository node — the prerequisite for using that site's stored Maven credentials.
+     * {@code nodeExists} returns false both when the node is absent and when the caller
+     * lacks read access, which is exactly the gate we want.
+     */
+    private static boolean callerCanAccessRepository(final JCRSessionWrapper session, final String siteName) throws RepositoryException {
+        if (StringUtils.isBlank(siteName)) {
+            return false;
+        }
+        return session.nodeExists("/sites/" + siteName + "/contents/modules-repository");
     }
 
     private ModuleReleaseInfo getModuleReleaseInfo(final JCRSessionWrapper session, final String siteName) throws RepositoryException {
