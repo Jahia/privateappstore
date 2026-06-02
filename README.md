@@ -11,7 +11,7 @@ authoring (module upload, reviews, …), background jobs, a Maven proxy, and the
 `moduleList.json` feed.
 
 Its website and in-site administration UI are provided by the sibling
-**[`store-template`](../store-template)** JavaScript module.
+**[`jahia-store-template`](../store-template)** JavaScript module.
 
 ## Build & test
 
@@ -21,7 +21,7 @@ cd tests && npx cypress run        # end-to-end suite (Jahia on localhost:8080)
 ```
 
 The `tests/` harness (`@jahia/cypress`) provisions Jahia + Nexus, installs the
-`javascript-modules-engine`, this module's JAR, and the `store-template` `.tgz`.
+`javascript-modules-engine`, this module's JAR, and the `jahia-store-template` `.tgz`.
 
 ## Documentation
 

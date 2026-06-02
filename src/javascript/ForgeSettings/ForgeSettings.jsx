@@ -120,7 +120,7 @@ export function ForgeSettings({siteKey}) {
             setPassword('');
         } catch {
             // The failure is surfaced to the user via the 'error' save status; avoid
-            // console logging in production (consistent with the store-template islands).
+            // console logging in production (consistent with the jahia-store-template islands).
             setSaveStatus('error');
         }
     };

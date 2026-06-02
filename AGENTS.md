@@ -1,17 +1,17 @@
-# AGENTS.md — privateappstore
+# AGENTS.md — jahia-store
 
 Guidance for AI agents (and humans) working in this repo. Read this before editing.
 
 ## What this is
 
-`privateappstore` is the **Jahia 8.2 Java/OSGi module** that powers the Private
+`jahia-store` is the **Jahia 8.2 Java/OSGi module** that powers the Private
 App Store ("Forge"): the JCR content model, the GraphQL admin API, the Jahia
 Actions for authoring, background jobs, the Maven proxy, and the
 `moduleList.json` feed. The **presentation/authoring UI** for it lives in the
-sibling **`store-template`** JavaScript module — this repo is the backend and the
+sibling **`jahia-store-template`** JavaScript module — this repo is the backend and the
 contract.
 
-- Maven coordinates: `org.jahia.community:privateappstore` (parent
+- Maven coordinates: `org.jahia.community:jahia-store` (parent
   `org.jahia.modules:jahia-modules`). Packaging: OSGi bundle (JAR).
 - Java source level is **below 16** — no `instanceof` pattern matching, no
   records in this module. Use classic `instanceof` + cast.
@@ -62,7 +62,7 @@ authenticated users are denied (`GqlAccessDeniedException`). This shapes the API
     passes, and auto-publishes the latest version.
   - **CSRF**: Action `.do` POSTs are protected by OWASP CSRFGuard, which patches
     **XMLHttpRequest only** (not `fetch`, not plain `<form>` posts). The
-    `store-template` client posts to actions via XHR; a `fetch`/form POST is
+    `jahia-store-template` client posts to actions via XHR; a `fetch`/form POST is
     rejected ("Required Token is missing" / "Request Token does not match Page
     Token"). The `/modules/graphql` endpoint is not CSRF-gated.
 
@@ -77,7 +77,7 @@ authenticated users are denied (`GqlAccessDeniedException`). This shapes the API
   `ItemExistsException` (used for atomic per-user dedup).
 - **`jmix:forgeSettings`** (mixin on the site node) holds the forge connection
   (`forgeSettingsUrl`/`Id`/`User`/`Password` base64 + `rootCategory`) AND the site
-  branding read by the store-template chrome: `forgeSettingsLogo` (weakreference to
+  branding read by the jahia-store-template chrome: `forgeSettingsLogo` (weakreference to
   a media image) plus footer strings `forgeSettingsCopyright` / `*PrivacyUrl` /
   `*TermsUrl` / `*CookiesUrl` / `*FacebookUrl` / `*LinkedinUrl` / `*TwitterUrl` /
   `*YoutubeUrl`. Exposed/edited via the `forgeSettings` query + `updateForgeSettings`
@@ -101,14 +101,14 @@ tests/                Cypress E2E (+ env tooling) — see below
 
 - **Build**: `mvn clean install` (Java 11). Produces the OSGi bundle JAR.
 - **E2E**: `tests/` uses `@jahia/cypress`. `env.run.sh` spins up Jahia + Nexus
-  (docker-compose); `ci.build.sh` copies the locally-built `privateappstore` JAR
-  *and* the sibling `store-template` `.tgz` into `tests/artifacts/`;
+  (docker-compose); `ci.build.sh` copies the locally-built `jahia-store` JAR
+  *and* the sibling `jahia-store-template` `.tgz` into `tests/artifacts/`;
   `assets/provisioning.yml` installs the `javascript-modules-engine` + deps.
   Run: `cd tests && npx cypress run` (`baseUrl` localhost:8080). Suite = 20 specs,
   must stay green. Credentials come from `tests/.env` via `set-env.sh` (do not
   print or commit secrets).
   - **Accessibility gate** (`20-accessibility.cy.ts`): runs axe-core (cypress-axe)
-    against the store-template pages (home grid, module detail, my-modules,
+    against the jahia-store-template pages (home grid, module detail, my-modules,
     in-site admin) at the full WCAG ladder up to **AAA** + landmark/region best
     practices. This is the enforced version of what used to be a manual EqualWeb
     audit — keep it green, and treat new AAA failures as real (the empty home
@@ -116,7 +116,7 @@ tests/                Cypress E2E (+ env tooling) — see below
 
 ## SonarQube
 
-- Project key (derive as `<groupId>:<artifactId>`): **`org.jahia.community:privateappstore`**.
+- Project key (derive as `<groupId>:<artifactId>`): **`org.jahia.community:jahia-store`**.
 - Scan: `mvn -B clean install sonar:sonar` — the `jahia-modules` parent pins a
   Java-11-compatible scanner, so this runs on the host's default Java 11. The
   `sonar` profile (host `~/.m2/settings.xml`) supplies the URL + token.
@@ -134,6 +134,6 @@ tests/                Cypress E2E (+ env tooling) — see below
 - Layered: keep Actions/GraphQL thin; business logic in services/helpers.
 - Domain errors as unchecked exceptions; log server-side, return safe messages.
 - **Do not break the `moduleList.json` external contract** — it is consumed by
-  `store-template` (and possibly external clients).
+  `jahia-store-template` (and possibly external clients).
 - Commit each change immediately (`git commit -s`), staging only changed files.
   Feature branch: `SECURITY-571-js-module-migration`.
