@@ -34,6 +34,24 @@
  *   - The stale per-version `url` property is DROPPED: 5.0.0 generates the
  *     /modules/mavenproxy/... download URL from the Maven coordinates at read time.
  *
+ * WORKSPACE (important): store content lives mostly in the LIVE workspace.
+ *   Modules are uploaded through the public storefront via the createEntryFromJar
+ *   Action, which writes in the REQUEST's workspace -> on a live-rendered page
+ *   that is LIVE, so those nodes exist in LIVE (often with no EDIT counterpart).
+ *   This script therefore copies WITHIN a single workspace, defaulting to 'live'
+ *   (set WORKSPACE = 'live'), so the migrated modules show up on the target
+ *   storefront immediately. We deliberately do NOT use the JCR cross-workspace
+ *   copy(srcWorkspace,...): it preserves source UUIDs, which would make the target
+ *   site share node identities with the source (EDIT/LIVE linkage corruption).
+ *   Same-workspace node.copy() assigns fresh UUIDs and is binary/i18n/ACL-safe.
+ *
+ *   - WORKSPACE = 'live'    : migrate the public store (recommended; matches where
+ *                            the content is). Target EDIT is left as-is.
+ *   - WORKSPACE = 'default' : migrate the EDIT/authoring tree; set PUBLISH_TO_LIVE
+ *                            = true to publish it to LIVE afterwards. Use this only
+ *                            if the source store is edited in jContent and fully
+ *                            published (i.e. its content really is in EDIT).
+ *
  * Idempotent: modules/versions that already exist by name under the target are
  * skipped (set REPLACE_EXISTING = true to overwrite). Re-runnable.
  *
@@ -55,10 +73,12 @@ import javax.jcr.RepositoryException
 // ============================ CONFIG ============================
 def SOURCE_SITE_KEY   = 'old-store'      // store running privateappstore 4.3.0
 def TARGET_SITE_KEY   = 'new-store'      // store running jahia-store 5.0.0
+def WORKSPACE         = 'live'           // 'live' (default) = migrate the public storefront content where store
+                                         // modules actually live; 'default' = migrate the EDIT/authoring tree.
 def DRY_RUN           = true             // true = preview only, no writes
 def REPLACE_EXISTING  = false            // true = overwrite modules that already exist by name on the target
 def MIGRATE_SETTINGS  = true             // copy jmix:forgeSettings (logo/footer/Nexus) onto the target site
-def PUBLISH_TO_LIVE    = false           // publish the target contents subtree to LIVE after migration
+def PUBLISH_TO_LIVE   = false            // only when WORKSPACE='default': publish the migrated EDIT content to LIVE
 def LANGUAGES         = null             // null = all site languages; or e.g. ['en','fr']
 // ================================================================
 
@@ -71,7 +91,11 @@ def stats  = [modulesCopied: 0, modulesSkipped: 0, versionsRemapped: 0, urlsDrop
 def log    = { String msg -> report.append(msg).append('\n'); println msg }
 def warn   = { String msg -> stats.warnings++; log("  ! WARN: ${msg}") }
 
-JCRTemplate.getInstance().doExecuteWithSystemSession(null, Constants.EDIT_WORKSPACE, { JCRSessionWrapper session ->
+if (WORKSPACE != Constants.LIVE_WORKSPACE && WORKSPACE != Constants.EDIT_WORKSPACE) {
+    throw new IllegalArgumentException("WORKSPACE must be 'live' or 'default', got: ${WORKSPACE}")
+}
+
+JCRTemplate.getInstance().doExecuteWithSystemSession(null, WORKSPACE, { JCRSessionWrapper session ->
 
     // ---- helpers --------------------------------------------------------
     def sitePath = { String key -> "/sites/${key}".toString() }
@@ -94,17 +118,28 @@ JCRTemplate.getInstance().doExecuteWithSystemSession(null, Constants.EDIT_WORKSP
     // ---- validate -------------------------------------------------------
     def srcPath = sitePath(SOURCE_SITE_KEY)
     def tgtPath = sitePath(TARGET_SITE_KEY)
-    if (!session.nodeExists(srcPath)) throw new RepositoryException("Source site not found: ${srcPath}")
-    if (!session.nodeExists(tgtPath)) throw new RepositoryException("Target site not found: ${tgtPath}")
     if (SOURCE_SITE_KEY == TARGET_SITE_KEY) throw new RepositoryException("Source and target site keys are identical")
-    if (!session.nodeExists(srcPath + REPO)) throw new RepositoryException("Source has no modules-repository: ${srcPath + REPO}")
+    if (!session.nodeExists(srcPath)) {
+        throw new RepositoryException("Source site not found in '${WORKSPACE}' workspace: ${srcPath}")
+    }
+    if (!session.nodeExists(tgtPath)) {
+        throw new RepositoryException("Target site not found in '${WORKSPACE}' workspace: ${tgtPath}" +
+            (WORKSPACE == Constants.LIVE_WORKSPACE ? " — publish the target site at least once so its base structure exists in LIVE, then re-run." : ""))
+    }
+    if (!session.nodeExists(srcPath + REPO)) {
+        throw new RepositoryException("Source has no modules-repository in '${WORKSPACE}': ${srcPath + REPO}" +
+            (WORKSPACE == Constants.LIVE_WORKSPACE ? " — if the source store is edited in jContent and not published, try WORKSPACE='default'." : ""))
+    }
 
     JCRNodeWrapper srcSite = session.getNode(srcPath)
     JCRNodeWrapper tgtSite = session.getNode(tgtPath)
     JCRNodeWrapper tgtContents = ensureChild(tgtSite, 'contents', 'jnt:contentFolder')
 
     log("=== Store content migration: ${SOURCE_SITE_KEY} (privateappstore 4.3.0) -> ${TARGET_SITE_KEY} (jahia-store 5.0.0) ===")
-    log("Mode: ${DRY_RUN ? 'DRY-RUN (no writes)' : 'APPLY'} | replaceExisting=${REPLACE_EXISTING} | migrateSettings=${MIGRATE_SETTINGS} | publish=${PUBLISH_TO_LIVE}")
+    log("Workspace: ${WORKSPACE} | Mode: ${DRY_RUN ? 'DRY-RUN (no writes)' : 'APPLY'} | replaceExisting=${REPLACE_EXISTING} | migrateSettings=${MIGRATE_SETTINGS}")
+    if (WORKSPACE == Constants.LIVE_WORKSPACE) {
+        log("  (LIVE migration: content lands directly in the storefront; the target EDIT/jContent tree is NOT populated — same shape as a contribution-style store.)")
+    }
 
     // ---- 1) modules-required-versions ----------------------------------
     log("\n[1] modules-required-versions")
@@ -240,13 +275,15 @@ JCRTemplate.getInstance().doExecuteWithSystemSession(null, Constants.EDIT_WORKSP
         log("\n[5] DRY-RUN: discarding session (no changes persisted)")
     } else {
         session.save()
-        log("\n[5] saved EDIT workspace")
-        if (PUBLISH_TO_LIVE) {
+        log("\n[5] saved ${WORKSPACE} workspace")
+        if (PUBLISH_TO_LIVE && WORKSPACE == Constants.EDIT_WORKSPACE) {
             def pub = JCRPublicationService.getInstance()
             def langs = (LANGUAGES != null) ? new HashSet(LANGUAGES) : null
             pub.publishByMainId(tgtContents.getIdentifier(), Constants.EDIT_WORKSPACE, Constants.LIVE_WORKSPACE, langs, true, null)
             pub.publishByMainId(tgtSite.getIdentifier(), Constants.EDIT_WORKSPACE, Constants.LIVE_WORKSPACE, langs, false, null)
             log("    published target contents + site node to LIVE")
+        } else if (PUBLISH_TO_LIVE) {
+            log("    (publish skipped: already operating in '${WORKSPACE}' — content is live)")
         }
     }
 
