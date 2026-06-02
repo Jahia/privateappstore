@@ -28,6 +28,7 @@ public final class ForgeSettingsMutationExtension {
     private static final Logger LOGGER = LoggerFactory.getLogger(ForgeSettingsMutationExtension.class);
     private static final String JMIX_FORGE_SETTINGS = "jmix:forgeSettings";
     private static final String PERMISSION = "siteAdminForgeSettings";
+    private static final String FORGE_SETTINGS_LOGO = "forgeSettingsLogo";
 
     private ForgeSettingsMutationExtension() {
     }
@@ -37,19 +38,7 @@ public final class ForgeSettingsMutationExtension {
     @GraphQLDescription("Create or update the forge settings for a site")
     public static GqlForgeSettings updateForgeSettings(
             @GraphQLName("siteKey") @GraphQLNonNull final String siteKey,
-            @GraphQLName("url") final String url,
-            @GraphQLName("id") final String id,
-            @GraphQLName("user") final String user,
-            @GraphQLName("password") final String password,
-            @GraphQLName("logo") @GraphQLDescription("UUID or path of the logo image node; blank clears it") final String logo,
-            @GraphQLName("copyright") final String copyright,
-            @GraphQLName("privacyUrl") final String privacyUrl,
-            @GraphQLName("termsUrl") final String termsUrl,
-            @GraphQLName("cookiesUrl") final String cookiesUrl,
-            @GraphQLName("facebookUrl") final String facebookUrl,
-            @GraphQLName("linkedinUrl") final String linkedinUrl,
-            @GraphQLName("twitterUrl") final String twitterUrl,
-            @GraphQLName("youtubeUrl") final String youtubeUrl) {
+            @GraphQLName("settings") @GraphQLNonNull @GraphQLDescription("Connection + branding fields") final ForgeSettingsInput settings) {
         try {
             return JCRTemplate.getInstance().doExecuteWithSystemSession(new JCRCallback<GqlForgeSettings>() {
                 @Override
@@ -70,14 +59,15 @@ public final class ForgeSettingsMutationExtension {
                         site.addMixin(JMIX_FORGE_SETTINGS);
                     }
 
-                    setStringProp(site, "forgeSettingsUrl", url);
-                    setStringProp(site, "forgeSettingsId", id);
-                    setStringProp(site, "forgeSettingsUser", user);
+                    setStringProp(site, "forgeSettingsUrl", settings.getUrl());
+                    setStringProp(site, "forgeSettingsId", settings.getId());
+                    setStringProp(site, "forgeSettingsUser", settings.getUser());
 
                     // Password handling preserves the previous Spring Web Flow behavior:
                     // store as base64 (obfuscation only — not encryption), blank input
                     // leaves the existing value alone so the UI can omit the field for
                     // already-configured sites without wiping it.
+                    final String password = settings.getPassword();
                     if (StringUtils.isNotBlank(password)) {
                         site.setProperty(
                                 "forgeSettingsPassword",
@@ -86,15 +76,15 @@ public final class ForgeSettingsMutationExtension {
 
                     // Branding / footer. Blank clears these (they are plain editable text,
                     // unlike the write-only password). The logo is a weakreference.
-                    setLogoRef(session, site, logo);
-                    setStringProp(site, "forgeSettingsCopyright", copyright);
-                    setStringProp(site, "forgeSettingsPrivacyUrl", privacyUrl);
-                    setStringProp(site, "forgeSettingsTermsUrl", termsUrl);
-                    setStringProp(site, "forgeSettingsCookiesUrl", cookiesUrl);
-                    setStringProp(site, "forgeSettingsFacebookUrl", facebookUrl);
-                    setStringProp(site, "forgeSettingsLinkedinUrl", linkedinUrl);
-                    setStringProp(site, "forgeSettingsTwitterUrl", twitterUrl);
-                    setStringProp(site, "forgeSettingsYoutubeUrl", youtubeUrl);
+                    setLogoRef(session, site, settings.getLogo());
+                    setStringProp(site, "forgeSettingsCopyright", settings.getCopyright());
+                    setStringProp(site, "forgeSettingsPrivacyUrl", settings.getPrivacyUrl());
+                    setStringProp(site, "forgeSettingsTermsUrl", settings.getTermsUrl());
+                    setStringProp(site, "forgeSettingsCookiesUrl", settings.getCookiesUrl());
+                    setStringProp(site, "forgeSettingsFacebookUrl", settings.getFacebookUrl());
+                    setStringProp(site, "forgeSettingsLinkedinUrl", settings.getLinkedinUrl());
+                    setStringProp(site, "forgeSettingsTwitterUrl", settings.getTwitterUrl());
+                    setStringProp(site, "forgeSettingsYoutubeUrl", settings.getYoutubeUrl());
 
                     session.save();
 
@@ -125,14 +115,14 @@ public final class ForgeSettingsMutationExtension {
     private static void setLogoRef(JCRSessionWrapper session, JCRNodeWrapper site, String logo)
             throws RepositoryException {
         if (StringUtils.isBlank(logo)) {
-            if (site.hasProperty("forgeSettingsLogo")) {
-                site.getProperty("forgeSettingsLogo").remove();
+            if (site.hasProperty(FORGE_SETTINGS_LOGO)) {
+                site.getProperty(FORGE_SETTINGS_LOGO).remove();
             }
             return;
         }
         final JCRNodeWrapper target = logo.startsWith("/")
                 ? session.getNode(logo)
                 : (JCRNodeWrapper) session.getNodeByIdentifier(logo);
-        site.setProperty("forgeSettingsLogo", target);
+        site.setProperty(FORGE_SETTINGS_LOGO, target);
     }
 }

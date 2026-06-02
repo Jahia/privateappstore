@@ -7,10 +7,7 @@ mutation UpdateForgeSettings(
 ) {
     updateForgeSettings(
         siteKey: $siteKey
-        url: $url
-        id: $id
-        user: $user
-        password: $password
+        settings: {url: $url, id: $id, user: $user, password: $password}
     ) {
         siteKey
         url

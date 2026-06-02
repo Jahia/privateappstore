@@ -40,19 +40,23 @@ export const UPDATE_FORGE_SETTINGS = gql`
     ) {
         updateForgeSettings(
             siteKey: $siteKey
-            url: $url
-            id: $id
-            user: $user
-            password: $password
-            logo: $logo
-            copyright: $copyright
-            privacyUrl: $privacyUrl
-            termsUrl: $termsUrl
-            cookiesUrl: $cookiesUrl
-            facebookUrl: $facebookUrl
-            linkedinUrl: $linkedinUrl
-            twitterUrl: $twitterUrl
-            youtubeUrl: $youtubeUrl
+            settings: {
+                url: $url
+                id: $id
+                user: $user
+                password: $password
+                logo: $logo
+                copyright: $copyright
+                footerLinks: {
+                    privacyUrl: $privacyUrl
+                    termsUrl: $termsUrl
+                    cookiesUrl: $cookiesUrl
+                    facebookUrl: $facebookUrl
+                    linkedinUrl: $linkedinUrl
+                    twitterUrl: $twitterUrl
+                    youtubeUrl: $youtubeUrl
+                }
+            }
         ) {
             siteKey
             url
