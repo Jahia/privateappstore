@@ -7,6 +7,7 @@ import graphql.annotations.annotationTypes.GraphQLNonNull;
 import graphql.annotations.annotationTypes.GraphQLTypeExtension;
 import org.apache.commons.lang.StringUtils;
 import org.apache.xerces.impl.dv.util.Base64;
+import org.jahia.services.cache.CacheHelper;
 import org.jahia.modules.graphql.provider.dxm.DXGraphQLProvider;
 import org.jahia.services.content.JCRCallback;
 import org.jahia.services.content.JCRNodeWrapper;
@@ -95,6 +96,12 @@ public final class ForgeSettingsMutationExtension {
                     setStringProp(site, "forgeSettingsYoutubeUrl", settings.getYoutubeUrl());
 
                     session.save();
+
+                    // The store-template chrome renders the logo, copyright and footer links from
+                    // these jmix:forgeSettings properties via SSR, and Jahia caches that rendered
+                    // HTML. Flush the site's output cache (whole subtree) so the change is visible
+                    // immediately instead of serving stale chrome until the cache expires.
+                    CacheHelper.flushOutputCachesForPath(sitePath, true);
 
                     return ForgeSettingsReader.read(site, siteKey);
                 }
