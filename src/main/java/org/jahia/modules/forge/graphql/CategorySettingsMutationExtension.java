@@ -110,20 +110,24 @@ public final class CategorySettingsMutationExtension {
             return;
         }
 
-        // Locale.forLanguageTag avoids the now-deprecated Locale(String) constructor
-        // while preserving the simple "en"/"fr" tag semantics the JCR session expects.
-        final JCRSessionWrapper localized = JCRSessionFactory.getInstance()
-                .getCurrentUserSession(WORKSPACE_DEFAULT, Locale.forLanguageTag(title.getLanguage()));
-        final JCRNodeWrapper node = localized.getNodeByIdentifier(uuid);
-        if (StringUtils.isBlank(title.getTitle())) {
-            if (node.hasProperty(JCR_TITLE)) {
-                node.getProperty(JCR_TITLE).remove();
-            }
-        } else {
-            node.setProperty(JCR_TITLE, title.getTitle());
-        }
-
-        localized.save();
+        // Write through a localized SYSTEM session in the default workspace. Using the system
+        // session (not a second user session) keeps the write under the same trust context that
+        // assertManagedBySite already validated against — eliminating the session-split window
+        // where the node could be relocated outside the site's subtree between the scope check
+        // and the write. Locale.forLanguageTag avoids the deprecated Locale(String) constructor.
+        JCRTemplate.getInstance().doExecuteWithSystemSession(null, WORKSPACE_DEFAULT,
+                Locale.forLanguageTag(title.getLanguage()), localized -> {
+                    final JCRNodeWrapper node = localized.getNodeByIdentifier(uuid);
+                    if (StringUtils.isBlank(title.getTitle())) {
+                        if (node.hasProperty(JCR_TITLE)) {
+                            node.getProperty(JCR_TITLE).remove();
+                        }
+                    } else {
+                        node.setProperty(JCR_TITLE, title.getTitle());
+                    }
+                    localized.save();
+                    return null;
+                });
     }
 
     @GraphQLField
