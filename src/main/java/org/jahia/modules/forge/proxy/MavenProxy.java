@@ -28,7 +28,6 @@ import java.net.URI;
 import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.core.fs.FileSystem;
 import org.apache.xerces.impl.dv.util.Base64;
-import org.jahia.api.Constants;
 import org.jahia.data.templates.ModuleReleaseInfo;
 import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.content.JCRSessionWrapper;
@@ -75,12 +74,6 @@ public class MavenProxy extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             JCRSessionWrapper session = JCRSessionFactory.getInstance().getCurrentUserSession("live");
-            // Require an authenticated (non-guest) user: the proxy forwards the site's stored
-            // Maven credentials, so it must never be reachable anonymously.
-            if (session.getUser() == null || Constants.GUEST_USERNAME.equals(session.getUser().getName())) {
-                trySendError(response, HttpServletResponse.SC_UNAUTHORIZED);
-                return;
-            }
 
             String pathInfo = StringUtils.defaultString(request.getPathInfo());
             if (pathInfo.startsWith("/")) {
@@ -98,18 +91,24 @@ public class MavenProxy extends HttpServlet {
                 return;
             }
 
-            // Authorization (SECURITY-571 B1): the proxy forwards the site's STORED Maven
-            // credentials, so it must only do so for a caller who can read that site's module
-            // repository in their OWN session. The site node + forgeSettings* properties are
-            // commonly world-readable, but modules-repository is jmix:accessControlled, so a
-            // PRIVATE site (restrictive inherited ACL) blocks a foreign caller here. NOTE: the
-            // proxy intentionally serves raw Maven coordinates (not only catalogued modules), so
-            // the gate is repository-level, not artifact-level. Residual: a site whose catalogue
-            // is PUBLIC but whose artifacts must stay private needs a restrictive ACL on its
+            // Authorization (SECURITY-571 B1): serve a site's modules only to a caller who can
+            // READ that site's module repository in their OWN session. modules-repository is
+            // jmix:accessControlled, so this single repository-level gate handles both cases:
+            //   - PUBLIC store (world-readable repository): anonymous/guest visitors can download
+            //     — the public-app-store use case. The site's STORED Maven credentials are used
+            //     SERVER-SIDE only (to fetch from Nexus) and are NEVER returned to the client, so
+            //     forwarding them on behalf of an anonymous request is safe.
+            //   - PRIVATE store (restrictive inherited ACL): guest/foreign callers are blocked.
+            // (A blanket "no anonymous" rule used to sit in front of this; it broke downloads on
+            // public stores and was redundant with this gate, so it was removed.) The proxy
+            // intentionally serves raw Maven coordinates (not only catalogued modules), so the
+            // gate is repository-level, not artifact-level. Residual: a store whose catalogue is
+            // PUBLIC but whose artifacts must stay private needs a restrictive ACL on its
             // modules-repository node (operational prerequisite).
             if (!callerCanAccessRepository(session, siteName)) {
-                LOGGER.warn("MavenProxy: user '{}' is not authorized for site '{}' module repository",
-                        session.getUser().getName(), siteName);
+                final String caller = (session.getUser() != null) ? session.getUser().getName() : "<none>";
+                LOGGER.warn("MavenProxy: caller '{}' is not authorized for site '{}' module repository",
+                        caller, siteName);
                 trySendError(response, HttpServletResponse.SC_FORBIDDEN);
                 return;
             }
@@ -171,8 +170,14 @@ public class MavenProxy extends HttpServlet {
     }
 
     private static boolean isSuspicious(String path) {
-        return path.contains("..") || path.contains("\\") || path.contains("://")
-                || path.contains("\n") || path.contains("\r");
+        // Block raw AND percent-encoded traversal / scheme-injection sequences. The proxy now
+        // serves anonymous callers on public stores, so harden the SSRF guard against encoded
+        // variants regardless of how the downstream URI builder normalizes them. Legitimate
+        // Maven coordinate paths never contain these.
+        final String p = path.toLowerCase();
+        return p.contains("..") || p.contains("\\") || p.contains("://")
+                || p.contains("\n") || p.contains("\r")
+                || p.contains("%2e") || p.contains("%2f") || p.contains("%5c");
     }
 
     /** A site key is a simple identifier; reject anything that could alter the JCR path. */
