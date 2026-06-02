@@ -65,6 +65,12 @@ public final class ManageRolesMutationExtension {
             @GraphQLName("role") @GraphQLNonNull final String role,
             @GraphQLName("principalName") @GraphQLNonNull final String principalName,
             @GraphQLName("principalType") @GraphQLNonNull final PrincipalType principalType) {
+        // Same allowlist as grantSiteRole: this gate manages only the store roles, so it must
+        // never revoke a non-store role (e.g. strip site-administrator from a principal). Without
+        // this a store admin could downgrade arbitrary site grants. (SECURITY-571 review NEW-1)
+        if (!ManageRolesQueryExtension.FORGE_ROLES.contains(role)) {
+            throw new ForgeSettingsException("Role not permitted: " + role, null);
+        }
         return execute(siteKey, session -> {
             final JCRNodeWrapper site = session.getNode(SITES_PATH + siteKey);
             final String principalKey = principalType.toPrincipalKey(principalName);
