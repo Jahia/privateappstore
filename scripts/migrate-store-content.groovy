@@ -18,8 +18,10 @@
  *   2. contents/modules-repository         (the uploaded modules/packages, their
  *      versions, files, icon, screenshots, reviews, tags, categories, changelog,
  *      i18n descriptions/FAQ/howToInstall/license)
- *   3. jmix:forgeSettings on the site node  (Nexus URL/id/user/password, copyright,
- *      footer URLs, rootCategory, logo)
+ *
+ * What it does NOT migrate: forge settings (Nexus URL/credentials, branding/footer, logo,
+ * root category). As of jahia-store 5.0.0 those live in per-site OSGi configuration, not
+ * JCR — re-enter them once in the target store's admin after migrating the modules.
  *
  * Reference handling (the only tricky part):
  *   - `requiredVersion` (version -> modules-required-versions) is PER-SITE, so it
@@ -77,7 +79,6 @@ def WORKSPACE         = 'live'           // 'live' (default) = migrate the publi
                                          // modules actually live; 'default' = migrate the EDIT/authoring tree.
 def DRY_RUN           = true             // true = preview only, no writes
 def REPLACE_EXISTING  = false            // true = overwrite modules that already exist by name on the target
-def MIGRATE_SETTINGS  = true             // copy jmix:forgeSettings (logo/footer/Nexus) onto the target site
 def PUBLISH_TO_LIVE   = false            // only when WORKSPACE='default': publish the migrated EDIT content to LIVE
 def LANGUAGES         = null             // null = all site languages; or e.g. ['en','fr']
 // ================================================================
@@ -136,7 +137,7 @@ JCRTemplate.getInstance().doExecuteWithSystemSession(null, WORKSPACE, { JCRSessi
     JCRNodeWrapper tgtContents = ensureChild(tgtSite, 'contents', 'jnt:contentFolder')
 
     log("=== Store content migration: ${SOURCE_SITE_KEY} (privateappstore 4.3.0) -> ${TARGET_SITE_KEY} (jahia-store 5.0.0) ===")
-    log("Workspace: ${WORKSPACE} | Mode: ${DRY_RUN ? 'DRY-RUN (no writes)' : 'APPLY'} | replaceExisting=${REPLACE_EXISTING} | migrateSettings=${MIGRATE_SETTINGS}")
+    log("Workspace: ${WORKSPACE} | Mode: ${DRY_RUN ? 'DRY-RUN (no writes)' : 'APPLY'} | replaceExisting=${REPLACE_EXISTING}")
     if (WORKSPACE == Constants.LIVE_WORKSPACE) {
         log("  (LIVE migration: content lands directly in the storefront; the target EDIT/jContent tree is NOT populated — same shape as a contribution-style store.)")
     }
@@ -214,61 +215,13 @@ JCRTemplate.getInstance().doExecuteWithSystemSession(null, WORKSPACE, { JCRSessi
         log("  would re-point ~${stats.versionsRemapped} version(s); would drop ~${stats.urlsDropped} stale url(s)")
     }
 
-    // ---- 4) jmix:forgeSettings on the site node ------------------------
-    if (MIGRATE_SETTINGS) {
-        log("\n[4] forgeSettings (site mixin)")
-        if (!srcSite.isNodeType('jmix:forgeSettings')) {
-            log("  source site has no forgeSettings; nothing to copy")
-        } else {
-            if (!DRY_RUN && !tgtSite.isNodeType('jmix:forgeSettings')) tgtSite.addMixin('jmix:forgeSettings')
-
-            def stringProps = ['forgeSettingsUrl','forgeSettingsId','forgeSettingsUser','forgeSettingsPassword',
-                               'forgeSettingsCopyright','forgeSettingsPrivacyUrl','forgeSettingsTermsUrl',
-                               'forgeSettingsCookiesUrl','forgeSettingsFacebookUrl','forgeSettingsLinkedinUrl',
-                               'forgeSettingsTwitterUrl','forgeSettingsYoutubeUrl']
-            stringProps.each { p ->
-                if (srcSite.hasProperty(p)) {
-                    def v = srcSite.getProperty(p).getString()
-                    log("  - ${p} = ${(p == 'forgeSettingsPassword') ? '********' : v}")
-                    if (!DRY_RUN) tgtSite.setProperty(p, v)
-                }
-            }
-
-            // rootCategory: global category UUID -> valid on the same server. Carry over.
-            if (srcSite.hasProperty('rootCategory')) {
-                try {
-                    def cat = srcSite.getProperty('rootCategory').getNode()
-                    log("  - rootCategory -> ${cat.getPath()}")
-                    if (!DRY_RUN) tgtSite.setProperty('rootCategory', cat)
-                } catch (RepositoryException e) { warn("source rootCategory is dangling; skipped") }
-            }
-
-            // forgeSettingsLogo: copy the file when it lives inside the source site,
-            // else keep the (shared) reference.
-            if (srcSite.hasProperty('forgeSettingsLogo')) {
-                try {
-                    def logo = srcSite.getProperty('forgeSettingsLogo').getNode()
-                    if (logo.getPath().startsWith(srcSite.getPath() + '/')) {
-                        def relLogo = logo.getPath().substring((srcSite.getPath() + '/').length())   // e.g. files/store/logo.png
-                        def tgtLogoPath = tgtSite.getPath() + '/' + relLogo
-                        log("  - logo (site-local): ${logo.getPath()} -> ${tgtLogoPath}")
-                        if (!DRY_RUN) {
-                            JCRNodeWrapper parent = tgtSite
-                            def segs = relLogo.split('/')
-                            for (int i = 0; i < segs.length - 1; i++) {
-                                parent = parent.hasNode(segs[i]) ? parent.getNode(segs[i]) : parent.addNode(segs[i], 'jnt:folder')
-                            }
-                            if (!session.nodeExists(tgtLogoPath)) logo.copy(parent, segs[-1], false)
-                            tgtSite.setProperty('forgeSettingsLogo', session.getNode(tgtLogoPath))
-                        }
-                    } else {
-                        log("  - logo (shared): ${logo.getPath()} -> reference kept")
-                        if (!DRY_RUN) tgtSite.setProperty('forgeSettingsLogo', logo)
-                    }
-                } catch (RepositoryException e) { warn("source forgeSettingsLogo is dangling; skipped") }
-            }
-        }
-    }
+    // ---- 4) forge settings (NOT migrated) ------------------------------
+    // As of jahia-store 5.0.0, forge settings (Nexus URL/credentials, branding/footer,
+    // logo, root category) live in per-site OSGi configuration (ForgeSettingsService),
+    // NOT in JCR — they were moved off the cross-module jmix:forgeSettings node type.
+    // They are therefore NOT part of content migration: re-enter them once in the target
+    // store's "Store administration" admin after migrating the modules.
+    log("\n[4] forge settings: NOT migrated — configure them in the target store's admin (per-site OSGi config).")
 
     // ---- 5) save & publish ---------------------------------------------
     if (DRY_RUN) {
