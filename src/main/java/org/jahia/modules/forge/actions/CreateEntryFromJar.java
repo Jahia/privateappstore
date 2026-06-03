@@ -251,8 +251,6 @@ public class CreateEntryFromJar extends Action {
                 || StringUtils.isEmpty(reqVersionAttribute) || !isSafeCoordinate(groupId, moduleName)) {
             return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
         }
-        final String moduleRelPath = groupId.replace(".", "/") + "/" + moduleName;
-
         final JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
         moduleParams.put(REQUIRED_VERSION, Arrays.asList(versions.getNode(requiredVersion).getIdentifier()));
 
@@ -261,15 +259,12 @@ public class CreateEntryFromJar extends Action {
         final String title = populateParameterMaps(moduleParams, moduleName, moduleParameters, versionParameters);
 
         logger.info("Start creating Private App Store Javascript Module {}", moduleName);
-
-        JCRNodeWrapper module = upsertModuleNode(request, repository, moduleRelPath, groupId, moduleName, moduleParameters);
-        grantOwnerRole(session, module);
-
         logger.info("Start adding module version {} of {}", version, title);
-        final ActionResult conflict = versionConflict(module, version, moduleName, session);
-        if (conflict != null) {
-            return conflict;
+        final ModulePrep prep = prepareModuleVersion(request, repository, groupId, moduleName, moduleParameters, version, session);
+        if (prep.conflict != null) {
+            return prep.conflict;
         }
+        final JCRNodeWrapper module = prep.module;
         final JCRNodeWrapper moduleVersion = createModuleVersion(request, module, versionParameters, version,
                 jahiaJsonObject.getString("module-dependencies"), session);
 
@@ -412,8 +407,6 @@ public class CreateEntryFromJar extends Action {
                 || StringUtils.isEmpty(reqVersionAttribute) || !isSafeCoordinate(groupId, moduleName)) {
             return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
         }
-        String moduleRelPath = groupId.replace(".", "/") + "/" + moduleName;
-
         JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
         moduleParams.put(REQUIRED_VERSION, Arrays.asList(versions.getNode(requiredVersion).getIdentifier()));
 
@@ -427,15 +420,12 @@ public class CreateEntryFromJar extends Action {
         String title = populateParameterMaps(moduleParams, moduleName, moduleParameters, versionParameters);
 
         logger.info("Start creating Private App Store Module {}", moduleName);
-
-        JCRNodeWrapper module = upsertModuleNode(request, repository, moduleRelPath, groupId, moduleName, moduleParameters);
-        grantOwnerRole(session, module);
-
         logger.info("Start adding module version {} of {}", version, title);
-        final ActionResult conflict = versionConflict(module, version, moduleName, session);
-        if (conflict != null) {
-            return conflict;
+        final ModulePrep prep = prepareModuleVersion(request, repository, groupId, moduleName, moduleParameters, version, session);
+        if (prep.conflict != null) {
+            return prep.conflict;
         }
+        final JCRNodeWrapper module = prep.module;
         createModuleVersion(request, module, versionParameters, version, attributes.getValue("Jahia-Depends"), session);
 
         logger.info("Module version {} of {} successfully added", version, title);
@@ -521,6 +511,31 @@ public class CreateEntryFromJar extends Action {
     private static boolean isSafeCoordinate(String groupId, String moduleName) {
         return !groupId.contains("..") && !groupId.contains("\\")
                 && !moduleName.contains("..") && !moduleName.contains("\\");
+    }
+
+    /** Outcome of preparing a module node for a new version: the module + an optional conflict error. */
+    private static final class ModulePrep {
+        private final JCRNodeWrapper module;
+        private final ActionResult conflict;
+
+        private ModulePrep(JCRNodeWrapper module, ActionResult conflict) {
+            this.module = module;
+            this.conflict = conflict;
+        }
+    }
+
+    /**
+     * Upsert the module node (creating its groupId folders as needed), grant the caller the owner
+     * role, and check whether {@code version} may be added. Shared by both upload paths.
+     */
+    private ModulePrep prepareModuleVersion(HttpServletRequest request, JCRNodeWrapper repository, String groupId,
+                                            String moduleName, Map<String, List<String>> moduleParameters,
+                                            String version, JCRSessionWrapper session)
+            throws RepositoryException, JSONException {
+        final String moduleRelPath = groupId.replace(".", "/") + "/" + moduleName;
+        final JCRNodeWrapper module = upsertModuleNode(request, repository, moduleRelPath, groupId, moduleName, moduleParameters);
+        grantOwnerRole(session, module);
+        return new ModulePrep(module, versionConflict(module, version, moduleName, session));
     }
 
     /** The "version already exists" error result, or null when {@code version} may be added. */
