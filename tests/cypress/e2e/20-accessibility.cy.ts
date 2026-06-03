@@ -78,7 +78,7 @@ describe('Accessibility — WCAG 2.2 AAA gate (JS module)', () => {
         }
 
         createSite(siteKey, {
-            languages: 'en',
+            languages: 'en,fr',
             templateSet: 'jahia-store-template',
             serverName: 'a11y.local',
             locale: 'en'

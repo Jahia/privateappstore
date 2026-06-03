@@ -54,7 +54,7 @@ describe('Storefront read views (JS module)', () => {
         // The jahia-store-template import.xml seeds the home page (+ modules list),
         // the My-modules sub-page and contents/modules-repository.
         createSite(siteKey, {
-            languages: 'en',
+            languages: 'en,fr',
             templateSet: 'jahia-store-template',
             serverName: 'storefront.local',
             locale: 'en'
@@ -216,6 +216,17 @@ describe('Storefront read views (JS module)', () => {
             .and('not.contain', 'moduleList.rss');
         // Social links are icon-only (brand glyphs); the platform name is the accessible label.
         cy.get('footer [aria-label="Facebook"]').find('svg').should('exist');
+    });
+
+    it('shows a language selector (current marked, other links to that language)', () => {
+        // The site is en,fr — the header language selector lists both, marks the current one,
+        // and each link points the current page at that language (Jahia /<lang>/ render).
+        cy.visit(homeRender);
+        cy.get('header [aria-label="Language"]', {timeout: 20000}).within(() => {
+            cy.contains('a', 'EN').should('have.attr', 'aria-current', 'true');
+            cy.contains('a', 'FR').should('not.have.attr', 'aria-current');
+            cy.contains('a', 'FR').should('have.attr', 'href').and('include', '/fr/');
+        });
     });
 
     it('signs in via the header login form (posts to /cms/login)', () => {
