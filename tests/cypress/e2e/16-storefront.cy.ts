@@ -227,6 +227,21 @@ describe('Storefront read views (JS module)', () => {
         cy.contains('root').should('be.visible');
     });
 
+    it('shows an inline error on bad credentials (no /cms/login dead-end)', () => {
+        publishAndWaitJobEnding(`/sites/${siteKey}`, ['en']);
+        cy.logout();
+        cy.visit(`/cms/render/live/en/sites/${siteKey}/home.html`);
+        cy.contains('button', /log in/i).click();
+        cy.get('#login-username').type('root');
+        cy.get('#login-password').type('definitely-not-the-password{enter}');
+        // Jahia redirects back to the page with ?loginError=…; the login island surfaces an
+        // inline message and reopens the form instead of stranding the user on /cms/login.
+        cy.contains(/invalid username or password/i, {timeout: 20000}).should('be.visible');
+        cy.location('pathname').should('not.contain', '/cms/login');
+        // The error param is stripped from the URL so a refresh is clean.
+        cy.location('search').should('not.contain', 'loginError');
+    });
+
     it('gates the "My modules" nav entry by login + Store role', () => {
         cy.login();
         publishAndWaitJobEnding(`/sites/${siteKey}`, ['en']);
