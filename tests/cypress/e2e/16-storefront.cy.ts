@@ -214,6 +214,8 @@ describe('Storefront read views (JS module)', () => {
             .should('have.attr', 'href')
             .and('match', /\/feed$/)
             .and('not.contain', 'moduleList.rss');
+        // Social links are icon-only (brand glyphs); the platform name is the accessible label.
+        cy.get('footer [aria-label="Facebook"]').find('svg').should('exist');
     });
 
     it('signs in via the header login form (posts to /cms/login)', () => {
@@ -223,7 +225,9 @@ describe('Storefront read views (JS module)', () => {
         cy.logout();
         cy.visit(`/cms/render/live/en/sites/${siteKey}/home.html`);
         // Open the login panel (the toggle button), then fill + submit the form.
-        cy.contains('button', /log in/i).click();
+        // Wait for the login island to hydrate (data-login-ready) before clicking the
+        // SSR trigger, else the panel-toggle handler may not be wired yet.
+        cy.contains('button[data-login-ready="true"]', /log in/i, {timeout: 20000}).click();
         cy.get('#login-username').type('root');
         cy.get('#login-password').type(`${Cypress.env('SUPER_USER_PASSWORD')}{enter}`);
         // A successful form login redirects back to the page, now authenticated:
@@ -236,7 +240,9 @@ describe('Storefront read views (JS module)', () => {
         publishAndWaitJobEnding(`/sites/${siteKey}`, ['en']);
         cy.logout();
         cy.visit(`/cms/render/live/en/sites/${siteKey}/home.html`);
-        cy.contains('button', /log in/i).click();
+        // Wait for the login island to hydrate (data-login-ready) before clicking the
+        // SSR trigger, else the panel-toggle handler may not be wired yet.
+        cy.contains('button[data-login-ready="true"]', /log in/i, {timeout: 20000}).click();
         cy.get('#login-username').type('root');
         cy.get('#login-password').type('definitely-not-the-password{enter}');
         // Jahia redirects back to the page with ?loginError=…; the login island surfaces an
