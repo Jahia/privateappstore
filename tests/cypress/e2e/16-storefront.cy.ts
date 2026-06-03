@@ -115,7 +115,11 @@ describe('Storefront read views (JS module)', () => {
         cy.contains('Draft Module').should('not.exist');
     });
 
-    it('filters the grid by status (server-side facet)', () => {
+    it('filters the grid by status (server-side facet, case-insensitive)', () => {
+        // Store the status capitalized, as migrated 4.3.0 data can be ("Supported"), while the
+        // facet submits the lowercase choicelist key ("supported"): matching must be
+        // case-insensitive. Restored to lowercase afterwards for the later tests.
+        setNodeProperty(`${repo}/analytics`, 'status', 'Supported', 'en');
         cy.visit(homeRender);
         // Server-side filtering: check a Status facet and submit the GET form; the page
         // reloads showing only matching modules (non-matching are absent, not just hidden).
@@ -123,6 +127,7 @@ describe('Storefront read views (JS module)', () => {
         cy.get('[data-forge-filter] button[type="submit"]').click();
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('be.visible');
         cy.contains('[data-forge-card]', 'SEO Toolkit').should('not.exist');
+        setNodeProperty(`${repo}/analytics`, 'status', 'supported', 'en');
     });
 
     it('filters the grid by text (server-side)', () => {
