@@ -127,6 +127,13 @@ public class CreateEntryFromJar extends Action {
     private static final long MAX_UPLOAD_SIZE_BYTES = 200L * 1024 * 1024;
     /** Maximum size of a single tar entry we read into memory (guards against decompression bombs). */
     private static final long MAX_TAR_ENTRY_SIZE_BYTES = 10L * 1024 * 1024;
+    /** Form params routed to the module node (the rest go to the version node). */
+    private static final List<String> MODULE_PARAM_KEYS = Arrays.asList(DESCRIPTION, CATEGORY, "icon",
+            AUTHOR_NAME_DISPLAYED_AS, AUTHOR_URL, AUTHOR_EMAIL, "FAQ", CODE_REPOSITORY, DOWNLOAD_COUNT,
+            SUPPORTED_BY_JAHIA, REVIEWED_BY_JAHIA, PUBLISHED, DELETED, SCREENSHOTS, VIDEO, GROUP_ID);
+    /** Form params routed to the version node. */
+    private static final List<String> VERSION_PARAM_KEYS =
+            Arrays.asList(REQUIRED_VERSION, VERSION_NUMBER, FILE_DSA_SIGNATURE, CHANGE_LOG);
 
     String mavenExecutable;
 
@@ -249,18 +256,9 @@ public class CreateEntryFromJar extends Action {
         final JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
         moduleParams.put(REQUIRED_VERSION, Arrays.asList(versions.getNode(requiredVersion).getIdentifier()));
 
-        final List<String> moduleParamKeys = Arrays.asList(DESCRIPTION, CATEGORY, "icon", AUTHOR_NAME_DISPLAYED_AS, AUTHOR_URL, AUTHOR_EMAIL, "FAQ", CODE_REPOSITORY, DOWNLOAD_COUNT, SUPPORTED_BY_JAHIA, REVIEWED_BY_JAHIA, PUBLISHED, DELETED, SCREENSHOTS, VIDEO, GROUP_ID);
-        final List<String> versionParamKeys = Arrays.asList(REQUIRED_VERSION, VERSION_NUMBER, FILE_DSA_SIGNATURE, CHANGE_LOG);
         final Map<String, List<String>> moduleParameters = new HashMap<>();
         final Map<String, List<String>> versionParameters = new HashMap<>();
-
-        String title = getParameter(moduleParams, Constants.JCR_TITLE);
-        if (StringUtils.isEmpty(title)) {
-            title = moduleName;
-        }
-        moduleParameters.put(Constants.JCR_TITLE, Arrays.asList(title));
-        versionParameters.put(Constants.JCR_TITLE, Arrays.asList(title));
-        partitionParams(moduleParams, moduleParamKeys, versionParamKeys, moduleParameters, versionParameters);
+        final String title = populateParameterMaps(moduleParams, moduleName, moduleParameters, versionParameters);
 
         logger.info("Start creating Private App Store Javascript Module {}", moduleName);
 
@@ -424,18 +422,9 @@ public class CreateEntryFromJar extends Action {
             return deployFailure;
         }
 
-        List<String> moduleParamKeys = Arrays.asList(DESCRIPTION, CATEGORY, "icon", AUTHOR_NAME_DISPLAYED_AS, AUTHOR_URL, AUTHOR_EMAIL, "FAQ", CODE_REPOSITORY, DOWNLOAD_COUNT, SUPPORTED_BY_JAHIA, REVIEWED_BY_JAHIA, PUBLISHED, DELETED, SCREENSHOTS, VIDEO, GROUP_ID);
-        List<String> versionParamKeys = Arrays.asList(REQUIRED_VERSION, VERSION_NUMBER, FILE_DSA_SIGNATURE, CHANGE_LOG);
         Map<String, List<String>> moduleParameters = new HashMap<>();
         Map<String, List<String>> versionParameters = new HashMap<>();
-
-        String title = getParameter(moduleParams, Constants.JCR_TITLE);
-        if (StringUtils.isEmpty(title)) {
-            title = moduleName;
-        }
-        moduleParameters.put(Constants.JCR_TITLE, Arrays.asList(title));
-        versionParameters.put(Constants.JCR_TITLE, Arrays.asList(title));
-        partitionParams(moduleParams, moduleParamKeys, versionParamKeys, moduleParameters, versionParameters);
+        String title = populateParameterMaps(moduleParams, moduleName, moduleParameters, versionParameters);
 
         logger.info("Start creating Private App Store Module {}", moduleName);
 
@@ -543,6 +532,24 @@ public class CreateEntryFromJar extends Action {
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
         }
         return null;
+    }
+
+    /**
+     * Split the collected form params into the module-level and version-level parameter maps
+     * (populating the supplied maps) and return the resolved module title (the submitted
+     * jcr:title, or the module name when none was given). Shared by both upload paths.
+     */
+    private String populateParameterMaps(Map<String, List<String>> moduleParams, String moduleName,
+                                         Map<String, List<String>> moduleParameters,
+                                         Map<String, List<String>> versionParameters) {
+        String title = getParameter(moduleParams, Constants.JCR_TITLE);
+        if (StringUtils.isEmpty(title)) {
+            title = moduleName;
+        }
+        moduleParameters.put(Constants.JCR_TITLE, Arrays.asList(title));
+        versionParameters.put(Constants.JCR_TITLE, Arrays.asList(title));
+        partitionParams(moduleParams, MODULE_PARAM_KEYS, VERSION_PARAM_KEYS, moduleParameters, versionParameters);
+        return title;
     }
 
     /** Create the version node under a module, set its dependency references, and grant the owner role. */
