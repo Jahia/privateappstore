@@ -134,6 +134,10 @@ public class CreateEntryFromJar extends Action {
     /** Form params routed to the version node. */
     private static final List<String> VERSION_PARAM_KEYS =
             Arrays.asList(REQUIRED_VERSION, VERSION_NUMBER, FILE_DSA_SIGNATURE, CHANGE_LOG);
+    /** Form params routed to a package node (no groupId / code-repository, unlike a module). */
+    private static final List<String> PACKAGE_PARAM_KEYS = Arrays.asList(DESCRIPTION, CATEGORY, "icon",
+            AUTHOR_NAME_DISPLAYED_AS, AUTHOR_URL, AUTHOR_EMAIL, "FAQ", DOWNLOAD_COUNT, SUPPORTED_BY_JAHIA,
+            REVIEWED_BY_JAHIA, PUBLISHED, DELETED, SCREENSHOTS, VIDEO);
 
     String mavenExecutable;
 
@@ -256,7 +260,7 @@ public class CreateEntryFromJar extends Action {
 
         final Map<String, List<String>> moduleParameters = new HashMap<>();
         final Map<String, List<String>> versionParameters = new HashMap<>();
-        final String title = populateParameterMaps(moduleParams, moduleName, moduleParameters, versionParameters);
+        final String title = populateParameterMaps(moduleParams, moduleName, MODULE_PARAM_KEYS, moduleParameters, versionParameters);
 
         logger.info("Start creating Private App Store Javascript Module {}", moduleName);
         logger.info("Start adding module version {} of {}", version, title);
@@ -301,18 +305,9 @@ public class CreateEntryFromJar extends Action {
         JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
         packageParams.put(REQUIRED_VERSION, Arrays.asList(versions.getNode(requiredVersion).getIdentifier()));
 
-        List<String> packageParamKeys = Arrays.asList(DESCRIPTION, CATEGORY, "icon", AUTHOR_NAME_DISPLAYED_AS, AUTHOR_URL, AUTHOR_EMAIL, "FAQ", DOWNLOAD_COUNT, SUPPORTED_BY_JAHIA, REVIEWED_BY_JAHIA, PUBLISHED, DELETED, SCREENSHOTS, VIDEO);
-        List<String> versionParamKeys = Arrays.asList(REQUIRED_VERSION, VERSION_NUMBER, FILE_DSA_SIGNATURE, CHANGE_LOG);
         Map<String, List<String>> packageParameters = new HashMap<>();
         Map<String, List<String>> versionParameters = new HashMap<>();
-
-        String title = getParameter(packageParams, Constants.JCR_TITLE);
-        if (StringUtils.isEmpty(title)) {
-            title = packageName;
-        }
-        packageParameters.put(Constants.JCR_TITLE, Arrays.asList(title));
-        versionParameters.put(Constants.JCR_TITLE, Arrays.asList(title));
-        partitionParams(packageParams, packageParamKeys, versionParamKeys, packageParameters, versionParameters);
+        String title = populateParameterMaps(packageParams, packageName, PACKAGE_PARAM_KEYS, packageParameters, versionParameters);
 
         logger.info("Start creating Private App Store Package {}", packageName);
 
@@ -337,14 +332,8 @@ public class CreateEntryFromJar extends Action {
 
         logger.info("Private App Store Package {} successfully created and added to repository {}", packageName, modulesPackage.getParent().getPath());
 
-        String packageUrl = renderContext.getResponse().encodeURL(modulesPackage.getUrl());
-        String packageAbsoluteUrl = modulesPackage.getProvider().getAbsoluteContextPath(request) + packageUrl;
         session.save();
-
-        ActionResult uploadResult = new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(SUCCESS_REDIRECT_URL, packageUrl).put(
-                SUCCESS_REDIRECT_ABSOLUTE_URL, packageAbsoluteUrl));
-        applySafeRedirect(uploadResult, formParams);
-        return uploadResult;
+        return buildUploadResult(request, renderContext, modulesPackage, formParams);
     }
 
     private JCRNodeWrapper upsertPackageNode(HttpServletRequest request, JCRNodeWrapper repositoryStart,
@@ -417,7 +406,7 @@ public class CreateEntryFromJar extends Action {
 
         Map<String, List<String>> moduleParameters = new HashMap<>();
         Map<String, List<String>> versionParameters = new HashMap<>();
-        String title = populateParameterMaps(moduleParams, moduleName, moduleParameters, versionParameters);
+        String title = populateParameterMaps(moduleParams, moduleName, MODULE_PARAM_KEYS, moduleParameters, versionParameters);
 
         logger.info("Start creating Private App Store Module {}", moduleName);
         logger.info("Start adding module version {} of {}", version, title);
@@ -554,16 +543,16 @@ public class CreateEntryFromJar extends Action {
      * (populating the supplied maps) and return the resolved module title (the submitted
      * jcr:title, or the module name when none was given). Shared by both upload paths.
      */
-    private String populateParameterMaps(Map<String, List<String>> moduleParams, String moduleName,
-                                         Map<String, List<String>> moduleParameters,
+    private String populateParameterMaps(Map<String, List<String>> params, String nameFallback,
+                                         List<String> entityParamKeys, Map<String, List<String>> entityParameters,
                                          Map<String, List<String>> versionParameters) {
-        String title = getParameter(moduleParams, Constants.JCR_TITLE);
+        String title = getParameter(params, Constants.JCR_TITLE);
         if (StringUtils.isEmpty(title)) {
-            title = moduleName;
+            title = nameFallback;
         }
-        moduleParameters.put(Constants.JCR_TITLE, Arrays.asList(title));
+        entityParameters.put(Constants.JCR_TITLE, Arrays.asList(title));
         versionParameters.put(Constants.JCR_TITLE, Arrays.asList(title));
-        partitionParams(moduleParams, MODULE_PARAM_KEYS, VERSION_PARAM_KEYS, moduleParameters, versionParameters);
+        partitionParams(params, entityParamKeys, VERSION_PARAM_KEYS, entityParameters, versionParameters);
         return title;
     }
 
