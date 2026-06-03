@@ -153,16 +153,17 @@ describe('Storefront read views (JS module)', () => {
         cy.contains('h1', 'Analytics Dashboard').should('be.visible');
         // Video is in the default Overview tab.
         cy.get('iframe[src*="youtube.com/embed/dQw4w9WgXcQ"]').should('exist');
-        // Versions live behind the Versions tab.
-        cy.get('[data-detail-tabs-ready]', {timeout: 20000});
-        cy.contains('[role="tab"]', /versions/i).click();
-        cy.contains('1.0.0').should('be.visible');
-        cy.contains('a', 'Download')
-            .should('have.attr', 'href')
-            .and('contain', 'analytics-1.0.0.jar');
-        // The per-version footer surfaces the release date (jcr:lastModified) — regression
-        // for the dropped "Updated" / "Requires Jahia" version metadata.
-        cy.get('[data-forge-version]').contains(/Updated/i).should('be.visible');
+        // Versions now open in a popup (from the header button), not a tab.
+        cy.get('[data-versions-open]', {timeout: 20000}).click();
+        cy.get('[data-versions-dialog][open]').within(() => {
+            cy.contains('1.0.0').should('be.visible');
+            cy.contains('a', 'Download')
+                .should('have.attr', 'href')
+                .and('contain', 'analytics-1.0.0.jar');
+            // The per-version footer surfaces the release date (jcr:lastModified) — regression
+            // for the dropped "Updated" / "Requires Jahia" version metadata.
+            cy.get('[data-forge-version]').contains(/Updated/i).should('be.visible');
+        });
     });
 
     it('shows the store.jahia.com-style Information rail + header download', () => {
