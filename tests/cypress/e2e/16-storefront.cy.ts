@@ -160,6 +160,9 @@ describe('Storefront read views (JS module)', () => {
         cy.contains('a', 'Download')
             .should('have.attr', 'href')
             .and('contain', 'analytics-1.0.0.jar');
+        // The per-version footer surfaces the release date (jcr:lastModified) — regression
+        // for the dropped "Updated" / "Requires Jahia" version metadata.
+        cy.get('[data-forge-version]').contains(/Updated/i).should('be.visible');
     });
 
     it('shows the store.jahia.com-style Information panel + header download', () => {
