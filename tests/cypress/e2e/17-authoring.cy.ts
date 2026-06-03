@@ -19,6 +19,17 @@ const saveAndWaitReload = (saveLabel = /^Save$/): void => {
 };
 
 /**
+ * Open the module detail page's "Versions" popup (replaced the old Versions tab).
+ * Waits for the trigger island to hydrate (data-versions-ready) before clicking,
+ * then for the native <dialog> to be open — so the per-version controls inside it
+ * are visible/interactive.
+ */
+const openVersionsPopup = (): void => {
+    cy.get('[data-versions-open][data-versions-ready="true"]', {timeout: 20000}).click();
+    cy.get('[data-versions-dialog][open]', {timeout: 20000}).should('be.visible');
+};
+
+/**
  * Authoring views (jahia-store-template JS module) — Phase 3.
  *
  * Covers in-site editing of module metadata via the ModuleEditor island, which
@@ -226,34 +237,24 @@ describe('Authoring views (JS module)', () => {
     });
 
     it('owner publishes a specific version via the version publish control', () => {
-        // Version controls live in the Versions tab.
-        const openVersionsTab = () => {
-            cy.get('[data-detail-tabs-ready]', {timeout: 20000});
-            cy.contains('[role="tab"]', /versions/i).click();
-        };
-
         cy.visit(moduleRender);
-        openVersionsTab();
+        openVersionsPopup();
         // The seeded version starts unpublished.
         cy.get('[data-forge-version] [data-publish-scope="version"][data-publish-ready="true"]', {timeout: 20000})
             .should('have.attr', 'data-published', 'false');
         cy.get('[data-forge-version] [data-publish-scope="version"] button').click();
         cy.get('[data-forge-version] [data-publish-scope="version"]').should('have.attr', 'data-published', 'true');
         cy.reload();
-        openVersionsTab();
+        openVersionsPopup();
         cy.get('[data-forge-version] [data-publish-scope="version"][data-publish-ready="true"]', {timeout: 20000})
             .should('have.attr', 'data-published', 'true');
     });
 
     it('owner removes a version via the version delete control (with confirm)', () => {
         const multiRender = `/cms/render/default/en${repo}/multiver.html`;
-        const openVersionsTab = () => {
-            cy.get('[data-detail-tabs-ready]', {timeout: 20000});
-            cy.contains('[role="tab"]', /versions/i).click();
-        };
 
         cy.visit(multiRender);
-        openVersionsTab();
+        openVersionsPopup();
         // Both seeded versions are listed.
         cy.contains('[data-forge-version]', '2.0.0').should('be.visible');
         cy.contains('[data-forge-version]', '1.0.0').should('be.visible');
@@ -274,7 +275,7 @@ describe('Authoring views (JS module)', () => {
         });
 
         // After the reload: 2.0.0 remains, 1.0.0 is gone.
-        openVersionsTab();
+        openVersionsPopup();
         cy.contains('[data-forge-version]', '2.0.0').should('be.visible');
         cy.get('[data-forge-version]').should('have.length', 1);
         cy.contains('[data-forge-version]', '1.0.0').should('not.exist');
@@ -290,11 +291,10 @@ describe('Authoring views (JS module)', () => {
         cy.get('body').should($b => expect($b.html()).to.contain('createEntryFromJar.do'));
     });
 
-    it('owner can add a version from the module page (upload form in the Versions tab)', () => {
+    it('owner can add a version from the module page (upload form in the Versions popup)', () => {
         cy.visit(moduleRender);
-        cy.get('[data-detail-tabs-ready]', {timeout: 20000});
-        cy.contains('[role="tab"]', /versions/i).click();
-        // The owner-only "Upload a new version" form lives in the Versions tab and
+        openVersionsPopup();
+        // The owner-only "Upload a new version" form lives in the Versions popup and
         // posts to the SAME createEntryFromJar action (which upserts: it appends the
         // version to the existing module). A real upload needs a Maven repo, so —
         // like the my-modules upload test — assert the form is present and wired.

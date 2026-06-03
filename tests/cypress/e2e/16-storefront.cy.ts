@@ -153,8 +153,9 @@ describe('Storefront read views (JS module)', () => {
         cy.contains('h1', 'Analytics Dashboard').should('be.visible');
         // Video is in the default Overview tab.
         cy.get('iframe[src*="youtube.com/embed/dQw4w9WgXcQ"]').should('exist');
-        // Versions now open in a popup (from the header button), not a tab.
-        cy.get('[data-versions-open]', {timeout: 20000}).click();
+        // Versions now open in a popup (from the header button), not a tab. Wait for the
+        // island to hydrate (data-versions-ready) before clicking, else the handler is not yet wired.
+        cy.get('[data-versions-open][data-versions-ready="true"]', {timeout: 20000}).click();
         cy.get('[data-versions-dialog][open]').within(() => {
             cy.contains('1.0.0').should('be.visible');
             cy.contains('a', 'Download')
