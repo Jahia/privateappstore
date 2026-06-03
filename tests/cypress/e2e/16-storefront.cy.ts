@@ -203,6 +203,12 @@ describe('Storefront read views (JS module)', () => {
         cy.get('footer')
             .contains('a', /privacy/i)
             .should('have.attr', 'href', 'https://acme.example.com/privacy');
+        // The RSS link points at the clean /feed alias (SEO rewrite), not the internal
+        // .moduleList.rss render URL.
+        cy.get('footer [data-rss-feed]')
+            .should('have.attr', 'href')
+            .and('match', /\/feed$/)
+            .and('not.contain', 'moduleList.rss');
     });
 
     it('signs in via the header login form (posts to /cms/login)', () => {
