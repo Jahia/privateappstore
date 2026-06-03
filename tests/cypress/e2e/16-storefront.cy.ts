@@ -165,17 +165,17 @@ describe('Storefront read views (JS module)', () => {
         cy.get('[data-forge-version]').contains(/Updated/i).should('be.visible');
     });
 
-    it('shows the store.jahia.com-style Information panel + header download', () => {
+    it('shows the store.jahia.com-style Information rail + header download', () => {
         cy.visit(detailRender);
         // The latest-version download CTA is always in the title area.
         cy.get('[data-latest-download]')
             .should('have.attr', 'href')
             .and('contain', 'analytics-1.0.0.jar');
-        // Module metadata lives behind the Information tab.
-        cy.get('[data-detail-tabs-ready]', {timeout: 20000});
-        cy.contains('[role="tab"]', /information/i).click();
-        cy.contains('dt', 'Module ID').next('dd').should('contain.text', 'analytics');
-        cy.contains('dt', /status/i).next('dd').should('contain.text', 'supported');
+        // Module metadata lives in the always-visible Information rail (no longer behind a tab).
+        cy.get('[data-detail-info]').within(() => {
+            cy.contains('dt', 'Module ID').next('dd').should('contain.text', 'analytics');
+            cy.contains('dt', /status/i).next('dd').should('contain.text', 'supported');
+        });
     });
 
     it('the "My modules" list shows the user own modules, including drafts', () => {
