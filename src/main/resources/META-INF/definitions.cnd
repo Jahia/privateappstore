@@ -127,6 +127,15 @@
  - forgeSettingsUser (string)
  - forgeSettingsPassword (string) hidden
  - rootCategory (weakreference)
+ - forgeSettingsLogo (weakreference)
+ - forgeSettingsCopyright (string)
+ - forgeSettingsPrivacyUrl (string)
+ - forgeSettingsTermsUrl (string)
+ - forgeSettingsCookiesUrl (string)
+ - forgeSettingsFacebookUrl (string)
+ - forgeSettingsLinkedinUrl (string)
+ - forgeSettingsTwitterUrl (string)
+ - forgeSettingsYoutubeUrl (string)
 
 [jnt:forgeSettings] > jnt:content, mix:title, jmix:studioOnly, jmix:siteComponent
 

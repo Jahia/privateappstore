@@ -27,9 +27,21 @@ import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.filter.AbstractFilter;
 import org.jahia.services.render.filter.RenderChain;
+import org.jahia.services.render.filter.RenderFilter;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 
 
+@Component(service = RenderFilter.class)
 public class PublishedModuleFilter extends AbstractFilter {
+
+    @Activate
+    public void activate() {
+        setPriority(20);
+        setApplyOnModes("live");
+        setApplyOnNodeTypes("jnt:forgeModule");
+    }
+
     @Override
     public String prepare(RenderContext renderContext, Resource resource, RenderChain chain) throws Exception {
         if (!resource.getNode().getProperty("published").getBoolean() && !resource.getNode().hasPermission("jcr:write")) {

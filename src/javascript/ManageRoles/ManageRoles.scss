@@ -1,0 +1,113 @@
+.roles_page_header {
+    padding: 24px 24px 0;
+}
+
+.roles_container {
+    padding: 24px;
+    max-width: 960px;
+}
+
+.roles_role {
+    margin-bottom: 28px;
+    padding: 16px;
+    border: 1px solid var(--color-border, #e0e0e0);
+    border-radius: 6px;
+}
+
+.roles_role_title {
+    margin: 0 0 12px;
+    font-weight: 600;
+}
+
+.roles_members {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.roles_member {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: var(--color-surface, #fafafa);
+    border-radius: 4px;
+}
+
+.roles_member_type {
+    font-size: 0.75em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary, #777);
+    margin-left: 8px;
+}
+
+.roles_empty {
+    color: var(--color-text-secondary, #777);
+    font-style: italic;
+    font-size: 0.9em;
+}
+
+.roles_add_row {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.roles_add_search {
+    flex: 1;
+    min-width: 220px;
+}
+
+.roles_search_results {
+    margin-top: 8px;
+    border: 1px solid var(--color-border, #ccc);
+    border-radius: 4px;
+    background: white;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.roles_search_result {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--color-border, #eee);
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &:hover {
+        background: var(--color-surface, #f0f0f0);
+    }
+}
+
+.roles_type_toggle {
+    display: flex;
+    gap: 4px;
+}
+
+.roles_alert {
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+
+    &.success {
+        background: var(--color-success-light, #e6f4ea);
+        color: var(--color-success-dark, #1e7e34);
+    }
+
+    &.error {
+        background: var(--color-danger-light, #fdeaea);
+        color: var(--color-danger-dark, #b1271b);
+    }
+}
+
+.roles_loading,
+.roles_error {
+    padding: 24px;
+}

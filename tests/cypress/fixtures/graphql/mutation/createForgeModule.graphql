@@ -1,0 +1,17 @@
+mutation CreateForgeModule($parentPath: String!, $name: String!, $title: String!) {
+    jcr(workspace: EDIT) {
+        addNode(
+            parentPathOrId: $parentPath
+            name: $name
+            primaryNodeType: "jnt:forgeModule"
+            properties: [
+                { name: "jcr:title", value: $title, language: "en" }
+            ]
+        ) {
+            node {
+                uuid
+                path
+            }
+        }
+    }
+}

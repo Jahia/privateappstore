@@ -1,0 +1,71 @@
+services:
+    # Sonatype Nexus 3 — backs the Private App Store as the Maven repository
+    # that hosts uploaded module JARs and serves them to the Forge UI.
+    # On first boot Nexus creates default 'maven-releases' / 'maven-snapshots'
+    # hosted repositories which is what the forge module needs out of the box.
+    nexus:
+        image: 'sonatype/nexus3:3.70.1'
+        container_name: nexus
+        ports:
+            - '8081:8081'
+        environment:
+            # Disable random admin password so credentials are deterministic
+            # for the tests (admin / admin123).
+            - NEXUS_SECURITY_RANDOMPASSWORD=false
+            # Keep the JVM modest so the stack runs on a developer laptop.
+            - INSTALL4J_ADD_VM_PARAMS=-Xms512m -Xmx1g -XX:MaxDirectMemorySize=1g -Djava.util.prefs.userRoot=/nexus-data/javaprefs
+        ulimits:
+            nofile:
+                soft: 65536
+                hard: 65536
+        healthcheck:
+            test: ['CMD-SHELL', 'curl -fsS http://localhost:8081/service/rest/v1/status || exit 1']
+            interval: 10s
+            timeout: 5s
+            retries: 30
+            start_period: 60s
+        networks:
+            - stack
+
+    jahia:
+        image: '${JAHIA_IMAGE}'
+        container_name: jahia
+        ports:
+            - '8080:8080'
+            - '8000:8000'
+        environment:
+            - SUPER_USER_PASSWORD=${SUPER_USER_PASSWORD}
+            - JAHIA_LICENSE=${JAHIA_LICENSE}
+            - JPDA=true
+            # Expose Nexus coordinates to Jahia so provisioning / tests can
+            # configure the forge settings programmatically.
+            - NEXUS_URL=http://nexus:8081
+            - NEXUS_USERNAME=${NEXUS_USERNAME:-admin}
+            - NEXUS_PASSWORD=${NEXUS_PASSWORD:-admin123}
+        extra_hosts:
+            - jahia:127.0.0.1
+        depends_on:
+            nexus:
+                condition: service_healthy
+        networks:
+            - stack
+
+    # Cypress container
+    cypress:
+        image: '${TESTS_IMAGE}'
+        # https://github.com/cypress-io/cypress/issues/350
+        ipc: host
+        container_name: cypress
+        depends_on:
+            - jahia
+        environment:
+            - MANIFEST=${MANIFEST}
+            - SUPER_USER_PASSWORD=${SUPER_USER_PASSWORD}
+            - JAHIA_URL=http://jahia:8080
+            - NEXUS_URL=http://nexus:8081
+            - NEXUS_USERNAME=${NEXUS_USERNAME:-admin}
+            - NEXUS_PASSWORD=${NEXUS_PASSWORD:-admin123}
+        networks:
+            - stack
+networks:
+    stack:

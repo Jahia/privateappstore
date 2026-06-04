@@ -1,0 +1,12 @@
+query GetNodeByPath($path: String!) {
+    jcr {
+        nodeByPath(path: $path) {
+            uuid
+            name
+            path
+            primaryNodeType {
+                name
+            }
+        }
+    }
+}

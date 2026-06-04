@@ -17,7 +17,6 @@
                         <c:when test="${child.properties['jcr:primaryType'].string eq 'jnt:forgeModule'}">
                             <c:set var="versions" value="${jcr:getChildrenOfType(child, 'jnt:forgeModuleVersion')}"/>
                             <c:set var="groupID" value="${child.properties['groupId'].string}"/>
-                            <c:set var="downloadUrl" value="${version.properties.url.string}"/>
                         </c:when>
                         <c:otherwise>
                             <c:set var="versions" value="${jcr:getChildrenOfType(child, 'jnt:forgePackageVersion')}"/>
@@ -61,7 +60,17 @@
                                                            value="${version.properties.requiredVersion.node.name}"/>
                                             <c:set var="files" value="${jcr:getChildrenOfType(version, 'jnt:file')}"/>
                                             <c:if test="${empty files}">
-                                                <c:set var="downloadUrl" value="${version.properties.url.string}"/>    
+                                                <%-- No attached artifact: the module was deployed to the site's Maven
+                                                     repository, so the download is served by the MavenProxy servlet at
+                                                     /modules/mavenproxy. Generate the URL from the request server + the
+                                                     module coordinates instead of storing an absolute URL on the node,
+                                                     so it adapts to the request's scheme / host / port / site.
+                                                     CANONICAL MAVENPROXY GRAMMAR (keep these three in sync; MavenProxy.java
+                                                     parses it back): {server}{context}/modules/mavenproxy/{siteKey}/
+                                                     {groupId-with-dots-as-slashes}/{name}/{version}/{name}-{version}.jar
+                                                     Also implemented in rss/contentFolder.moduleList.jsp and, root-relative
+                                                     for the browser, in store-template src/components/forge/versions.ts. --%>
+                                                <c:set var="downloadUrl" value="${url.server}${url.context}/modules/mavenproxy/${currentNode.resolveSite.siteKey}/${fn:replace(groupID, '.', '/')}/${child.name}/${version.properties.versionNumber.string}/${child.name}-${version.properties.versionNumber.string}.jar"/>
                                             </c:if>
                                             <c:if test="${not empty files}">
                                                 <c:forEach var="file" items="${files}">

@@ -1,0 +1,3 @@
+mutation SetRootCategory($siteKey: String!, $rootCategoryUuid: String!) {
+    setRootCategory(siteKey: $siteKey, rootCategoryUuid: $rootCategoryUuid)
+}

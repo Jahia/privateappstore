@@ -1,0 +1,114 @@
+{
+  "administration": {
+    "menu_entry": "Administration du store"
+  },
+  "label": {
+    "menu_entry": "Paramètres",
+    "title": "Paramètres de l'App Store privé",
+    "url": "URL de la forge",
+    "urlPlaceholder": "URL complète d'un dépôt Maven déployable (ex. /repository/maven-releases/)",
+    "id": "Identifiant de la forge",
+    "user": "Utilisateur",
+    "password": "Mot de passe",
+    "passwordUnchanged": "Inchangé",
+    "passwordNewHint": "Saisir le mot de passe de la forge distante",
+    "passwordReplaceHint": "Laisser vide pour conserver le mot de passe existant",
+    "logo": "Logo",
+    "logoNone": "Aucun logo configuré",
+    "logoRemove": "Retirer",
+    "logoPick": "Choisir un logo dans les médias du site",
+    "logoNoImages": "Aucune image dans la médiathèque de ce site — ajoutez-en dans jContent d'abord.",
+    "copyright": "Copyright",
+    "privacyUrl": "Lien politique de confidentialité",
+    "termsUrl": "Lien conditions d'utilisation",
+    "cookiesUrl": "Lien politique de cookies",
+    "facebookUrl": "Lien Facebook",
+    "linkedinUrl": "Lien LinkedIn",
+    "twitterUrl": "Lien Twitter/X",
+    "youtubeUrl": "Lien YouTube",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "cancel": "Annuler",
+    "loading": "Chargement…",
+    "add": "Ajouter",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "revoke": "Révoquer"
+  },
+  "branding": {
+    "title": "Identité visuelle"
+  },
+  "footer": {
+    "title": "Pied de page"
+  },
+  "success": {
+    "update": "Paramètres enregistrés."
+  },
+  "errors": {
+    "load": {
+      "failed": "Échec du chargement des paramètres"
+    },
+    "update": {
+      "failed": "Échec de l'enregistrement des paramètres"
+    }
+  },
+  "categories": {
+    "menu_entry": "Catégories",
+    "title": "Catégories App Store",
+    "root": {
+      "heading": "Catégorie racine",
+      "none": "Aucune catégorie racine configurée.",
+      "uuidField": "UUID de la catégorie racine",
+      "uuidPlaceholder": "Coller l'UUID d'un nœud JCR de type catégorie"
+    },
+    "list": {
+      "heading": "Catégories",
+      "empty": "Aucune catégorie — ajoutez-en une ci-dessous.",
+      "untranslated": "aucune traduction",
+      "usages": "{{count}} utilisation(s)"
+    },
+    "editor": {
+      "heading": "Modifier les titres de la catégorie"
+    },
+    "add": {
+      "heading": "Ajouter une catégorie",
+      "nameField": "Nom de la catégorie",
+      "namePlaceholder": "ex. portlets"
+    },
+    "delete": {
+      "confirmInUse": "Cette catégorie est référencée par {{count}} élément(s). Supprimer quand même ?"
+    },
+    "success": {
+      "root": "Catégorie racine mise à jour.",
+      "add": "Catégorie ajoutée.",
+      "titles": "Titres enregistrés.",
+      "delete": "Catégorie supprimée."
+    }
+  },
+  "roles": {
+    "menu_entry": "Rôles",
+    "title": "Rôles App Store",
+    "empty": "Aucun membre pour ce rôle.",
+    "addMember": "Attribuer le rôle",
+    "revoke": {
+      "confirm": "Révoquer {{role}} pour {{principal}} ?"
+    },
+    "search": {
+      "label": "Rechercher",
+      "placeholder": "Nom d'utilisateur ou de groupe",
+      "users": "Utilisateurs",
+      "groups": "Groupes",
+      "action": "Rechercher",
+      "noResults": "Aucun résultat."
+    },
+    "names": {
+      "store-administrator": "Administrateur du store",
+      "store-developer": "Développeur du store",
+      "reader": "Lecteur"
+    },
+    "success": {
+      "granted": "Rôle attribué.",
+      "revoked": "Rôle révoqué."
+    }
+  }
+}

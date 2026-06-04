@@ -1,0 +1,3 @@
+mutation DeleteForgeCategory($siteKey: String!, $uuid: String!) {
+    deleteForgeCategory(siteKey: $siteKey, uuid: $uuid)
+}

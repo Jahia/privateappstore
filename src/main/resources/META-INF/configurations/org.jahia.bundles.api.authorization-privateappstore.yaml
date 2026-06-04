@@ -1,7 +1,0 @@
-access-privateappstore-json-views:
-  auto_apply:
-    - always: true
-  grants:
-    - api: view.json.moduleList
-      node:
-        nodeType: jnt:contentFolder

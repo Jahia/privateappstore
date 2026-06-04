@@ -8,7 +8,7 @@ on:
     - cron: '0 4 * * 1,3,5' # At 4AM, on Monday, Wednesday and Friday
 
 env:
-  MODULE_ID: privateappstore
+  MODULE_ID: jahia-store
 
 jobs:
   sonar-analysis:

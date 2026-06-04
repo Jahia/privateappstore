@@ -9,4 +9,7 @@
             <jahiaForgeModerateModule jcr:primaryType="jnt:permission"/>
         </jahiaForge>
     </actions>
+    <site-admin jcr:primaryType="jnt:permission">
+        <siteAdminForgeSettings jcr:primaryType="jnt:permission"/>
+    </site-admin>
 </permissions>

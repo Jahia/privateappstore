@@ -1,0 +1,22 @@
+mutation AddNodeWithProperties(
+    $parentPath: String!
+    $name: String!
+    $primaryNodeType: String!
+    $properties: [InputJCRProperty]
+    $mixins: [String!]
+) {
+    jcr(workspace: EDIT) {
+        addNode(
+            parentPathOrId: $parentPath
+            name: $name
+            primaryNodeType: $primaryNodeType
+            properties: $properties
+            mixins: $mixins
+        ) {
+            node {
+                uuid
+                path
+            }
+        }
+    }
+}
