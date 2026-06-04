@@ -26,7 +26,9 @@ jobs:
       - uses: actions/checkout@v3
       - uses: Jahia/jahia-modules-action/static-analysis@v2
         with:
-          node_version: 12
+          # Match the Node the Maven build embeds (frontend-maven-plugin: v22.6.0);
+          # the dependency tree (normalize-package-data@7 via resolutions) needs Node >= 18.17.
+          node_version: 22
           auditci_level: critical
 
   build:

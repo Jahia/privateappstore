@@ -54,7 +54,7 @@ describe('Storefront read views (JS module)', () => {
         // The jahia-store-template import.xml seeds the home page (+ modules list),
         // the My-modules sub-page and contents/modules-repository.
         createSite(siteKey, {
-            languages: 'en',
+            languages: 'en,fr',
             templateSet: 'jahia-store-template',
             serverName: 'storefront.local',
             locale: 'en'
@@ -115,7 +115,11 @@ describe('Storefront read views (JS module)', () => {
         cy.contains('Draft Module').should('not.exist');
     });
 
-    it('filters the grid by status (server-side facet)', () => {
+    it('filters the grid by status (server-side facet, case-insensitive)', () => {
+        // Store the status capitalized, as migrated 4.3.0 data can be ("Supported"), while the
+        // facet submits the lowercase choicelist key ("supported"): matching must be
+        // case-insensitive. Restored to lowercase afterwards for the later tests.
+        setNodeProperty(`${repo}/analytics`, 'status', 'Supported', 'en');
         cy.visit(homeRender);
         // Server-side filtering: check a Status facet and submit the GET form; the page
         // reloads showing only matching modules (non-matching are absent, not just hidden).
@@ -123,6 +127,7 @@ describe('Storefront read views (JS module)', () => {
         cy.get('[data-forge-filter] button[type="submit"]').click();
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('be.visible');
         cy.contains('[data-forge-card]', 'SEO Toolkit').should('not.exist');
+        setNodeProperty(`${repo}/analytics`, 'status', 'supported', 'en');
     });
 
     it('filters the grid by text (server-side)', () => {
@@ -209,6 +214,19 @@ describe('Storefront read views (JS module)', () => {
             .should('have.attr', 'href')
             .and('match', /\/feed$/)
             .and('not.contain', 'moduleList.rss');
+        // Social links are icon-only (brand glyphs); the platform name is the accessible label.
+        cy.get('footer [aria-label="Facebook"]').find('svg').should('exist');
+    });
+
+    it('shows a language selector (current marked, other links to that language)', () => {
+        // The site is en,fr — the header language selector lists both, marks the current one,
+        // and each link points the current page at that language (Jahia /<lang>/ render).
+        cy.visit(homeRender);
+        cy.get('header [aria-label="Language"]', {timeout: 20000}).within(() => {
+            cy.contains('a', 'EN').should('have.attr', 'aria-current', 'true');
+            cy.contains('a', 'FR').should('not.have.attr', 'aria-current');
+            cy.contains('a', 'FR').should('have.attr', 'href').and('include', '/fr/');
+        });
     });
 
     it('signs in via the header login form (posts to /cms/login)', () => {
@@ -218,13 +236,32 @@ describe('Storefront read views (JS module)', () => {
         cy.logout();
         cy.visit(`/cms/render/live/en/sites/${siteKey}/home.html`);
         // Open the login panel (the toggle button), then fill + submit the form.
-        cy.contains('button', /log in/i).click();
+        // Wait for the login island to hydrate (data-login-ready) before clicking the
+        // SSR trigger, else the panel-toggle handler may not be wired yet.
+        cy.contains('button[data-login-ready="true"]', /log in/i, {timeout: 20000}).click();
         cy.get('#login-username').type('root');
         cy.get('#login-password').type(`${Cypress.env('SUPER_USER_PASSWORD')}{enter}`);
         // A successful form login redirects back to the page, now authenticated:
         // the header shows the account menu with a real Log out *button* (not a link).
         cy.get('header').contains('button', /log out/i, {timeout: 20000}).should('be.visible');
         cy.contains('root').should('be.visible');
+    });
+
+    it('shows an inline error on bad credentials (no /cms/login dead-end)', () => {
+        publishAndWaitJobEnding(`/sites/${siteKey}`, ['en']);
+        cy.logout();
+        cy.visit(`/cms/render/live/en/sites/${siteKey}/home.html`);
+        // Wait for the login island to hydrate (data-login-ready) before clicking the
+        // SSR trigger, else the panel-toggle handler may not be wired yet.
+        cy.contains('button[data-login-ready="true"]', /log in/i, {timeout: 20000}).click();
+        cy.get('#login-username').type('root');
+        cy.get('#login-password').type('definitely-not-the-password{enter}');
+        // Jahia redirects back to the page with ?loginError=…; the login island surfaces an
+        // inline message and reopens the form instead of stranding the user on /cms/login.
+        cy.contains(/invalid username or password/i, {timeout: 20000}).should('be.visible');
+        cy.location('pathname').should('not.contain', '/cms/login');
+        // The error param is stripped from the URL so a refresh is clean.
+        cy.location('search').should('not.contain', 'loginError');
     });
 
     it('gates the "My modules" nav entry by login + Store role', () => {
