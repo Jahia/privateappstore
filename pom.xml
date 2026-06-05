@@ -81,7 +81,7 @@
         <pluginRepository>
             <id>jahiaRepository</id>
             <name>Jahia's Maven Repository</name>
-            <url>http://maven.jahia.org/maven2</url>
+            <url>https://maven.jahia.org/maven2</url>
         </pluginRepository>
     </pluginRepositories>
     <dependencies>
