@@ -123,6 +123,10 @@ public class CreateEntryFromJar extends Action {
     private static final String ERR_MISSING_MANIFEST_ATTRIBUTE = "forge.uploadJar.error.missing.manifest.attribute";
     private static final String ERR_VERSION_NUMBER = "forge.uploadJar.error.versionNumber";
     private static final String LOG_UNSAFE_REDIRECT = "CreateEntryFromJar: rejected unsafe redirectURL '{}'";
+    /** Allowed upload extensions. Downstream code only ever sees these constants, never user input. */
+    private static final String EXTENSION_JAR = "jar";
+    private static final String EXTENSION_WAR = "war";
+    private static final String EXTENSION_TGZ = "tgz";
     /** Maximum accepted size for an uploaded artifact (guards against resource-exhaustion uploads). */
     private static final long MAX_UPLOAD_SIZE_BYTES = 200L * 1024 * 1024;
     /** Maximum size of a single tar entry we read into memory (guards against decompression bombs). */
@@ -176,12 +180,12 @@ public class CreateEntryFromJar extends Action {
         if (StringUtils.contains(filename, "SNAPSHOT.")) {
             return errorResult(session, "forge.uploadJar.error.snapshot.not.allowed");
         }
-        String extension = StringUtils.substringAfterLast(filename, ".");
-        if (!(StringUtils.equals(extension, "jar") || StringUtils.equals(extension, "war") || StringUtils.equals(extension, "tgz"))) {
+        String extension = trustedExtension(filename);
+        if (extension == null) {
             return errorResult(session, "forge.uploadJar.error.wrong.format");
         }
         Map<String, List<String>> formParameters = fu.getParameterMap();
-        if (extension.endsWith("tgz")) {
+        if (EXTENSION_TGZ.equals(extension)) {
             return handleTgzUpload(uploadedFile, request, renderContext, resource, session, formParameters);
         }
         return handleJarUpload(uploadedFile, extension, request, renderContext, resource, session, formParameters);
@@ -447,6 +451,26 @@ public class CreateEntryFromJar extends Action {
         } finally {
             FileUtils.deleteQuietly(artifact);
         }
+    }
+
+    /**
+     * Allow-lists the uploaded file extension and returns the matching {@code EXTENSION_*} constant,
+     * or {@code null} when the extension is not supported. The returned value is always a constant —
+     * never the user-derived string — so the suffix later embedded in the temp-artifact path
+     * ({@code File.createTempFile}) is provably untainted (CodeQL java/path-injection).
+     */
+    private static String trustedExtension(String filename) {
+        String extension = StringUtils.substringAfterLast(filename, ".");
+        if (StringUtils.equals(extension, EXTENSION_JAR)) {
+            return EXTENSION_JAR;
+        }
+        if (StringUtils.equals(extension, EXTENSION_WAR)) {
+            return EXTENSION_WAR;
+        }
+        if (StringUtils.equals(extension, EXTENSION_TGZ)) {
+            return EXTENSION_TGZ;
+        }
+        return null;
     }
 
     private static ActionResult errorResult(JCRSessionWrapper session, String messageKey) throws JSONException {
