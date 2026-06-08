@@ -174,6 +174,22 @@ describe('Storefront read views (JS module)', () => {
         });
     });
 
+    it('groups Latest releases per module (newest version wins, no duplicates)', () => {
+        // Give analytics a second published version: the panel must still list the module
+        // ONCE, showing its newest version (2.0.0) — grouped per module, not per version.
+        addNode(`${repo}/analytics`, 'v200', 'jnt:forgeModuleVersion', [
+            {name: 'versionNumber', value: '2.0.0'},
+            {name: 'published', value: 'true'}
+        ]);
+        cy.visit(homeRender);
+        cy.get('[data-latest-releases]', {timeout: 20000}).within(() => {
+            cy.get('[data-latest-card]:contains("Analytics Dashboard")').should('have.length', 1);
+            cy.root().should('contain.text', '2.0.0').and('not.contain.text', '1.0.0');
+        });
+        // Restore the single-version state so later specs still see 1.0.0 as the latest.
+        cy.apollo({mutation: deleteNode, variables: {path: `${repo}/analytics/v200`}});
+    });
+
     it('hides the "Latest releases" section while searching/filtering', () => {
         cy.visit(`${homeRender}?src_terms=seo`);
         cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible');
