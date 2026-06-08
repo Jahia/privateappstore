@@ -152,6 +152,22 @@ describe('Authoring views (JS module)', () => {
         cy.contains('a', 'https://github.com/acme/widget').should('exist');
     });
 
+    it('chooses the author display mode (authorNameDisplayedAs) and persists it', () => {
+        cy.visit(moduleRender);
+        cy.get('[data-editor-ready]', {timeout: 20000});
+        cy.contains('button', /edit module/i).click();
+        // The author-display selector (Email / First and last name / Organization) is on
+        // the Author tab; its option values are the authorNameDisplayedAs choicelist keys.
+        cy.contains('[role="tab"]', /author/i).click();
+        cy.get('#edit-author-display', {timeout: 10000}).select('fullName');
+        saveAndWaitReload();
+        // Re-open the editor: the persisted choice is reflected back.
+        cy.get('[data-editor-ready]', {timeout: 20000});
+        cy.contains('button', /edit module/i).click();
+        cy.contains('[role="tab"]', /author/i).click();
+        cy.get('#edit-author-display', {timeout: 10000}).should('have.value', 'fullName');
+    });
+
     it('edits status + tags on the General tab and persists them', () => {
         cy.visit(moduleRender);
         cy.get('[data-editor-ready]', {timeout: 20000});
