@@ -125,7 +125,6 @@ public class CreateEntryFromJar extends Action {
     private static final String LOG_UNSAFE_REDIRECT = "CreateEntryFromJar: rejected unsafe redirectURL '{}'";
     /** Allowed upload extensions. Downstream code only ever sees these constants, never user input. */
     private static final String EXTENSION_JAR = "jar";
-    private static final String EXTENSION_WAR = "war";
     private static final String EXTENSION_TGZ = "tgz";
     /** Maximum accepted size for an uploaded artifact (guards against resource-exhaustion uploads). */
     private static final long MAX_UPLOAD_SIZE_BYTES = 200L * 1024 * 1024;
@@ -379,9 +378,6 @@ public class CreateEntryFromJar extends Action {
         String groupId;
         String version = attributes.getValue("Implementation-Version");
         String moduleName = attributes.getValue(BUNDLE_SYMBOLIC_NAME);
-        if (uploadedFile.getName().endsWith(".war")) {
-            moduleName = attributes.getValue("root-folder");
-        }
         groupId = attributes.getValue("Jahia-GroupId");
         JCRSiteNode site = resource.getNode().getResolveSite();
 
@@ -463,9 +459,6 @@ public class CreateEntryFromJar extends Action {
         String extension = StringUtils.substringAfterLast(filename, ".");
         if (StringUtils.equals(extension, EXTENSION_JAR)) {
             return EXTENSION_JAR;
-        }
-        if (StringUtils.equals(extension, EXTENSION_WAR)) {
-            return EXTENSION_WAR;
         }
         if (StringUtils.equals(extension, EXTENSION_TGZ)) {
             return EXTENSION_TGZ;
