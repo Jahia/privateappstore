@@ -121,19 +121,24 @@ describe('Storefront read views (JS module)', () => {
         // case-insensitive. Restored to lowercase afterwards for the later tests.
         setNodeProperty(`${repo}/analytics`, 'status', 'Supported', 'en');
         cy.visit(homeRender);
-        // Server-side filtering: check a Status facet and submit the GET form; the page
-        // reloads showing only matching modules (non-matching are absent, not just hidden).
-        cy.get('[data-forge-filter] input[name="status"][value="supported"]', {timeout: 20000}).check();
-        cy.get('[data-forge-filter] button[type="submit"]').click();
+        // Server-side filtering: the facet form auto-applies on change once the island
+        // hydrates (no "Apply" button). Wait for the ready flag, then checking a Status
+        // facet submits the GET form; the page reloads showing only matching modules.
+        cy.get('[data-forge-filter][data-filter-ready="true"]', {timeout: 20000});
+        cy.get('[data-forge-filter] input[name="status"][value="supported"]').check();
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('be.visible');
         cy.contains('[data-forge-card]', 'SEO Toolkit').should('not.exist');
         setNodeProperty(`${repo}/analytics`, 'status', 'supported', 'en');
     });
 
-    it('filters the grid by text (server-side)', () => {
+    it('filters the grid by text (server-side, via the global header search)', () => {
         cy.visit(homeRender);
-        cy.get('[data-forge-filter] input[name="src_terms"]', {timeout: 20000}).clear().type('seo');
-        cy.get('[data-forge-filter] button[type="submit"]').click();
+        // The in-rail search box was removed: the header's global search is the single
+        // search entry point. Submitting it navigates to the grid with ?src_terms and
+        // filters server-side. Scope to the visible desktop form (the mobile-nav island
+        // renders a duplicate hidden at this viewport).
+        cy.get('header [role="search"] input[name="src_terms"]:visible', {timeout: 20000})
+            .type('seo{enter}');
         cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible');
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('not.exist');
     });
