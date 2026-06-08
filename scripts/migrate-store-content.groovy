@@ -70,6 +70,7 @@ import org.jahia.services.content.JCRTemplate
 import org.jahia.services.content.JCRSessionWrapper
 import org.jahia.services.content.JCRNodeWrapper
 import org.jahia.services.content.JCRCallback
+import org.jahia.services.content.JCRObservationManager
 import org.jahia.services.content.JCRPublicationService
 import org.jahia.services.usermanager.JahiaUserManagerService
 import org.jahia.api.Constants
@@ -160,8 +161,10 @@ JCRTemplate.getInstance().doExecuteWithSystemSession(null, WORKSPACE, { JCRSessi
     // jcr:created/jcr:lastModified at COPY time, so without this every migrated module/version
     // would show the migration run date as its "Updated" date. jcr:lastModified/jcr:lastModifiedBy
     // are autocreated but NOT protected (unlike jcr:created/jcr:createdBy, which is why the author
-    // is preserved via copy-as-author instead), so we can set them back to the source values; an
-    // explicitly-set jcr:lastModified is kept by Jahia's save instead of being re-stamped to "now".
+    // is preserved via copy-as-author instead), so we can set them back to the source values. The
+    // catch: Jahia's LastModifiedListener re-stamps jcr:lastModified to "now" on every save, which
+    // would clobber our value — so the fixup save below runs with JCRObservationManager event
+    // listeners DISABLED (the listener is skipped; Jackrabbit still indexes the persisted value).
     // (jcr:created stays the migration time — it is protected — so the storefront sorts/shows the
     // "updated" date, not the created date.)
     def preserveLastModified = { JCRNodeWrapper target, JCRNodeWrapper source ->
@@ -310,14 +313,25 @@ JCRTemplate.getInstance().doExecuteWithSystemSession(null, WORKSPACE, { JCRSessi
     if (DRY_RUN) {
         log("\n[5] DRY-RUN: discarding session (no changes persisted)")
     } else {
-        session.save()
-        log("\n[5] saved ${WORKSPACE} workspace")
+        // Save with Jahia event listeners disabled so LastModifiedListener does NOT re-stamp the
+        // jcr:lastModified values we just preserved (it would otherwise set them all to "now").
+        // Only Jahia's app-level listeners are suppressed — Jackrabbit still indexes the persisted
+        // values, so the storefront's ORDER BY jcr:lastModified and the status facet stay correct.
+        JCRObservationManager.setAllEventListenersDisabled(Boolean.TRUE)
+        try {
+            session.save()
+        } finally {
+            JCRObservationManager.setAllEventListenersDisabled(Boolean.FALSE)
+        }
+        log("\n[5] saved ${WORKSPACE} workspace (event listeners disabled to keep the preserved updated dates)")
         if (PUBLISH_TO_LIVE && WORKSPACE == Constants.EDIT_WORKSPACE) {
             def pub = JCRPublicationService.getInstance()
             def langs = (LANGUAGES != null) ? new HashSet(LANGUAGES) : null
             pub.publishByMainId(tgtContents.getIdentifier(), Constants.EDIT_WORKSPACE, Constants.LIVE_WORKSPACE, langs, true, null)
             pub.publishByMainId(tgtSite.getIdentifier(), Constants.EDIT_WORKSPACE, Constants.LIVE_WORKSPACE, langs, false, null)
             log("    published target contents + site node to LIVE")
+            // NOTE: publication may re-stamp jcr:lastModified on the LIVE copies. The recommended
+            // path is WORKSPACE='live' (no publish), where the preserved dates land directly in LIVE.
         } else if (PUBLISH_TO_LIVE) {
             log("    (publish skipped: already operating in '${WORKSPACE}' — content is live)")
         }
