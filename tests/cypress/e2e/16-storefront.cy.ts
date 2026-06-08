@@ -143,6 +143,27 @@ describe('Storefront read views (JS module)', () => {
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('not.exist');
     });
 
+    it('searches the description too, not only the title (advanced-search scope)', () => {
+        cy.visit(homeRender);
+        // "sitemaps" appears only in SEO Toolkit's description, never in any title — so a
+        // hit proves the search now spans the description (title + module id + description).
+        cy.get('header [role="search"] input[name="src_terms"]:visible', {timeout: 20000})
+            .type('sitemaps{enter}');
+        cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible');
+        cy.contains('[data-forge-card]', 'Analytics Dashboard').should('not.exist');
+    });
+
+    it('filters from the header advanced-search panel (status facet)', () => {
+        cy.visit(homeRender);
+        // Open the header disclosure, pick a status and submit the panel — it posts through
+        // the same GET pipeline as the home rail, landing on the filtered grid.
+        cy.get('header [role="search"] details > summary:visible', {timeout: 20000}).click();
+        cy.get('header [role="search"] details input[name="status"][value="community"]').check();
+        cy.get('header [role="search"] details button[type="submit"]').click();
+        cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible');
+        cy.contains('[data-forge-card]', 'Analytics Dashboard').should('not.exist');
+    });
+
     it('paginates the grid when modules exceed the page size', () => {
         const listNode = `/sites/${siteKey}/home/main/store-modules`;
         // Two published modules; shrink the page size to 1 so there are two pages.
