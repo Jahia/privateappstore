@@ -162,6 +162,24 @@ describe('Storefront read views (JS module)', () => {
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('not.exist');
     });
 
+    it('shows a "Latest releases" section on the default home view', () => {
+        cy.visit(homeRender);
+        cy.get('[data-latest-releases]', {timeout: 20000}).within(() => {
+            cy.contains('Latest releases').should('be.visible');
+            // analytics has a published 1.0.0 version (seo has none), so it leads the strip.
+            cy.contains('[data-latest-card]', 'Analytics Dashboard')
+                .should('have.attr', 'href')
+                .and('include', 'analytics');
+            cy.contains('[data-latest-card]', '1.0.0').should('exist');
+        });
+    });
+
+    it('hides the "Latest releases" section while searching/filtering', () => {
+        cy.visit(`${homeRender}?src_terms=seo`);
+        cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible');
+        cy.get('[data-latest-releases]').should('not.exist');
+    });
+
     it('paginates the grid when modules exceed the page size', () => {
         const listNode = `/sites/${siteKey}/home/main/store-modules`;
         // Two published modules; shrink the page size to 1 so there are two pages.
