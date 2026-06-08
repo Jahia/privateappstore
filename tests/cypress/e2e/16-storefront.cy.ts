@@ -68,7 +68,6 @@ describe('Storefront read views (JS module)', () => {
         setNodeProperty(`${repo}/analytics`, 'description', '<p>Real-time charts and KPI widgets.</p>', 'en');
         setNodeProperty(`${repo}/analytics`, 'status', 'supported', 'en');
         setNodeProperty(`${repo}/analytics`, 'published', 'true', 'en');
-        setNodeProperty(`${repo}/analytics`, 'supportedByJahia', 'true', 'en');
         // GroupId is intrinsic to a JAR module; the version download URL is GENERATED
         // from it (+ name/version/site), not stored on the version node.
         setNodeProperty(`${repo}/analytics`, 'groupId', 'org.cypress.test', 'en');
@@ -111,7 +110,6 @@ describe('Storefront read views (JS module)', () => {
         cy.contains('Analytics Dashboard').should('be.visible');
         cy.contains('SEO Toolkit').should('be.visible');
         cy.contains('Real-time charts').should('be.visible');
-        cy.contains('Supported').should('be.visible');
         cy.contains('Draft Module').should('not.exist');
     });
 

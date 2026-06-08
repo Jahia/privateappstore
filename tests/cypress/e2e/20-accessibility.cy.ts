@@ -93,7 +93,6 @@ describe('Accessibility — WCAG 2.2 AAA gate (JS module)', () => {
         setNodeProperty(`${repo}/analytics`, 'description', '<p>Real-time charts and KPI widgets.</p>', 'en');
         setNodeProperty(`${repo}/analytics`, 'status', 'supported', 'en');
         setNodeProperty(`${repo}/analytics`, 'published', 'true', 'en');
-        setNodeProperty(`${repo}/analytics`, 'supportedByJahia', 'true', 'en');
         // GroupId drives the generated (mavenproxy) download URL, so the audit covers
         // the rendered download links too.
         setNodeProperty(`${repo}/analytics`, 'groupId', 'org.cypress.test', 'en');
