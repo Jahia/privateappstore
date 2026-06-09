@@ -178,8 +178,8 @@ describe('Authoring views (JS module)', () => {
         cy.get('#edit-tags').type('analytics{enter}charts{enter}');
         // Wait for the save-triggered reload before asserting. Scope the status check to the
         // detail Information rail's Status field: a bare cy.contains(/legacy/) would also match
-        // the header advanced-search panel's "legacy" facet label (hidden in a collapsed
-        // <details>), which is not visible and would fail the assertion.
+        // the editor's own status <select> "legacy" <option>, which would make the assertion
+        // pass for the wrong reason (or fail on visibility).
         saveAndWaitReload();
         cy.get('[data-detail-info]', {timeout: 20000})
             .contains('dt', /status/i)

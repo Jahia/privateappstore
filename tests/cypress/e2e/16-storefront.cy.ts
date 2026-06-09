@@ -113,18 +113,17 @@ describe('Storefront read views (JS module)', () => {
         cy.contains('Draft Module').should('not.exist');
     });
 
-    it('filters the grid by status (server-side facet, case-insensitive)', () => {
+    it('filters the grid by status (left-rail facet, case-insensitive)', () => {
         // Store the status capitalized, as migrated 4.3.0 data can be ("Supported"), while the
         // facet submits the lowercase choicelist key ("supported"): matching must be
         // case-insensitive. Restored to lowercase afterwards for the later tests.
         setNodeProperty(`${repo}/analytics`, 'status', 'Supported', 'en');
         cy.visit(homeRender);
-        // Status/Category filtering lives only in the header advanced-search panel now (the home
-        // filter rail was removed). Open it, check a Status facet and submit the GET form; the
-        // page reloads showing only matching modules.
-        cy.get('header [role="search"] details > summary:visible', {timeout: 20000}).click();
-        cy.get('header [role="search"] details input[name="status"][value="supported"]').check();
-        cy.get('header [role="search"] details button[type="submit"]').click();
+        // Status/Category filtering lives in the modules-list LEFT rail. The FilterAutoSubmit
+        // island submits the GET form on change once hydrated (data-filter-ready), so checking a
+        // Status facet reloads the page showing only matching modules.
+        cy.get('[data-forge-filter][data-filter-ready] input[name="status"][value="supported"]', {timeout: 20000})
+            .check();
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('be.visible');
         cy.contains('[data-forge-card]', 'SEO Toolkit').should('not.exist');
         setNodeProperty(`${repo}/analytics`, 'status', 'supported', 'en');
@@ -166,51 +165,19 @@ describe('Storefront read views (JS module)', () => {
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('not.exist');
     });
 
-    it('filters from the header advanced-search panel (status facet)', () => {
-        cy.visit(homeRender);
-        // Open the header disclosure, pick a status and submit the panel — it posts through
-        // the same GET pipeline as the home rail, landing on the filtered grid.
-        cy.get('header [role="search"] details > summary:visible', {timeout: 20000}).click();
-        cy.get('header [role="search"] details input[name="status"][value="community"]').check();
-        cy.get('header [role="search"] details button[type="submit"]').click();
-        cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible');
-        cy.contains('[data-forge-card]', 'Analytics Dashboard').should('not.exist');
-    });
-
-    it('shows a "Latest releases" section on the default home view', () => {
-        cy.visit(homeRender);
-        cy.get('[data-latest-releases]', {timeout: 20000}).within(() => {
-            cy.contains('Latest releases').should('be.visible');
-            // Analytics has a published 1.0.0 version (seo has none), so it leads the strip.
-            cy.contains('[data-latest-card]', 'Analytics Dashboard')
-                .should('have.attr', 'href')
-                .and('include', 'analytics');
-            cy.contains('[data-latest-card]', '1.0.0').should('exist');
-        });
-    });
-
-    it('groups Latest releases per module (newest version wins, no duplicates)', () => {
-        // Give analytics a second published version: the panel must still list the module
-        // ONCE, showing its newest version (2.0.0) — grouped per module, not per version.
-        addNode(`${repo}/analytics`, 'v200', 'jnt:forgeModuleVersion', [
-            {name: 'versionNumber', value: '2.0.0'},
+    it('orders the grid by release date, most recent first', () => {
+        // A module's release date lives on its version nodes (the grid sorts modules by their
+        // newest published version's date, descending). analytics's only release (1.0.0) was
+        // created during seed; give seo a release NOW so it is the newest in the catalogue and
+        // must lead the grid. Cleaned up afterwards so later specs see seo version-less again.
+        addNode(`${repo}/seo`, 'v100', 'jnt:forgeModuleVersion', [
+            {name: 'versionNumber', value: '1.0.0'},
             {name: 'published', value: 'true'}
         ]);
         cy.visit(homeRender);
-        cy.get('[data-latest-releases]', {timeout: 20000}).within(() => {
-            cy.get('[data-latest-card]:contains("Analytics Dashboard")').should('have.length', 1);
-            cy.root().should('contain.text', '2.0.0').and('not.contain.text', '1.0.0');
-        });
-        // Restore the single-version state so later specs still see 1.0.0 as the latest.
-        cy.apollo({mutation: deleteNode, variables: {path: `${repo}/analytics/v200`}});
-    });
-
-    it('keeps the "Latest releases" sidebar panel visible while filtering', () => {
-        // It is a persistent left-rail widget, so it stays put when the grid is filtered.
-        cy.visit(`${homeRender}?status=community`);
-        cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible');
-        cy.get('[data-latest-releases]').should('exist');
-        cy.contains('[data-latest-card]', 'Analytics Dashboard').should('exist');
+        cy.get('[data-forge-card]', {timeout: 20000}).should('have.length', 2);
+        cy.get('[data-forge-card]').first().should('contain.text', 'SEO Toolkit');
+        cy.apollo({mutation: deleteNode, variables: {path: `${repo}/seo/v100`}});
     });
 
     it('paginates the grid when modules exceed the page size', () => {
