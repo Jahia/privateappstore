@@ -303,6 +303,20 @@ describe('Storefront read views (JS module)', () => {
         });
     });
 
+    it('keeps the filter/search params when switching language', () => {
+        cy.visit(`${homeRender}?status=community`);
+        cy.get('[data-forge-list]', {timeout: 20000});
+        // The header sync island appends the current query string to the language links.
+        cy.get('header [data-lang-switch][hreflang="fr"]', {timeout: 20000})
+            .should('have.attr', 'href')
+            .and('include', 'status=community');
+        cy.get('header [data-lang-switch][hreflang="fr"]').click();
+        cy.location('pathname').should('include', '/fr/');
+        cy.location('search').should('include', 'status=community');
+        // The FR grid is still status-filtered: community → seo only.
+        cy.get('[data-forge-card]').should('have.length', 1);
+    });
+
     it('signs in via the header login form (posts to /cms/login)', () => {
         // Publish the site so the LIVE home exists (anonymous can only see LIVE),
         // then go anonymous — the header then shows the sign-in form.
