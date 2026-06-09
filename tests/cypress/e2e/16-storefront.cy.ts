@@ -247,6 +247,19 @@ describe('Storefront read views (JS module)', () => {
         });
     });
 
+    it('shows a breadcrumb back to the home view on a module detail page', () => {
+        cy.visit(detailRender);
+        // The current module is plain text; only "Home" is a link back to the listing.
+        cy.get('[data-breadcrumb]').within(() => {
+            cy.contains('Analytics Dashboard').should('be.visible');
+            cy.get('[data-back-home]').should('have.attr', 'href').and('include', '/home');
+        });
+        // Following it lands back on the storefront home grid.
+        cy.get('[data-breadcrumb] [data-back-home]').click();
+        cy.get('[data-forge-list]', {timeout: 20000}).should('exist');
+        cy.get('[data-forge-card]').should('have.length.greaterThan', 0);
+    });
+
     it('shows the store.jahia.com-style Information rail + header download', () => {
         cy.visit(detailRender);
         // The latest-version download CTA is always in the title area.
