@@ -204,10 +204,12 @@ describe('Storefront read views (JS module)', () => {
         cy.apollo({mutation: deleteNode, variables: {path: `${repo}/analytics/v200`}});
     });
 
-    it('hides the "Latest releases" section while searching/filtering', () => {
-        cy.visit(`${homeRender}?src_terms=seo`);
+    it('keeps the "Latest releases" sidebar panel visible while filtering', () => {
+        // It is a persistent left-rail widget, so it stays put when the grid is filtered.
+        cy.visit(`${homeRender}?status=community`);
         cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible');
-        cy.get('[data-latest-releases]').should('not.exist');
+        cy.get('[data-latest-releases]').should('exist');
+        cy.contains('[data-latest-card]', 'Analytics Dashboard').should('exist');
     });
 
     it('paginates the grid when modules exceed the page size', () => {
