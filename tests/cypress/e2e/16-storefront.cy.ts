@@ -180,7 +180,7 @@ describe('Storefront read views (JS module)', () => {
         cy.visit(homeRender);
         cy.get('[data-latest-releases]', {timeout: 20000}).within(() => {
             cy.contains('Latest releases').should('be.visible');
-            // analytics has a published 1.0.0 version (seo has none), so it leads the strip.
+            // Analytics has a published 1.0.0 version (seo has none), so it leads the strip.
             cy.contains('[data-latest-card]', 'Analytics Dashboard')
                 .should('have.attr', 'href')
                 .and('include', 'analytics');
