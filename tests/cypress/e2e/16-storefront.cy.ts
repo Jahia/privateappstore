@@ -129,6 +129,20 @@ describe('Storefront read views (JS module)', () => {
         setNodeProperty(`${repo}/analytics`, 'status', 'supported', 'en');
     });
 
+    it('filters the grid by status in a non-default language (French)', () => {
+        // Regression: `status` is indexed=no, so a JCR WHERE on it only resolves in the site's
+        // default language (en) and returned nothing in fr. Status is now filtered in-app on the
+        // shared property, so it must work in fr too: seo (community) shows, analytics (supported)
+        // does not. Cards fall back to the node name when there is no fr title, so assert by count.
+        const frHome = `/cms/render/default/fr/sites/${siteKey}/home.html`;
+        cy.visit(frHome);
+        cy.get('[data-forge-list]', {timeout: 20000});
+        cy.get('[data-forge-card]').should('have.length', 2);
+        cy.visit(`${frHome}?status=community`);
+        cy.get('[data-forge-list]', {timeout: 20000});
+        cy.get('[data-forge-card]').should('have.length', 1);
+    });
+
     it('filters the grid by text (server-side, via the global header search)', () => {
         cy.visit(homeRender);
         // The in-rail search box was removed: the header's global search is the single
