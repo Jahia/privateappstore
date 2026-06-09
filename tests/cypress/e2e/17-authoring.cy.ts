@@ -176,11 +176,15 @@ describe('Authoring views (JS module)', () => {
         // the same non-i18n setValue / multi-value setValues paths as category.
         cy.get('#edit-status', {timeout: 10000}).select('legacy');
         cy.get('#edit-tags').type('analytics{enter}charts{enter}');
-        // Wait for the save-triggered reload before asserting — so /legacy/ matches
-        // the rendered status badge on the fresh page, not the (now-gone) open
-        // <select>'s <option>.
+        // Wait for the save-triggered reload before asserting. Scope the status check to the
+        // detail Information rail's Status field: a bare cy.contains(/legacy/) would also match
+        // the header advanced-search panel's "legacy" facet label (hidden in a collapsed
+        // <details>), which is not visible and would fail the assertion.
         saveAndWaitReload();
-        cy.contains(/legacy/i, {timeout: 20000}).should('be.visible');
+        cy.get('[data-detail-info]', {timeout: 20000})
+            .contains('dt', /status/i)
+            .next('dd')
+            .should('contain.text', 'legacy');
         cy.get('[data-tag-list]').should('contain.text', 'analytics').and('contain.text', 'charts');
     });
 
