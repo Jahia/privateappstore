@@ -292,11 +292,12 @@ describe('Storefront read views (JS module)', () => {
         cy.get('footer [aria-label="Facebook"]').find('svg').should('exist');
     });
 
-    it('shows a language selector (current marked, other links to that language)', () => {
-        // The site is en,fr — the header language selector lists both, marks the current one,
-        // and each link points the current page at that language (Jahia /<lang>/ render).
+    it('shows a language selector (globe disclosure; current marked, other links to that language)', () => {
+        // The site is en,fr — the header language switcher is a globe disclosure that lists both,
+        // marks the current one, and each link points the current page at that language.
         cy.visit(homeRender);
-        cy.get('header [aria-label="Language"]', {timeout: 20000}).within(() => {
+        cy.get('header [data-lang-toggle]', {timeout: 20000}).click();
+        cy.get('header [aria-label="Language"]').within(() => {
             cy.contains('a', 'EN').should('have.attr', 'aria-current', 'true');
             cy.contains('a', 'FR').should('not.have.attr', 'aria-current');
             cy.contains('a', 'FR').should('have.attr', 'href').and('include', '/fr/');
@@ -306,8 +307,9 @@ describe('Storefront read views (JS module)', () => {
     it('keeps the filter/search params when switching language', () => {
         cy.visit(`${homeRender}?status=community`);
         cy.get('[data-forge-list]', {timeout: 20000});
-        // The header sync island appends the current query string to the language links.
-        cy.get('header [data-lang-switch][hreflang="fr"]', {timeout: 20000})
+        // Open the globe disclosure; the sync island appends the current query string to the links.
+        cy.get('header [data-lang-toggle]', {timeout: 20000}).click();
+        cy.get('header [data-lang-switch][hreflang="fr"]')
             .should('have.attr', 'href')
             .and('include', 'status=community');
         cy.get('header [data-lang-switch][hreflang="fr"]').click();
