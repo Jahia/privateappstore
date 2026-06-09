@@ -165,6 +165,20 @@ describe('Storefront read views (JS module)', () => {
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('not.exist');
     });
 
+    it('keeps the active status/category facets when searching from the header', () => {
+        cy.visit(`${homeRender}?status=community`);
+        // The header is cached chrome, so the AdvancedSearchSync island injects the active facets
+        // as hidden inputs on the search form from the live URL — wait for that before submitting,
+        // else the keyword would drop them. seo is community + matches "toolkit"; analytics is
+        // supported, so it is excluded by the carried status facet even though both are published.
+        cy.get('header [role="search"] input[type="hidden"][name="status"][value="community"]', {timeout: 20000})
+            .should('exist');
+        cy.get('header [role="search"] input[name="src_terms"]:visible').type('toolkit{enter}');
+        cy.location('search').should('include', 'src_terms=toolkit').and('include', 'status=community');
+        cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible');
+        cy.contains('[data-forge-card]', 'Analytics Dashboard').should('not.exist');
+    });
+
     it('orders the grid by release date, most recent first', () => {
         // A module's release date lives on its version nodes (the grid sorts modules by their
         // newest published version's date, descending). analytics's only release (1.0.0) was
