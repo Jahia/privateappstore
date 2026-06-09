@@ -43,6 +43,12 @@ public final class ForgeSettingsQueryExtension {
             if (!caller.getNode(sitePath).hasPermission(PERMISSION)) {
                 throw new AccessDeniedException(PERMISSION);
             }
+        } catch (AccessDeniedException e) {
+            // Surface authorization failures as an error. AccessDeniedException is itself a
+            // RepositoryException, so without this more-specific catch the broad one below would
+            // swallow it and return null — rendering in the admin UI as an empty settings panel
+            // indistinguishable from a server fault (SECURITY-571 ergonomy).
+            throw new ForgeSettingsException("Not allowed to read forge settings for site " + siteKey, e);
         } catch (RepositoryException e) {
             LOGGER.error("Error reading forge settings for site {}", siteKey, e);
             return null;
