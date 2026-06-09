@@ -176,7 +176,7 @@ export function CategorySettings({siteKey}) {
             </div>
             <div className={styles.category_container}>
                 {status === 'success' && (
-                    <div className={`${styles.category_alert} ${styles.success}`}>{statusMessage}</div>
+                    <div className={`${styles.category_alert} ${styles.success}`} role="status">{statusMessage}</div>
                 )}
                 {status === 'error' && (
                     <div className={`${styles.category_alert} ${styles.error}`} role="alert">{statusMessage}</div>

@@ -93,7 +93,6 @@ describe('Accessibility — WCAG 2.2 AAA gate (JS module)', () => {
         setNodeProperty(`${repo}/analytics`, 'description', '<p>Real-time charts and KPI widgets.</p>', 'en');
         setNodeProperty(`${repo}/analytics`, 'status', 'supported', 'en');
         setNodeProperty(`${repo}/analytics`, 'published', 'true', 'en');
-        setNodeProperty(`${repo}/analytics`, 'supportedByJahia', 'true', 'en');
         // GroupId drives the generated (mavenproxy) download URL, so the audit covers
         // the rendered download links too.
         setNodeProperty(`${repo}/analytics`, 'groupId', 'org.cypress.test', 'en');
@@ -131,8 +130,8 @@ describe('Accessibility — WCAG 2.2 AAA gate (JS module)', () => {
 
     it('home storefront grid has no WCAG 2.2 AAA violations', () => {
         cy.visit(render('/home'));
-        // The filter is now a server-rendered GET form (no island to hydrate); wait for it + a card.
-        cy.get('[data-forge-filter]', {timeout: 20000});
+        // Wait for the storefront grid to render, then a card, before auditing.
+        cy.get('[data-forge-list]', {timeout: 20000});
         cy.contains('Analytics Dashboard').should('be.visible');
         audit();
     });

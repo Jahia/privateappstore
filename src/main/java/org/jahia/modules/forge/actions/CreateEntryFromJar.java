@@ -120,17 +120,19 @@ public class CreateEntryFromJar extends Action {
     private static final String SUCCESS_REDIRECT_URL = "successRedirectUrl";
     private static final String SUCCESS_REDIRECT_ABSOLUTE_URL = "successRedirectAbsoluteUrl";
     private static final String ERR_UNABLE_READ_FILE = "forge.uploadJar.error.unable.read.file";
+    private static final String ERR_FILE_TOO_LARGE = "forge.uploadJar.error.file.too.large";
     private static final String ERR_MISSING_MANIFEST_ATTRIBUTE = "forge.uploadJar.error.missing.manifest.attribute";
     private static final String ERR_VERSION_NUMBER = "forge.uploadJar.error.versionNumber";
     private static final String LOG_UNSAFE_REDIRECT = "CreateEntryFromJar: rejected unsafe redirectURL '{}'";
     /** Allowed upload extensions. Downstream code only ever sees these constants, never user input. */
     private static final String EXTENSION_JAR = "jar";
-    private static final String EXTENSION_WAR = "war";
     private static final String EXTENSION_TGZ = "tgz";
     /** Maximum accepted size for an uploaded artifact (guards against resource-exhaustion uploads). */
     private static final long MAX_UPLOAD_SIZE_BYTES = 200L * 1024 * 1024;
     /** Maximum size of a single tar entry we read into memory (guards against decompression bombs). */
     private static final long MAX_TAR_ENTRY_SIZE_BYTES = 10L * 1024 * 1024;
+    /** A safe Maven coordinate token: letters, digits, dot, underscore, hyphen only — no shell/expression metacharacters. */
+    private static final Pattern SAFE_MAVEN_COORD = Pattern.compile("[A-Za-z0-9._-]+");
     /** Form params routed to the module node (the rest go to the version node). */
     private static final List<String> MODULE_PARAM_KEYS = Arrays.asList(DESCRIPTION, CATEGORY, "icon",
             AUTHOR_NAME_DISPLAYED_AS, AUTHOR_URL, AUTHOR_EMAIL, "FAQ", CODE_REPOSITORY, DOWNLOAD_COUNT,
@@ -143,7 +145,7 @@ public class CreateEntryFromJar extends Action {
             AUTHOR_NAME_DISPLAYED_AS, AUTHOR_URL, AUTHOR_EMAIL, "FAQ", DOWNLOAD_COUNT, SUPPORTED_BY_JAHIA,
             REVIEWED_BY_JAHIA, PUBLISHED, DELETED, SCREENSHOTS, VIDEO);
 
-    String mavenExecutable;
+    private volatile String mavenExecutable;
 
     @Reference
     private ForgeSettingsService forgeSettingsService;
@@ -174,7 +176,7 @@ public class CreateEntryFromJar extends Action {
                         ActionSecurityUtils.sanitizeForLog(uploadedFile.getName()), uploadedFile.getSize());
             }
             uploadedFile.delete();
-            return errorResult(session, ERR_UNABLE_READ_FILE);
+            return errorResult(session, ERR_FILE_TOO_LARGE);
         }
         String filename = uploadedFile.getName();
         if (StringUtils.contains(filename, "SNAPSHOT.")) {
@@ -303,7 +305,8 @@ public class CreateEntryFromJar extends Action {
 
         String reqVersionAttribute = attributes.getValue("Jahia-Required-Version");
         final String requiredVersion = VERSION_PREFIX + reqVersionAttribute;
-        if (StringUtils.isEmpty(packageName) || StringUtils.isEmpty(reqVersionAttribute) || StringUtils.isEmpty(version)) {
+        if (StringUtils.isEmpty(packageName) || StringUtils.isEmpty(reqVersionAttribute) || StringUtils.isEmpty(version)
+                || !isSafePackageName(packageName)) {
             return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
         }
         JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
@@ -379,9 +382,6 @@ public class CreateEntryFromJar extends Action {
         String groupId;
         String version = attributes.getValue("Implementation-Version");
         String moduleName = attributes.getValue(BUNDLE_SYMBOLIC_NAME);
-        if (uploadedFile.getName().endsWith(".war")) {
-            moduleName = attributes.getValue("root-folder");
-        }
         groupId = attributes.getValue("Jahia-GroupId");
         JCRSiteNode site = resource.getNode().getResolveSite();
 
@@ -464,9 +464,6 @@ public class CreateEntryFromJar extends Action {
         if (StringUtils.equals(extension, EXTENSION_JAR)) {
             return EXTENSION_JAR;
         }
-        if (StringUtils.equals(extension, EXTENSION_WAR)) {
-            return EXTENSION_WAR;
-        }
         if (StringUtils.equals(extension, EXTENSION_TGZ)) {
             return EXTENSION_TGZ;
         }
@@ -503,7 +500,7 @@ public class CreateEntryFromJar extends Action {
         for (Map.Entry<String, List<String>> e : source.entrySet()) {
             String key = e.getKey();
             List<String> value = e.getValue();
-            if (value.get(0) == null) {
+            if (value == null || value.isEmpty() || value.get(0) == null) {
                 continue;
             }
             if (moduleKeys.contains(key)) {
@@ -524,6 +521,21 @@ public class CreateEntryFromJar extends Action {
     private static boolean isSafeCoordinate(String groupId, String moduleName) {
         return !groupId.contains("..") && !groupId.contains("\\")
                 && !moduleName.contains("..") && !moduleName.contains("\\");
+    }
+
+    /**
+     * Reject a package id that could traverse the JCR tree. {@code Jahia-Package-ID} comes from the
+     * uploaded MANIFEST.MF and is concatenated into the relative path "packages/" + id; it is a flat
+     * identifier, so any "/", "\\" or ".." segment is illegal (SECURITY-571). Mirrors the
+     * {@link #isSafeCoordinate} guard the module and JS upload paths already apply.
+     */
+    private static boolean isSafePackageName(String name) {
+        return name != null && !name.contains("..") && !name.contains("/") && !name.contains("\\");
+    }
+
+    /** True when {@code value} is a plain Maven coordinate token (no expression / option metacharacters). */
+    private static boolean isSafeMavenCoordinate(String value) {
+        return value != null && SAFE_MAVEN_COORD.matcher(value).matches();
     }
 
     /** Outcome of preparing a module node for a new version: the module + an optional conflict error. */
@@ -703,11 +715,21 @@ public class CreateEntryFromJar extends Action {
             if (version == null) {
                 throw new IOException("unable to read project version");
             }
+            // The coordinates come from the uploaded artifact's pom. Maven evaluates -D values
+            // (e.g. ${...} expressions) and treats a leading '-' or embedded whitespace as further
+            // options, so reject anything but a plain coordinate token before building the deploy
+            // command (SECURITY-571 — option/expression injection into the deploy subprocess).
+            final String pomGroupId = PomUtils.getGroupId(pom);
+            final String pomArtifactId = pom.getArtifactId();
+            if (!isSafeMavenCoordinate(pomGroupId) || !isSafeMavenCoordinate(pomArtifactId)
+                    || !isSafeMavenCoordinate(version)) {
+                throw new IOException("Refusing to deploy: unsafe Maven coordinate in the uploaded artifact pom");
+            }
             String[] deployParams = {"deploy:deploy-file", "-Dfile=" + generatedJar,
                     "-DrepositoryId=" + releaseInfo.getRepositoryId(), "-Durl=" + releaseInfo.getRepositoryUrl(),
                     "-DpomFile=" + pomFile.getPath(),
                     "-Dpackaging=" + StringUtils.substringAfterLast(generatedJar.getName(), "."),
-                    "-DgroupId=" + PomUtils.getGroupId(pom), "-DartifactId=" + pom.getArtifactId(),
+                    "-DgroupId=" + pomGroupId, "-DartifactId=" + pomArtifactId,
                     "-Dversion=" + version};
             if (settings != null) {
                 deployParams = (String[]) ArrayUtils.addAll(deployParams,

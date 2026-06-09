@@ -118,6 +118,9 @@ public final class ManageRolesMutationExtension {
     }
 
     private static <T> T execute(String siteKey, JCRCallback<T> work) {
+        // Reject a path-traversal siteKey before it is concatenated into a JCR site path — the
+        // sibling mutation/query extensions all validate first; this one must too (SECURITY-571).
+        ForgeSettingsMutationExtension.validateSiteKey(siteKey);
         try {
             return JCRTemplate.getInstance().doExecuteWithSystemSession(session -> {
                 final String sitePath = SITES_PATH + siteKey;

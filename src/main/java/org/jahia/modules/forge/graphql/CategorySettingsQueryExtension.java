@@ -6,6 +6,7 @@ import graphql.annotations.annotationTypes.GraphQLName;
 import graphql.annotations.annotationTypes.GraphQLNonNull;
 import graphql.annotations.annotationTypes.GraphQLTypeExtension;
 import org.apache.commons.lang.StringUtils;
+import org.apache.jackrabbit.core.fs.FileSystem;
 import org.jahia.modules.graphql.provider.dxm.DXGraphQLProvider;
 import org.jahia.services.content.JCRCallback;
 import org.jahia.services.content.JCRNodeIteratorWrapper;
@@ -14,6 +15,7 @@ import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.JCRTemplate;
 import org.jahia.services.content.decorator.JCRSiteNode;
+import org.jahia.services.sites.JahiaSitesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +38,7 @@ public final class CategorySettingsQueryExtension {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CategorySettingsQueryExtension.class);
     private static final String PERMISSION = "siteAdminForgeSettings";
+    private static final String SITES_PATH = JahiaSitesService.SITES_JCR_PATH + FileSystem.SEPARATOR;
     private static final String JCR_TITLE = "jcr:title";
     private static final String JNT_CATEGORY = "jnt:category";
     private static final String WORKSPACE_DEFAULT = "default";
@@ -49,11 +52,12 @@ public final class CategorySettingsQueryExtension {
     @GraphQLDescription("Read the forge category settings for a site")
     public static GqlForgeCategorySettings getForgeCategorySettings(
             @GraphQLName("siteKey") @GraphQLNonNull final String siteKey) {
+        ForgeSettingsMutationExtension.validateSiteKey(siteKey);
         try {
             return JCRTemplate.getInstance().doExecuteWithSystemSession(new JCRCallback<GqlForgeCategorySettings>() {
                 @Override
                 public GqlForgeCategorySettings doInJCR(JCRSessionWrapper session) throws RepositoryException {
-                    final String sitePath = "/sites/" + siteKey;
+                    final String sitePath = SITES_PATH + siteKey;
                     if (!session.nodeExists(sitePath)) {
                         return null;
                     }

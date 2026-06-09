@@ -70,6 +70,7 @@ import org.jahia.services.content.JCRTemplate
 import org.jahia.services.content.JCRSessionWrapper
 import org.jahia.services.content.JCRNodeWrapper
 import org.jahia.services.content.JCRCallback
+import org.jahia.services.content.JCRObservationManager
 import org.jahia.services.content.JCRPublicationService
 import org.jahia.services.usermanager.JahiaUserManagerService
 import org.jahia.api.Constants
@@ -92,7 +93,7 @@ def VERSION_TYPES     = ['jnt:forgeModuleVersion', 'jnt:forgePackageVersion'] as
 def MODULE_TYPES      = ['jnt:forgeModule', 'jnt:forgePackage'] as Set
 
 def report = new StringBuilder()
-def stats  = [modulesCopied: 0, modulesSkipped: 0, versionsRemapped: 0, urlsDropped: 0, reqVersionsCopied: 0, statusNormalized: 0, warnings: 0]
+def stats  = [modulesCopied: 0, modulesSkipped: 0, versionsRemapped: 0, urlsDropped: 0, reqVersionsCopied: 0, statusNormalized: 0, datesPreserved: 0, warnings: 0]
 def log    = { String msg -> report.append(msg).append('\n'); println msg }
 def warn   = { String msg -> stats.warnings++; log("  ! WARN: ${msg}") }
 
@@ -154,6 +155,29 @@ JCRTemplate.getInstance().doExecuteWithSystemSession(null, WORKSPACE, { JCRSessi
         }
         JCRTemplate.getInstance().doExecuteWithSystemSession(null, WORKSPACE,
                 { JCRSessionWrapper s -> doCopy(s, srcModPath, tgtRepoPath, relPath) } as JCRCallback)
+    }
+
+    // Carry the historical "updated" date over to a copied node. node.copy() stamps fresh
+    // jcr:created/jcr:lastModified at COPY time, so without this every migrated module/version
+    // would show the migration run date as its "Updated" date. jcr:lastModified/jcr:lastModifiedBy
+    // are autocreated but NOT protected (unlike jcr:created/jcr:createdBy, which is why the author
+    // is preserved via copy-as-author instead), so we can set them back to the source values. The
+    // catch: Jahia's LastModifiedListener re-stamps jcr:lastModified to "now" on every save, which
+    // would clobber our value — so the fixup save below runs with JCRObservationManager event
+    // listeners DISABLED (the listener is skipped; Jackrabbit still indexes the persisted value).
+    // (jcr:created stays the migration time — it is protected — so the storefront sorts/shows the
+    // "updated" date, not the created date.)
+    def preserveLastModified = { JCRNodeWrapper target, JCRNodeWrapper source ->
+        if (!source.hasProperty('jcr:lastModified')) return
+        try {
+            target.setProperty('jcr:lastModified', source.getProperty('jcr:lastModified').getDate())
+            if (source.hasProperty('jcr:lastModifiedBy')) {
+                target.setProperty('jcr:lastModifiedBy', source.getProperty('jcr:lastModifiedBy').getString())
+            }
+            stats.datesPreserved++
+        } catch (Exception e) {
+            warn("could not preserve lastModified for ${target.getName()}: ${e.message}")
+        }
     }
 
     // ---- validate -------------------------------------------------------
@@ -228,13 +252,24 @@ JCRTemplate.getInstance().doExecuteWithSystemSession(null, WORKSPACE, { JCRSessi
     // to the target site's modules-required-versions node of that name. Also lowercase
     // each module's `status` to the choicelist key — 4.3.0 data may store it capitalized
     // (e.g. "Community"), which the lowercase-keyed storefront status facet won't match.
-    log("\n[3] re-point requiredVersion + drop stale url + normalize status")
+    log("\n[3] re-point requiredVersion + drop stale url + normalize status + preserve updated date")
     if (!DRY_RUN) {
+        // The step-2 module copies were committed by SEPARATE per-author sessions, so this
+        // long-lived session still holds a stale view of the target repo. Refresh it (keepChanges
+        // = true preserves step-1's not-yet-saved required-versions copies) and re-fetch tgtRepo
+        // before walking it — otherwise collect() iterates the stale view and the date-preservation
+        // / requiredVersion re-point silently does nothing.
+        session.refresh(true)
+        tgtRepo = session.getNode(tgtRepoPath)
         collect(tgtRepo, MODULE_TYPES, []).each { JCRNodeWrapper tm ->
             if (tm.hasProperty('status')) {
                 String s = tm.getProperty('status').getString(), lc = s.toLowerCase()
                 if (s != lc) { tm.setProperty('status', lc); stats.statusNormalized++ }
             }
+            // Preserve the module's historical "updated" date from its source counterpart.
+            def relMod = tm.getPath().substring((tgtRepo.getPath() + '/').length())
+            def srcModPath = srcRepo.getPath() + '/' + relMod
+            if (session.nodeExists(srcModPath)) preserveLastModified(tm, session.getNode(srcModPath))
         }
         collect(tgtRepo, VERSION_TYPES, []).each { JCRNodeWrapper tv ->
             // drop stale generated-download url (5.0.0 builds it from maven coords)
@@ -244,27 +279,33 @@ JCRTemplate.getInstance().doExecuteWithSystemSession(null, WORKSPACE, { JCRSessi
             def srcVerPath = srcRepo.getPath() + '/' + relUnderRepo
             if (!session.nodeExists(srcVerPath)) { warn("no source version for ${relUnderRepo}"); return }
             def sv = session.getNode(srcVerPath)
-            if (!sv.hasProperty('requiredVersion')) return
-            String reqName
-            try {
-                reqName = sv.getProperty('requiredVersion').getNode().getName()
-            } catch (RepositoryException e) { warn("source requiredVersion dangling for ${relUnderRepo}"); return }
+            // Preserve the version's historical "updated" date (the date the storefront shows /
+            // sorts "Latest releases" by) before any other change re-stamps it.
+            preserveLastModified(tv, sv)
+            if (sv.hasProperty('requiredVersion')) {
+                String reqName
+                try {
+                    reqName = sv.getProperty('requiredVersion').getNode().getName()
+                } catch (RepositoryException e) { warn("source requiredVersion dangling for ${relUnderRepo}"); return }
 
-            if (!tgtReq.hasNode(reqName)) { warn("target modules-required-versions has no '${reqName}' for ${relUnderRepo}"); return }
-            tv.setProperty('requiredVersion', tgtReq.getNode(reqName))
-            stats.versionsRemapped++
+                if (!tgtReq.hasNode(reqName)) { warn("target modules-required-versions has no '${reqName}' for ${relUnderRepo}"); return }
+                tv.setProperty('requiredVersion', tgtReq.getNode(reqName))
+                stats.versionsRemapped++
+            }
         }
-        log("  re-pointed ${stats.versionsRemapped} version(s); dropped ${stats.urlsDropped} stale url(s); normalized ${stats.statusNormalized} status value(s)")
+        log("  re-pointed ${stats.versionsRemapped} version(s); dropped ${stats.urlsDropped} stale url(s); normalized ${stats.statusNormalized} status value(s); preserved ${stats.datesPreserved} updated date(s)")
     } else {
         // dry-run: just count what exists on the source
         collect(srcRepo, MODULE_TYPES, []).each { JCRNodeWrapper sm ->
             if (sm.hasProperty('status') && sm.getProperty('status').getString() != sm.getProperty('status').getString().toLowerCase()) stats.statusNormalized++
+            if (sm.hasProperty('jcr:lastModified')) stats.datesPreserved++
         }
         collect(srcRepo, VERSION_TYPES, []).each { JCRNodeWrapper sv ->
             if (sv.hasProperty('url')) stats.urlsDropped++
             if (sv.hasProperty('requiredVersion')) stats.versionsRemapped++
+            if (sv.hasProperty('jcr:lastModified')) stats.datesPreserved++
         }
-        log("  would re-point ~${stats.versionsRemapped} version(s); would drop ~${stats.urlsDropped} stale url(s); would normalize ~${stats.statusNormalized} status value(s)")
+        log("  would re-point ~${stats.versionsRemapped} version(s); would drop ~${stats.urlsDropped} stale url(s); would normalize ~${stats.statusNormalized} status value(s); would preserve ~${stats.datesPreserved} updated date(s)")
     }
 
     // ---- 4) forge settings (NOT migrated) ------------------------------
@@ -279,14 +320,25 @@ JCRTemplate.getInstance().doExecuteWithSystemSession(null, WORKSPACE, { JCRSessi
     if (DRY_RUN) {
         log("\n[5] DRY-RUN: discarding session (no changes persisted)")
     } else {
-        session.save()
-        log("\n[5] saved ${WORKSPACE} workspace")
+        // Save with Jahia event listeners disabled so LastModifiedListener does NOT re-stamp the
+        // jcr:lastModified values we just preserved (it would otherwise set them all to "now").
+        // Only Jahia's app-level listeners are suppressed — Jackrabbit still indexes the persisted
+        // values, so the storefront's ORDER BY jcr:lastModified and the status facet stay correct.
+        JCRObservationManager.setAllEventListenersDisabled(Boolean.TRUE)
+        try {
+            session.save()
+        } finally {
+            JCRObservationManager.setAllEventListenersDisabled(Boolean.FALSE)
+        }
+        log("\n[5] saved ${WORKSPACE} workspace (event listeners disabled to keep the preserved updated dates)")
         if (PUBLISH_TO_LIVE && WORKSPACE == Constants.EDIT_WORKSPACE) {
             def pub = JCRPublicationService.getInstance()
             def langs = (LANGUAGES != null) ? new HashSet(LANGUAGES) : null
             pub.publishByMainId(tgtContents.getIdentifier(), Constants.EDIT_WORKSPACE, Constants.LIVE_WORKSPACE, langs, true, null)
             pub.publishByMainId(tgtSite.getIdentifier(), Constants.EDIT_WORKSPACE, Constants.LIVE_WORKSPACE, langs, false, null)
             log("    published target contents + site node to LIVE")
+            // NOTE: publication may re-stamp jcr:lastModified on the LIVE copies. The recommended
+            // path is WORKSPACE='live' (no publish), where the preserved dates land directly in LIVE.
         } else if (PUBLISH_TO_LIVE) {
             log("    (publish skipped: already operating in '${WORKSPACE}' — content is live)")
         }
@@ -300,6 +352,7 @@ JCRTemplate.getInstance().doExecuteWithSystemSession(null, WORKSPACE, { JCRSessi
     log("  versions re-pointed      : ${stats.versionsRemapped}")
     log("  stale urls dropped       : ${stats.urlsDropped}")
     log("  status values normalized : ${stats.statusNormalized}")
+    log("  updated dates preserved  : ${stats.datesPreserved}")
     log("  warnings                 : ${stats.warnings}")
     if (DRY_RUN) log("  (DRY-RUN — re-run with DRY_RUN = false to apply)")
     return null

@@ -68,7 +68,6 @@ describe('Storefront read views (JS module)', () => {
         setNodeProperty(`${repo}/analytics`, 'description', '<p>Real-time charts and KPI widgets.</p>', 'en');
         setNodeProperty(`${repo}/analytics`, 'status', 'supported', 'en');
         setNodeProperty(`${repo}/analytics`, 'published', 'true', 'en');
-        setNodeProperty(`${repo}/analytics`, 'supportedByJahia', 'true', 'en');
         // GroupId is intrinsic to a JAR module; the version download URL is GENERATED
         // from it (+ name/version/site), not stored on the version node.
         setNodeProperty(`${repo}/analytics`, 'groupId', 'org.cypress.test', 'en');
@@ -111,7 +110,6 @@ describe('Storefront read views (JS module)', () => {
         cy.contains('Analytics Dashboard').should('be.visible');
         cy.contains('SEO Toolkit').should('be.visible');
         cy.contains('Real-time charts').should('be.visible');
-        cy.contains('Supported').should('be.visible');
         cy.contains('Draft Module').should('not.exist');
     });
 
@@ -121,21 +119,98 @@ describe('Storefront read views (JS module)', () => {
         // case-insensitive. Restored to lowercase afterwards for the later tests.
         setNodeProperty(`${repo}/analytics`, 'status', 'Supported', 'en');
         cy.visit(homeRender);
-        // Server-side filtering: check a Status facet and submit the GET form; the page
-        // reloads showing only matching modules (non-matching are absent, not just hidden).
-        cy.get('[data-forge-filter] input[name="status"][value="supported"]', {timeout: 20000}).check();
-        cy.get('[data-forge-filter] button[type="submit"]').click();
+        // Status/Category filtering lives only in the header advanced-search panel now (the home
+        // filter rail was removed). Open it, check a Status facet and submit the GET form; the
+        // page reloads showing only matching modules.
+        cy.get('header [role="search"] details > summary:visible', {timeout: 20000}).click();
+        cy.get('header [role="search"] details input[name="status"][value="supported"]').check();
+        cy.get('header [role="search"] details button[type="submit"]').click();
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('be.visible');
         cy.contains('[data-forge-card]', 'SEO Toolkit').should('not.exist');
         setNodeProperty(`${repo}/analytics`, 'status', 'supported', 'en');
     });
 
-    it('filters the grid by text (server-side)', () => {
+    it('filters the grid by status in a non-default language (French)', () => {
+        // Regression: `status` is indexed=no, so a JCR WHERE on it only resolves in the site's
+        // default language (en) and returned nothing in fr. Status is now filtered in-app on the
+        // shared property, so it must work in fr too: seo (community) shows, analytics (supported)
+        // does not. Cards fall back to the node name when there is no fr title, so assert by count.
+        const frHome = `/cms/render/default/fr/sites/${siteKey}/home.html`;
+        cy.visit(frHome);
+        cy.get('[data-forge-list]', {timeout: 20000});
+        cy.get('[data-forge-card]').should('have.length', 2);
+        cy.visit(`${frHome}?status=community`);
+        cy.get('[data-forge-list]', {timeout: 20000});
+        cy.get('[data-forge-card]').should('have.length', 1);
+    });
+
+    it('filters the grid by text (server-side, via the global header search)', () => {
         cy.visit(homeRender);
-        cy.get('[data-forge-filter] input[name="src_terms"]', {timeout: 20000}).clear().type('seo');
-        cy.get('[data-forge-filter] button[type="submit"]').click();
+        // The in-rail search box was removed: the header's global search is the single
+        // search entry point. Submitting it navigates to the grid with ?src_terms and
+        // filters server-side. Scope to the visible desktop form (the mobile-nav island
+        // renders a duplicate hidden at this viewport).
+        cy.get('header [role="search"] input[name="src_terms"]:visible', {timeout: 20000})
+            .type('seo{enter}');
         cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible');
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('not.exist');
+    });
+
+    it('searches the description too, not only the title (advanced-search scope)', () => {
+        cy.visit(homeRender);
+        // "sitemaps" appears only in SEO Toolkit's description, never in any title — so a
+        // hit proves the search now spans the description (title + module id + description).
+        cy.get('header [role="search"] input[name="src_terms"]:visible', {timeout: 20000})
+            .type('sitemaps{enter}');
+        cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible');
+        cy.contains('[data-forge-card]', 'Analytics Dashboard').should('not.exist');
+    });
+
+    it('filters from the header advanced-search panel (status facet)', () => {
+        cy.visit(homeRender);
+        // Open the header disclosure, pick a status and submit the panel — it posts through
+        // the same GET pipeline as the home rail, landing on the filtered grid.
+        cy.get('header [role="search"] details > summary:visible', {timeout: 20000}).click();
+        cy.get('header [role="search"] details input[name="status"][value="community"]').check();
+        cy.get('header [role="search"] details button[type="submit"]').click();
+        cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible');
+        cy.contains('[data-forge-card]', 'Analytics Dashboard').should('not.exist');
+    });
+
+    it('shows a "Latest releases" section on the default home view', () => {
+        cy.visit(homeRender);
+        cy.get('[data-latest-releases]', {timeout: 20000}).within(() => {
+            cy.contains('Latest releases').should('be.visible');
+            // Analytics has a published 1.0.0 version (seo has none), so it leads the strip.
+            cy.contains('[data-latest-card]', 'Analytics Dashboard')
+                .should('have.attr', 'href')
+                .and('include', 'analytics');
+            cy.contains('[data-latest-card]', '1.0.0').should('exist');
+        });
+    });
+
+    it('groups Latest releases per module (newest version wins, no duplicates)', () => {
+        // Give analytics a second published version: the panel must still list the module
+        // ONCE, showing its newest version (2.0.0) — grouped per module, not per version.
+        addNode(`${repo}/analytics`, 'v200', 'jnt:forgeModuleVersion', [
+            {name: 'versionNumber', value: '2.0.0'},
+            {name: 'published', value: 'true'}
+        ]);
+        cy.visit(homeRender);
+        cy.get('[data-latest-releases]', {timeout: 20000}).within(() => {
+            cy.get('[data-latest-card]:contains("Analytics Dashboard")').should('have.length', 1);
+            cy.root().should('contain.text', '2.0.0').and('not.contain.text', '1.0.0');
+        });
+        // Restore the single-version state so later specs still see 1.0.0 as the latest.
+        cy.apollo({mutation: deleteNode, variables: {path: `${repo}/analytics/v200`}});
+    });
+
+    it('keeps the "Latest releases" sidebar panel visible while filtering', () => {
+        // It is a persistent left-rail widget, so it stays put when the grid is filtered.
+        cy.visit(`${homeRender}?status=community`);
+        cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible');
+        cy.get('[data-latest-releases]').should('exist');
+        cy.contains('[data-latest-card]', 'Analytics Dashboard').should('exist');
     });
 
     it('paginates the grid when modules exceed the page size', () => {
@@ -218,15 +293,31 @@ describe('Storefront read views (JS module)', () => {
         cy.get('footer [aria-label="Facebook"]').find('svg').should('exist');
     });
 
-    it('shows a language selector (current marked, other links to that language)', () => {
-        // The site is en,fr — the header language selector lists both, marks the current one,
-        // and each link points the current page at that language (Jahia /<lang>/ render).
+    it('shows a language selector (globe disclosure; current marked, other links to that language)', () => {
+        // The site is en,fr — the header language switcher is a globe disclosure that lists both,
+        // marks the current one, and each link points the current page at that language.
         cy.visit(homeRender);
-        cy.get('header [aria-label="Language"]', {timeout: 20000}).within(() => {
+        cy.get('header [data-lang-toggle]', {timeout: 20000}).click();
+        cy.get('header [aria-label="Language"]').within(() => {
             cy.contains('a', 'EN').should('have.attr', 'aria-current', 'true');
             cy.contains('a', 'FR').should('not.have.attr', 'aria-current');
             cy.contains('a', 'FR').should('have.attr', 'href').and('include', '/fr/');
         });
+    });
+
+    it('keeps the filter/search params when switching language', () => {
+        cy.visit(`${homeRender}?status=community`);
+        cy.get('[data-forge-list]', {timeout: 20000});
+        // Open the globe disclosure; the sync island appends the current query string to the links.
+        cy.get('header [data-lang-toggle]', {timeout: 20000}).click();
+        cy.get('header [data-lang-switch][hreflang="fr"]')
+            .should('have.attr', 'href')
+            .and('include', 'status=community');
+        cy.get('header [data-lang-switch][hreflang="fr"]').click();
+        cy.location('pathname').should('include', '/fr/');
+        cy.location('search').should('include', 'status=community');
+        // The FR grid is still status-filtered: community → seo only.
+        cy.get('[data-forge-card]').should('have.length', 1);
     });
 
     it('signs in via the header login form (posts to /cms/login)', () => {
