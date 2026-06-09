@@ -345,10 +345,11 @@ describe('Storefront read views (JS module)', () => {
         cy.contains('button[data-login-ready="true"]', /log in/i, {timeout: 20000}).click();
         cy.get('#login-username').type('root');
         cy.get('#login-password').type(`${Cypress.env('SUPER_USER_PASSWORD')}{enter}`);
-        // A successful form login redirects back to the page, now authenticated:
-        // the header shows the account menu with a real Log out *button* (not a link).
-        cy.get('header').contains('button', /log out/i, {timeout: 20000}).should('be.visible');
-        cy.contains('root').should('be.visible');
+        // A successful form login redirects back to the page, now authenticated: the header
+        // shows the account menu (the username). Open it to reveal the Log out *button*.
+        cy.contains('root', {timeout: 20000}).should('be.visible');
+        cy.get('header [data-account-toggle]').click();
+        cy.get('header').contains('button', /log out/i).should('be.visible');
     });
 
     it('shows an inline error on bad credentials (no /cms/login dead-end)', () => {
@@ -368,17 +369,20 @@ describe('Storefront read views (JS module)', () => {
         cy.location('search').should('not.contain', 'loginError');
     });
 
-    it('gates the "My modules" nav entry by login + Store role', () => {
+    it('gates the "My modules" account-menu entry by login + Store role', () => {
         cy.login();
         publishAndWaitJobEnding(`/sites/${siteKey}`, ['en']);
-        // Root holds every permission → the entry is shown.
+        // Root holds every permission → My modules is in the account menu (not the main nav).
         cy.visit(homeRender);
-        cy.contains('nav a', /my modules/i).should('be.visible');
-        // Anonymous visitor on the live site → the entry is hidden.
+        cy.get('header [data-account-toggle]', {timeout: 20000}).click();
+        cy.contains('header [data-my-modules]', /my modules/i).should('be.visible');
+        cy.contains('nav a', /my modules/i).should('not.exist');
+        // Anonymous visitor on the live site → no account menu, no My modules anywhere.
         cy.logout();
         cy.visit(`/cms/render/live/en/sites/${siteKey}/home.html`);
-        cy.get('nav', {timeout: 20000}).should('exist');
-        cy.contains('nav a', /my modules/i).should('not.exist');
+        cy.get('header', {timeout: 20000}).should('exist');
+        cy.get('header [data-account-toggle]').should('not.exist');
+        cy.get('[data-my-modules]').should('not.exist');
     });
 
     it('renders the configured logo in the header (DAM reference)', () => {
@@ -396,18 +400,18 @@ describe('Storefront read views (JS module)', () => {
 
     // Destructive (removes the My-modules list node), so it runs LAST. The site is
     // torn down in after(), so nothing else depends on the deletion.
-    it('keeps "My modules" hidden from anonymous even when the list content is invisible', () => {
-        // Regression for the fail-open nav gate: the gate used to detect which page
-        // to hide by querying for the jnt:forgeMyModulesList with the visitor's own
-        // session. Delete that list node so the content-type query finds nothing —
-        // the conventional-page-name safety net must still keep the entry hidden for
-        // anonymous visitors (the page node itself is published and in the nav).
+    it('keeps "My modules" hidden from anonymous (no account menu when logged out)', () => {
+        // My modules now lives in the account menu, gated by login + Store role. An
+        // anonymous visitor gets the sign-in form, not the account menu, so the entry is
+        // absent regardless of the list content. (Deleting the list node also exercises the
+        // detail-detection path that drops the page from the main nav.)
         cy.login();
         cy.apollo({mutation: deleteNode, variables: {path: `/sites/${siteKey}/home/my-modules/main/mine`}});
         publishAndWaitJobEnding(`/sites/${siteKey}`, ['en']);
         cy.logout();
         cy.visit(`/cms/render/live/en/sites/${siteKey}/home.html`);
-        cy.get('nav', {timeout: 20000}).should('exist');
-        cy.contains('nav a', /my modules/i).should('not.exist');
+        cy.get('header', {timeout: 20000}).should('exist');
+        cy.get('header [data-account-toggle]').should('not.exist');
+        cy.get('[data-my-modules]').should('not.exist');
     });
 });
