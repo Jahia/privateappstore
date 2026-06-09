@@ -113,21 +113,35 @@ describe('Storefront read views (JS module)', () => {
         cy.contains('Draft Module').should('not.exist');
     });
 
-    it('filters the grid by status (server-side facet, case-insensitive)', () => {
+    it('filters the grid by status (left-rail facet, case-insensitive)', () => {
         // Store the status capitalized, as migrated 4.3.0 data can be ("Supported"), while the
         // facet submits the lowercase choicelist key ("supported"): matching must be
         // case-insensitive. Restored to lowercase afterwards for the later tests.
         setNodeProperty(`${repo}/analytics`, 'status', 'Supported', 'en');
         cy.visit(homeRender);
-        // Status/Category filtering lives only in the header advanced-search panel now (the home
-        // filter rail was removed). Open it, check a Status facet and submit the GET form; the
-        // page reloads showing only matching modules.
-        cy.get('header [role="search"] details > summary:visible', {timeout: 20000}).click();
-        cy.get('header [role="search"] details input[name="status"][value="supported"]').check();
-        cy.get('header [role="search"] details button[type="submit"]').click();
+        // Status/Category filtering lives in the modules-list LEFT rail. The FilterAutoSubmit
+        // island submits the GET form on change once hydrated (data-filter-ready), so checking a
+        // Status facet reloads the page showing only matching modules.
+        cy.get('[data-forge-filter][data-filter-ready] input[name="status"][value="supported"]', {timeout: 20000})
+            .check();
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('be.visible');
         cy.contains('[data-forge-card]', 'SEO Toolkit').should('not.exist');
         setNodeProperty(`${repo}/analytics`, 'status', 'supported', 'en');
+    });
+
+    it('shows a loading indicator while applying a filter', () => {
+        cy.visit(homeRender);
+        // The bar is global header chrome, hidden until a filter/search/pagination navigation starts.
+        cy.get('[data-nav-progress]', {timeout: 20000}).should('exist').and('not.have.attr', 'data-loading');
+        // Suppress the actual page navigation so the in-flight indicator is observable: the island
+        // reveals the bar on the capture-phase submit, before this bubble-phase preventDefault runs.
+        cy.get('[data-forge-filter][data-filter-ready]', {timeout: 20000}).then($f => {
+            $f[0].addEventListener('submit', e => e.preventDefault(), {once: true});
+        });
+        cy.get('[data-forge-filter] input[name="status"][value="community"]').check();
+        cy.get('[data-nav-progress]').should('have.attr', 'data-loading');
+        // The accessible status region announces loading.
+        cy.get('[role="status"]').should('contain.text', 'Loading');
     });
 
     it('filters the grid by status in a non-default language (French)', () => {
@@ -166,51 +180,33 @@ describe('Storefront read views (JS module)', () => {
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('not.exist');
     });
 
-    it('filters from the header advanced-search panel (status facet)', () => {
-        cy.visit(homeRender);
-        // Open the header disclosure, pick a status and submit the panel — it posts through
-        // the same GET pipeline as the home rail, landing on the filtered grid.
-        cy.get('header [role="search"] details > summary:visible', {timeout: 20000}).click();
-        cy.get('header [role="search"] details input[name="status"][value="community"]').check();
-        cy.get('header [role="search"] details button[type="submit"]').click();
+    it('keeps the active status/category facets when searching from the header', () => {
+        cy.visit(`${homeRender}?status=community`);
+        // The header is cached chrome, so the AdvancedSearchSync island injects the active facets
+        // as hidden inputs on the search form from the live URL — wait for that before submitting,
+        // else the keyword would drop them. seo is community + matches "toolkit"; analytics is
+        // supported, so it is excluded by the carried status facet even though both are published.
+        cy.get('header [role="search"] input[type="hidden"][name="status"][value="community"]', {timeout: 20000})
+            .should('exist');
+        cy.get('header [role="search"] input[name="src_terms"]:visible').type('toolkit{enter}');
+        cy.location('search').should('include', 'src_terms=toolkit').and('include', 'status=community');
         cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible');
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('not.exist');
     });
 
-    it('shows a "Latest releases" section on the default home view', () => {
-        cy.visit(homeRender);
-        cy.get('[data-latest-releases]', {timeout: 20000}).within(() => {
-            cy.contains('Latest releases').should('be.visible');
-            // Analytics has a published 1.0.0 version (seo has none), so it leads the strip.
-            cy.contains('[data-latest-card]', 'Analytics Dashboard')
-                .should('have.attr', 'href')
-                .and('include', 'analytics');
-            cy.contains('[data-latest-card]', '1.0.0').should('exist');
-        });
-    });
-
-    it('groups Latest releases per module (newest version wins, no duplicates)', () => {
-        // Give analytics a second published version: the panel must still list the module
-        // ONCE, showing its newest version (2.0.0) — grouped per module, not per version.
-        addNode(`${repo}/analytics`, 'v200', 'jnt:forgeModuleVersion', [
-            {name: 'versionNumber', value: '2.0.0'},
+    it('orders the grid by release date, most recent first', () => {
+        // A module's release date lives on its version nodes (the grid sorts modules by their
+        // newest published version's date, descending). analytics's only release (1.0.0) was
+        // created during seed; give seo a release NOW so it is the newest in the catalogue and
+        // must lead the grid. Cleaned up afterwards so later specs see seo version-less again.
+        addNode(`${repo}/seo`, 'v100', 'jnt:forgeModuleVersion', [
+            {name: 'versionNumber', value: '1.0.0'},
             {name: 'published', value: 'true'}
         ]);
         cy.visit(homeRender);
-        cy.get('[data-latest-releases]', {timeout: 20000}).within(() => {
-            cy.get('[data-latest-card]:contains("Analytics Dashboard")').should('have.length', 1);
-            cy.root().should('contain.text', '2.0.0').and('not.contain.text', '1.0.0');
-        });
-        // Restore the single-version state so later specs still see 1.0.0 as the latest.
-        cy.apollo({mutation: deleteNode, variables: {path: `${repo}/analytics/v200`}});
-    });
-
-    it('keeps the "Latest releases" sidebar panel visible while filtering', () => {
-        // It is a persistent left-rail widget, so it stays put when the grid is filtered.
-        cy.visit(`${homeRender}?status=community`);
-        cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible');
-        cy.get('[data-latest-releases]').should('exist');
-        cy.contains('[data-latest-card]', 'Analytics Dashboard').should('exist');
+        cy.get('[data-forge-card]', {timeout: 20000}).should('have.length', 2);
+        cy.get('[data-forge-card]').first().should('contain.text', 'SEO Toolkit');
+        cy.apollo({mutation: deleteNode, variables: {path: `${repo}/seo/v100`}});
     });
 
     it('paginates the grid when modules exceed the page size', () => {
@@ -245,6 +241,19 @@ describe('Storefront read views (JS module)', () => {
             // for the dropped "Updated" / "Requires Jahia" version metadata.
             cy.get('[data-forge-version]').contains(/Updated/i).should('be.visible');
         });
+    });
+
+    it('shows a breadcrumb back to the home view on a module detail page', () => {
+        cy.visit(detailRender);
+        // The current module is plain text; only "Home" is a link back to the listing.
+        cy.get('[data-breadcrumb]').within(() => {
+            cy.contains('Analytics Dashboard').should('be.visible');
+            cy.get('[data-back-home]').should('have.attr', 'href').and('include', '/home');
+        });
+        // Following it lands back on the storefront home grid.
+        cy.get('[data-breadcrumb] [data-back-home]').click();
+        cy.get('[data-forge-list]', {timeout: 20000}).should('exist');
+        cy.get('[data-forge-card]').should('have.length.greaterThan', 0);
     });
 
     it('shows the store.jahia.com-style Information rail + header download', () => {
@@ -332,10 +341,11 @@ describe('Storefront read views (JS module)', () => {
         cy.contains('button[data-login-ready="true"]', /log in/i, {timeout: 20000}).click();
         cy.get('#login-username').type('root');
         cy.get('#login-password').type(`${Cypress.env('SUPER_USER_PASSWORD')}{enter}`);
-        // A successful form login redirects back to the page, now authenticated:
-        // the header shows the account menu with a real Log out *button* (not a link).
-        cy.get('header').contains('button', /log out/i, {timeout: 20000}).should('be.visible');
-        cy.contains('root').should('be.visible');
+        // A successful form login redirects back to the page, now authenticated: the header
+        // shows the account menu (the username). Open it to reveal the Log out *button*.
+        cy.contains('root', {timeout: 20000}).should('be.visible');
+        cy.get('header [data-account-toggle]').click();
+        cy.get('header').contains('button', /log out/i).should('be.visible');
     });
 
     it('shows an inline error on bad credentials (no /cms/login dead-end)', () => {
@@ -355,17 +365,20 @@ describe('Storefront read views (JS module)', () => {
         cy.location('search').should('not.contain', 'loginError');
     });
 
-    it('gates the "My modules" nav entry by login + Store role', () => {
+    it('gates the "My modules" account-menu entry by login + Store role', () => {
         cy.login();
         publishAndWaitJobEnding(`/sites/${siteKey}`, ['en']);
-        // Root holds every permission → the entry is shown.
+        // Root holds every permission → My modules is in the account menu (not the main nav).
         cy.visit(homeRender);
-        cy.contains('nav a', /my modules/i).should('be.visible');
-        // Anonymous visitor on the live site → the entry is hidden.
+        cy.get('header [data-account-toggle]', {timeout: 20000}).click();
+        cy.contains('header [data-my-modules]', /my modules/i).should('be.visible');
+        cy.contains('nav a', /my modules/i).should('not.exist');
+        // Anonymous visitor on the live site → no account menu, no My modules anywhere.
         cy.logout();
         cy.visit(`/cms/render/live/en/sites/${siteKey}/home.html`);
-        cy.get('nav', {timeout: 20000}).should('exist');
-        cy.contains('nav a', /my modules/i).should('not.exist');
+        cy.get('header', {timeout: 20000}).should('exist');
+        cy.get('header [data-account-toggle]').should('not.exist');
+        cy.get('[data-my-modules]').should('not.exist');
     });
 
     it('renders the configured logo in the header (DAM reference)', () => {
@@ -383,18 +396,18 @@ describe('Storefront read views (JS module)', () => {
 
     // Destructive (removes the My-modules list node), so it runs LAST. The site is
     // torn down in after(), so nothing else depends on the deletion.
-    it('keeps "My modules" hidden from anonymous even when the list content is invisible', () => {
-        // Regression for the fail-open nav gate: the gate used to detect which page
-        // to hide by querying for the jnt:forgeMyModulesList with the visitor's own
-        // session. Delete that list node so the content-type query finds nothing —
-        // the conventional-page-name safety net must still keep the entry hidden for
-        // anonymous visitors (the page node itself is published and in the nav).
+    it('keeps "My modules" hidden from anonymous (no account menu when logged out)', () => {
+        // My modules now lives in the account menu, gated by login + Store role. An
+        // anonymous visitor gets the sign-in form, not the account menu, so the entry is
+        // absent regardless of the list content. (Deleting the list node also exercises the
+        // detail-detection path that drops the page from the main nav.)
         cy.login();
         cy.apollo({mutation: deleteNode, variables: {path: `/sites/${siteKey}/home/my-modules/main/mine`}});
         publishAndWaitJobEnding(`/sites/${siteKey}`, ['en']);
         cy.logout();
         cy.visit(`/cms/render/live/en/sites/${siteKey}/home.html`);
-        cy.get('nav', {timeout: 20000}).should('exist');
-        cy.contains('nav a', /my modules/i).should('not.exist');
+        cy.get('header', {timeout: 20000}).should('exist');
+        cy.get('header [data-account-toggle]').should('not.exist');
+        cy.get('[data-my-modules]').should('not.exist');
     });
 });
