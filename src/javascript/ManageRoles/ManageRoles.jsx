@@ -114,7 +114,7 @@ export function ManageRoles({siteKey}) {
 
     const settings = data && data.manageRolesSettings;
     if (!settings) {
-        return <div className={styles.roles_error}>{t('errors.load.failed')}</div>;
+        return <div className={styles.roles_error} role="alert">{t('errors.load.failed')}</div>;
     }
 
     return (
@@ -124,7 +124,7 @@ export function ManageRoles({siteKey}) {
             </div>
             <div className={styles.roles_container}>
                 {status === 'success' && (
-                    <div className={`${styles.roles_alert} ${styles.success}`}>{statusMessage}</div>
+                    <div className={`${styles.roles_alert} ${styles.success}`} role="status">{statusMessage}</div>
                 )}
                 {status === 'error' && (
                     <div className={`${styles.roles_alert} ${styles.error}`} role="alert">{statusMessage}</div>
@@ -213,7 +213,15 @@ export function ManageRoles({siteKey}) {
                                             <li
                                                 key={`${p.type}:${p.name}`}
                                                 className={styles.roles_search_result}
+                                                role="button"
+                                                tabIndex={0}
                                                 onClick={() => handleGrant(p)}
+                                                onKeyDown={e => {
+                                                    if (e.key === 'Enter' || e.key === ' ') {
+                                                        e.preventDefault();
+                                                        handleGrant(p);
+                                                    }
+                                                }}
                                             >
                                                 {p.displayName || p.name} <span className={styles.roles_member_type}>{p.type}</span>
                                             </li>

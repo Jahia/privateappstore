@@ -152,7 +152,7 @@ export function ForgeSettings({siteKey}) {
             </div>
             <div className={styles.forge_container}>
                 {saveStatus === 'success' && (
-                    <div className={`${styles.forge_alert} ${styles.success}`}>
+                    <div className={`${styles.forge_alert} ${styles.success}`} role="status">
                         {t('success.update')}
                     </div>
                 )}
@@ -198,7 +198,7 @@ export function ForgeSettings({siteKey}) {
                     <Field label={t('label.logo')} id="forge-logo">
                         <div className={styles.forge_logo_current} data-logo-path={logoPath}>
                             {logoPath ? (
-                                <img className={styles.forge_logo_preview} src={fileUrl(logoPath)} alt=""/>
+                                <img className={styles.forge_logo_preview} src={fileUrl(logoPath)} alt={t('label.logo')}/>
                             ) : (
                                 <span className={styles.forge_logo_none}>{t('label.logoNone')}</span>
                             )}
@@ -215,13 +215,12 @@ export function ForgeSettings({siteKey}) {
                         {images.length === 0 ? (
                             <div className={styles.forge_password_hint}>{t('label.logoNoImages')}</div>
                         ) : (
-                            <div className={styles.forge_logo_grid} role="listbox" aria-label={t('label.logoPick')}>
+                            <div className={styles.forge_logo_grid} role="group" aria-label={t('label.logoPick')}>
                                 {images.map(img => (
                                     <button
                                         key={img.uuid}
                                         type="button"
-                                        role="option"
-                                        aria-selected={img.path === logoPath}
+                                        aria-pressed={img.path === logoPath}
                                         title={img.name}
                                         data-image-path={img.path}
                                         className={
