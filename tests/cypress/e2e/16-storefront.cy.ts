@@ -135,8 +135,8 @@ describe('Storefront read views (JS module)', () => {
         cy.get('[data-nav-progress]', {timeout: 20000}).should('exist').and('not.have.attr', 'data-loading');
         // Suppress the actual page navigation so the in-flight indicator is observable: the island
         // reveals the bar on the capture-phase submit, before this bubble-phase preventDefault runs.
-        cy.get('[data-forge-filter][data-filter-ready]', {timeout: 20000}).then(($f) => {
-            $f[0].addEventListener('submit', (e) => e.preventDefault(), {once: true});
+        cy.get('[data-forge-filter][data-filter-ready]', {timeout: 20000}).then($f => {
+            $f[0].addEventListener('submit', e => e.preventDefault(), {once: true});
         });
         cy.get('[data-forge-filter] input[name="status"][value="community"]').check();
         cy.get('[data-nav-progress]').should('have.attr', 'data-loading');
