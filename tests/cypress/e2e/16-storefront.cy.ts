@@ -119,11 +119,12 @@ describe('Storefront read views (JS module)', () => {
         // case-insensitive. Restored to lowercase afterwards for the later tests.
         setNodeProperty(`${repo}/analytics`, 'status', 'Supported', 'en');
         cy.visit(homeRender);
-        // Server-side filtering: the facet form auto-applies on change once the island
-        // hydrates (no "Apply" button). Wait for the ready flag, then checking a Status
-        // facet submits the GET form; the page reloads showing only matching modules.
-        cy.get('[data-forge-filter][data-filter-ready="true"]', {timeout: 20000});
-        cy.get('[data-forge-filter] input[name="status"][value="supported"]').check();
+        // Status/Category filtering lives only in the header advanced-search panel now (the home
+        // filter rail was removed). Open it, check a Status facet and submit the GET form; the
+        // page reloads showing only matching modules.
+        cy.get('header [role="search"] details > summary:visible', {timeout: 20000}).click();
+        cy.get('header [role="search"] details input[name="status"][value="supported"]').check();
+        cy.get('header [role="search"] details button[type="submit"]').click();
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('be.visible');
         cy.contains('[data-forge-card]', 'SEO Toolkit').should('not.exist');
         setNodeProperty(`${repo}/analytics`, 'status', 'supported', 'en');

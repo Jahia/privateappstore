@@ -130,8 +130,8 @@ describe('Accessibility — WCAG 2.2 AAA gate (JS module)', () => {
 
     it('home storefront grid has no WCAG 2.2 AAA violations', () => {
         cy.visit(render('/home'));
-        // The filter is now a server-rendered GET form (no island to hydrate); wait for it + a card.
-        cy.get('[data-forge-filter]', {timeout: 20000});
+        // Wait for the storefront grid to render, then a card, before auditing.
+        cy.get('[data-forge-list]', {timeout: 20000});
         cy.contains('Analytics Dashboard').should('be.visible');
         audit();
     });
