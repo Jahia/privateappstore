@@ -254,6 +254,13 @@ JCRTemplate.getInstance().doExecuteWithSystemSession(null, WORKSPACE, { JCRSessi
     // (e.g. "Community"), which the lowercase-keyed storefront status facet won't match.
     log("\n[3] re-point requiredVersion + drop stale url + normalize status + preserve updated date")
     if (!DRY_RUN) {
+        // The step-2 module copies were committed by SEPARATE per-author sessions, so this
+        // long-lived session still holds a stale view of the target repo. Refresh it (keepChanges
+        // = true preserves step-1's not-yet-saved required-versions copies) and re-fetch tgtRepo
+        // before walking it — otherwise collect() iterates the stale view and the date-preservation
+        // / requiredVersion re-point silently does nothing.
+        session.refresh(true)
+        tgtRepo = session.getNode(tgtRepoPath)
         collect(tgtRepo, MODULE_TYPES, []).each { JCRNodeWrapper tm ->
             if (tm.hasProperty('status')) {
                 String s = tm.getProperty('status').getString(), lc = s.toLowerCase()
