@@ -129,6 +129,14 @@ describe('Storefront read views (JS module)', () => {
         setNodeProperty(`${repo}/analytics`, 'status', 'supported', 'en');
     });
 
+    it('lists the status facets in alphabetical order', () => {
+        cy.visit(homeRender);
+        // The left-rail Status facet is sorted alphabetically to ease scanning.
+        cy.get('[data-forge-filter] input[name="status"]', {timeout: 20000})
+            .then($els => $els.toArray().map(el => el.value))
+            .should('deep.equal', ['community', 'labs', 'legacy', 'supported']);
+    });
+
     it('shows a loading indicator while applying a filter', () => {
         cy.visit(homeRender);
         // The bar is global header chrome, hidden until a filter/search/pagination navigation starts.
