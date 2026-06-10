@@ -258,7 +258,8 @@ public class CreateEntryFromJar extends Action {
         final String reqVersionAttribute = jahiaJsonObject.getString("required-version");
         final String requiredVersion = VERSION_PREFIX + reqVersionAttribute;
         if (StringUtils.isEmpty(moduleName) || StringUtils.isEmpty(groupId)
-                || StringUtils.isEmpty(reqVersionAttribute) || !isSafeCoordinate(groupId, moduleName)) {
+                || StringUtils.isEmpty(reqVersionAttribute) || !isSafeCoordinate(groupId, moduleName)
+                || !isSafeRequiredVersion(reqVersionAttribute)) {
             return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
         }
         final JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
@@ -306,7 +307,7 @@ public class CreateEntryFromJar extends Action {
         String reqVersionAttribute = attributes.getValue("Jahia-Required-Version");
         final String requiredVersion = VERSION_PREFIX + reqVersionAttribute;
         if (StringUtils.isEmpty(packageName) || StringUtils.isEmpty(reqVersionAttribute) || StringUtils.isEmpty(version)
-                || !isSafePackageName(packageName)) {
+                || !isSafePackageName(packageName) || !isSafeRequiredVersion(reqVersionAttribute)) {
             return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
         }
         JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
@@ -397,7 +398,8 @@ public class CreateEntryFromJar extends Action {
         String reqVersionAttribute = attributes.getValue("Jahia-Required-Version");
         final String requiredVersion = VERSION_PREFIX + reqVersionAttribute;
         if (StringUtils.isEmpty(moduleName) || StringUtils.isEmpty(groupId)
-                || StringUtils.isEmpty(reqVersionAttribute) || !isSafeCoordinate(groupId, moduleName)) {
+                || StringUtils.isEmpty(reqVersionAttribute) || !isSafeCoordinate(groupId, moduleName)
+                || !isSafeRequiredVersion(reqVersionAttribute)) {
             return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
         }
         JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
@@ -519,8 +521,16 @@ public class CreateEntryFromJar extends Action {
      * remain valid — only parent-traversal and path escapes are rejected (SECURITY-571).
      */
     private static boolean isSafeCoordinate(String groupId, String moduleName) {
-        return !groupId.contains("..") && !groupId.contains("\\")
-                && !moduleName.contains("..") && !moduleName.contains("\\");
+        return isSafePathFragment(groupId) && isSafePathFragment(moduleName);
+    }
+
+    /**
+     * True when {@code value} cannot escape or deepen the JCR relative path it is spliced into:
+     * no ".." parent-traversal, no "\\" or "/" path separator (a "/" in an addNode relative path
+     * silently creates extra nested children — SECURITY-571).
+     */
+    private static boolean isSafePathFragment(String value) {
+        return value != null && !value.contains("..") && !value.contains("\\") && !value.contains("/");
     }
 
     /**
@@ -530,12 +540,22 @@ public class CreateEntryFromJar extends Action {
      * {@link #isSafeCoordinate} guard the module and JS upload paths already apply.
      */
     private static boolean isSafePackageName(String name) {
-        return name != null && !name.contains("..") && !name.contains("/") && !name.contains("\\");
+        return isSafePathFragment(name);
     }
 
     /** True when {@code value} is a plain Maven coordinate token (no expression / option metacharacters). */
     private static boolean isSafeMavenCoordinate(String value) {
         return value != null && SAFE_MAVEN_COORD.matcher(value).matches();
+    }
+
+    /**
+     * True when the archive-supplied required-version is a plain version token. It is concatenated
+     * into the {@code version-<x>} JCR node name and navigated/created under
+     * {@code …/modules-required-versions}; restricting it to the Maven-coordinate charset keeps a
+     * crafted value (e.g. {@code 8.2/../../x}) from traversing the JCR tree (SECURITY-571).
+     */
+    private static boolean isSafeRequiredVersion(String value) {
+        return isSafeMavenCoordinate(value);
     }
 
     /** Outcome of preparing a module node for a new version: the module + an optional conflict error. */
