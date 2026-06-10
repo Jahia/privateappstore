@@ -42,10 +42,10 @@
                         </c:otherwise>
                     </c:choose>
                 <item>
-                    <title>${version.name}, ${version.properties['versionNumber']}</title>
+                    <title>${fn:escapeXml(version.name)}, ${fn:escapeXml(version.properties['versionNumber'].string)}</title>
                     <link>${fn:escapeXml(downloadUrl)}</link>
                     <guid>${fn:escapeXml(downloadUrl)}</guid>
-                    <description>${version.displayableName}, version ${version.properties['versionNumber']}.</description>
+                    <description>${fn:escapeXml(version.displayableName)}, version ${fn:escapeXml(version.properties['versionNumber'].string)}.</description>
                         <jcr:nodeProperty node="${version}" name="jcr:lastModified" var="modified"/>
                     <pubDate><fmt:formatDate value="${modified.time}" pattern="EEE, dd MMM yyyy HH:mm:ss Z" /></pubDate>
                 </item>

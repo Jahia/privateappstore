@@ -56,6 +56,7 @@ public final class ManageRolesQueryExtension {
     @GraphQLDescription("Read the role-management settings for a site")
     public static GqlManageRolesSettings getManageRolesSettings(
             @GraphQLName("siteKey") @GraphQLNonNull final String siteKey) {
+        ForgeSettingsMutationExtension.validateSiteKey(siteKey);
         try {
             return JCRTemplate.getInstance().doExecuteWithSystemSession(session ->
                     readManageRolesSettings(session, siteKey));
@@ -137,6 +138,7 @@ public final class ManageRolesQueryExtension {
             @GraphQLName("siteKey") @GraphQLNonNull final String siteKey,
             @GraphQLName("searchTerm") @GraphQLNonNull final String searchTerm,
             @GraphQLName("type") @GraphQLNonNull final PrincipalType type) {
+        ForgeSettingsMutationExtension.validateSiteKey(siteKey);
         if (StringUtils.isBlank(searchTerm)) {
             return Collections.emptyList();
         }
