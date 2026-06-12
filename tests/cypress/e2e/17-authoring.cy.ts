@@ -492,4 +492,44 @@ describe('Authoring views (JS module)', () => {
         cy.get('[data-screenshots-ready] [role="alert"]', {timeout: 20000}).should('be.visible');
         cy.get('[data-screenshot-name="provisioning.yml"]').should('not.exist');
     });
+
+    it('accepts a pasted YouTube URL and stores the extracted video id', () => {
+        cy.visit(moduleRender);
+        openEditorMediaTab();
+
+        cy.get('#edit-video-provider').select('youtube');
+        cy.get('[data-video-id]').clear().type('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+        cy.get('[data-video-save]').click();
+        cy.contains('[data-video-manager] output', 'Saved', {timeout: 20000});
+        // The full URL is stored as the bare id, not verbatim.
+        readProp(`${repo}/widget/video`, 'identifier')
+            .its('data.jcr.nodeByPath.properties[0].value')
+            .should('equal', 'dQw4w9WgXcQ');
+
+        // Clean up so the shared module ends without a video node.
+        cy.get('#edit-video-provider').select('None');
+        cy.get('[data-video-save]').click();
+        cy.contains('[data-video-manager] output', 'Saved', {timeout: 20000});
+    });
+
+    it('confirms before discarding unsaved editor changes', () => {
+        cy.visit(moduleRender);
+        cy.get('[data-editor-ready]', {timeout: 20000});
+        cy.contains('button', /edit module/i).click();
+        // Make the editor dirty on the General tab.
+        cy.get('#edit-jcr-title', {timeout: 10000}).clear().type('Throwaway title');
+
+        // Cancel now asks before discarding; "Keep editing" dismisses and preserves the edit.
+        cy.get('[data-editor-cancel]').click();
+        cy.contains('[role="alertdialog"]', 'Discard', {timeout: 10000}).should('be.visible');
+        cy.contains('button', 'Keep editing').click();
+        cy.get('#edit-jcr-title').should('have.value', 'Throwaway title');
+
+        // Cancel again, then Discard -> the editor closes and the edit is gone on reopen.
+        cy.get('[data-editor-cancel]').click();
+        cy.contains('[role="alertdialog"] button', 'Discard').click();
+        cy.contains('button', /edit module/i, {timeout: 10000}).should('be.visible');
+        cy.contains('button', /edit module/i).click();
+        cy.get('#edit-jcr-title', {timeout: 10000}).should('not.have.value', 'Throwaway title');
+    });
 });
