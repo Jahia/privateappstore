@@ -464,6 +464,22 @@ describe('Authoring views (JS module)', () => {
         cy.get('[data-lightbox]').should('not.exist');
     });
 
+    it('owner jumps from the detail screenshots to the editor Media tab (cross-island shortcut)', () => {
+        // A screenshot makes the detail page render the screenshots section + the owner shortcut.
+        uploadFile('../../assets/screenshot.png', `${repo}/widget/screenshots`, 'ux13.png', 'image/png');
+        cy.visit(moduleRender);
+        // Wait for the editor island to hydrate (its listener must be attached) AND the shortcut
+        // island to hydrate (its click handler), then click the shortcut.
+        cy.get('[data-editor-ready]', {timeout: 20000});
+        cy.get('[data-edit-media][data-edit-media-ready="true"]', {timeout: 20000}).click();
+        // The separate ModuleEditor island received the event and opened itself on the Media tab
+        // (the "Module fields" tablist only renders when the editor is open).
+        cy.get('[aria-label="Module fields"]', {timeout: 20000})
+            .contains('[role="tab"]', 'Media')
+            .should('have.attr', 'aria-selected', 'true');
+        cy.get('[data-screenshots-ready]', {timeout: 20000}).should('be.visible');
+    });
+
     it('rejects an invalid video id without writing the video node', () => {
         cy.intercept('POST', '/modules/graphql').as('gql');
         cy.visit(moduleRender);
