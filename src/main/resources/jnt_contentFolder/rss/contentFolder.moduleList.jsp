@@ -22,6 +22,9 @@
                 <c:if test="${version.properties.published.boolean}">
                     <c:set var="module" value="${version.parent}"/>
                     <c:set var="files" value="${jcr:getChildrenOfType(version, 'jnt:file')}"/>
+                    <%-- Reset per version so an unsafe-coordinate skip below can't leak the previous
+                         item's URL into this <item>. --%>
+                    <c:set var="downloadUrl" value=""/>
                     <c:choose>
                         <c:when test="${not empty files}">
                             <c:forEach var="file" items="${files}">
@@ -38,7 +41,13 @@
                                  json/contentFolder.moduleList.jsp; MavenProxy.java parses it back):
                                  {server}{context}/modules/mavenproxy/{siteKey}/{groupId-as-path}/
                                  {name}/{version}/{name}-{version}.jar --%>
-                            <c:set var="downloadUrl" value="${url.server}${url.context}/modules/mavenproxy/${currentNode.resolveSite.siteKey}/${fn:replace(module.properties['groupId'].string, '.', '/')}/${module.name}/${version.properties.versionNumber.string}/${module.name}-${version.properties.versionNumber.string}.jar"/>
+                            <c:set var="grp" value="${module.properties['groupId'].string}"/>
+                            <c:set var="vNum" value="${version.properties.versionNumber.string}"/>
+                            <%-- Skip the URL when a coordinate could deepen/traverse the proxy path
+                                 (".." or "/"), mirroring SAFE_MAVEN_SEGMENT in versions.ts. --%>
+                            <c:if test="${not (fn:contains(grp, '..') or fn:contains(grp, '/') or fn:contains(module.name, '..') or fn:contains(module.name, '/') or fn:contains(vNum, '..') or fn:contains(vNum, '/'))}">
+                                <c:set var="downloadUrl" value="${url.server}${url.context}/modules/mavenproxy/${currentNode.resolveSite.siteKey}/${fn:replace(grp, '.', '/')}/${module.name}/${vNum}/${module.name}-${vNum}.jar"/>
+                            </c:if>
                         </c:otherwise>
                     </c:choose>
                 <item>
