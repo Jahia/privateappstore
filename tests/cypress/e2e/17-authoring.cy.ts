@@ -32,6 +32,21 @@ const openVersionsPopup = (): void => {
 };
 
 /**
+ * Open the module editor and switch to its Media tab, where the screenshot and
+ * video managers live. Scope the tab click to the editor tablist ("Module
+ * fields") since the detail page also has a "Module sections" tablist. Waits for
+ * the screenshot manager to hydrate.
+ */
+const openEditorMediaTab = (): void => {
+    // Wait for the editor island to hydrate before clicking (the SSR button is
+    // visible before its handler attaches).
+    cy.get('[data-editor-ready]', {timeout: 20000});
+    cy.contains('button', /edit module/i).click();
+    cy.get('[aria-label="Module fields"]', {timeout: 20000}).contains('[role="tab"]', 'Media').click();
+    cy.get('[data-screenshots-ready]', {timeout: 20000});
+};
+
+/**
  * Authoring views (jahia-store-template JS module) — Phase 3.
  *
  * Covers in-site editing of module metadata via the ModuleEditor island, which
@@ -50,6 +65,23 @@ describe('Authoring views (JS module)', () => {
 
     const addNodeWithProps: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeWithProperties.graphql');
+
+    const getNodeProperty: DocumentNode =
+        require('graphql-tag/loader!../fixtures/graphql/query/getNodeProperties.graphql');
+
+    // Category-settings fixtures (same OSGi-backed path the admin UI uses), to verify
+    // the editor lists the configured categories.
+    const addNode: DocumentNode =
+        require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeForTest.graphql');
+
+    const setRootCategory: DocumentNode =
+        require('graphql-tag/loader!../fixtures/graphql/mutation/setRootCategory.graphql');
+
+    const addForgeCategory: DocumentNode =
+        require('graphql-tag/loader!../fixtures/graphql/mutation/addForgeCategory.graphql');
+
+    const readProp = (path: string, name: string) =>
+        cy.apollo({query: getNodeProperty, variables: {path, name, language: null}, fetchPolicy: 'no-cache'});
 
     const islandBundle = '/modules/jahia-store-template/dist/client/components/forge/ModuleEditor.client.tsx.js';
 
@@ -326,14 +358,14 @@ describe('Authoring views (JS module)', () => {
         cy.get('body').should($b => expect($b.html()).to.contain('createEntryFromJar.do'));
     });
 
-    it('owner can reorder and delete screenshots (jcr mutations)', () => {
+    it('owner can reorder and delete screenshots in the editor Media tab (jcr mutations)', () => {
         // Two screenshots in the module's (autocreated) screenshots node.
         uploadFile('../../assets/screenshot.png', `${repo}/widget/screenshots`, 'shot-a.png', 'image/png');
         uploadFile('../../assets/screenshot.png', `${repo}/widget/screenshots`, 'shot-b.png', 'image/png');
 
         cy.intercept('POST', '/modules/graphql').as('gql');
         cy.visit(moduleRender);
-        cy.get('[data-screenshots-ready]', {timeout: 20000});
+        openEditorMediaTab();
         cy.get('[data-screenshot-name]').then($els => {
             expect($els.eq(0).attr('data-screenshot-name')).to.eq('shot-a.png');
             expect($els.eq(1).attr('data-screenshot-name')).to.eq('shot-b.png');
@@ -343,7 +375,7 @@ describe('Authoring views (JS module)', () => {
         cy.get('[data-screenshot-name="shot-a.png"]').find('button[aria-label="Move down"]').click();
         cy.wait('@gql');
         cy.reload();
-        cy.get('[data-screenshots-ready]', {timeout: 20000});
+        openEditorMediaTab();
         cy.get('[data-screenshot-name]').first().should('have.attr', 'data-screenshot-name', 'shot-b.png');
 
         // Delete the (now first) screenshot -> only shot-a.png remains. Deletion is
@@ -353,8 +385,57 @@ describe('Authoring views (JS module)', () => {
         cy.get('[data-screenshot-name="shot-b.png"]').contains('button', 'Delete').click();
         cy.wait('@gql');
         cy.reload();
-        cy.get('[data-screenshots-ready]', {timeout: 20000});
+        openEditorMediaTab();
         cy.get('[data-screenshot-name="shot-b.png"]').should('not.exist');
         cy.get('[data-screenshot-name="shot-a.png"]').should('exist');
+    });
+
+    it('owner can set and clear the module video in the editor Media tab', () => {
+        // Verify persistence via GraphQL rather than reloading the page: once a video
+        // exists the detail page embeds a YouTube iframe, which never loads in the
+        // offline test env and would hang cy.reload() waiting for the page load event.
+        cy.visit(moduleRender);
+        openEditorMediaTab();
+
+        // Set a YouTube video (creates the `video` child node + its properties).
+        cy.get('#edit-video-provider').select('youtube');
+        cy.get('[data-video-id]').clear().type('dQw4w9WgXcQ');
+        cy.get('[data-video-save]').click();
+        cy.contains('[data-video-manager] output', 'Saved', {timeout: 20000});
+        readProp(`${repo}/widget/video`, 'provider')
+            .its('data.jcr.nodeByPath.properties[0].value')
+            .should('equal', 'youtube');
+        readProp(`${repo}/widget/video`, 'identifier')
+            .its('data.jcr.nodeByPath.properties[0].value')
+            .should('equal', 'dQw4w9WgXcQ');
+
+        // Clear it (provider "None" + Save) -> the video node is deleted.
+        cy.get('#edit-video-provider').select('None');
+        cy.get('[data-video-save]').click();
+        cy.contains('[data-video-manager] output', 'Saved', {timeout: 20000});
+        // A missing node makes nodeByPath resolve to null/undefined (the field errors
+        // out for a non-existent path), so assert "not exist" rather than strictly null.
+        readProp(`${repo}/widget/video`, 'provider').its('data.jcr.nodeByPath').should('not.exist');
+    });
+
+    it('editor lists the configured categories (regression: was always "none configured")', () => {
+        // Wire a site root category + a child via the OSGi-backed admin path, then
+        // confirm the editor surfaces them. Guards the bug where the editor read the
+        // stale JCR `rootCategory` property instead of the OSGi forge config.
+        cy.apollo({
+            mutation: addNode,
+            variables: {parentPath: `/sites/${siteKey}`, name: 'cy-cats', primaryNodeType: 'jnt:category'}
+        }).then(result => {
+            const rootUuid = (result.data as {jcr: {addNode: {node: {uuid: string}}}}).jcr.addNode.node.uuid;
+            cy.apollo({mutation: setRootCategory, variables: {siteKey, rootCategoryUuid: rootUuid}});
+        });
+        cy.apollo({mutation: addForgeCategory, variables: {siteKey, name: 'widgets'}});
+
+        cy.visit(moduleRender);
+        cy.get('[data-editor-ready]', {timeout: 20000});
+        cy.contains('button', /edit module/i).click();
+        // The category control lives on the default (General) tab.
+        cy.contains('No categories are configured').should('not.exist');
+        cy.contains('label', /widgets/i, {timeout: 20000}).should('exist');
     });
 });
