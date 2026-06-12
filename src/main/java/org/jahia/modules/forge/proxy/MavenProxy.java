@@ -178,7 +178,7 @@ public class MavenProxy extends HttpServlet {
         }
     }
 
-    private static boolean isSuspicious(String path) {
+    static boolean isSuspicious(String path) {
         // Block raw AND percent-encoded traversal / scheme-injection sequences. The proxy now
         // serves anonymous callers on public stores, so harden the SSRF guard against encoded
         // variants regardless of how the downstream URI builder normalizes them. Legitimate
@@ -189,9 +189,11 @@ public class MavenProxy extends HttpServlet {
                 || p.contains("%2e") || p.contains("%2f") || p.contains("%5c");
     }
 
-    /** A site key is a simple identifier; reject anything that could alter the JCR path. */
-    private static boolean isValidSiteName(String siteName) {
-        return StringUtils.isNotBlank(siteName) && siteName.matches("[A-Za-z0-9._-]+");
+    /** A site key is a simple identifier; reject anything that could alter the JCR path. The
+     *  charset permits dots, so ".." is rejected explicitly (it would otherwise match the pattern). */
+    static boolean isValidSiteName(String siteName) {
+        return StringUtils.isNotBlank(siteName) && siteName.matches("[A-Za-z0-9._-]+")
+                && !siteName.contains("..");
     }
 
     /**

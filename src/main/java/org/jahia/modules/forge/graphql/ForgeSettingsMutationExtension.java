@@ -99,7 +99,9 @@ public final class ForgeSettingsMutationExtension {
      * (e.g. "../.." resolving to "/"). Mirrors {@code MavenProxy.isValidSiteName} (SECURITY-571).
      */
     static void validateSiteKey(String siteKey) {
-        if (siteKey == null || !SAFE_SITE_KEY.matcher(siteKey).matches()) {
+        // The charset permits dots, so also reject ".." explicitly: a pure-traversal key like
+        // ".." would otherwise match the pattern and resolve "/sites/.." to "/".
+        if (siteKey == null || !SAFE_SITE_KEY.matcher(siteKey).matches() || siteKey.contains("..")) {
             throw new ForgeSettingsException("Invalid site key: " + siteKey, null);
         }
     }
