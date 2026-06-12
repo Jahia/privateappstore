@@ -3,11 +3,13 @@ import {createSite, deleteSite, setNodeProperty} from '@jahia/cypress';
 
 /** Click Save and wait for the full-page reload the editor triggers (reload-safe
  *  via a window stamp — see 17-authoring for the rationale). */
-const saveAndWaitReload = (saveLabel = /^Save$/): void => {
+const saveAndWaitReload = (): void => {
     cy.window().then(w => {
         (w as unknown as {__preSave?: boolean}).__preSave = true;
     });
-    cy.contains('button', saveLabel).click();
+    // The editor Save is an icon-only button (tooltip + aria-label); target its
+    // stable data hook rather than visible text.
+    cy.get('[data-editor-save]').click();
     cy.window({timeout: 20000}).should(w => {
         expect((w as unknown as {__preSave?: boolean}).__preSave).to.be.undefined;
     });

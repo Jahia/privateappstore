@@ -8,11 +8,13 @@ import {createSite, deleteSite, setNodeProperty, uploadFile} from '@jahia/cypres
  * a window object doesn't "detach" like a DOM element would mid-navigation, so no
  * assertion ends up straddling the reload.
  */
-const saveAndWaitReload = (saveLabel = /^Save$/): void => {
+const saveAndWaitReload = (): void => {
     cy.window().then(w => {
         (w as unknown as {__preSave?: boolean}).__preSave = true;
     });
-    cy.contains('button', saveLabel).click();
+    // The editor Save is an icon-only button (tooltip + aria-label); target its
+    // stable data hook rather than visible text.
+    cy.get('[data-editor-save]').click();
     cy.window({timeout: 20000}).should(w => {
         expect((w as unknown as {__preSave?: boolean}).__preSave).to.be.undefined;
     });
