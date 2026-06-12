@@ -59,6 +59,9 @@
                                             <json:property name="requiredVersion"
                                                            value="${version.properties.requiredVersion.node.name}"/>
                                             <c:set var="files" value="${jcr:getChildrenOfType(version, 'jnt:file')}"/>
+                                            <%-- Reset per version so an unsafe-coordinate skip below can't leak the
+                                                 previous version's URL into this entry. --%>
+                                            <c:set var="downloadUrl" value=""/>
                                             <c:if test="${empty files}">
                                                 <%-- No attached artifact: the module was deployed to the site's Maven
                                                      repository, so the download is served by the MavenProxy servlet at
@@ -70,7 +73,13 @@
                                                      {groupId-with-dots-as-slashes}/{name}/{version}/{name}-{version}.jar
                                                      Also implemented in rss/contentFolder.moduleList.jsp and, root-relative
                                                      for the browser, in store-template src/components/forge/versions.ts. --%>
-                                                <c:set var="downloadUrl" value="${url.server}${url.context}/modules/mavenproxy/${currentNode.resolveSite.siteKey}/${fn:replace(groupID, '.', '/')}/${child.name}/${version.properties.versionNumber.string}/${child.name}-${version.properties.versionNumber.string}.jar"/>
+                                                <c:set var="vNum" value="${version.properties.versionNumber.string}"/>
+                                                <%-- Skip the URL when a coordinate could deepen/traverse the proxy path
+                                                     (".." or "/"), mirroring the SAFE_MAVEN_SEGMENT guard in versions.ts so
+                                                     this feed never emits a path the proxy/storefront would reject. --%>
+                                                <c:if test="${not (fn:contains(groupID, '..') or fn:contains(groupID, '/') or fn:contains(child.name, '..') or fn:contains(child.name, '/') or fn:contains(vNum, '..') or fn:contains(vNum, '/'))}">
+                                                    <c:set var="downloadUrl" value="${url.server}${url.context}/modules/mavenproxy/${currentNode.resolveSite.siteKey}/${fn:replace(groupID, '.', '/')}/${child.name}/${vNum}/${child.name}-${vNum}.jar"/>
+                                                </c:if>
                                             </c:if>
                                             <c:if test="${not empty files}">
                                                 <c:forEach var="file" items="${files}">
