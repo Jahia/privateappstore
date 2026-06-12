@@ -308,4 +308,53 @@ describe('Module list JSON + download', () => {
             });
         });
     });
+
+    it('suppresses the download URL when a module coordinate carries a forbidden segment (feed guard)', () => {
+        // The upload action rejects unsafe coordinates, but a direct JCR/GraphQL write could plant
+        // one. Both moduleList feeds build the mavenproxy URL from the coordinates, so they must
+        // skip emitting it (mirroring versions.ts SAFE_MAVEN_SEGMENT) rather than serve a URL the
+        // storefront would refuse and MavenProxy.java would reject — the "spanning test" the
+        // architecture review flagged as missing for the 3-place URL grammar.
+        const badName = 'cy-bad-coord';
+        const badModulePath = `${repositoryPath}/${badName}`;
+        const badGroupId = 'org/evil/../secret'; // Carries both '/' and '..'
+        cy.apollo({
+            mutation: createForgeModule,
+            variables: {parentPath: repositoryPath, name: badName, title: 'Bad Coord'}
+        });
+        cy.apollo({
+            mutation: addNodeWithProps,
+            variables: {
+                parentPath: badModulePath,
+                name: `${badName}-1.0.0`,
+                primaryNodeType: 'jnt:forgeModuleVersion',
+                properties: [{name: 'versionNumber', value: '1.0.0'}]
+            }
+        });
+        setNodeProperty(badModulePath, 'groupId', badGroupId, 'en');
+        setNodeProperty(badModulePath, 'published', 'true', 'en');
+        setNodeProperty(`${badModulePath}/${badName}-1.0.0`, 'published', 'true', 'en');
+        publishAndWaitJobEnding(`/sites/${siteKey}`, ['en']);
+
+        // JSON feed: the guarded version's downloadUrl is suppressed — never a mavenproxy/traversal URL.
+        cy.request({url: jsonUrl, failOnStatusCode: false}).then(res => {
+            const payload = Array.isArray(res.body) ? res.body[0] : res.body;
+            const modules =
+                (payload as {modules?: Array<{name: string; versions: Array<{version: string; downloadUrl?: string}>}>})
+                    .modules || [];
+            const bad = modules.find(m => m.name === badName);
+            expect(bad, 'forbidden-coordinate module present in feed').to.not.be.undefined;
+            const v = bad!.versions.find(x => x.version === '1.0.0');
+            const downloadUrl = v?.downloadUrl ?? '';
+            expect(downloadUrl, 'forbidden-coordinate downloadUrl is suppressed')
+                .to.satisfy((u: string) => u === '' || (!u.includes('/modules/mavenproxy/') && !u.includes('..')));
+        });
+
+        // RSS feed: the same guard means no item links to a traversal coordinate.
+        const rssUrl = `/en/sites/${siteKey}/contents/modules-repository.moduleList.rss`;
+        cy.request({url: rssUrl, failOnStatusCode: false}).then(res => {
+            expect(res.status).to.equal(200);
+            expect(String(res.body), 'rss feed must not emit the traversal coordinate').to.not.contain('org/evil');
+        });
+    });
 });
