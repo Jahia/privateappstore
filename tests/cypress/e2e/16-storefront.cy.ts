@@ -148,8 +148,8 @@ describe('Storefront read views (JS module)', () => {
         });
         cy.get('[data-forge-filter] input[name="status"][value="community"]').check();
         cy.get('[data-nav-progress]').should('have.attr', 'data-loading');
-        // The accessible status region announces loading.
-        cy.get('[role="status"]').should('contain.text', 'Loading');
+        // The accessible status region (an <output>, implicit role=status) announces loading.
+        cy.get('[data-nav-status]').should('contain.text', 'Loading');
     });
 
     it('filters the grid by status in a non-default language (French)', () => {

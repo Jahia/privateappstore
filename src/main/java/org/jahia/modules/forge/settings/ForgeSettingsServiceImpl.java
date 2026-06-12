@@ -166,7 +166,7 @@ public class ForgeSettingsServiceImpl implements ForgeSettingsService {
     }
 
     /** Escape the value half of an LDAP/OSGi filter assertion. */
-    private static String escape(String value) {
+    static String escape(String value) {
         return value.replace("\\", "\\5c").replace("*", "\\2a")
                 .replace("(", "\\28").replace(")", "\\29");
     }

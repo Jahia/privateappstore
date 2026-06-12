@@ -8,11 +8,13 @@ import {createSite, deleteSite, setNodeProperty, uploadFile} from '@jahia/cypres
  * a window object doesn't "detach" like a DOM element would mid-navigation, so no
  * assertion ends up straddling the reload.
  */
-const saveAndWaitReload = (saveLabel = /^Save$/): void => {
+const saveAndWaitReload = (): void => {
     cy.window().then(w => {
         (w as unknown as {__preSave?: boolean}).__preSave = true;
     });
-    cy.contains('button', saveLabel).click();
+    // The editor Save is an icon-only button (tooltip + aria-label); target its
+    // stable data hook rather than visible text.
+    cy.get('[data-editor-save]').click();
     cy.window({timeout: 20000}).should(w => {
         expect((w as unknown as {__preSave?: boolean}).__preSave).to.be.undefined;
     });
@@ -27,6 +29,21 @@ const saveAndWaitReload = (saveLabel = /^Save$/): void => {
 const openVersionsPopup = (): void => {
     cy.get('[data-versions-open][data-versions-ready="true"]', {timeout: 20000}).click();
     cy.get('[data-versions-dialog][open]', {timeout: 20000}).should('be.visible');
+};
+
+/**
+ * Open the module editor and switch to its Media tab, where the screenshot and
+ * video managers live. Scope the tab click to the editor tablist ("Module
+ * fields") since the detail page also has a "Module sections" tablist. Waits for
+ * the screenshot manager to hydrate.
+ */
+const openEditorMediaTab = (): void => {
+    // Wait for the editor island to hydrate before clicking (the SSR button is
+    // visible before its handler attaches).
+    cy.get('[data-editor-ready]', {timeout: 20000});
+    cy.contains('button', /edit module/i).click();
+    cy.get('[aria-label="Module fields"]', {timeout: 20000}).contains('[role="tab"]', 'Media').click();
+    cy.get('[data-screenshots-ready]', {timeout: 20000});
 };
 
 /**
@@ -48,6 +65,23 @@ describe('Authoring views (JS module)', () => {
 
     const addNodeWithProps: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeWithProperties.graphql');
+
+    const getNodeProperty: DocumentNode =
+        require('graphql-tag/loader!../fixtures/graphql/query/getNodeProperties.graphql');
+
+    // Category-settings fixtures (same OSGi-backed path the admin UI uses), to verify
+    // the editor lists the configured categories.
+    const addNode: DocumentNode =
+        require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeForTest.graphql');
+
+    const setRootCategory: DocumentNode =
+        require('graphql-tag/loader!../fixtures/graphql/mutation/setRootCategory.graphql');
+
+    const addForgeCategory: DocumentNode =
+        require('graphql-tag/loader!../fixtures/graphql/mutation/addForgeCategory.graphql');
+
+    const readProp = (path: string, name: string) =>
+        cy.apollo({query: getNodeProperty, variables: {path, name, language: null}, fetchPolicy: 'no-cache'});
 
     const islandBundle = '/modules/jahia-store-template/dist/client/components/forge/ModuleEditor.client.tsx.js';
 
@@ -324,14 +358,14 @@ describe('Authoring views (JS module)', () => {
         cy.get('body').should($b => expect($b.html()).to.contain('createEntryFromJar.do'));
     });
 
-    it('owner can reorder and delete screenshots (jcr mutations)', () => {
+    it('owner can reorder and delete screenshots in the editor Media tab (jcr mutations)', () => {
         // Two screenshots in the module's (autocreated) screenshots node.
         uploadFile('../../assets/screenshot.png', `${repo}/widget/screenshots`, 'shot-a.png', 'image/png');
         uploadFile('../../assets/screenshot.png', `${repo}/widget/screenshots`, 'shot-b.png', 'image/png');
 
         cy.intercept('POST', '/modules/graphql').as('gql');
         cy.visit(moduleRender);
-        cy.get('[data-screenshots-ready]', {timeout: 20000});
+        openEditorMediaTab();
         cy.get('[data-screenshot-name]').then($els => {
             expect($els.eq(0).attr('data-screenshot-name')).to.eq('shot-a.png');
             expect($els.eq(1).attr('data-screenshot-name')).to.eq('shot-b.png');
@@ -341,7 +375,7 @@ describe('Authoring views (JS module)', () => {
         cy.get('[data-screenshot-name="shot-a.png"]').find('button[aria-label="Move down"]').click();
         cy.wait('@gql');
         cy.reload();
-        cy.get('[data-screenshots-ready]', {timeout: 20000});
+        openEditorMediaTab();
         cy.get('[data-screenshot-name]').first().should('have.attr', 'data-screenshot-name', 'shot-b.png');
 
         // Delete the (now first) screenshot -> only shot-a.png remains. Deletion is
@@ -351,8 +385,111 @@ describe('Authoring views (JS module)', () => {
         cy.get('[data-screenshot-name="shot-b.png"]').contains('button', 'Delete').click();
         cy.wait('@gql');
         cy.reload();
-        cy.get('[data-screenshots-ready]', {timeout: 20000});
+        openEditorMediaTab();
         cy.get('[data-screenshot-name="shot-b.png"]').should('not.exist');
         cy.get('[data-screenshot-name="shot-a.png"]').should('exist');
+    });
+
+    it('owner can set and clear the module video in the editor Media tab', () => {
+        // Verify persistence via GraphQL rather than reloading the page: once a video
+        // exists the detail page embeds a YouTube iframe, which never loads in the
+        // offline test env and would hang cy.reload() waiting for the page load event.
+        cy.visit(moduleRender);
+        openEditorMediaTab();
+
+        // Set a YouTube video (creates the `video` child node + its properties).
+        cy.get('#edit-video-provider').select('youtube');
+        cy.get('[data-video-id]').clear().type('dQw4w9WgXcQ');
+        cy.get('[data-video-save]').click();
+        cy.contains('[data-video-manager] output', 'Saved', {timeout: 20000});
+        readProp(`${repo}/widget/video`, 'provider')
+            .its('data.jcr.nodeByPath.properties[0].value')
+            .should('equal', 'youtube');
+        readProp(`${repo}/widget/video`, 'identifier')
+            .its('data.jcr.nodeByPath.properties[0].value')
+            .should('equal', 'dQw4w9WgXcQ');
+
+        // Clear it (provider "None" + Save) -> the video node is deleted.
+        cy.get('#edit-video-provider').select('None');
+        cy.get('[data-video-save]').click();
+        cy.contains('[data-video-manager] output', 'Saved', {timeout: 20000});
+        // A missing node makes nodeByPath resolve to null/undefined (the field errors
+        // out for a non-existent path), so assert "not exist" rather than strictly null.
+        readProp(`${repo}/widget/video`, 'provider').its('data.jcr.nodeByPath').should('not.exist');
+    });
+
+    it('editor lists the configured categories (regression: was always "none configured")', () => {
+        // Wire a site root category + a child via the OSGi-backed admin path, then
+        // confirm the editor surfaces them. Guards the bug where the editor read the
+        // stale JCR `rootCategory` property instead of the OSGi forge config.
+        cy.apollo({
+            mutation: addNode,
+            variables: {parentPath: `/sites/${siteKey}`, name: 'cy-cats', primaryNodeType: 'jnt:category'}
+        }).then(result => {
+            const rootUuid = (result.data as {jcr: {addNode: {node: {uuid: string}}}}).jcr.addNode.node.uuid;
+            cy.apollo({mutation: setRootCategory, variables: {siteKey, rootCategoryUuid: rootUuid}});
+        });
+        cy.apollo({mutation: addForgeCategory, variables: {siteKey, name: 'widgets'}});
+
+        cy.visit(moduleRender);
+        cy.get('[data-editor-ready]', {timeout: 20000});
+        cy.contains('button', /edit module/i).click();
+        // The category control lives on the default (General) tab.
+        cy.contains('No categories are configured').should('not.exist');
+        cy.contains('label', /widgets/i, {timeout: 20000}).should('exist');
+    });
+
+    it('screenshot viewer: arrow keys navigate and Escape closes', () => {
+        // Two distinct screenshots so the detail-page lightbox has something to page
+        // through (same source image, different node names -> different URLs).
+        uploadFile('../../assets/screenshot.png', `${repo}/widget/screenshots`, 'kbd-1.png', 'image/png');
+        uploadFile('../../assets/screenshot.png', `${repo}/widget/screenshots`, 'kbd-2.png', 'image/png');
+
+        cy.visit(moduleRender);
+        // Open the viewer on the first screenshot (Overview is the default detail tab).
+        cy.get('[aria-label^="Open screenshot"]', {timeout: 20000}).first().click();
+        cy.get('[data-lightbox]').should('exist');
+
+        cy.get('[data-lightbox-image]').invoke('attr', 'src').then(firstSrc => {
+            // ArrowRight advances to the next image...
+            cy.get('body').type('{rightarrow}');
+            cy.get('[data-lightbox-image]').should('have.attr', 'src').and('not.eq', firstSrc);
+            // ...ArrowLeft returns to the first.
+            cy.get('body').type('{leftarrow}');
+            cy.get('[data-lightbox-image]').should('have.attr', 'src', firstSrc);
+        });
+
+        // Escape closes the viewer.
+        cy.get('body').type('{esc}');
+        cy.get('[data-lightbox]').should('not.exist');
+    });
+
+    it('rejects an invalid video id without writing the video node', () => {
+        cy.intercept('POST', '/modules/graphql').as('gql');
+        cy.visit(moduleRender);
+        openEditorMediaTab();
+
+        cy.get('#edit-video-provider').select('youtube');
+        cy.get('[data-video-id]').clear().type('../../etc/passwd');
+        cy.get('[data-video-save]').click();
+
+        // The manager surfaces an error and writes nothing (the guard short-circuits before any
+        // GraphQL mutation), so the video node stays absent.
+        cy.get('[data-video-manager] [role="alert"]', {timeout: 20000}).should('be.visible');
+        readProp(`${repo}/widget/video`, 'provider').its('data.jcr.nodeByPath').should('not.exist');
+    });
+
+    it('uploads a screenshot through the Media-tab control and rejects a non-image', () => {
+        cy.visit(moduleRender);
+        openEditorMediaTab();
+
+        // Happy path: a PNG picked through the UI is uploaded and shown.
+        cy.get('[data-screenshot-input]').selectFile('assets/screenshot.png', {force: true});
+        cy.get('[data-screenshot-name="screenshot.png"]', {timeout: 20000}).should('exist');
+
+        // A non-image file is rejected client-side with an error and adds no thumbnail.
+        cy.get('[data-screenshot-input]').selectFile('assets/provisioning.yml', {force: true});
+        cy.get('[data-screenshots-ready] [role="alert"]', {timeout: 20000}).should('be.visible');
+        cy.get('[data-screenshot-name="provisioning.yml"]').should('not.exist');
     });
 });

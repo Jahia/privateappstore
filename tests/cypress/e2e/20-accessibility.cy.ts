@@ -1,6 +1,6 @@
 import {DocumentNode} from 'graphql';
 import {Result} from 'axe-core';
-import {createSite, deleteSite, setNodeProperty} from '@jahia/cypress';
+import {createSite, deleteSite, setNodeProperty, uploadFile} from '@jahia/cypress';
 
 /**
  * Accessibility gate (jahia-store-template JS module) — enforces the module's
@@ -118,6 +118,10 @@ describe('Accessibility — WCAG 2.2 AAA gate (JS module)', () => {
         setNodeProperty(`${repo}/seo`, 'description', '<p>Meta tags and sitemaps.</p>', 'en');
         setNodeProperty(`${repo}/seo`, 'status', 'community', 'en');
         setNodeProperty(`${repo}/seo`, 'published', 'true', 'en');
+
+        // Two screenshots so the detail page shows the lightbox (audited in its open state below).
+        uploadFile('../../assets/screenshot.png', `${repo}/analytics/screenshots`, 'a11y-1.png', 'image/png');
+        uploadFile('../../assets/screenshot.png', `${repo}/analytics/screenshots`, 'a11y-2.png', 'image/png');
     });
 
     after(() => {
@@ -147,6 +151,23 @@ describe('Accessibility — WCAG 2.2 AAA gate (JS module)', () => {
     it('"My modules" page has no WCAG 2.2 AAA violations', () => {
         cy.visit(render('/home/my-modules'));
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('be.visible');
+        audit();
+    });
+
+    it('the in-site editor (open) has no WCAG 2.2 AAA violations', () => {
+        cy.visit(detailRender);
+        cy.get('[data-editor-ready]', {timeout: 20000});
+        cy.contains('button', /edit module/i).click();
+        // The editor field tablist is present once the form is open.
+        cy.get('[aria-label="Module fields"]', {timeout: 20000}).should('be.visible');
+        audit();
+    });
+
+    it('the screenshot viewer (open) has no WCAG 2.2 AAA violations', () => {
+        cy.visit(detailRender);
+        cy.get('[data-detail-tabs-ready]', {timeout: 20000});
+        cy.get('[aria-label^="Open screenshot"]', {timeout: 20000}).first().click();
+        cy.get('[data-lightbox]').should('exist');
         audit();
     });
 });

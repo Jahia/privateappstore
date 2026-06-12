@@ -282,4 +282,30 @@ describe('Module list JSON + download', () => {
             expect(module, 'unpublished module hidden from listing').to.be.undefined;
         });
     });
+
+    it('rejects a bad site name and never serves a traversal / scheme-injection path on the mavenproxy', () => {
+        // The SSRF + site-name guard (isValidSiteName) runs before any auth, so this is checked
+        // anonymously. A site name the servlet container does not normalise away (a space / colon)
+        // reaches the app guard and is rejected with 400.
+        const base = '/modules/mavenproxy';
+        [`${base}/bad%20site/org/x/1.0/x-1.0.jar`, `${base}/foo:evil/org/x/1.0/x-1.0.jar`].forEach(url => {
+            cy.request({url, failOnStatusCode: false}).then(res => {
+                expect(res.status, url).to.equal(400);
+            });
+        });
+
+        // Traversal / encoded-separator / scheme-injection paths must never serve an artifact:
+        // they are blocked either by the servlet guard (400) or normalised/rejected by the
+        // container (404/400) — in every case a 4xx, never a 200. (isSuspicious itself is covered
+        // directly by MavenProxyValidatorTest at the unit level.)
+        [
+            `${base}/${siteKey}/org/jahia/%2e%2e/%2e%2e/etc`,
+            `${base}/${siteKey}/a/b%5cc/1.0/a-1.0.jar`,
+            `${base}/${siteKey}/x/http%3a%2f%2fevil/1.0/x.jar`
+        ].forEach(url => {
+            cy.request({url, failOnStatusCode: false}).then(res => {
+                expect(res.status, url).to.be.gte(400);
+            });
+        });
+    });
 });

@@ -461,7 +461,8 @@ public class CreateEntryFromJar extends Action {
      * never the user-derived string — so the suffix later embedded in the temp-artifact path
      * ({@code File.createTempFile}) is provably untainted (CodeQL java/path-injection).
      */
-    private static String trustedExtension(String filename) {
+    // package-private for unit testing
+    static String trustedExtension(String filename) {
         String extension = StringUtils.substringAfterLast(filename, ".");
         if (StringUtils.equals(extension, EXTENSION_JAR)) {
             return EXTENSION_JAR;
@@ -520,7 +521,7 @@ public class CreateEntryFromJar extends Action {
      * could escape the modules repository. Dotted groupIds and scoped (@scope/name) module names
      * remain valid — only parent-traversal and path escapes are rejected (SECURITY-571).
      */
-    private static boolean isSafeCoordinate(String groupId, String moduleName) {
+    static boolean isSafeCoordinate(String groupId, String moduleName) {
         return isSafePathFragment(groupId) && isSafePathFragment(moduleName);
     }
 
@@ -529,7 +530,7 @@ public class CreateEntryFromJar extends Action {
      * no ".." parent-traversal, no "\\" or "/" path separator (a "/" in an addNode relative path
      * silently creates extra nested children — SECURITY-571).
      */
-    private static boolean isSafePathFragment(String value) {
+    static boolean isSafePathFragment(String value) {
         return value != null && !value.contains("..") && !value.contains("\\") && !value.contains("/");
     }
 
@@ -539,12 +540,12 @@ public class CreateEntryFromJar extends Action {
      * identifier, so any "/", "\\" or ".." segment is illegal (SECURITY-571). Mirrors the
      * {@link #isSafeCoordinate} guard the module and JS upload paths already apply.
      */
-    private static boolean isSafePackageName(String name) {
+    static boolean isSafePackageName(String name) {
         return isSafePathFragment(name);
     }
 
     /** True when {@code value} is a plain Maven coordinate token (no expression / option metacharacters). */
-    private static boolean isSafeMavenCoordinate(String value) {
+    static boolean isSafeMavenCoordinate(String value) {
         return value != null && SAFE_MAVEN_COORD.matcher(value).matches();
     }
 
@@ -554,7 +555,7 @@ public class CreateEntryFromJar extends Action {
      * {@code …/modules-required-versions}; restricting it to the Maven-coordinate charset keeps a
      * crafted value (e.g. {@code 8.2/../../x}) from traversing the JCR tree (SECURITY-571).
      */
-    private static boolean isSafeRequiredVersion(String value) {
+    static boolean isSafeRequiredVersion(String value) {
         return isSafeMavenCoordinate(value);
     }
 
