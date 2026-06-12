@@ -64,8 +64,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
+import org.apache.jackrabbit.core.fs.FileSystem;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
@@ -187,16 +190,24 @@ public class CreateEntryFromJar extends Action {
             return errorResult(session, "forge.uploadJar.error.wrong.format");
         }
         Map<String, List<String>> formParameters = fu.getParameterMap();
-        if (EXTENSION_TGZ.equals(extension)) {
-            return handleTgzUpload(uploadedFile, request, renderContext, resource, session, formParameters);
+        final UploadContext ctx = new UploadContext(uploadedFile, request, renderContext, resource, session, formParameters);
+        // The temp upload is always cleaned up here, and any archive parse error maps to a single
+        // read-file error - owned by the entry point so neither handler repeats the wrapper.
+        try {
+            if (EXTENSION_TGZ.equals(extension)) {
+                return handleTgzUpload(ctx);
+            }
+            return handleJarUpload(ctx, extension);
+        } catch (IOException ex) {
+            logger.error("Impossible to parse archive", ex);
+            return errorResult(ctx.session, ERR_UNABLE_READ_FILE);
+        } finally {
+            ctx.uploadedFile.delete();
         }
-        return handleJarUpload(uploadedFile, extension, request, renderContext, resource, session, formParameters);
     }
 
-    private ActionResult handleTgzUpload(DiskFileItem uploadedFile, HttpServletRequest request,
-                                         RenderContext renderContext, Resource resource, JCRSessionWrapper session,
-                                         Map<String, List<String>> formParameters) throws Exception {
-        try (InputStream fileInputStream = new FileInputStream(uploadedFile.getStoreLocation());
+    private ActionResult handleTgzUpload(UploadContext ctx) throws IOException, RepositoryException, JSONException {
+        try (InputStream fileInputStream = new FileInputStream(ctx.uploadedFile.getStoreLocation());
              InputStream gzipInputStream = new GZIPInputStream(fileInputStream);
              TarArchiveInputStream tarInputStream = new TarArchiveInputStream(gzipInputStream)) {
 
@@ -207,91 +218,129 @@ public class CreateEntryFromJar extends Action {
                 }
                 if (entry.getSize() > MAX_TAR_ENTRY_SIZE_BYTES) {
                     logger.warn("CreateEntryFromJar: package.json entry too large ({} bytes) - rejected", entry.getSize());
-                    return errorResult(session, ERR_UNABLE_READ_FILE);
+                    return errorResult(ctx.session, ERR_UNABLE_READ_FILE);
                 }
-                final JSONObject jsonObject = new JSONObject(IOUtils.toString(tarInputStream, "UTF-8"));
-                return createJavascriptModule(uploadedFile, jsonObject, request, renderContext, resource, session, formParameters);
+                final JSONObject jsonObject = new JSONObject(IOUtils.toString(tarInputStream, StandardCharsets.UTF_8));
+                return createJavascriptModule(ctx, jsonObject);
             }
-            return errorResult(session, "forge.uploadJar.error.unable.read.manifest");
-        } catch (IOException ex) {
-            logger.error("Impossible to parse archive", ex);
-            return errorResult(session, ERR_UNABLE_READ_FILE);
-        } finally {
-            uploadedFile.delete();
+            return errorResult(ctx.session, "forge.uploadJar.error.unable.read.manifest");
         }
     }
 
-    private ActionResult handleJarUpload(DiskFileItem uploadedFile, String extension, HttpServletRequest request,
-                                         RenderContext renderContext, Resource resource, JCRSessionWrapper session,
-                                         Map<String, List<String>> formParameters) throws Exception {
-        try (JarFile jar = new JarFile(uploadedFile.getStoreLocation())) {
+    private ActionResult handleJarUpload(UploadContext ctx, String extension) throws IOException, RepositoryException, JSONException {
+        try (JarFile jar = new JarFile(ctx.uploadedFile.getStoreLocation())) {
             Manifest manifest = jar.getManifest();
             if (manifest == null) {
-                return errorResult(session, "forge.uploadJar.error.unable.read.manifest");
+                return errorResult(ctx.session, "forge.uploadJar.error.unable.read.manifest");
             }
             Attributes attributes = manifest.getMainAttributes();
             if (attributes.getValue("Jahia-Package-Name") != null) {
-                return createPackage(uploadedFile, jar, attributes, request, renderContext, resource, session, formParameters);
+                return createPackage(ctx, jar, attributes);
             }
-            return createModule(uploadedFile, attributes, request, renderContext, resource, session, extension, formParameters);
-        } catch (IOException ex) {
-            logger.error("Impossible to parse archive", ex);
-            return errorResult(session, ERR_UNABLE_READ_FILE);
-        } finally {
-            uploadedFile.delete();
+            return createModule(ctx, attributes, extension);
         }
     }
-    
-    private ActionResult createJavascriptModule(DiskFileItem uploadedFile, JSONObject jsonObject, HttpServletRequest request, RenderContext renderContext, Resource resource, JCRSessionWrapper session, Map<String, List<String>> formParams) throws Exception {
-        JCRNodeWrapper repository = resource.getNode();
+
+    private ActionResult createJavascriptModule(UploadContext ctx, JSONObject jsonObject)
+            throws RepositoryException, JSONException, IOException {
         final String version = jsonObject.getString("version");
         final String moduleName = jsonObject.getString("name");
         final JSONObject jahiaJsonObject = jsonObject.getJSONObject("jahia");
-        final JSONObject mavenJsonObject = jahiaJsonObject.getJSONObject("maven");
-        final String groupId = mavenJsonObject.getString(GROUP_ID);
+        final String groupId = jahiaJsonObject.getJSONObject("maven").getString(GROUP_ID);
         final Map<String, List<String>> moduleParams = new HashMap<>();
         moduleParams.put(MODULE_NAME, Arrays.asList(moduleName));
         moduleParams.put(GROUP_ID, Arrays.asList(groupId));
         moduleParams.put(Constants.JCR_TITLE, Arrays.asList(moduleName));
         moduleParams.put(VERSION_NUMBER, Arrays.asList(version));
+        // JS modules attach the package to the version node (no Maven deploy).
+        return createForgeModule(ctx, moduleParams, jahiaJsonObject.getString("required-version"),
+                jahiaJsonObject.getString("module-dependencies"), false, null);
+    }
 
-        final String reqVersionAttribute = jahiaJsonObject.getString("required-version");
+    /**
+     * Shared module-creation core for both upload paths (JAR via {@link #createModule}, JS via
+     * {@link #createJavascriptModule}). The caller pre-populates {@code moduleParams} from its
+     * source (MANIFEST / package.json). Differences captured by the flags: JAR modules deploy the
+     * artifact to the site's Maven repo before node creation ({@code deployJar=true}, {@code
+     * extension} set); JS modules attach the package file to the version node afterwards. Behaviour
+     * mirrors the two former methods (validation set, ordering, save points) - extracted to remove
+     * the duplicated body.
+     */
+    private ActionResult createForgeModule(UploadContext ctx, Map<String, List<String>> moduleParams,
+                                           String reqVersionAttribute, String dependencies, boolean deployJar,
+                                           String extension) throws RepositoryException, JSONException, IOException {
+        final String moduleName = getParameter(moduleParams, MODULE_NAME);
+        final String groupId = getParameter(moduleParams, GROUP_ID);
+        final String version = getParameter(moduleParams, VERSION_NUMBER);
         final String requiredVersion = VERSION_PREFIX + reqVersionAttribute;
         if (StringUtils.isEmpty(moduleName) || StringUtils.isEmpty(groupId)
                 || StringUtils.isEmpty(reqVersionAttribute) || !isSafeCoordinate(groupId, moduleName)
                 || !isSafeRequiredVersion(reqVersionAttribute)) {
-            return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
+            return errorResult(ctx.session, ERR_MISSING_MANIFEST_ATTRIBUTE);
         }
-        final JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
+        final JCRNodeWrapper repository = ctx.resource.getNode();
+        final JCRNodeWrapper versions = getJahiaVersion(requiredVersion, ctx.resource, ctx.session);
         moduleParams.put(REQUIRED_VERSION, Arrays.asList(versions.getNode(requiredVersion).getIdentifier()));
+
+        if (deployJar) {
+            final ActionResult deployFailure = deployArtifact(ctx.uploadedFile, repository.getResolveSite(),
+                    extension, groupId, moduleName, ctx.session);
+            if (deployFailure != null) {
+                return deployFailure;
+            }
+        }
 
         final Map<String, List<String>> moduleParameters = new HashMap<>();
         final Map<String, List<String>> versionParameters = new HashMap<>();
         final String title = populateParameterMaps(moduleParams, moduleName, MODULE_PARAM_KEYS, moduleParameters, versionParameters);
 
-        logger.info("Start creating Private App Store Javascript Module {}", moduleName);
+        logger.info("Start creating Private App Store Module {}", moduleName);
         logger.info("Start adding module version {} of {}", version, title);
-        final ModulePrep prep = prepareModuleVersion(request, repository, groupId, moduleName, moduleParameters, version, session);
+        final ModulePrep prep = prepareModuleVersion(ctx.request, repository, groupId, moduleName, moduleParameters, version, ctx.session);
         if (prep.conflict != null) {
             return prep.conflict;
         }
         final JCRNodeWrapper module = prep.module;
-        final JCRNodeWrapper moduleVersion = createModuleVersion(request, module, versionParameters, version,
-                jahiaJsonObject.getString("module-dependencies"), session);
+        final JCRNodeWrapper moduleVersion = createModuleVersion(ctx.request, module, versionParameters, version, dependencies, ctx.session);
 
-        logger.info("Javascript Module version {} of {} successfully added", version, title);
-        logger.info("Private App Store Javascript Module {} successfully created and added to repository {}", moduleName, repository.getPath());
+        logger.info("Module version {} of {} successfully added", version, title);
+        logger.info("Private App Store Module {} successfully created and added to repository {}", moduleName, module.getParent().getPath());
 
-        session.save();
-        moduleVersion.uploadFile(uploadedFile.getName(), uploadedFile.getInputStream(), uploadedFile.getContentType());
-        session.save();
-        return buildUploadResult(request, renderContext, module, formParams);
+        ctx.session.save();
+        if (!deployJar) {
+            moduleVersion.uploadFile(ctx.uploadedFile.getName(), ctx.uploadedFile.getInputStream(), ctx.uploadedFile.getContentType());
+            ctx.session.save();
+        }
+        return buildUploadResult(ctx.request, ctx.renderContext, module, ctx.formParams);
     }
 
-    private ActionResult createPackage(DiskFileItem uploadedFile, JarFile jar, Attributes attributes, HttpServletRequest request, RenderContext renderContext, Resource resource, JCRSessionWrapper session, Map<String, List<String>> formParams) throws RepositoryException, JSONException, IOException {
-        JCRNodeWrapper repository = resource.getNode();
+    /**
+     * Immutable bundle of the request-scoped arguments shared by both upload paths, so the shared
+     * {@link #createForgeModule} core stays within a sane parameter count. The module coordinates
+     * (name / groupId / version) are read back from the populated {@code moduleParams} map.
+     */
+    private static final class UploadContext {
+        private final DiskFileItem uploadedFile;
+        private final HttpServletRequest request;
+        private final RenderContext renderContext;
+        private final Resource resource;
+        private final JCRSessionWrapper session;
+        private final Map<String, List<String>> formParams;
 
-        JCRNodeWrapper modulesPackage;
+        private UploadContext(DiskFileItem uploadedFile, HttpServletRequest request, RenderContext renderContext,
+                              Resource resource, JCRSessionWrapper session, Map<String, List<String>> formParams) {
+            this.uploadedFile = uploadedFile;
+            this.request = request;
+            this.renderContext = renderContext;
+            this.resource = resource;
+            this.session = session;
+            this.formParams = formParams;
+        }
+    }
+
+    private ActionResult createPackage(UploadContext ctx, JarFile jar, Attributes attributes)
+            throws RepositoryException, JSONException, IOException {
+        final JCRNodeWrapper repository = ctx.resource.getNode();
 
         String packageName = attributes.getValue("Jahia-Package-ID");
         String packageRelPath = "packages/" + packageName;
@@ -308,9 +357,9 @@ public class CreateEntryFromJar extends Action {
         final String requiredVersion = VERSION_PREFIX + reqVersionAttribute;
         if (StringUtils.isEmpty(packageName) || StringUtils.isEmpty(reqVersionAttribute) || StringUtils.isEmpty(version)
                 || !isSafePackageName(packageName) || !isSafeRequiredVersion(reqVersionAttribute)) {
-            return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
+            return errorResult(ctx.session, ERR_MISSING_MANIFEST_ATTRIBUTE);
         }
-        JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
+        JCRNodeWrapper versions = getJahiaVersion(requiredVersion, ctx.resource, ctx.session);
         packageParams.put(REQUIRED_VERSION, Arrays.asList(versions.getNode(requiredVersion).getIdentifier()));
 
         Map<String, List<String>> packageParameters = new HashMap<>();
@@ -319,20 +368,20 @@ public class CreateEntryFromJar extends Action {
 
         logger.info("Start creating Private App Store Package {}", packageName);
 
-        modulesPackage = upsertPackageNode(request, repository, packageRelPath, packageName, packageParameters);
-        grantOwnerRole(session, modulesPackage);
+        final JCRNodeWrapper modulesPackage = upsertPackageNode(ctx.request, repository, packageRelPath, packageName, packageParameters);
+        grantOwnerRole(ctx.session, modulesPackage);
 
         boolean hasPackageVersions = JCRTagUtils.hasChildrenOfType(modulesPackage, JNT_FORGEPACKAGEVERSION);
         logger.info("Start adding package version {} of {}", version, title);
 
         if (hasPackageVersions && !hasValidVersionNumber(modulesPackage, version)) {
-            String error = Messages.getWithArgs(RESOURCES_JAHIA_STORE, ERR_VERSION_NUMBER, session.getLocale(), packageName, version);
+            String error = Messages.getWithArgs(RESOURCES_JAHIA_STORE, ERR_VERSION_NUMBER, ctx.session.getLocale(), packageName, version);
             return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put(ERROR, error));
         }
 
-        JCRNodeWrapper packageVersion = createNode(request, versionParameters, modulesPackage, JNT_FORGEPACKAGEVERSION, modulesPackage.getName() + "-" + version, false);
-        grantOwnerRole(session, packageVersion);
-        packageVersion.uploadFile(uploadedFile.getName(), uploadedFile.getInputStream(), uploadedFile.getContentType());
+        JCRNodeWrapper packageVersion = createNode(ctx.request, versionParameters, modulesPackage, JNT_FORGEPACKAGEVERSION, modulesPackage.getName() + "-" + version, false);
+        grantOwnerRole(ctx.session, packageVersion);
+        packageVersion.uploadFile(ctx.uploadedFile.getName(), ctx.uploadedFile.getInputStream(), ctx.uploadedFile.getContentType());
 
         logger.info("Package version {} of {} successfully added", version, title);
 
@@ -340,8 +389,8 @@ public class CreateEntryFromJar extends Action {
 
         logger.info("Private App Store Package {} successfully created and added to repository {}", packageName, modulesPackage.getParent().getPath());
 
-        session.save();
-        return buildUploadResult(request, renderContext, modulesPackage, formParams);
+        ctx.session.save();
+        return buildUploadResult(ctx.request, ctx.renderContext, modulesPackage, ctx.formParams);
     }
 
     private JCRNodeWrapper upsertPackageNode(HttpServletRequest request, JCRNodeWrapper repositoryStart,
@@ -376,16 +425,12 @@ public class CreateEntryFromJar extends Action {
         }
     }
 
-    private ActionResult createModule(DiskFileItem uploadedFile, Attributes attributes, HttpServletRequest request, RenderContext renderContext, Resource resource, JCRSessionWrapper session, String extension, Map<String, List<String>> formParams) throws Exception {
-        JCRNodeWrapper repository = resource.getNode();
-
-        Map<String, List<String>> moduleParams = new HashMap<>();
-        String groupId;
-        String version = attributes.getValue("Implementation-Version");
-        String moduleName = attributes.getValue(BUNDLE_SYMBOLIC_NAME);
-        groupId = attributes.getValue("Jahia-GroupId");
-        JCRSiteNode site = resource.getNode().getResolveSite();
-
+    private ActionResult createModule(UploadContext ctx, Attributes attributes, String extension)
+            throws RepositoryException, JSONException, IOException {
+        final String version = attributes.getValue("Implementation-Version");
+        final String moduleName = attributes.getValue(BUNDLE_SYMBOLIC_NAME);
+        final String groupId = attributes.getValue("Jahia-GroupId");
+        final Map<String, List<String>> moduleParams = new HashMap<>();
         moduleParams.put(MODULE_NAME, Arrays.asList(moduleName));
         moduleParams.put(GROUP_ID, Arrays.asList(groupId));
         moduleParams.put(Constants.JCR_TITLE, Arrays.asList(attributes.getValue("Implementation-Title")));
@@ -393,41 +438,9 @@ public class CreateEntryFromJar extends Action {
         moduleParams.put(AUTHOR_URL, Arrays.asList(attributes.getValue("Implementation-URL")));
         moduleParams.put(CODE_REPOSITORY, Arrays.asList(attributes.getValue("Jahia-Source-Control-Connection")));
         moduleParams.put(VERSION_NUMBER, Arrays.asList(version));
-
-
-        String reqVersionAttribute = attributes.getValue("Jahia-Required-Version");
-        final String requiredVersion = VERSION_PREFIX + reqVersionAttribute;
-        if (StringUtils.isEmpty(moduleName) || StringUtils.isEmpty(groupId)
-                || StringUtils.isEmpty(reqVersionAttribute) || !isSafeCoordinate(groupId, moduleName)
-                || !isSafeRequiredVersion(reqVersionAttribute)) {
-            return errorResult(session, ERR_MISSING_MANIFEST_ATTRIBUTE);
-        }
-        JCRNodeWrapper versions = getJahiaVersion(requiredVersion, resource, session);
-        moduleParams.put(REQUIRED_VERSION, Arrays.asList(versions.getNode(requiredVersion).getIdentifier()));
-
-        ActionResult deployFailure = deployArtifact(uploadedFile, site, extension, groupId, moduleName, session);
-        if (deployFailure != null) {
-            return deployFailure;
-        }
-
-        Map<String, List<String>> moduleParameters = new HashMap<>();
-        Map<String, List<String>> versionParameters = new HashMap<>();
-        String title = populateParameterMaps(moduleParams, moduleName, MODULE_PARAM_KEYS, moduleParameters, versionParameters);
-
-        logger.info("Start creating Private App Store Module {}", moduleName);
-        logger.info("Start adding module version {} of {}", version, title);
-        final ModulePrep prep = prepareModuleVersion(request, repository, groupId, moduleName, moduleParameters, version, session);
-        if (prep.conflict != null) {
-            return prep.conflict;
-        }
-        final JCRNodeWrapper module = prep.module;
-        createModuleVersion(request, module, versionParameters, version, attributes.getValue("Jahia-Depends"), session);
-
-        logger.info("Module version {} of {} successfully added", version, title);
-        logger.info("Private App Store Module {} successfully created and added to repository {}", moduleName, module.getParent().getPath());
-
-        session.save();
-        return buildUploadResult(request, renderContext, module, formParams);
+        // JAR modules deploy the artifact to the site's Maven repo before node creation.
+        return createForgeModule(ctx, moduleParams, attributes.getValue("Jahia-Required-Version"),
+                attributes.getValue("Jahia-Depends"), true, extension);
     }
 
     private ActionResult deployArtifact(DiskFileItem uploadedFile, JCRSiteNode site, String extension,
@@ -578,7 +591,7 @@ public class CreateEntryFromJar extends Action {
                                             String moduleName, Map<String, List<String>> moduleParameters,
                                             String version, JCRSessionWrapper session)
             throws RepositoryException, JSONException {
-        final String moduleRelPath = groupId.replace(".", "/") + "/" + moduleName;
+        final String moduleRelPath = groupId.replace(".", FileSystem.SEPARATOR) + FileSystem.SEPARATOR + moduleName;
         final JCRNodeWrapper module = upsertModuleNode(request, repository, moduleRelPath, groupId, moduleName, moduleParameters);
         grantOwnerRole(session, module);
         return new ModulePrep(module, versionConflict(module, version, moduleName, session));
