@@ -447,7 +447,7 @@ describe('Authoring views (JS module)', () => {
 
         cy.visit(moduleRender);
         // Open the viewer on the first screenshot (Overview is the default detail tab).
-        cy.get('[aria-label="Open screenshot"]', {timeout: 20000}).first().click();
+        cy.get('[aria-label^="Open screenshot"]', {timeout: 20000}).first().click();
         cy.get('[data-lightbox]').should('exist');
 
         cy.get('[data-lightbox-image]').invoke('attr', 'src').then(firstSrc => {
