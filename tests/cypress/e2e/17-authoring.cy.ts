@@ -438,4 +438,29 @@ describe('Authoring views (JS module)', () => {
         cy.contains('No categories are configured').should('not.exist');
         cy.contains('label', /widgets/i, {timeout: 20000}).should('exist');
     });
+
+    it('screenshot viewer: arrow keys navigate and Escape closes', () => {
+        // Two distinct screenshots so the detail-page lightbox has something to page
+        // through (same source image, different node names -> different URLs).
+        uploadFile('../../assets/screenshot.png', `${repo}/widget/screenshots`, 'kbd-1.png', 'image/png');
+        uploadFile('../../assets/screenshot.png', `${repo}/widget/screenshots`, 'kbd-2.png', 'image/png');
+
+        cy.visit(moduleRender);
+        // Open the viewer on the first screenshot (Overview is the default detail tab).
+        cy.get('[aria-label="Open screenshot"]', {timeout: 20000}).first().click();
+        cy.get('[data-lightbox]').should('exist');
+
+        cy.get('[data-lightbox-image]').invoke('attr', 'src').then(firstSrc => {
+            // ArrowRight advances to the next image...
+            cy.get('body').type('{rightarrow}');
+            cy.get('[data-lightbox-image]').should('have.attr', 'src').and('not.eq', firstSrc);
+            // ...ArrowLeft returns to the first.
+            cy.get('body').type('{leftarrow}');
+            cy.get('[data-lightbox-image]').should('have.attr', 'src', firstSrc);
+        });
+
+        // Escape closes the viewer.
+        cy.get('body').type('{esc}');
+        cy.get('[data-lightbox]').should('not.exist');
+    });
 });
