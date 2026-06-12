@@ -26,6 +26,13 @@ describe('Module upload — UI workflow', () => {
     const createForgeModule: DocumentNode =
         require('graphql-tag/loader!../fixtures/graphql/mutation/createForgeModule.graphql');
 
+    const getNodeProperty: DocumentNode =
+        require('graphql-tag/loader!../fixtures/graphql/query/getNodeProperties.graphql');
+
+    const primaryType = (path: string) =>
+        cy.apollo({query: getNodeProperty, variables: {path, name: 'jcr:primaryType', language: null}, fetchPolicy: 'no-cache'})
+            .its('data.jcr.nodeByPath.properties[0].value');
+
     before(() => {
         cy.login();
         try {
@@ -124,5 +131,36 @@ describe('Module upload — UI workflow', () => {
         cy.contains('[role="alert"]', 'choose a module package').should('be.visible');
         cy.location('pathname').should('include', 'my-modules.html');
         cy.location('pathname').should('not.include', 'createEntryFromJar');
+    });
+
+    it('uploads a JS-module .tgz through the action and creates the forge node + version', function () {
+        // End-to-end coverage of the createJavascriptModule path (the shared module-creation core,
+        // minus the JAR-only Maven deploy which stays out of scope). The JS path attaches the
+        // package to the version node — no Maven/Nexus round-trip — so it is fast and deterministic.
+        cy.request({
+            url: '/modules/jahia-store-template/dist/client/components/forge/ModuleEditor.client.tsx.js',
+            failOnStatusCode: false
+        }).then(res => {
+            if (res.status !== 200) {
+                this.skip();
+            }
+        });
+        const repositoryPath = `/sites/${siteKey}/contents/modules-repository`;
+        cy.login();
+        cy.visit(`/cms/render/default/en/sites/${siteKey}/home/my-modules.html`);
+        cy.get('[data-upload-ready="true"]', {timeout: 20000});
+
+        cy.intercept('POST', /createEntryFromJar\.do/).as('upload');
+        cy.get('input[type="file"][name="file"]').selectFile('assets/cy-js-module.tgz', {force: true});
+        cy.get('[data-upload-ready] button[type="submit"]').click();
+        // Wait for the action to run; its success path commits the node then redirects (which can
+        // tear down response capture), so the authoritative check is the created node below.
+        cy.wait('@upload', {timeout: 60000});
+
+        // The createJavascriptModule path created the module under its groupId path
+        // (groupId-as-folders + name) with a version child (name-version).
+        const modulePath = `${repositoryPath}/org/cypress/test/cy-js-module`;
+        primaryType(modulePath).should('equal', 'jnt:forgeModule');
+        primaryType(`${modulePath}/cy-js-module-1.0.0`).should('equal', 'jnt:forgeModuleVersion');
     });
 });
