@@ -463,4 +463,33 @@ describe('Authoring views (JS module)', () => {
         cy.get('body').type('{esc}');
         cy.get('[data-lightbox]').should('not.exist');
     });
+
+    it('rejects an invalid video id without writing the video node', () => {
+        cy.intercept('POST', '/modules/graphql').as('gql');
+        cy.visit(moduleRender);
+        openEditorMediaTab();
+
+        cy.get('#edit-video-provider').select('youtube');
+        cy.get('[data-video-id]').clear().type('../../etc/passwd');
+        cy.get('[data-video-save]').click();
+
+        // The manager surfaces an error and writes nothing (the guard short-circuits before any
+        // GraphQL mutation), so the video node stays absent.
+        cy.get('[data-video-manager] [role="alert"]', {timeout: 20000}).should('be.visible');
+        readProp(`${repo}/widget/video`, 'provider').its('data.jcr.nodeByPath').should('not.exist');
+    });
+
+    it('uploads a screenshot through the Media-tab control and rejects a non-image', () => {
+        cy.visit(moduleRender);
+        openEditorMediaTab();
+
+        // Happy path: a PNG picked through the UI is uploaded and shown.
+        cy.get('[data-screenshot-input]').selectFile('assets/screenshot.png', {force: true});
+        cy.get('[data-screenshot-name="screenshot.png"]', {timeout: 20000}).should('exist');
+
+        // A non-image file is rejected client-side with an error and adds no thumbnail.
+        cy.get('[data-screenshot-input]').selectFile('assets/provisioning.yml', {force: true});
+        cy.get('[data-screenshots-ready] [role="alert"]', {timeout: 20000}).should('be.visible');
+        cy.get('[data-screenshot-name="provisioning.yml"]').should('not.exist');
+    });
 });
