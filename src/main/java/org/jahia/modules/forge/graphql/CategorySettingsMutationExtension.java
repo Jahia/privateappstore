@@ -6,7 +6,6 @@ import graphql.annotations.annotationTypes.GraphQLName;
 import graphql.annotations.annotationTypes.GraphQLNonNull;
 import graphql.annotations.annotationTypes.GraphQLTypeExtension;
 import org.apache.commons.lang.StringUtils;
-import org.apache.jackrabbit.core.fs.FileSystem;
 import org.jahia.modules.forge.settings.ForgeSettingsService;
 import org.jahia.modules.graphql.provider.dxm.DXGraphQLProvider;
 import org.jahia.services.content.JCRCallback;
@@ -14,8 +13,6 @@ import org.jahia.services.content.JCRContentUtils;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.content.JCRSessionWrapper;
-import org.jahia.services.content.JCRTemplate;
-import org.jahia.services.sites.JahiaSitesService;
 
 import javax.jcr.AccessDeniedException;
 import javax.jcr.ItemNotFoundException;
@@ -29,7 +26,6 @@ import java.util.Locale;
 public final class CategorySettingsMutationExtension {
 
     private static final String PERMISSION = "siteAdminForgeSettings";
-    private static final String SITES_PATH = JahiaSitesService.SITES_JCR_PATH + FileSystem.SEPARATOR;
     private static final String JCR_TITLE = "jcr:title";
     private static final String JNT_CATEGORY = "jnt:category";
     private static final String WORKSPACE_DEFAULT = "default";
@@ -184,25 +180,7 @@ public final class CategorySettingsMutationExtension {
     }
 
     private static <T> T execute(String siteKey, JCRCallback<T> work) {
-        ForgeSettingsMutationExtension.validateSiteKey(siteKey);
-        try {
-            return JCRTemplate.getInstance().doExecuteWithSystemSession(session -> {
-                final String sitePath = SITES_PATH + siteKey;
-                if (!session.nodeExists(sitePath)) {
-                    throw new RepositoryException("Site not found: " + siteKey);
-                }
-
-                final JCRSessionWrapper callerSession = JCRSessionFactory.getInstance().getCurrentUserSession();
-                if (!callerSession.nodeExists(sitePath)
-                        || !callerSession.getNode(sitePath).hasPermission(PERMISSION)) {
-                    throw new AccessDeniedException(PERMISSION);
-                }
-
-                return work.doInJCR(session);
-            });
-        } catch (RepositoryException e) {
-            throw new ForgeSettingsException(
-                    "Category settings mutation failed for site " + siteKey, e);
-        }
+        return ForgeSiteAccess.executeAsSystemForSite(
+                siteKey, PERMISSION, "Category settings mutation failed for site ", work);
     }
 }
