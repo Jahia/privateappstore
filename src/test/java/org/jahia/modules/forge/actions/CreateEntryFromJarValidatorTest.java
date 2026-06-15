@@ -109,4 +109,24 @@ class CreateEntryFromJarValidatorTest {
         // For an accepted extension the returned value is the interned constant, not the input slice.
         assertThat(CreateEntryFromJar.trustedExtension("a.JAR")).isNull(); // case-sensitive: only lowercase jar
     }
+
+    @Test
+    @DisplayName("isVersionAlreadyDeployed detects the Nexus release-repo 'cannot be updated' 400")
+    void isVersionAlreadyDeployed_nexusRedeployBlocked() {
+        final String mavenError = " Failed to deploy artifacts: Could not transfer artifact "
+                + "org.jahia.community.modules:autofileuploader:jar:2.0.0 ... status: 400 "
+                + "jahia-public-app-store/.../autofileuploader-2.0.0.jar cannot be updated -> [Help 1]";
+        assertThat(CreateEntryFromJar.isVersionAlreadyDeployed(mavenError)).isTrue();
+        // Case-insensitive (defensive against future Nexus phrasing tweaks).
+        assertThat(CreateEntryFromJar.isVersionAlreadyDeployed("artifact CANNOT BE UPDATED")).isTrue();
+    }
+
+    @Test
+    @DisplayName("isVersionAlreadyDeployed is false for other deploy failures and null")
+    void isVersionAlreadyDeployed_otherFailures() {
+        assertThat(CreateEntryFromJar.isVersionAlreadyDeployed(null)).isFalse();
+        assertThat(CreateEntryFromJar.isVersionAlreadyDeployed(
+                "Could not transfer artifact ...: Authentication failed ... 401 Unauthorized")).isFalse();
+        assertThat(CreateEntryFromJar.isVersionAlreadyDeployed("Connection refused")).isFalse();
+    }
 }

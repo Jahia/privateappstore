@@ -3,6 +3,9 @@ package org.jahia.modules.forge.settings;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -35,5 +38,29 @@ class ForgeSettingsServiceImplTest {
                 .isEqualTo("\\2a\\29\\28uid=\\2a");
         // Backslash is escaped before the others so its own escape is not re-escaped.
         assertThat(ForgeSettingsServiceImpl.escape("\\*")).isEqualTo("\\5c\\2a");
+    }
+
+    @Test
+    @DisplayName("decodePassword returns null for a blank value")
+    void decodePassword_blank() {
+        assertThat(ForgeSettingsServiceImpl.decodePassword(null)).isNull();
+        assertThat(ForgeSettingsServiceImpl.decodePassword("")).isNull();
+        assertThat(ForgeSettingsServiceImpl.decodePassword("   ")).isNull();
+    }
+
+    @Test
+    @DisplayName("decodePassword decodes a base64-encoded value (how save()/the UI store it)")
+    void decodePassword_base64() {
+        final String encoded = Base64.getEncoder().encodeToString("s3cr3t!".getBytes(StandardCharsets.UTF_8));
+        assertThat(ForgeSettingsServiceImpl.decodePassword(encoded)).isEqualTo("s3cr3t!");
+    }
+
+    @Test
+    @DisplayName("decodePassword falls back to the raw value when it is not valid base64 (hand-edited .cfg)")
+    void decodePassword_plaintextFallback() {
+        // A password typed straight into karaf/etc — the space and '!' make it invalid base64, so
+        // it must be used as-is rather than throwing (which would break every get() for the site).
+        assertThat(ForgeSettingsServiceImpl.decodePassword("my plaintext pwd!"))
+                .isEqualTo("my plaintext pwd!");
     }
 }

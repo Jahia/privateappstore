@@ -130,10 +130,7 @@ public class ForgeSettingsServiceImpl implements ForgeSettingsService {
     }
 
     private ForgeSettings toSettings(Dictionary<String, Object> d) {
-        final String pw64 = str(d, P_PASSWORD);
-        final String password = StringUtils.isNotBlank(pw64)
-                ? new String(Base64.getDecoder().decode(pw64), StandardCharsets.UTF_8)
-                : null;
+        final String password = decodePassword(str(d, P_PASSWORD));
         return ForgeSettings.builder()
                 .url(str(d, P_URL))
                 .id(str(d, P_ID))
@@ -155,6 +152,23 @@ public class ForgeSettingsServiceImpl implements ForgeSettingsService {
     private static String str(Dictionary<String, Object> d, String key) {
         final Object v = d.get(key);
         return (v != null) ? v.toString() : null;
+    }
+
+    /**
+     * Decode the stored password. {@link #save} (and the admin UI) store it base64-encoded, but a
+     * value hand-typed into the {@code karaf/etc} .cfg may not be valid base64 — fall back to the
+     * raw value instead of letting {@link Base64} throw, which would break every {@code get()} for
+     * the site (the proxy, the upload deploy, the storefront chrome all call it).
+     */
+    static String decodePassword(String stored) {
+        if (StringUtils.isBlank(stored)) {
+            return null;
+        }
+        try {
+            return new String(Base64.getDecoder().decode(stored), StandardCharsets.UTF_8);
+        } catch (IllegalArgumentException e) {
+            return stored;
+        }
     }
 
     private static void putOrRemove(Dictionary<String, Object> d, String key, String value) {
