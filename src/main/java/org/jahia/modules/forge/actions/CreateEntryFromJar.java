@@ -462,10 +462,25 @@ public class CreateEntryFromJar extends Action {
             deployToMaven(groupId, moduleName, moduleReleaseInfo, artifact);
             return null;
         } catch (IOException e) {
-            return errorResult(session, "forge.uploadJar.error.cannot.upload");
+            // A release repository (e.g. Nexus hosted "release") refuses to overwrite an existing
+            // version -> surface an actionable "bump the version" message instead of the raw Maven
+            // failure. Any other deploy error stays generic (the detail is in the server log).
+            final String key = isVersionAlreadyDeployed(e.getMessage())
+                    ? "forge.uploadJar.error.version.already.deployed"
+                    : "forge.uploadJar.error.cannot.upload";
+            return errorResult(session, key);
         } finally {
             FileUtils.deleteQuietly(artifact);
         }
+    }
+
+    /**
+     * True when a Maven deploy failed because the version already exists in a release repository:
+     * Nexus answers HTTP 400 "... cannot be updated" (redeploy disabled on release repos). Matched
+     * on that phrase, which {@link #getMavenError} keeps from the {@code [ERROR]} lines.
+     */
+    static boolean isVersionAlreadyDeployed(String mavenError) {
+        return mavenError != null && StringUtils.containsIgnoreCase(mavenError, "cannot be updated");
     }
 
     /**
