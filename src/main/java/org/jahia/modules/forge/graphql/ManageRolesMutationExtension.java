@@ -9,13 +9,8 @@ import org.apache.jackrabbit.core.fs.FileSystem;
 import org.jahia.modules.graphql.provider.dxm.DXGraphQLProvider;
 import org.jahia.services.content.JCRCallback;
 import org.jahia.services.content.JCRNodeWrapper;
-import org.jahia.services.content.JCRSessionFactory;
-import org.jahia.services.content.JCRSessionWrapper;
-import org.jahia.services.content.JCRTemplate;
 import org.jahia.services.sites.JahiaSitesService;
 
-import javax.jcr.AccessDeniedException;
-import javax.jcr.RepositoryException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -118,27 +113,7 @@ public final class ManageRolesMutationExtension {
     }
 
     private static <T> T execute(String siteKey, JCRCallback<T> work) {
-        // Reject a path-traversal siteKey before it is concatenated into a JCR site path — the
-        // sibling mutation/query extensions all validate first; this one must too (SECURITY-571).
-        ForgeSettingsMutationExtension.validateSiteKey(siteKey);
-        try {
-            return JCRTemplate.getInstance().doExecuteWithSystemSession(session -> {
-                final String sitePath = SITES_PATH + siteKey;
-                if (!session.nodeExists(sitePath)) {
-                    throw new RepositoryException("Site not found: " + siteKey);
-                }
-
-                final JCRSessionWrapper callerSession = JCRSessionFactory.getInstance().getCurrentUserSession();
-                if (!callerSession.nodeExists(sitePath)
-                        || !callerSession.getNode(sitePath).hasPermission(PERMISSION)) {
-                    throw new AccessDeniedException(PERMISSION);
-                }
-
-                return work.doInJCR(session);
-            });
-        } catch (RepositoryException e) {
-            throw new ForgeSettingsException(
-                    "Manage-roles mutation failed for site " + siteKey, e);
-        }
+        return ForgeSiteAccess.executeAsSystemForSite(
+                siteKey, PERMISSION, "Manage-roles mutation failed for site ", work);
     }
 }
