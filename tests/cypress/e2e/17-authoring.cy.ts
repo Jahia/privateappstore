@@ -434,9 +434,43 @@ describe('Authoring views (JS module)', () => {
         cy.visit(moduleRender);
         cy.get('[data-editor-ready]', {timeout: 20000});
         cy.contains('button', /edit module/i).click();
-        // The category control lives on the default (General) tab.
+        // The category control lives on the default (General) tab. Categories now use a
+        // tag-style chip picker: a configured-but-unselected category appears as an option
+        // in the add-dropdown (not a checkbox label).
         cy.contains('No categories are configured').should('not.exist');
-        cy.contains('label', /widgets/i, {timeout: 20000}).should('exist');
+        cy.get('#edit-category', {timeout: 20000}).find('option').contains(/widgets/i).should('exist');
+    });
+
+    it('category picker works like the tag chips: pick adds a chip, × removes it', () => {
+        // Configure two categories so the dropdown still offers one after the first is picked.
+        cy.apollo({
+            mutation: addNode,
+            variables: {parentPath: `/sites/${siteKey}`, name: 'cy-cats2', primaryNodeType: 'jnt:category'}
+        }).then(result => {
+            const rootUuid = (result.data as {jcr: {addNode: {node: {uuid: string}}}}).jcr.addNode.node.uuid;
+            cy.apollo({mutation: setRootCategory, variables: {siteKey, rootCategoryUuid: rootUuid}});
+        });
+        cy.apollo({mutation: addForgeCategory, variables: {siteKey, name: 'alpha'}});
+        cy.apollo({mutation: addForgeCategory, variables: {siteKey, name: 'beta'}});
+
+        cy.visit(moduleRender);
+        cy.get('[data-editor-ready]', {timeout: 20000});
+        cy.contains('button', /edit module/i).click();
+
+        // Pick "alpha" from the add-dropdown — it becomes a removable chip and leaves the dropdown.
+        cy.get('#edit-category', {timeout: 20000}).select('alpha');
+        cy.get('[data-category-select]').contains('li', 'alpha').should('be.visible');
+        cy.get('#edit-category').find('option').contains(/alpha/i).should('not.exist');
+        // "beta" is still offered.
+        cy.get('#edit-category').find('option').contains(/beta/i).should('exist');
+
+        // The chip's × removes it and returns it to the dropdown.
+        cy.get('[data-category-select]')
+            .contains('li', 'alpha')
+            .find('button[aria-label^="Remove category"]')
+            .click();
+        cy.get('[data-category-select]').contains('li', 'alpha').should('not.exist');
+        cy.get('#edit-category').find('option').contains(/alpha/i).should('exist');
     });
 
     it('screenshot viewer: arrow keys navigate and Escape closes', () => {
