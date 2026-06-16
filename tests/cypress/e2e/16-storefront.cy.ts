@@ -37,6 +37,28 @@ describe('Storefront read views (JS module)', () => {
     const addNode = (parentPath: string, name: string, primaryNodeType: string, properties: object[] = []) =>
         cy.apollo({mutation: addNodeWithProps, variables: {parentPath, name, primaryNodeType, properties}});
 
+    /**
+     * Clear the header search via its native clear gesture (the `search` event) and wait for the
+     * programmatic-submit reload it triggers. `.trigger('search')` causes a requestSubmit()
+     * navigation that Cypress doesn't track as a page-load like a click/{enter} does, so a bare
+     * assertion straight after would straddle the reload (and inherit the empty subject the
+     * @jahia/cypress console-error logger injects on window:load). Stamping window and waiting for
+     * the stamp to vanish is reload-safe — a window object doesn't detach mid-navigation like a DOM
+     * node — so later assertions run on the settled, reloaded page. Mirrors 17-authoring's
+     * saveAndWaitReload.
+     */
+    const clearHeaderSearchAndWaitReload = (): void => {
+        cy.window().then(w => {
+            (w as unknown as {__preClear?: boolean}).__preClear = true;
+        });
+        cy.get('header [role="search"] input[name="src_terms"]:visible', {timeout: 20000})
+            .clear()
+            .trigger('search');
+        cy.window({timeout: 20000}).should(w => {
+            expect((w as unknown as {__preClear?: boolean}).__preClear).to.be.undefined;
+        });
+    };
+
     before(function () {
         cy.request({url: islandBundle, failOnStatusCode: false}).then(res => {
             if (res.status !== 200) {
@@ -198,6 +220,36 @@ describe('Storefront read views (JS module)', () => {
             .should('exist');
         cy.get('header [role="search"] input[name="src_terms"]:visible').type('toolkit{enter}');
         cy.location('search').should('include', 'src_terms=toolkit').and('include', 'status=community');
+        cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible');
+        cy.contains('[data-forge-card]', 'Analytics Dashboard').should('not.exist');
+    });
+
+    it('re-applies the filter when the search is cleared, dropping the keyword', () => {
+        cy.visit(`${homeRender}?src_terms=seo`);
+        cy.get('[data-forge-list]', {timeout: 20000});
+        cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible');
+        cy.contains('[data-forge-card]', 'Analytics Dashboard').should('not.exist');
+        // The native type=search "×" empties the field but does not submit; clearing fires a
+        // `search` event and the AdvancedSearchSync island submits the now-empty form, so the
+        // keyword filter lifts without the user pressing Enter. (Cypress can't click the native
+        // clear pseudo-element, so we reproduce the gesture: clear the value + emit `search`.)
+        clearHeaderSearchAndWaitReload();
+        // On the settled, reloaded page the keyword is gone and the previously filtered-out module
+        // is back.
+        cy.location('search').should('not.contain', 'src_terms=seo');
+        cy.contains('[data-forge-card]', 'Analytics Dashboard').should('be.visible');
+    });
+
+    it('keeps the active status facet when the search is cleared', () => {
+        cy.visit(`${homeRender}?status=community&src_terms=toolkit`);
+        // Wait for the island to inject the carried facet as a hidden input before clearing,
+        // else the cleared submit would drop it.
+        cy.get('header [role="search"] input[type="hidden"][name="status"][value="community"]', {timeout: 20000})
+            .should('exist');
+        clearHeaderSearchAndWaitReload();
+        // On the settled, reloaded page the keyword is gone but the carried status facet survives.
+        cy.location('search').should('include', 'status=community').and('not.contain', 'src_terms=toolkit');
+        // The community filter still excludes the supported module.
         cy.contains('[data-forge-card]', 'SEO Toolkit').should('be.visible');
         cy.contains('[data-forge-card]', 'Analytics Dashboard').should('not.exist');
     });
