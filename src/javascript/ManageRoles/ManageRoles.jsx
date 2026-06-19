@@ -112,7 +112,7 @@ export function ManageRoles({siteKey}) {
         );
     }
 
-    const settings = data && data.manageRolesSettings;
+    const settings = data && data.forge && data.forge.manageRolesSettings;
     if (!settings) {
         return <div className={styles.roles_error} role="alert">{t('errors.load.failed')}</div>;
     }
@@ -207,9 +207,9 @@ export function ManageRoles({siteKey}) {
                                         }}
                                     />
                                 </div>
-                                {searchData && searchData.searchForgePrincipals && searchData.searchForgePrincipals.length > 0 ? (
+                                {searchData && searchData.forge && searchData.forge.searchPrincipals && searchData.forge.searchPrincipals.length > 0 ? (
                                     <ul className={styles.roles_search_results}>
-                                        {searchData.searchForgePrincipals.map(p => (
+                                        {searchData.forge.searchPrincipals.map(p => (
                                             <li
                                                 key={`${p.type}:${p.name}`}
                                                 className={styles.roles_search_result}

@@ -1,3 +1,5 @@
 mutation AddForgeCategory($siteKey: String!, $name: String!) {
-    addForgeCategory(siteKey: $siteKey, name: $name)
+    forge {
+        addCategory(siteKey: $siteKey, name: $name)
+    }
 }

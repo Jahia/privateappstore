@@ -53,7 +53,7 @@ describe('Forge settings — live UI', () => {
         cy.contains(/success|updated|saved/i, {timeout: 15000}).should('be.visible');
 
         cy.apollo({query: getForgeSettings, variables: {siteKey}})
-            .its('data.forgeSettings')
+            .its('data.forge.settings')
             .should((s: { url: string; id: string; user: string; passwordSet: boolean }) => {
                 expect(s.url).to.equal('https://store.example.com');
                 expect(s.id).to.equal('forge-ui-1');

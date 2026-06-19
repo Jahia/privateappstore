@@ -1,13 +1,7 @@
 package org.jahia.modules.forge.graphql;
 
-import graphql.annotations.annotationTypes.GraphQLDescription;
-import graphql.annotations.annotationTypes.GraphQLField;
-import graphql.annotations.annotationTypes.GraphQLName;
-import graphql.annotations.annotationTypes.GraphQLNonNull;
-import graphql.annotations.annotationTypes.GraphQLTypeExtension;
 import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.core.fs.FileSystem;
-import org.jahia.modules.graphql.provider.dxm.DXGraphQLProvider;
 import org.jahia.services.content.JCRContentUtils;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionFactory;
@@ -28,9 +22,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@GraphQLTypeExtension(DXGraphQLProvider.Query.class)
-@GraphQLName("ManageRolesQueries")
-@GraphQLDescription("Private App Store role-management queries")
+/**
+ * Logic holder for the Private App Store role-management read operations. The GraphQL surface is
+ * {@code query { forge { manageRolesSettings / searchPrincipals } }} — see {@link ForgeQuery},
+ * which delegates here. (Formerly a flat {@code @GraphQLTypeExtension} contributing
+ * {@code manageRolesSettings} and {@code searchForgePrincipals} straight onto the root Query.)
+ */
 public final class ManageRolesQueryExtension {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageRolesQueryExtension.class);
@@ -51,11 +48,7 @@ public final class ManageRolesQueryExtension {
     private ManageRolesQueryExtension() {
     }
 
-    @GraphQLField
-    @GraphQLName("manageRolesSettings")
-    @GraphQLDescription("Read the role-management settings for a site")
-    public static GqlManageRolesSettings getManageRolesSettings(
-            @GraphQLName("siteKey") @GraphQLNonNull final String siteKey) {
+    public static GqlManageRolesSettings getManageRolesSettings(final String siteKey) {
         ForgeSettingsMutationExtension.validateSiteKey(siteKey);
         try {
             return JCRTemplate.getInstance().doExecuteWithSystemSession(session ->
@@ -131,13 +124,8 @@ public final class ManageRolesQueryExtension {
                 && FORGE_ROLES.contains(grant[2]);
     }
 
-    @GraphQLField
-    @GraphQLName("searchForgePrincipals")
-    @GraphQLDescription("Find users or groups whose name contains the given term (case-insensitive)")
-    public static List<GqlPrincipal> searchForgePrincipals(
-            @GraphQLName("siteKey") @GraphQLNonNull final String siteKey,
-            @GraphQLName("searchTerm") @GraphQLNonNull final String searchTerm,
-            @GraphQLName("type") @GraphQLNonNull final PrincipalType type) {
+    public static List<GqlPrincipal> searchForgePrincipals(final String siteKey, final String searchTerm,
+                                                           final PrincipalType type) {
         ForgeSettingsMutationExtension.validateSiteKey(siteKey);
         if (StringUtils.isBlank(searchTerm)) {
             return Collections.emptyList();

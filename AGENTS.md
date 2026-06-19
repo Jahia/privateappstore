@@ -80,8 +80,11 @@ authenticated users are denied (`GqlAccessDeniedException`). This shapes the API
   branding read by the jahia-store-template chrome: `forgeSettingsLogo` (weakreference to
   a media image) plus footer strings `forgeSettingsCopyright` / `*PrivacyUrl` /
   `*TermsUrl` / `*CookiesUrl` / `*FacebookUrl` / `*LinkedinUrl` / `*TwitterUrl` /
-  `*YoutubeUrl`. Exposed/edited via the `forgeSettings` query + `updateForgeSettings`
-  mutation (shared `ForgeSettingsReader`; `GqlForgeSettings` uses a builder).
+  `*YoutubeUrl`. Exposed/edited via the `forge { settings }` query + `forge { updateSettings }`
+  mutation (shared `ForgeSettingsReader`; `GqlForgeSettings` uses a builder). All store GraphQL
+  operations are namespaced under a single `forge` field on the root Query/Mutation
+  (`ForgeQueryExtension`/`ForgeMutationExtension` → `ForgeQuery`/`ForgeMutation` containers),
+  rather than flat top-level fields.
 
 ## Directory map
 

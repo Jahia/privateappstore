@@ -4,10 +4,12 @@ mutation RevokeSiteRole(
     $principalName: String!
     $principalType: ForgePrincipalType!
 ) {
-    revokeSiteRole(
-        siteKey: $siteKey
-        role: $role
-        principalName: $principalName
-        principalType: $principalType
-    )
+    forge {
+        revokeRole(
+            siteKey: $siteKey
+            role: $role
+            principalName: $principalName
+            principalType: $principalType
+        )
+    }
 }

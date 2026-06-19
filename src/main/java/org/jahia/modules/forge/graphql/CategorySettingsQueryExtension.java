@@ -1,13 +1,7 @@
 package org.jahia.modules.forge.graphql;
 
-import graphql.annotations.annotationTypes.GraphQLDescription;
-import graphql.annotations.annotationTypes.GraphQLField;
-import graphql.annotations.annotationTypes.GraphQLName;
-import graphql.annotations.annotationTypes.GraphQLNonNull;
-import graphql.annotations.annotationTypes.GraphQLTypeExtension;
 import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.core.fs.FileSystem;
-import org.jahia.modules.graphql.provider.dxm.DXGraphQLProvider;
 import org.jahia.services.content.JCRCallback;
 import org.jahia.services.content.JCRNodeIteratorWrapper;
 import org.jahia.services.content.JCRNodeWrapper;
@@ -31,9 +25,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-@GraphQLTypeExtension(DXGraphQLProvider.Query.class)
-@GraphQLName("CategorySettingsQueries")
-@GraphQLDescription("Private App Store category settings queries")
+/**
+ * Logic holder for the Private App Store "read category settings" operation. The GraphQL surface
+ * is {@code query { forge { categorySettings(siteKey: "...") } }} — see {@link ForgeQuery}, which
+ * delegates here. (Formerly a flat {@code @GraphQLTypeExtension} contributing
+ * {@code forgeCategorySettings} straight onto the root Query.)
+ */
 public final class CategorySettingsQueryExtension {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CategorySettingsQueryExtension.class);
@@ -47,11 +44,7 @@ public final class CategorySettingsQueryExtension {
     private CategorySettingsQueryExtension() {
     }
 
-    @GraphQLField
-    @GraphQLName("forgeCategorySettings")
-    @GraphQLDescription("Read the forge category settings for a site")
-    public static GqlForgeCategorySettings getForgeCategorySettings(
-            @GraphQLName("siteKey") @GraphQLNonNull final String siteKey) {
+    public static GqlForgeCategorySettings getForgeCategorySettings(final String siteKey) {
         ForgeSettingsMutationExtension.validateSiteKey(siteKey);
         try {
             return JCRTemplate.getInstance().doExecuteWithSystemSession(new JCRCallback<GqlForgeCategorySettings>() {

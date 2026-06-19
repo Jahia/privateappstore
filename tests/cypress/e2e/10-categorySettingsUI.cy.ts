@@ -103,7 +103,7 @@ describe('Category settings — live UI', () => {
             });
 
         cy.apollo({query: getCategorySettings, variables: {siteKey}, fetchPolicy: 'no-cache'})
-            .its('data.forgeCategorySettings.categories')
+            .its('data.forge.categorySettings.categories')
             .should((cats: Array<{ titles: Array<{ language: string; title: string }> }>) => {
                 expect(cats).to.have.length(1);
                 const titles = Object.fromEntries(cats[0].titles.map(t => [t.language, t.title]));

@@ -3,5 +3,7 @@ mutation UpdateForgeCategoryTitles(
     $uuid: String!
     $titles: [InputForgeCategoryTitle!]!
 ) {
-    updateForgeCategoryTitles(siteKey: $siteKey, uuid: $uuid, titles: $titles)
+    forge {
+        updateCategoryTitles(siteKey: $siteKey, uuid: $uuid, titles: $titles)
+    }
 }

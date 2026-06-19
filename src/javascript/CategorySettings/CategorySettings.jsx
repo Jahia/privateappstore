@@ -53,7 +53,7 @@ export function CategorySettings({siteKey}) {
         );
     }
 
-    const settings = data && data.forgeCategorySettings;
+    const settings = data && data.forge && data.forge.categorySettings;
     if (!settings) {
         return (
             <div className={styles.category_error} role="alert">
@@ -100,10 +100,10 @@ export function CategorySettings({siteKey}) {
             reportSuccess('categories.success.add');
             // Auto-open the editor for the new category so the admin can immediately
             // fill in the per-language titles.
-            const newUuid = addData && addData.addForgeCategory;
+            const newUuid = addData && addData.forge && addData.forge.addCategory;
             if (newUuid) {
                 const refreshed = await refetch();
-                const created = refreshed?.data?.forgeCategorySettings?.categories?.find(c => c.uuid === newUuid);
+                const created = refreshed?.data?.forge?.categorySettings?.categories?.find(c => c.uuid === newUuid);
                 if (created) {
                     openEditor(created);
                 }

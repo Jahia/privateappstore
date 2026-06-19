@@ -43,7 +43,7 @@ describe('Manage roles admin (React + GraphQL)', () => {
 
     it('returns the curated role list with no direct grants on a fresh site', () => {
         cy.apollo({query: getManageRolesSettings, variables: {siteKey}})
-            .its('data.manageRolesSettings')
+            .its('data.forge.manageRolesSettings')
             .should((s: { roles: Array<{ role: string; members: unknown[] }> }) => {
                 const roleNames = s.roles.map(r => r.role);
                 expect(roleNames).to.deep.equal(['store-administrator', 'store-developer', 'reader']);
@@ -56,7 +56,7 @@ describe('Manage roles admin (React + GraphQL)', () => {
             query: searchForgePrincipals,
             variables: {siteKey, searchTerm: rootPrincipal, type: 'USER'}
         })
-            .its('data.searchForgePrincipals')
+            .its('data.forge.searchPrincipals')
             .should((results: Array<{ name: string; type: string }>) => {
                 expect(results.length).to.be.greaterThan(0);
                 expect(results.some(p => p.name === rootPrincipal && p.type === 'USER')).to.be.true;
@@ -73,11 +73,11 @@ describe('Manage roles admin (React + GraphQL)', () => {
                 principalType: 'USER'
             }
         })
-            .its('data.grantSiteRole')
+            .its('data.forge.grantRole')
             .should('equal', true);
 
         cy.apollo({query: getManageRolesSettings, variables: {siteKey}})
-            .its('data.manageRolesSettings.roles')
+            .its('data.forge.manageRolesSettings.roles')
             .should((roles: Array<{ role: string; members: Array<{ name: string; type: string }> }>) => {
                 const admin = roles.find(r => r.role === 'store-administrator');
                 expect(admin, 'store-administrator role present').to.not.be.undefined;
@@ -93,11 +93,11 @@ describe('Manage roles admin (React + GraphQL)', () => {
                 principalType: 'USER'
             }
         })
-            .its('data.revokeSiteRole')
+            .its('data.forge.revokeRole')
             .should('equal', true);
 
         cy.apollo({query: getManageRolesSettings, variables: {siteKey}})
-            .its('data.manageRolesSettings.roles')
+            .its('data.forge.manageRolesSettings.roles')
             .should((roles: Array<{ role: string; members: unknown[] }>) => {
                 const admin = roles.find(r => r.role === 'store-administrator');
                 expect(admin!.members).to.have.length(0);

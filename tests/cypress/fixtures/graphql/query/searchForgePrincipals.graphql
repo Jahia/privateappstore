@@ -1,7 +1,9 @@
 query SearchForgePrincipals($siteKey: String!, $searchTerm: String!, $type: ForgePrincipalType!) {
-    searchForgePrincipals(siteKey: $siteKey, searchTerm: $searchTerm, type: $type) {
-        name
-        type
-        displayName
+    forge {
+        searchPrincipals(siteKey: $siteKey, searchTerm: $searchTerm, type: $type) {
+            name
+            type
+            displayName
+        }
     }
 }

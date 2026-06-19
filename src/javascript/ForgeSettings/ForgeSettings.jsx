@@ -86,8 +86,8 @@ export function ForgeSettings({siteKey}) {
     };
 
     useEffect(() => {
-        if (data && data.forgeSettings) {
-            syncFromSettings(data.forgeSettings);
+        if (data && data.forge && data.forge.settings) {
+            syncFromSettings(data.forge.settings);
         }
     }, [data]);
 
@@ -116,7 +116,7 @@ export function ForgeSettings({siteKey}) {
                     youtubeUrl: footer.youtubeUrl || null
                 }
             });
-            setSaveStatus(result.data && result.data.updateForgeSettings ? 'success' : 'error');
+            setSaveStatus(result.data && result.data.forge && result.data.forge.updateSettings ? 'success' : 'error');
             setPassword('');
         } catch {
             // The failure is surfaced to the user via the 'error' save status; avoid
@@ -126,8 +126,8 @@ export function ForgeSettings({siteKey}) {
     };
 
     const handleCancel = () => {
-        if (data && data.forgeSettings) {
-            syncFromSettings(data.forgeSettings);
+        if (data && data.forge && data.forge.settings) {
+            syncFromSettings(data.forge.settings);
         }
 
         setSaveStatus('cancel');

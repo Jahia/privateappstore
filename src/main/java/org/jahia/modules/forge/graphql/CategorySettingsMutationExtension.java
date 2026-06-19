@@ -1,13 +1,7 @@
 package org.jahia.modules.forge.graphql;
 
-import graphql.annotations.annotationTypes.GraphQLDescription;
-import graphql.annotations.annotationTypes.GraphQLField;
-import graphql.annotations.annotationTypes.GraphQLName;
-import graphql.annotations.annotationTypes.GraphQLNonNull;
-import graphql.annotations.annotationTypes.GraphQLTypeExtension;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.forge.settings.ForgeSettingsService;
-import org.jahia.modules.graphql.provider.dxm.DXGraphQLProvider;
 import org.jahia.services.content.JCRCallback;
 import org.jahia.services.content.JCRContentUtils;
 import org.jahia.services.content.JCRNodeWrapper;
@@ -20,9 +14,12 @@ import javax.jcr.RepositoryException;
 import java.util.List;
 import java.util.Locale;
 
-@GraphQLTypeExtension(DXGraphQLProvider.Mutation.class)
-@GraphQLName("CategorySettingsMutations")
-@GraphQLDescription("Private App Store category settings mutations")
+/**
+ * Logic holder for the Private App Store category-management write operations. The GraphQL surface
+ * is {@code mutation { forge { setRootCategory / addCategory / updateCategoryTitles / deleteCategory } }}
+ * — see {@link ForgeMutation}, which delegates here. (Formerly a flat {@code @GraphQLTypeExtension}
+ * contributing those mutations straight onto the root Mutation.)
+ */
 public final class CategorySettingsMutationExtension {
 
     private static final String PERMISSION = "siteAdminForgeSettings";
@@ -33,12 +30,7 @@ public final class CategorySettingsMutationExtension {
     private CategorySettingsMutationExtension() {
     }
 
-    @GraphQLField
-    @GraphQLName("setRootCategory")
-    @GraphQLDescription("Set the JCR node configured as the site's root category")
-    public static Boolean setRootCategory(
-            @GraphQLName("siteKey") @GraphQLNonNull final String siteKey,
-            @GraphQLName("rootCategoryUuid") @GraphQLNonNull final String rootCategoryUuid) {
+    public static Boolean setRootCategory(final String siteKey, final String rootCategoryUuid) {
         return execute(siteKey, session -> {
             // Validate the target is an actual category before storing it: the gate runs in a
             // system session that bypasses ACLs, so an unvalidated UUID could point the site's
@@ -54,12 +46,7 @@ public final class CategorySettingsMutationExtension {
         });
     }
 
-    @GraphQLField
-    @GraphQLName("addForgeCategory")
-    @GraphQLDescription("Create a jnt:category node under the site's root category, returning its UUID")
-    public static String addForgeCategory(
-            @GraphQLName("siteKey") @GraphQLNonNull final String siteKey,
-            @GraphQLName("name") @GraphQLNonNull final String name) {
+    public static String addForgeCategory(final String siteKey, final String name) {
         if (StringUtils.isBlank(name)) {
             throw new IllegalArgumentException("Category name must not be blank");
         }
@@ -73,13 +60,8 @@ public final class CategorySettingsMutationExtension {
         });
     }
 
-    @GraphQLField
-    @GraphQLName("updateForgeCategoryTitles")
-    @GraphQLDescription("Set per-language jcr:title on a category. Blank/null title removes the translation.")
-    public static Boolean updateForgeCategoryTitles(
-            @GraphQLName("siteKey") @GraphQLNonNull final String siteKey,
-            @GraphQLName("uuid") @GraphQLNonNull final String uuid,
-            @GraphQLName("titles") @GraphQLNonNull final List<InputCategoryTitle> titles) {
+    public static Boolean updateForgeCategoryTitles(final String siteKey, final String uuid,
+                                                    final List<InputCategoryTitle> titles) {
         return execute(siteKey, session -> {
             // Confine titling to a category within THIS site's root-category subtree
             // (the gate is site-scoped; validate the caller-supplied UUID).
@@ -115,12 +97,7 @@ public final class CategorySettingsMutationExtension {
         localized.save();
     }
 
-    @GraphQLField
-    @GraphQLName("deleteForgeCategory")
-    @GraphQLDescription("Delete a category node by UUID")
-    public static Boolean deleteForgeCategory(
-            @GraphQLName("siteKey") @GraphQLNonNull final String siteKey,
-            @GraphQLName("uuid") @GraphQLNonNull final String uuid) {
+    public static Boolean deleteForgeCategory(final String siteKey, final String uuid) {
         return execute(siteKey, session -> {
             // Confine deletion to a category within THIS site's root-category subtree.
             // The gate authorizes against the site, but the system session bypasses

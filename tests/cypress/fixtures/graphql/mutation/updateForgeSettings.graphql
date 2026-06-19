@@ -5,14 +5,16 @@ mutation UpdateForgeSettings(
     $user: String
     $password: String
 ) {
-    updateForgeSettings(
-        siteKey: $siteKey
-        settings: {url: $url, id: $id, user: $user, password: $password}
-    ) {
-        siteKey
-        url
-        id
-        user
-        passwordSet
+    forge {
+        updateSettings(
+            siteKey: $siteKey
+            settings: {url: $url, id: $id, user: $user, password: $password}
+        ) {
+            siteKey
+            url
+            id
+            user
+            passwordSet
+        }
     }
 }

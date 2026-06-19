@@ -1,9 +1,11 @@
 query ForgeSettings($siteKey: String!) {
-    forgeSettings(siteKey: $siteKey) {
-        siteKey
-        url
-        id
-        user
-        passwordSet
+    forge {
+        settings(siteKey: $siteKey) {
+            siteKey
+            url
+            id
+            user
+            passwordSet
+        }
     }
 }

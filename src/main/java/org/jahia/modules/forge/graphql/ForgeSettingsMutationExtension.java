@@ -1,14 +1,8 @@
 package org.jahia.modules.forge.graphql;
 
-import graphql.annotations.annotationTypes.GraphQLDescription;
-import graphql.annotations.annotationTypes.GraphQLField;
-import graphql.annotations.annotationTypes.GraphQLName;
-import graphql.annotations.annotationTypes.GraphQLNonNull;
-import graphql.annotations.annotationTypes.GraphQLTypeExtension;
 import org.apache.jackrabbit.core.fs.FileSystem;
 import org.jahia.modules.forge.settings.ForgeSettings;
 import org.jahia.modules.forge.settings.ForgeSettingsService;
-import org.jahia.modules.graphql.provider.dxm.DXGraphQLProvider;
 import org.jahia.osgi.BundleUtils;
 import org.jahia.services.cache.CacheHelper;
 import org.jahia.services.content.JCRSessionFactory;
@@ -19,9 +13,13 @@ import javax.jcr.AccessDeniedException;
 import javax.jcr.RepositoryException;
 import java.util.regex.Pattern;
 
-@GraphQLTypeExtension(DXGraphQLProvider.Mutation.class)
-@GraphQLName("ForgeSettingsMutations")
-@GraphQLDescription("Private App Store forge settings mutations")
+/**
+ * Logic holder for the Private App Store "update forge settings" operation, plus the shared
+ * {@link #validateSiteKey(String)} and {@link #service()} helpers reused by the other forge
+ * logic holders. The GraphQL surface is {@code mutation { forge { updateSettings(...) } }} —
+ * see {@link ForgeMutation}, which delegates here. (Formerly a flat {@code @GraphQLTypeExtension}
+ * contributing {@code updateForgeSettings} straight onto the root Mutation.)
+ */
 public final class ForgeSettingsMutationExtension {
 
     private static final String PERMISSION = "siteAdminForgeSettings";
@@ -32,12 +30,7 @@ public final class ForgeSettingsMutationExtension {
     private ForgeSettingsMutationExtension() {
     }
 
-    @GraphQLField
-    @GraphQLName("updateForgeSettings")
-    @GraphQLDescription("Create or update the forge settings for a site")
-    public static GqlForgeSettings updateForgeSettings(
-            @GraphQLName("siteKey") @GraphQLNonNull final String siteKey,
-            @GraphQLName("settings") @GraphQLNonNull @GraphQLDescription("Connection + branding fields") final ForgeSettingsInput settings) {
+    public static GqlForgeSettings updateForgeSettings(final String siteKey, final ForgeSettingsInput settings) {
         validateSiteKey(siteKey);
         final String sitePath = SITES_PATH + siteKey;
         try {

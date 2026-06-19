@@ -71,7 +71,7 @@ describe('Category settings admin (React + GraphQL)', () => {
 
     it('returns empty settings before any root is configured', () => {
         cy.apollo({query: getCategorySettings, variables: {siteKey}})
-            .its('data.forgeCategorySettings')
+            .its('data.forge.categorySettings')
             .should((s: { rootCategoryUuid: string | null; siteLanguages: string[]; categories: unknown[] }) => {
                 expect(s.rootCategoryUuid).to.be.null;
                 expect(s.siteLanguages).to.include.members(['en', 'fr']);
@@ -86,7 +86,7 @@ describe('Category settings admin (React + GraphQL)', () => {
         });
 
         cy.apollo({query: getCategorySettings, variables: {siteKey}})
-            .its('data.forgeCategorySettings')
+            .its('data.forge.categorySettings')
             .should((s: { rootCategoryUuid: string; rootCategoryPath: string }) => {
                 expect(s.rootCategoryUuid).to.equal(rootCategoryUuid);
                 expect(s.rootCategoryPath).to.equal(`/sites/${siteKey}/${rootCategoryName}`);
@@ -100,7 +100,7 @@ describe('Category settings admin (React + GraphQL)', () => {
             mutation: addForgeCategory,
             variables: {siteKey, name: 'portlets'}
         })
-            .its('data.addForgeCategory')
+            .its('data.forge.addCategory')
             .should((uuid: string) => {
                 expect(uuid).to.be.a('string').and.not.empty;
                 createdUuid = uuid;
@@ -120,7 +120,7 @@ describe('Category settings admin (React + GraphQL)', () => {
             });
 
             cy.apollo({query: getCategorySettings, variables: {siteKey}})
-                .its('data.forgeCategorySettings.categories')
+                .its('data.forge.categorySettings.categories')
                 .should((categories: Array<{ uuid: string; titles: Array<{ language: string; title: string }> }>) => {
                     const created = categories.find(c => c.uuid === createdUuid);
                     expect(created, 'created category present').to.not.be.undefined;
@@ -135,7 +135,7 @@ describe('Category settings admin (React + GraphQL)', () => {
             });
 
             cy.apollo({query: getCategorySettings, variables: {siteKey}})
-                .its('data.forgeCategorySettings.categories')
+                .its('data.forge.categorySettings.categories')
                 .should('have.length', 0);
         });
     });
@@ -157,10 +157,10 @@ describe('Category settings admin (React + GraphQL)', () => {
         cy.then(() => {
             // DeleteForgeCategory must be REJECTED. cy.apollo catches GraphQL errors and
             // yields the ApolloError (it does not throw), so a successful call would carry
-            // data.deleteForgeCategory; a rejected one carries graphQLErrors and no data.
+            // data.forge.deleteCategory; a rejected one carries graphQLErrors and no data.
             cy.apollo({mutation: deleteForgeCategory, variables: {siteKey, uuid: outsiderUuid}}).then(r => {
                 const res = r as {data?: {deleteForgeCategory?: boolean}; graphQLErrors?: unknown[]};
-                expect(res.data?.deleteForgeCategory, 'no deletion performed').to.not.equal(true);
+                expect(res.data?.forge?.deleteCategory, 'no deletion performed').to.not.equal(true);
                 expect(res.graphQLErrors, 'rejected with a GraphQL error').to.exist;
             });
 
