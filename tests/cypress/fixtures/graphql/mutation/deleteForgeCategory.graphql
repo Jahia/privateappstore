@@ -1,3 +1,5 @@
 mutation DeleteForgeCategory($siteKey: String!, $uuid: String!) {
-    deleteForgeCategory(siteKey: $siteKey, uuid: $uuid)
+    forge {
+        deleteCategory(siteKey: $siteKey, uuid: $uuid)
+    }
 }

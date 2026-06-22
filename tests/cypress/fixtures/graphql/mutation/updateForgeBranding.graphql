@@ -4,12 +4,14 @@ mutation UpdateForgeBranding(
     $copyright: String
     $privacyUrl: String
 ) {
-    updateForgeSettings(siteKey: $siteKey, settings: {logo: $logo, copyright: $copyright, footerLinks: {privacyUrl: $privacyUrl}}) {
-        siteKey
-        copyright
-        footerLinks {
-            privacyUrl
+    forge {
+        updateSettings(siteKey: $siteKey, settings: {logo: $logo, copyright: $copyright, footerLinks: {privacyUrl: $privacyUrl}}) {
+            siteKey
+            copyright
+            footerLinks {
+                privacyUrl
+            }
+            logoPath
         }
-        logoPath
     }
 }

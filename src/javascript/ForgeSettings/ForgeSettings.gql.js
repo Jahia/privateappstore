@@ -2,22 +2,24 @@ import {gql} from '@apollo/client';
 
 export const GET_FORGE_SETTINGS = gql`
     query ForgeSettings($siteKey: String!) {
-        forgeSettings(siteKey: $siteKey) {
-            siteKey
-            url
-            id
-            user
-            passwordSet
-            logoPath
-            copyright
-            footerLinks {
-                privacyUrl
-                termsUrl
-                cookiesUrl
-                facebookUrl
-                linkedinUrl
-                twitterUrl
-                youtubeUrl
+        forge {
+            settings(siteKey: $siteKey) {
+                siteKey
+                url
+                id
+                user
+                passwordSet
+                logoPath
+                copyright
+                footerLinks {
+                    privacyUrl
+                    termsUrl
+                    cookiesUrl
+                    facebookUrl
+                    linkedinUrl
+                    twitterUrl
+                    youtubeUrl
+                }
             }
         }
     }
@@ -40,41 +42,43 @@ export const UPDATE_FORGE_SETTINGS = gql`
         $twitterUrl: String
         $youtubeUrl: String
     ) {
-        updateForgeSettings(
-            siteKey: $siteKey
-            settings: {
-                url: $url
-                id: $id
-                user: $user
-                password: $password
-                logo: $logo
-                copyright: $copyright
-                footerLinks: {
-                    privacyUrl: $privacyUrl
-                    termsUrl: $termsUrl
-                    cookiesUrl: $cookiesUrl
-                    facebookUrl: $facebookUrl
-                    linkedinUrl: $linkedinUrl
-                    twitterUrl: $twitterUrl
-                    youtubeUrl: $youtubeUrl
+        forge {
+            updateSettings(
+                siteKey: $siteKey
+                settings: {
+                    url: $url
+                    id: $id
+                    user: $user
+                    password: $password
+                    logo: $logo
+                    copyright: $copyright
+                    footerLinks: {
+                        privacyUrl: $privacyUrl
+                        termsUrl: $termsUrl
+                        cookiesUrl: $cookiesUrl
+                        facebookUrl: $facebookUrl
+                        linkedinUrl: $linkedinUrl
+                        twitterUrl: $twitterUrl
+                        youtubeUrl: $youtubeUrl
+                    }
                 }
-            }
-        ) {
-            siteKey
-            url
-            id
-            user
-            passwordSet
-            logoPath
-            copyright
-            footerLinks {
-                privacyUrl
-                termsUrl
-                cookiesUrl
-                facebookUrl
-                linkedinUrl
-                twitterUrl
-                youtubeUrl
+            ) {
+                siteKey
+                url
+                id
+                user
+                passwordSet
+                logoPath
+                copyright
+                footerLinks {
+                    privacyUrl
+                    termsUrl
+                    cookiesUrl
+                    facebookUrl
+                    linkedinUrl
+                    twitterUrl
+                    youtubeUrl
+                }
             }
         }
     }

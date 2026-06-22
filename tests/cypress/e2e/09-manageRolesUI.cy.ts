@@ -72,7 +72,7 @@ describe('Manage roles — live UI', () => {
             .should('be.visible');
 
         cy.apollo({query: getManageRolesSettings, variables: {siteKey}})
-            .its('data.manageRolesSettings.roles')
+            .its('data.forge.manageRolesSettings.roles')
             .should((roles: Array<{ role: string; members: Array<{ name: string }> }>) => {
                 const admin = roles.find(r => r.role === 'store-administrator');
                 expect(admin, 'store-administrator role present').to.not.be.undefined;

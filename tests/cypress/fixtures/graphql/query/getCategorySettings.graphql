@@ -1,19 +1,21 @@
 query ForgeCategorySettings($siteKey: String!) {
-    forgeCategorySettings(siteKey: $siteKey) {
-        siteKey
-        rootCategoryUuid
-        rootCategoryPath
-        rootCategoryDisplayName
-        siteLanguages
-        categories {
-            uuid
-            name
-            displayName
-            titles {
-                language
-                title
+    forge {
+        categorySettings(siteKey: $siteKey) {
+            siteKey
+            rootCategoryUuid
+            rootCategoryPath
+            rootCategoryDisplayName
+            siteLanguages
+            categories {
+                uuid
+                name
+                displayName
+                titles {
+                    language
+                    title
+                }
+                usages
             }
-            usages
         }
     }
 }

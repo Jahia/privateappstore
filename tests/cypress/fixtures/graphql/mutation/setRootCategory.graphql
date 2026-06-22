@@ -1,3 +1,5 @@
 mutation SetRootCategory($siteKey: String!, $rootCategoryUuid: String!) {
-    setRootCategory(siteKey: $siteKey, rootCategoryUuid: $rootCategoryUuid)
+    forge {
+        setRootCategory(siteKey: $siteKey, rootCategoryUuid: $rootCategoryUuid)
+    }
 }

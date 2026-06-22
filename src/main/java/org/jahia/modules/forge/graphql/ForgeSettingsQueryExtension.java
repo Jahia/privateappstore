@@ -1,12 +1,6 @@
 package org.jahia.modules.forge.graphql;
 
-import graphql.annotations.annotationTypes.GraphQLDescription;
-import graphql.annotations.annotationTypes.GraphQLField;
-import graphql.annotations.annotationTypes.GraphQLName;
-import graphql.annotations.annotationTypes.GraphQLNonNull;
-import graphql.annotations.annotationTypes.GraphQLTypeExtension;
 import org.apache.jackrabbit.core.fs.FileSystem;
-import org.jahia.modules.graphql.provider.dxm.DXGraphQLProvider;
 import org.jahia.services.content.JCRSessionFactory;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.sites.JahiaSitesService;
@@ -16,9 +10,12 @@ import org.slf4j.LoggerFactory;
 import javax.jcr.AccessDeniedException;
 import javax.jcr.RepositoryException;
 
-@GraphQLTypeExtension(DXGraphQLProvider.Query.class)
-@GraphQLName("ForgeSettingsQueries")
-@GraphQLDescription("Private App Store forge settings queries")
+/**
+ * Logic holder for the Private App Store "read forge settings" operation. The GraphQL surface is
+ * {@code query { forge { settings(siteKey: "...") } }} — see {@link ForgeQuery}, which delegates
+ * here. (Formerly a flat {@code @GraphQLTypeExtension} contributing {@code forgeSettings} straight
+ * onto the root Query.)
+ */
 public final class ForgeSettingsQueryExtension {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ForgeSettingsQueryExtension.class);
@@ -28,11 +25,7 @@ public final class ForgeSettingsQueryExtension {
     private ForgeSettingsQueryExtension() {
     }
 
-    @GraphQLField
-    @GraphQLName("forgeSettings")
-    @GraphQLDescription("Read the forge settings for a site")
-    public static GqlForgeSettings getForgeSettings(
-            @GraphQLName("siteKey") @GraphQLNonNull final String siteKey) {
+    public static GqlForgeSettings getForgeSettings(final String siteKey) {
         ForgeSettingsMutationExtension.validateSiteKey(siteKey);
         final String sitePath = SITES_PATH + siteKey;
         try {

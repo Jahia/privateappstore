@@ -1,12 +1,6 @@
 package org.jahia.modules.forge.graphql;
 
-import graphql.annotations.annotationTypes.GraphQLDescription;
-import graphql.annotations.annotationTypes.GraphQLField;
-import graphql.annotations.annotationTypes.GraphQLName;
-import graphql.annotations.annotationTypes.GraphQLNonNull;
-import graphql.annotations.annotationTypes.GraphQLTypeExtension;
 import org.apache.jackrabbit.core.fs.FileSystem;
-import org.jahia.modules.graphql.provider.dxm.DXGraphQLProvider;
 import org.jahia.services.content.JCRCallback;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.sites.JahiaSitesService;
@@ -16,9 +10,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@GraphQLTypeExtension(DXGraphQLProvider.Mutation.class)
-@GraphQLName("ManageRolesMutations")
-@GraphQLDescription("Private App Store role-management mutations")
+/**
+ * Logic holder for the Private App Store role-management write operations. The GraphQL surface is
+ * {@code mutation { forge { grantRole / revokeRole } }} — see {@link ForgeMutation}, which delegates
+ * here. (Formerly a flat {@code @GraphQLTypeExtension} contributing {@code grantSiteRole} and
+ * {@code revokeSiteRole} straight onto the root Mutation.)
+ */
 public final class ManageRolesMutationExtension {
 
     private static final String PERMISSION = "siteAdminForgeSettings";
@@ -28,14 +25,8 @@ public final class ManageRolesMutationExtension {
     private ManageRolesMutationExtension() {
     }
 
-    @GraphQLField
-    @GraphQLName("grantSiteRole")
-    @GraphQLDescription("Grant a role to a principal on the site node")
-    public static Boolean grantSiteRole(
-            @GraphQLName("siteKey") @GraphQLNonNull final String siteKey,
-            @GraphQLName("role") @GraphQLNonNull final String role,
-            @GraphQLName("principalName") @GraphQLNonNull final String principalName,
-            @GraphQLName("principalType") @GraphQLNonNull final PrincipalType principalType) {
+    public static Boolean grantSiteRole(final String siteKey, final String role,
+                                        final String principalName, final PrincipalType principalType) {
         // Only the store-managed roles may be granted through this gate. Without this an admin
         // with siteAdminForgeSettings could pass an arbitrary role name and create ACL entries
         // beyond the store's intended set (SECURITY-571). The allowlist is the same set the
@@ -52,14 +43,8 @@ public final class ManageRolesMutationExtension {
         });
     }
 
-    @GraphQLField
-    @GraphQLName("revokeSiteRole")
-    @GraphQLDescription("Revoke a single role from a principal on the site node. Leaves other roles untouched.")
-    public static Boolean revokeSiteRole(
-            @GraphQLName("siteKey") @GraphQLNonNull final String siteKey,
-            @GraphQLName("role") @GraphQLNonNull final String role,
-            @GraphQLName("principalName") @GraphQLNonNull final String principalName,
-            @GraphQLName("principalType") @GraphQLNonNull final PrincipalType principalType) {
+    public static Boolean revokeSiteRole(final String siteKey, final String role,
+                                         final String principalName, final PrincipalType principalType) {
         // Same allowlist as grantSiteRole: this gate manages only the store roles, so it must
         // never revoke a non-store role (e.g. strip site-administrator from a principal). Without
         // this a store admin could downgrade arbitrary site grants. (SECURITY-571 review NEW-1)
@@ -93,7 +78,7 @@ public final class ManageRolesMutationExtension {
      * minus the one being revoked. Inherited entries are intentionally excluded —
      * they can only be edited at their source node.
      */
-    private static Set<String> directGrantsExcluding(List<String[]> grants, String sitePath, String roleToRevoke) {
+    static Set<String> directGrantsExcluding(List<String[]> grants, String sitePath, String roleToRevoke) {
         final Set<String> remaining = new HashSet<>();
         for (String[] grant : grants) {
             if (isDirectGrantForOtherRole(grant, sitePath, roleToRevoke)) {

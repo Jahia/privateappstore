@@ -37,7 +37,7 @@ describe('Forge settings admin (React + GraphQL)', () => {
 
     it('returns an empty settings payload before any save', () => {
         cy.apollo({query: getForgeSettings, variables: {siteKey}})
-            .its('data.forgeSettings')
+            .its('data.forge.settings')
             .should((settings: { siteKey: string; url: string | null; passwordSet: boolean }) => {
                 expect(settings.siteKey).to.equal(siteKey);
                 expect(settings.url).to.be.null;
@@ -56,14 +56,14 @@ describe('Forge settings admin (React + GraphQL)', () => {
                 password: 'p@ssw0rd'
             }
         })
-            .its('data.updateForgeSettings')
+            .its('data.forge.updateSettings')
             .should((settings: { url: string; passwordSet: boolean }) => {
                 expect(settings.url).to.equal('https://store.example.com');
                 expect(settings.passwordSet).to.equal(true);
             });
 
         cy.apollo({query: getForgeSettings, variables: {siteKey}})
-            .its('data.forgeSettings')
+            .its('data.forge.settings')
             .should((settings: { url: string; id: string; user: string; passwordSet: boolean }) => {
                 expect(settings.url).to.equal('https://store.example.com');
                 expect(settings.id).to.equal('forge-1');
@@ -83,7 +83,7 @@ describe('Forge settings admin (React + GraphQL)', () => {
                 password: null
             }
         })
-            .its('data.updateForgeSettings.passwordSet')
+            .its('data.forge.updateSettings.passwordSet')
             .should('equal', true);
     });
 

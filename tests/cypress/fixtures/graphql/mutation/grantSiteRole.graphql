@@ -4,10 +4,12 @@ mutation GrantSiteRole(
     $principalName: String!
     $principalType: ForgePrincipalType!
 ) {
-    grantSiteRole(
-        siteKey: $siteKey
-        role: $role
-        principalName: $principalName
-        principalType: $principalType
-    )
+    forge {
+        grantRole(
+            siteKey: $siteKey
+            role: $role
+            principalName: $principalName
+            principalType: $principalType
+        )
+    }
 }
