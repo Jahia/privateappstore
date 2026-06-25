@@ -75,13 +75,21 @@ authenticated users are denied (`GqlAccessDeniedException`). This shapes the API
 - `jnt:post` carries `jcr:title` + `content`.
 - No same-name siblings — `addNode` with an existing name throws
   `ItemExistsException` (used for atomic per-user dedup).
-- **`jmix:forgeSettings`** (mixin on the site node) holds the forge connection
-  (`forgeSettingsUrl`/`Id`/`User`/`Password` base64 + `rootCategory`) AND the site
-  branding read by the jahia-store-template chrome: `forgeSettingsLogo` (weakreference to
-  a media image) plus footer strings `forgeSettingsCopyright` / `*PrivacyUrl` /
-  `*TermsUrl` / `*CookiesUrl` / `*FacebookUrl` / `*LinkedinUrl` / `*TwitterUrl` /
-  `*YoutubeUrl`. Exposed/edited via the `forge { settings }` query + `forge { updateSettings }`
-  mutation (shared `ForgeSettingsReader`; `GqlForgeSettings` uses a builder). All store GraphQL
+- **Forge settings are NOT stored in JCR.** The `jmix:forgeSettings` mixin is dormant (like
+  `jnt:review*` above). Per-site settings — the forge connection (`url`/`id`/`user`/`password`
+  base64 + `rootCategoryUuid`) and the storefront branding read by the jahia-store-template chrome
+  (`logoPath` plus footer strings `copyright` / `privacyUrl` / `termsUrl` / `cookiesUrl` /
+  `facebookUrl` / `linkedinUrl` / `twitterUrl` / `youtubeUrl`) — live in a per-site **OSGi factory
+  configuration** `<karaf.etc>/org.jahia.modules.forge.forgeSettings-<siteKey>.cfg`. They are served
+  by `ForgeSettingsServiceImpl`, a `ManagedServiceFactory` keyed by the `siteKey` property: Felix
+  FileInstall delivers each `.cfg` to `updated()` into a live per-site map; `save()`/`delete()`
+  write/remove that file atomically. File-backed, so settings survive restarts and redeploys (the
+  earlier programmatic `ConfigurationAdmin.createFactoryConfiguration` instances were lost on
+  restart). The logo is a plain DAM **path string**, not a JCR weakreference. Exposed/edited via the
+  `forge { settings }` query + `forge { updateSettings }` mutation (`GqlForgeSettings` uses a
+  builder); the SSR chrome reads branding in-process via
+  `server.osgi.getService("org.jahia.modules.forge.settings.ForgeSettingsService")` (the
+  permission-gated GraphQL field is unusable for anonymous storefront rendering). All store GraphQL
   operations are namespaced under a single `forge` field on the root Query/Mutation
   (`ForgeQueryExtension`/`ForgeMutationExtension` → `ForgeQuery`/`ForgeMutation` containers),
   rather than flat top-level fields.

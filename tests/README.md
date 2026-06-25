@@ -18,7 +18,7 @@ The provisioning manifest installs Jahia plus:
 - `jahia-store` — the backend module being tested (taken from `../target/*-SNAPSHOT.jar` when present, otherwise from Nexus).
 - `jahia-store-template` — the front-end templates set, pulled from a local sibling checkout at `../../store-template/target/*-SNAPSHOT.tgz` when present, otherwise from Nexus (see `provisioning-manifest-snapshot.yml`). The on-disk folder keeps its `store-template/` name.
 
-Nexus is reachable from inside the network at `http://nexus:8081` (Jahia / Cypress) and from the host at `http://localhost:8081`. The forge module's per-site `jnt:forgeSettings` should point at the internal URL when configured by a test, using the credentials exposed via the `NEXUS_USERNAME` / `NEXUS_PASSWORD` environment variables.
+Nexus is reachable from inside the network at `http://nexus:8081` (Jahia / Cypress) and from the host at `http://localhost:8081`. A test configures the forge module's per-site settings (Nexus URL + credentials) through the store admin GraphQL (`forge { updateSettings }`) or the `ForgeSettingsService` — they are stored as a per-site OSGi factory config (`karaf/etc/org.jahia.modules.forge.forgeSettings-<siteKey>.cfg`), not JCR properties. Point the URL at the internal `http://nexus:8081`, using the `NEXUS_USERNAME` / `NEXUS_PASSWORD` credentials.
 
 On first boot Nexus auto-creates two hosted Maven repositories (`maven-releases`, `maven-snapshots`) which the forge module can use without further setup. If you need additional repos for a specific test scenario, create them via the Nexus REST API in a `before()` hook.
 
