@@ -29,6 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.core.fs.FileSystem;
 import org.apache.xerces.impl.dv.util.Base64;
 import org.jahia.data.templates.ModuleReleaseInfo;
+import org.jahia.modules.forge.actions.ActionSecurityUtils;
 import org.jahia.modules.forge.settings.ForgeSettings;
 import org.jahia.modules.forge.settings.ForgeSettingsService;
 import org.jahia.services.content.JCRSessionFactory;
@@ -90,7 +91,11 @@ public class MavenProxy extends HttpServlet {
             // not be able to escape the configured repository root or point at another host. The
             // siteName segment is validated separately (it is concatenated into a JCR path).
             if (isSuspicious(path) || !isValidSiteName(siteName)) {
-                LOGGER.warn("MavenProxy: rejected suspicious request site='{}' path='{}'", siteName, path);
+                // siteName/path are raw request input reaching this sink BEFORE validation (a CR/LF
+                // in path is exactly what trips isSuspicious), so sanitize to prevent log forging
+                // (CWE-117) on this anonymous-reachable branch (SECURITY-571 #58).
+                LOGGER.warn("MavenProxy: rejected suspicious request site='{}' path='{}'",
+                        ActionSecurityUtils.sanitizeForLog(siteName), ActionSecurityUtils.sanitizeForLog(path));
                 trySendError(response, HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
@@ -112,7 +117,7 @@ public class MavenProxy extends HttpServlet {
             if (!callerCanAccessRepository(session, siteName)) {
                 final String caller = (session.getUser() != null) ? session.getUser().getName() : "<none>";
                 LOGGER.warn("MavenProxy: caller '{}' is not authorized for site '{}' module repository",
-                        caller, siteName);
+                        ActionSecurityUtils.sanitizeForLog(caller), ActionSecurityUtils.sanitizeForLog(siteName));
                 trySendError(response, HttpServletResponse.SC_FORBIDDEN);
                 return;
             }
@@ -121,7 +126,8 @@ public class MavenProxy extends HttpServlet {
 
             String repositoryUrl = releaseInfo.getRepositoryUrl();
             if (StringUtils.isBlank(repositoryUrl)) {
-                LOGGER.warn("MavenProxy: site '{}' has no configured repository URL", siteName);
+                LOGGER.warn("MavenProxy: site '{}' has no configured repository URL",
+                        ActionSecurityUtils.sanitizeForLog(siteName));
                 trySendError(response, HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
@@ -132,7 +138,8 @@ public class MavenProxy extends HttpServlet {
             // Canonicalize and confirm the resolved URL still lives under the repository root.
             final URI resolvedUri = UriComponentsBuilder.fromHttpUrl(url).build(false).toUri().normalize();
             if (!resolvedUri.toString().startsWith(repositoryRoot)) {
-                LOGGER.warn("MavenProxy: resolved URL '{}' escapes repository root '{}'", resolvedUri, repositoryRoot);
+                LOGGER.warn("MavenProxy: resolved URL '{}' escapes repository root '{}'",
+                        ActionSecurityUtils.sanitizeForLog(resolvedUri.toString()), repositoryRoot);
                 trySendError(response, HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
