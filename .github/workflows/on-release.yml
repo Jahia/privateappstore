@@ -33,6 +33,16 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.GH_SSH_PRIVATE_KEY_JAHIACI }}
 
+      # The release action forks git inside this container with a HOME that does not
+      # carry checkout@v3's temporary safe.directory entry, so a stricter git in the
+      # runner image now aborts with "detected dubious ownership" (exit 128) before
+      # Maven runs. Register the workspace as safe system-wide so every git invocation
+      # in the container (any HOME/user) is covered.
+      - name: Mark workspace safe for git (container dubious-ownership fix)
+        run: |
+          git config --system --add safe.directory '*'
+          git config --global --add safe.directory '*'
+
       - uses: jahia/jahia-modules-action/release@v2
         name: Release Module
         env:
