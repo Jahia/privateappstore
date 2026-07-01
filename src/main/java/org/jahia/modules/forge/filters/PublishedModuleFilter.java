@@ -39,7 +39,11 @@ public class PublishedModuleFilter extends AbstractFilter {
     public void activate() {
         setPriority(20);
         setApplyOnModes("live");
-        setApplyOnNodeTypes("jnt:forgeModule");
+        // Gate on the shared jmix:forgeElement mixin (carried by jnt:forgeModule AND jnt:forgePackage,
+        // and inherited by any future forge element type) rather than a single concrete type. Binding
+        // to jnt:forgeModule only left draft jnt:forgePackage detail pages fully readable to anonymous
+        // visitors at their (predictable) direct URL (SECURITY-571 #54).
+        setApplyOnNodeTypes("jmix:forgeElement");
     }
 
     @Override
