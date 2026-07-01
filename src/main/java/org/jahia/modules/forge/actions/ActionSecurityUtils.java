@@ -27,9 +27,11 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * Small security helpers shared by upload/redirect actions: site-relative redirect validation
- * and log-input sanitization (CR/LF stripping) to prevent log forging.
+ * and log-input sanitization (CR/LF stripping) to prevent log forging. Public so the single
+ * {@link #sanitizeForLog} implementation can be reused across the bundle (e.g. by the MavenProxy
+ * servlet in the sibling {@code proxy} package) instead of being duplicated (SECURITY-571 #58).
  */
-final class ActionSecurityUtils {
+public final class ActionSecurityUtils {
 
     private ActionSecurityUtils() {
         // utility class - prevent instantiation
@@ -55,7 +57,7 @@ final class ActionSecurityUtils {
      * be used to forge a log line. Returns "null" for null input. Truncated to 200 chars to keep
      * log lines bounded.
      */
-    static String sanitizeForLog(String input) {
+    public static String sanitizeForLog(String input) {
         if (input == null) {
             return "null";
         }

@@ -6,8 +6,10 @@
 <%@ taglib prefix="template" uri="http://www.jahia.org/tags/templateLib" %>
 <json:array>
     <json:object>
+<%-- Emit a stable opaque id (UUID) but NOT the absolute JCR path: the path is
+     internal-structure reconnaissance for anonymous callers and no feed consumer
+     needs it (SECURITY-571 #55). --%>
         <json:property name="id" value="${currentNode.identifier}"/>
-        <json:property name="path" value="${currentNode.path}"/>
         <json:property name="name" value="${currentNode.name}"/>
         <json:property name="title" value="${currentNode.displayableName}"/>
         <json:array name="modules">
@@ -33,9 +35,10 @@
                             <c:set var="icon" value="${iconItem}"/>
                         </c:forEach>
                         <json:object>
+                            <%-- Stable opaque id only; the absolute JCR path and jcr:primaryType are
+                                 internal identifiers withheld from the anonymous feed (SECURITY-571 #55).
+                                 Consumers distinguish modules from packages via groupId ("package"). --%>
                             <json:property name="id" value="${child.identifier}"/>
-                            <json:property name="path" value="${child.path}"/>
-                            <json:property name="jcrprimarytype" value="${child.properties['jcr:primaryType'].string}"/>
                             <c:url context="/" var="localUrl" value="${url.server}${child.url}">
                                 <c:param name="dx" value="true"/>
                             </c:url>

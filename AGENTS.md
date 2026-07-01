@@ -146,5 +146,27 @@ tests/                Cypress E2E (+ env tooling) — see below
 - Domain errors as unchecked exceptions; log server-side, return safe messages.
 - **Do not break the `moduleList.json` external contract** — it is consumed by
   `jahia-store-template` (and possibly external clients).
+
+### Deployment invariant — MavenProxy on a PUBLIC store (SECURITY-571 #57)
+
+`MavenProxy` deliberately serves **raw** Maven coordinates (not only catalogued
+modules) and, on a world-readable `modules-repository`, serves **anonymous**
+callers while using the site's stored Nexus credentials server-side. That is the
+public-app-store download use case. The authorization gate is therefore
+**repository-level** (can the caller read `…/contents/modules-repository`?), not
+artifact-level — an artifact-level gate was tried and **broke** the jnt:file-less
+proxy download (E2E spec 14), so do **not** re-introduce one.
+
+The residual is a *confused-deputy on a misconfigured deployment*, not an in-module
+code bug. Operators MUST honour this invariant:
+
+- **Never co-locate private binaries under the same Nexus repository root as a
+  public catalogue.** Anything resolvable under `ForgeSettings.repositoryUrl` is
+  reachable through the proxy with the site's credentials.
+- When the catalogue is public but some artifacts must stay private, apply a
+  restrictive **ACL on the `modules-repository` node** (deny guest READ) — that
+  makes the repository-level gate return 403 for anonymous callers.
+- Prefer a dedicated **least-privilege upstream credential** scoped to the public
+  catalogue only.
 - Commit each change immediately (`git commit -s`), staging only changed files.
   Feature branch: `SECURITY-571-js-module-migration`.
