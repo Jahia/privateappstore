@@ -294,8 +294,12 @@ public class CreateEntryFromJar extends Action {
         final Map<String, List<String>> versionParameters = new HashMap<>();
         final String title = populateParameterMaps(moduleParams, moduleName, MODULE_PARAM_KEYS, moduleParameters, versionParameters);
 
-        logger.info("Start creating Private App Store Module {}", moduleName);
-        logger.info("Start adding module version {} of {}", version, title);
+        // Sanitize archive-supplied coordinates before logging: moduleName/version/title pass the
+        // path-fragment guard (no ../\/) but may still carry CR/LF, which would forge log lines
+        // (CWE-117). Mirrors the already-sanitized error-path sinks (SECURITY-571 #56).
+        logger.info("Start creating Private App Store Module {}", ActionSecurityUtils.sanitizeForLog(moduleName));
+        logger.info("Start adding module version {} of {}",
+                ActionSecurityUtils.sanitizeForLog(version), ActionSecurityUtils.sanitizeForLog(title));
         final ModulePrep prep = prepareModuleVersion(ctx.request, repository, groupId, moduleName, moduleParameters, version, ctx.session);
         if (prep.conflict != null) {
             return prep.conflict;
@@ -303,8 +307,10 @@ public class CreateEntryFromJar extends Action {
         final JCRNodeWrapper module = prep.module;
         final JCRNodeWrapper moduleVersion = createModuleVersion(ctx.request, module, versionParameters, version, dependencies, ctx.session);
 
-        logger.info("Module version {} of {} successfully added", version, title);
-        logger.info("Private App Store Module {} successfully created and added to repository {}", moduleName, module.getParent().getPath());
+        logger.info("Module version {} of {} successfully added",
+                ActionSecurityUtils.sanitizeForLog(version), ActionSecurityUtils.sanitizeForLog(title));
+        logger.info("Private App Store Module {} successfully created and added to repository {}",
+                ActionSecurityUtils.sanitizeForLog(moduleName), module.getParent().getPath());
 
         ctx.session.save();
         if (!deployJar) {
@@ -366,13 +372,14 @@ public class CreateEntryFromJar extends Action {
         Map<String, List<String>> versionParameters = new HashMap<>();
         String title = populateParameterMaps(packageParams, packageName, PACKAGE_PARAM_KEYS, packageParameters, versionParameters);
 
-        logger.info("Start creating Private App Store Package {}", packageName);
+        logger.info("Start creating Private App Store Package {}", ActionSecurityUtils.sanitizeForLog(packageName));
 
         final JCRNodeWrapper modulesPackage = upsertPackageNode(ctx.request, repository, packageRelPath, packageName, packageParameters);
         grantOwnerRole(ctx.session, modulesPackage);
 
         boolean hasPackageVersions = JCRTagUtils.hasChildrenOfType(modulesPackage, JNT_FORGEPACKAGEVERSION);
-        logger.info("Start adding package version {} of {}", version, title);
+        logger.info("Start adding package version {} of {}",
+                ActionSecurityUtils.sanitizeForLog(version), ActionSecurityUtils.sanitizeForLog(title));
 
         if (hasPackageVersions && !hasValidVersionNumber(modulesPackage, version)) {
             String error = Messages.getWithArgs(RESOURCES_JAHIA_STORE, ERR_VERSION_NUMBER, ctx.session.getLocale(), packageName, version);
@@ -383,11 +390,13 @@ public class CreateEntryFromJar extends Action {
         grantOwnerRole(ctx.session, packageVersion);
         packageVersion.uploadFile(ctx.uploadedFile.getName(), ctx.uploadedFile.getInputStream(), ctx.uploadedFile.getContentType());
 
-        logger.info("Package version {} of {} successfully added", version, title);
+        logger.info("Package version {} of {} successfully added",
+                ActionSecurityUtils.sanitizeForLog(version), ActionSecurityUtils.sanitizeForLog(title));
 
         populatePackageModulesList(packageVersion, jar);
 
-        logger.info("Private App Store Package {} successfully created and added to repository {}", packageName, modulesPackage.getParent().getPath());
+        logger.info("Private App Store Package {} successfully created and added to repository {}",
+                ActionSecurityUtils.sanitizeForLog(packageName), modulesPackage.getParent().getPath());
 
         ctx.session.save();
         return buildUploadResult(ctx.request, ctx.renderContext, modulesPackage, ctx.formParams);
