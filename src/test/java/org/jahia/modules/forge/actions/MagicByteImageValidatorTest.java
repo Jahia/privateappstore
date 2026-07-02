@@ -101,4 +101,49 @@ class MagicByteImageValidatorTest {
     void disallowedMimes(String mime) {
         assertThat(MagicByteImageValidator.isAllowedRasterMime(mime)).isFalse();
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "image/svg+xml", "text/html", "application/xhtml+xml", "text/xml", "application/xml",
+            "IMAGE/SVG+XML", "text/html; charset=utf-8", " text/html "})
+    @DisplayName("isScriptCapableMime flags the SVG/HTML/XML family (case- and param-insensitive)")
+    void scriptCapableMimes(String mime) {
+        assertThat(MagicByteImageValidator.isScriptCapableMime(mime)).isTrue();
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"image/png", "image/jpeg", "image/webp", "application/java-archive",
+            "application/gzip", "application/octet-stream", "application/pdf"})
+    @DisplayName("isScriptCapableMime leaves rasters and inert binaries (module artifacts) alone")
+    void nonScriptCapableMimes(String mime) {
+        assertThat(MagicByteImageValidator.isScriptCapableMime(mime)).isFalse();
+    }
+
+    @Test
+    @DisplayName("looksLikeMarkup detects SVG/HTML/XML, including with leading whitespace or a UTF-8 BOM")
+    void detectsMarkup() {
+        assertThat(MagicByteImageValidator.looksLikeMarkup(
+                "<svg xmlns='...'><script>x</script></svg>".getBytes(StandardCharsets.UTF_8))).isTrue();
+        assertThat(MagicByteImageValidator.looksLikeMarkup(
+                "<!doctype html><script>1</script>".getBytes(StandardCharsets.UTF_8))).isTrue();
+        assertThat(MagicByteImageValidator.looksLikeMarkup(
+                "   \n\t <html>".getBytes(StandardCharsets.UTF_8))).isTrue();
+        // UTF-8 BOM (EF BB BF) followed by '<'
+        assertThat(MagicByteImageValidator.looksLikeMarkup(
+                new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF, '<', 's', 'v', 'g'})).isTrue();
+    }
+
+    @Test
+    @DisplayName("looksLikeMarkup returns false for binary/raster/empty content (no false-positive on artifacts)")
+    void ignoresNonMarkup() {
+        // PNG / JPEG / JAR(ZIP 'PK') / gzip magic — none lead with '<'
+        assertThat(MagicByteImageValidator.looksLikeMarkup(withHeader(0x89, 0x50, 0x4E, 0x47))).isFalse();
+        assertThat(MagicByteImageValidator.looksLikeMarkup(withHeader(0xFF, 0xD8, 0xFF))).isFalse();
+        assertThat(MagicByteImageValidator.looksLikeMarkup("PK".getBytes(StandardCharsets.ISO_8859_1))).isFalse();
+        assertThat(MagicByteImageValidator.looksLikeMarkup(withHeader(0x1F, 0x8B))).isFalse();
+        assertThat(MagicByteImageValidator.looksLikeMarkup(new byte[0])).isFalse();
+        assertThat(MagicByteImageValidator.looksLikeMarkup(null)).isFalse();
+        assertThat(MagicByteImageValidator.looksLikeMarkup("plain text".getBytes(StandardCharsets.UTF_8))).isFalse();
+    }
 }
