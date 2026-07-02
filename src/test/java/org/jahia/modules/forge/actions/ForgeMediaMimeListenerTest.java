@@ -9,9 +9,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit tests for the pure event-path matcher of {@link ForgeMediaMimeListener}. The JCR
- * read/reject/correct behaviour needs a running repository (covered by the Cypress E2E); this
- * verifies which events the listener selects and that it normalizes to the resource node path.
+ * Unit tests for the pure event-path pre-filter of {@link ForgeMediaMimeListener}. The precise
+ * scoping (is the file under a jmix:forgeElement?), the media/artifact distinction and the
+ * reject/correct behaviour are node-structure based and need a running repository (covered by the
+ * Cypress E2E). This verifies the cheap path gate that decides which events are loaded at all.
  */
 class ForgeMediaMimeListenerTest {
 
@@ -20,19 +21,30 @@ class ForgeMediaMimeListenerTest {
     @Test
     @DisplayName("matches an icon resource node and its mime/data property events")
     void matchesIconEvents() {
-        assertThat(ForgeMediaMimeListener.forgeMediaResourcePath(BASE + "/icon/logo.png/jcr:content"))
+        assertThat(ForgeMediaMimeListener.forgeRepositoryResourcePath(BASE + "/icon/logo.png/jcr:content"))
                 .isEqualTo(BASE + "/icon/logo.png/jcr:content");
-        assertThat(ForgeMediaMimeListener.forgeMediaResourcePath(BASE + "/icon/logo.png/jcr:content/jcr:mimeType"))
+        assertThat(ForgeMediaMimeListener.forgeRepositoryResourcePath(BASE + "/icon/logo.png/jcr:content/jcr:mimeType"))
                 .isEqualTo(BASE + "/icon/logo.png/jcr:content");
-        assertThat(ForgeMediaMimeListener.forgeMediaResourcePath(BASE + "/icon/logo.png/jcr:content/jcr:data"))
+        assertThat(ForgeMediaMimeListener.forgeRepositoryResourcePath(BASE + "/icon/logo.png/jcr:content/jcr:data"))
                 .isEqualTo(BASE + "/icon/logo.png/jcr:content");
     }
 
     @Test
     @DisplayName("matches a screenshots resource node")
     void matchesScreenshotEvents() {
-        assertThat(ForgeMediaMimeListener.forgeMediaResourcePath(BASE + "/screenshots/shot1.png/jcr:content/jcr:mimeType"))
+        assertThat(ForgeMediaMimeListener.forgeRepositoryResourcePath(BASE + "/screenshots/shot1.png/jcr:content/jcr:mimeType"))
                 .isEqualTo(BASE + "/screenshots/shot1.png/jcr:content");
+    }
+
+    @Test
+    @DisplayName("#61: matches a file planted OUTSIDE icon/screenshots (now covered; structural skip happens later)")
+    void matchesFilePlantedElsewhere() {
+        // Previously returned null (path scoping gap); now the pre-filter admits it and the
+        // structural forge-element check + script-capable rule handle it in-session.
+        assertThat(ForgeMediaMimeListener.forgeRepositoryResourcePath(BASE + "/x.svg/jcr:content"))
+                .isEqualTo(BASE + "/x.svg/jcr:content");
+        assertThat(ForgeMediaMimeListener.forgeRepositoryResourcePath(BASE + "/evil/x.svg/jcr:content/jcr:mimeType"))
+                .isEqualTo(BASE + "/evil/x.svg/jcr:content");
     }
 
     @ParameterizedTest
@@ -40,15 +52,12 @@ class ForgeMediaMimeListenerTest {
     @ValueSource(strings = {
             // Not under modules-repository:
             "/sites/store/home/page.html",
-            // Under modules-repository but not icon/screenshots (e.g. the artifact file itself):
-            "/sites/store/contents/modules-repository/org/acme/mymodule/mymodule-1.0/mymodule-1.0.jar/jcr:content/jcr:mimeType",
-            // icon/screenshots outside the module repository:
             "/sites/store/files/icon/logo.png/jcr:content",
-            // A container node, no jcr:content resource segment:
+            // Under modules-repository but no jcr:content resource segment (a container node):
             "/sites/store/contents/modules-repository/org/acme/mymodule/icon"
     })
-    @DisplayName("ignores events outside forge icon/screenshots resources")
+    @DisplayName("ignores events outside the module repository or with no resource node")
     void ignoresUnrelated(String path) {
-        assertThat(ForgeMediaMimeListener.forgeMediaResourcePath(path)).isNull();
+        assertThat(ForgeMediaMimeListener.forgeRepositoryResourcePath(path)).isNull();
     }
 }

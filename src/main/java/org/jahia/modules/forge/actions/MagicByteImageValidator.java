@@ -25,6 +25,7 @@ package org.jahia.modules.forge.actions;
 
 import java.util.Locale;
 import java.util.Set;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Content-based (magic-byte) detector for the raster image types the store accepts as module
@@ -50,6 +51,21 @@ public final class MagicByteImageValidator {
 
     /** Enough leading bytes to identify every signature below (WEBP needs bytes 8-11 = "WEBP"). */
     public static final int SNIFF_LENGTH = 16;
+
+    /**
+     * Bytes to read for the markup check. Aligns with the ~512-byte window browsers use when
+     * MIME-sniffing, so padding past it also defeats the browser's own sniff (bounded residual).
+     */
+    public static final int MARKUP_SNIFF_LENGTH = 512;
+
+    /**
+     * MIME types a browser will render as script-capable when served inline. A module-owned file
+     * declared as one of these (or whose bytes sniff as markup) must never be served from the site
+     * origin (SECURITY-571 #61). Lower-cased for case-insensitive comparison.
+     */
+    private static final Set<String> SCRIPT_CAPABLE_MIMES = Set.of(
+            "image/svg+xml", "image/svg-xml", "text/html", "application/xhtml+xml",
+            "text/xml", "application/xml");
 
     private MagicByteImageValidator() {
         // utility class - prevent instantiation
@@ -89,6 +105,45 @@ public final class MagicByteImageValidator {
     /** True when {@code mime} is one of the accepted raster types (case-insensitive). */
     public static boolean isAllowedRasterMime(String mime) {
         return mime != null && ALLOWED_RASTER_MIMES.contains(mime.trim().toLowerCase(Locale.ROOT));
+    }
+
+    /**
+     * True when {@code mime} names a type a browser renders as script-capable inline (SVG/HTML/XML
+     * family). Any {@code ;charset=...} parameter is ignored and comparison is case-insensitive.
+     */
+    public static boolean isScriptCapableMime(String mime) {
+        if (mime == null) {
+            return false;
+        }
+        final String base = StringUtils.substringBefore(mime, ";").trim().toLowerCase(Locale.ROOT);
+        return SCRIPT_CAPABLE_MIMES.contains(base);
+    }
+
+    /**
+     * True when the leading bytes look like an XML/HTML/SVG document — i.e. the first non-whitespace
+     * byte (after an optional UTF-8 BOM) is {@code '<'}. This catches a file that lies about its
+     * MIME type but whose bytes a browser could sniff and execute as markup (SECURITY-571 #61).
+     */
+    public static boolean looksLikeMarkup(byte[] header) {
+        if (header == null) {
+            return false;
+        }
+        int i = 0;
+        // Skip a UTF-8 BOM (EF BB BF) if present.
+        if (header.length >= 3 && (header[0] & 0xFF) == 0xEF && (header[1] & 0xFF) == 0xBB
+                && (header[2] & 0xFF) == 0xBF) {
+            i = 3;
+        }
+        // Skip ASCII whitespace (space, tab, CR, LF, form-feed, vertical tab).
+        while (i < header.length) {
+            final int b = header[i] & 0xFF;
+            if (b == 0x20 || b == 0x09 || b == 0x0A || b == 0x0D || b == 0x0C || b == 0x0B) {
+                i++;
+            } else {
+                break;
+            }
+        }
+        return i < header.length && (header[i] & 0xFF) == 0x3C; // '<'
     }
 
     private static boolean isWebp(byte[] header) {
