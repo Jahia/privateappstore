@@ -9,7 +9,9 @@
 <%-- CONTRACT: `path` (here + per-entry) and per-entry `jcrprimarytype` are REQUIRED
      by the Jahia core ForgeService that consumes this feed (admin "available modules"
      refresh). Dropping them (SECURITY-571 #55) made consumers fail with "unable to
-     parse JSON return string" — do NOT remove them again. --%>
+     parse JSON return string" — do NOT remove them again. The full required key set is
+     locked by tests/cypress/e2e/14-moduleListAndDownload.cy.ts (the "#55 guard" test);
+     keep the two in sync. --%>
         <json:property name="id" value="${currentNode.identifier}"/>
         <json:property name="path" value="${currentNode.path}"/>
         <json:property name="name" value="${currentNode.name}"/>
