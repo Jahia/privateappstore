@@ -6,10 +6,12 @@
 <%@ taglib prefix="template" uri="http://www.jahia.org/tags/templateLib" %>
 <json:array>
     <json:object>
-<%-- Emit a stable opaque id (UUID) but NOT the absolute JCR path: the path is
-     internal-structure reconnaissance for anonymous callers and no feed consumer
-     needs it (SECURITY-571 #55). --%>
+<%-- CONTRACT: `path` (here + per-entry) and per-entry `jcrprimarytype` are REQUIRED
+     by the Jahia core ForgeService that consumes this feed (admin "available modules"
+     refresh). Dropping them (SECURITY-571 #55) made consumers fail with "unable to
+     parse JSON return string" — do NOT remove them again. --%>
         <json:property name="id" value="${currentNode.identifier}"/>
+        <json:property name="path" value="${currentNode.path}"/>
         <json:property name="name" value="${currentNode.name}"/>
         <json:property name="title" value="${currentNode.displayableName}"/>
         <json:array name="modules">
@@ -35,10 +37,11 @@
                             <c:set var="icon" value="${iconItem}"/>
                         </c:forEach>
                         <json:object>
-                            <%-- Stable opaque id only; the absolute JCR path and jcr:primaryType are
-                                 internal identifiers withheld from the anonymous feed (SECURITY-571 #55).
-                                 Consumers distinguish modules from packages via groupId ("package"). --%>
+                            <%-- path + jcrprimarytype are REQUIRED by the core ForgeService consumer
+                                 (see contract note at the top) — do NOT remove (SECURITY-571 #55 regression). --%>
                             <json:property name="id" value="${child.identifier}"/>
+                            <json:property name="path" value="${child.path}"/>
+                            <json:property name="jcrprimarytype" value="${child.properties['jcr:primaryType'].string}"/>
                             <c:url context="/" var="localUrl" value="${url.server}${child.url}">
                                 <c:param name="dx" value="true"/>
                             </c:url>
