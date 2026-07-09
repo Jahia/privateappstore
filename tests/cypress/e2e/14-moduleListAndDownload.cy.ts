@@ -168,6 +168,39 @@ describe('Module list JSON + download', () => {
         });
     });
 
+    it('keeps the full moduleList.json field contract required by consumers (SECURITY-571 #55 guard)', () => {
+        // REGRESSION GUARD. Jahia core ForgeService (the admin "available modules" refresh
+        // client, and any remote DX instance) parses this feed and REQUIRES the top-level `path`
+        // and per-entry `path` + `jcrprimarytype`. #55 dropped them; the feed stayed valid JSON
+        // (so the other assertions here still passed), but every consumer failed with
+        // "unable to parse JSON return string". This locks the exact required key set so removing
+        // any field fails HERE, at author time, instead of on a downstream instance.
+        //
+        // Keep in sync with the CONTRACT comment in
+        // src/main/resources/jnt_contentFolder/json/contentFolder.moduleList.jsp.
+        const TOP_LEVEL_KEYS = ['id', 'path', 'name', 'title', 'modules'];
+        const ENTRY_KEYS = ['id', 'path', 'jcrprimarytype', 'remoteUrl', 'groupId', 'name', 'title', 'versions'];
+        // Only fields this fixture's version guarantees. `requiredVersion` is intentionally NOT
+        // asserted: the fixture version sets only versionNumber (no requiredVersion reference), so
+        // that key can be absent here for fixture reasons — not a regression. The #55 break was the
+        // per-entry path/jcrprimarytype above, which this locks.
+        const VERSION_KEYS = ['version', 'downloadUrl'];
+
+        cy.request({url: jsonUrl, failOnStatusCode: false}).then(res => {
+            expect(res.status).to.equal(200);
+            const {payload, module, version: v} = findVersion(res.body);
+            expect(module, `module ${moduleName} present in modules[]`).to.not.be.undefined;
+            expect(v, `version ${version} listed`).to.not.be.undefined;
+
+            expect(payload, 'top-level feed object must keep its full key contract')
+                .to.include.all.keys(TOP_LEVEL_KEYS);
+            expect(module, 'per-module entry must keep path + jcrprimarytype (+ the rest)')
+                .to.include.all.keys(ENTRY_KEYS);
+            expect(v, 'per-version object must keep its full key contract')
+                .to.include.all.keys(VERSION_KEYS);
+        });
+    });
+
     it('the catalog downloadUrl serves the artifact (download test)', () => {
         cy.request({url: jsonUrl, failOnStatusCode: false}).then(res => {
             const {version: v} = findVersion(res.body);
