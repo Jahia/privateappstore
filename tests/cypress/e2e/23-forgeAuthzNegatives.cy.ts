@@ -1,5 +1,5 @@
-import {DocumentNode} from 'graphql';
-import {createSite, deleteSite, createUser, deleteUser} from '@jahia/cypress';
+import { DocumentNode } from 'graphql'
+import { createSite, deleteSite, createUser, deleteUser } from '@jahia/cypress'
 
 /**
  * Negative authorization coverage for the {@code forge} GraphQL namespace — the NEW halves of the
@@ -21,101 +21,148 @@ import {createSite, deleteSite, createUser, deleteUser} from '@jahia/cypress';
  * access-denied surfacing (errorPolicy 'all' → non-empty errors / null data) against the live node.
  */
 describe('forge GraphQL — authorization negatives', () => {
-    const siteKey = 'forgeAuthzNeg';
-    const contents = `/sites/${siteKey}/contents`;
-    const ORDINARY = 'ordinary';
-    const ORDINARY_PWD = 'Ordinary#1234';
+    const siteKey = 'forgeAuthzNeg'
+    const ORDINARY = 'ordinary'
+    const ORDINARY_PWD = 'Ordinary#1234'
 
-    const getForgeSettings: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/query/getForgeSettings.graphql');
-    const updateForgeSettings: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/updateForgeSettings.graphql');
-    const grantSiteRole: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/grantSiteRole.graphql');
-    const setRootCategory: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/setRootCategory.graphql');
-    const updateForgeCategoryTitles: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/updateForgeCategoryTitles.graphql');
-    const addNodeWithProperties: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeWithProperties.graphql');
+    const getForgeSettings: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/query/getForgeSettings.graphql')
+    const updateForgeSettings: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/updateForgeSettings.graphql')
+    const grantSiteRole: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/grantSiteRole.graphql')
+    const setRootCategory: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/setRootCategory.graphql')
+    const updateForgeCategoryTitles: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/updateForgeCategoryTitles.graphql')
+    const addNodeWithProperties: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeWithProperties.graphql')
 
     // Assert a GraphQL op was denied: with errorPolicy 'all' the guard surfaces as a GraphQL error
     // (GqlAccessDeniedException / ForgeSettingsException) rather than data.
     const expectDenied = (chainable: Cypress.Chainable) =>
-        chainable.then((res: {errors?: unknown[]; data?: Record<string, unknown>}) => {
-            const errors = res?.errors ?? [];
-            expect(errors.length, 'operation should be rejected').to.be.greaterThan(0);
-        });
+        chainable.then((res: { errors?: unknown[]; data?: Record<string, unknown> }) => {
+            const errors = res?.errors ?? []
+            expect(errors.length, 'operation should be rejected').to.be.greaterThan(0)
+        })
 
     before(() => {
-        cy.login();
+        cy.login()
         try {
-            deleteSite(siteKey);
+            deleteSite(siteKey)
         } catch {
             // first run
         }
 
-        createSite(siteKey, {languages: 'en', templateSet: 'jahia-store-template', serverName: 'forgeauthzneg.local', locale: 'en'});
-        createUser(ORDINARY, ORDINARY_PWD); // global user, no site roles -> no siteAdminForgeSettings
-    });
+        createSite(siteKey, {
+            languages: 'en',
+            templateSet: 'jahia-store-template',
+            serverName: 'forgeauthzneg.local',
+            locale: 'en',
+        })
+        createUser(ORDINARY, ORDINARY_PWD) // global user, no site roles -> no siteAdminForgeSettings
+    })
 
     after(() => {
-        cy.login();
-        deleteSite(siteKey);
-        deleteUser(ORDINARY);
-    });
+        cy.login()
+        deleteSite(siteKey)
+        deleteUser(ORDINARY)
+    })
 
     it('S33: an ordinary user is DENIED reading forge.settings', () => {
-        const client = cy.apolloClient({username: ORDINARY, password: ORDINARY_PWD}, {setCurrentApolloClient: false});
-        expectDenied(client.apollo({query: getForgeSettings, variables: {siteKey}, errorPolicy: 'all', fetchPolicy: 'no-cache'}));
-    });
+        const client = cy.apolloClient(
+            { username: ORDINARY, password: ORDINARY_PWD },
+            { setCurrentApolloClient: false },
+        )
+        expectDenied(
+            client.apollo({
+                query: getForgeSettings,
+                variables: { siteKey },
+                errorPolicy: 'all',
+                fetchPolicy: 'no-cache',
+            }),
+        )
+    })
 
     it('S33: an ordinary user is DENIED updating forge settings', () => {
-        const client = cy.apolloClient({username: ORDINARY, password: ORDINARY_PWD}, {setCurrentApolloClient: false});
-        expectDenied(client.apollo({
-            mutation: updateForgeSettings,
-            variables: {siteKey, url: 'https://evil.example', id: 'x', user: 'x', password: 'x'},
-            errorPolicy: 'all'
-        }));
-    });
+        const client = cy.apolloClient(
+            { username: ORDINARY, password: ORDINARY_PWD },
+            { setCurrentApolloClient: false },
+        )
+        expectDenied(
+            client.apollo({
+                mutation: updateForgeSettings,
+                variables: { siteKey, url: 'https://evil.example', id: 'x', user: 'x', password: 'x' },
+                errorPolicy: 'all',
+            }),
+        )
+    })
 
     it('S35/D13: the settings payload never carries the password value (only passwordSet)', () => {
-        cy.login();
-        cy.apollo({mutation: updateForgeSettings, variables: {siteKey, url: 'https://s.example', id: 'i', user: 'u', password: 'secret'}});
-        cy.apollo({query: getForgeSettings, variables: {siteKey}, fetchPolicy: 'no-cache'})
+        cy.login()
+        cy.apollo({
+            mutation: updateForgeSettings,
+            variables: { siteKey, url: 'https://s.example', id: 'i', user: 'u', password: 'secret' },
+        })
+        cy.apollo({ query: getForgeSettings, variables: { siteKey }, fetchPolicy: 'no-cache' })
             .its('data.forge.settings')
             .should((settings: Record<string, unknown>) => {
-                expect(settings).to.have.property('passwordSet', true);
-                expect(settings).to.not.have.property('password');
-            });
-    });
+                expect(settings).to.have.property('passwordSet', true)
+                expect(settings).to.not.have.property('password')
+            })
+    })
 
     it('S37/D8: a role outside the store allow-list (owner / site-administrator) cannot be granted', () => {
-        cy.login();
-        expectDenied(cy.apollo({
-            mutation: grantSiteRole,
-            variables: {siteKey, role: 'owner', principalName: ORDINARY, principalType: 'USER'},
-            errorPolicy: 'all'
-        }));
-        expectDenied(cy.apollo({
-            mutation: grantSiteRole,
-            variables: {siteKey, role: 'site-administrator', principalName: ORDINARY, principalType: 'USER'},
-            errorPolicy: 'all'
-        }));
-    });
+        cy.login()
+        expectDenied(
+            cy.apollo({
+                mutation: grantSiteRole,
+                variables: { siteKey, role: 'owner', principalName: ORDINARY, principalType: 'USER' },
+                errorPolicy: 'all',
+            }),
+        )
+        expectDenied(
+            cy.apollo({
+                mutation: grantSiteRole,
+                variables: { siteKey, role: 'site-administrator', principalName: ORDINARY, principalType: 'USER' },
+                errorPolicy: 'all',
+            }),
+        )
+    })
 
     it('S36/S25: a category outside the site root-category subtree is refused', () => {
-        cy.login();
+        cy.login()
         // Root category + a sibling ("foreign") category that is NOT under the root subtree.
-        cy.apollo({mutation: addNodeWithProperties, variables: {parentPath: contents, name: 'rootCat', primaryNodeType: 'jnt:category', properties: [], mixins: []}})
+        cy.apollo({
+            mutation: addNodeWithProperties,
+            variables: {
+                parentPath: `/sites/${siteKey}`,
+                name: 'rootCat',
+                primaryNodeType: 'jnt:category',
+                properties: [],
+                mixins: [],
+            },
+        })
             .its('data.jcr.addNode.node.uuid')
             .then((rootUuid: string) => {
-                cy.apollo({mutation: setRootCategory, variables: {siteKey, rootCategoryUuid: rootUuid}})
-                    .its('data.forge.setRootCategory').should('equal', true);
-            });
-        cy.apollo({mutation: addNodeWithProperties, variables: {parentPath: contents, name: 'foreignCat', primaryNodeType: 'jnt:category', properties: [], mixins: []}})
+                cy.apollo({ mutation: setRootCategory, variables: { siteKey, rootCategoryUuid: rootUuid } })
+                    .its('data.forge.setRootCategory')
+                    .should('equal', true)
+            })
+        cy.apollo({
+            mutation: addNodeWithProperties,
+            variables: {
+                parentPath: `/sites/${siteKey}`,
+                name: 'foreignCat',
+                primaryNodeType: 'jnt:category',
+                properties: [],
+                mixins: [],
+            },
+        })
             .its('data.jcr.addNode.node.uuid')
             .then((foreignUuid: string) => {
                 // foreignCat is a real jnt:category but lives OUTSIDE rootCat's subtree -> must be refused.
-                expectDenied(cy.apollo({
-                    mutation: updateForgeCategoryTitles,
-                    variables: {siteKey, uuid: foreignUuid, titles: [{language: 'en', title: 'Hijacked'}]},
-                    errorPolicy: 'all'
-                }));
-            });
-    });
-});
+                expectDenied(
+                    cy.apollo({
+                        mutation: updateForgeCategoryTitles,
+                        variables: { siteKey, uuid: foreignUuid, titles: [{ language: 'en', title: 'Hijacked' }] },
+                        errorPolicy: 'all',
+                    }),
+                )
+            })
+    })
+})
