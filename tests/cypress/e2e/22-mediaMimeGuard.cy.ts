@@ -1,5 +1,5 @@
-import { DocumentNode } from 'graphql'
-import { createSite, deleteSite, uploadFile } from '@jahia/cypress'
+import {DocumentNode} from 'graphql';
+import {createSite, deleteSite, uploadFile} from '@jahia/cypress';
 
 /**
  * S34 / U1 — end-to-end proof that {@code ForgeMediaMimeListener} + {@code MagicByteImageValidator}
@@ -22,36 +22,36 @@ import { createSite, deleteSite, uploadFile } from '@jahia/cypress'
  * The wait is a deterministic poll on node-removal, not a fixed timeout.
  */
 describe('Media MIME guard removes spoofed/script-capable uploads (stored-XSS)', () => {
-    const siteKey = 'mediaMimeGuard'
-    const repo = `/sites/${siteKey}/contents/modules-repository`
-    const iconFolder = `${repo}/widget/icon`
-    const evilPath = `${iconFolder}/evil.png`
-    const legitPath = `${iconFolder}/logo.webp`
+    const siteKey = 'mediaMimeGuard';
+    const repo = `/sites/${siteKey}/contents/modules-repository`;
+    const iconFolder = `${repo}/widget/icon`;
+    const evilPath = `${iconFolder}/evil.png`;
+    const legitPath = `${iconFolder}/logo.webp`;
 
-    const createForgeModule: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/createForgeModule.graphql')
-    const addNodeWithProperties: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeWithProperties.graphql')
-    const getNodeByPath: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/query/getNodeByPath.graphql')
+    const createForgeModule: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/createForgeModule.graphql');
+    const addNodeWithProperties: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/addNodeWithProperties.graphql');
+    const getNodeByPath: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/query/getNodeByPath.graphql');
 
     const nodeExists = (path: string) =>
         cy
-            .apollo({ query: getNodeByPath, variables: { path }, fetchPolicy: 'no-cache', errorPolicy: 'all' })
-            .then((res: { data?: { jcr?: { nodeByPath?: unknown } } }) => Boolean(res?.data?.jcr?.nodeByPath))
+            .apollo({query: getNodeByPath, variables: {path}, fetchPolicy: 'no-cache', errorPolicy: 'all'})
+            .then((res: { data?: { jcr?: { nodeByPath?: unknown } } }) => Boolean(res?.data?.jcr?.nodeByPath));
 
     before(() => {
-        cy.login()
+        cy.login();
         try {
-            deleteSite(siteKey)
+            deleteSite(siteKey);
         } catch {
-            // first run
+            // First run
         }
 
         createSite(siteKey, {
             languages: 'en',
             templateSet: 'jahia-store-template',
             serverName: 'mediamimeguard.local',
-            locale: 'en',
-        })
-        cy.apollo({ mutation: createForgeModule, variables: { parentPath: repo, name: 'widget', title: 'Widget' } })
+            locale: 'en'
+        });
+        cy.apollo({mutation: createForgeModule, variables: {parentPath: repo, name: 'widget', title: 'Widget'}});
         // The forge module's CND defines `+ icon (jnt:folder)`, so the icon media folder MUST be a
         // jnt:folder (a jnt:contentFolder violates the child-node definition and is rejected).
         cy.apollo({
@@ -61,32 +61,32 @@ describe('Media MIME guard removes spoofed/script-capable uploads (stored-XSS)',
                 name: 'icon',
                 primaryNodeType: 'jnt:folder',
                 properties: [],
-                mixins: [],
-            },
-        })
+                mixins: []
+            }
+        });
 
         // A genuine raster (control, must survive) and the spoofed markup-as-PNG (attack, removed).
         // uploadFile paths are relative to cypress/fixtures; assets/ is two levels up. assets/icon.png
         // is a real WebP, so declare it image/webp — detected == declared → left untouched.
-        uploadFile('../../assets/icon.png', iconFolder, 'logo.webp', 'image/webp')
-        uploadFile('evil-markup.svg', iconFolder, 'evil.png', 'image/png')
-    })
+        uploadFile('../../assets/icon.png', iconFolder, 'logo.webp', 'image/webp');
+        uploadFile('evil-markup.svg', iconFolder, 'evil.png', 'image/png');
+    });
 
     after(() => {
-        cy.login()
-        deleteSite(siteKey)
-    })
+        cy.login();
+        deleteSite(siteKey);
+    });
 
     it('removes the spoofed script-capable file and keeps the genuine raster', () => {
         // Poll until the async listener removes the offending node (both workspaces are checked
         // server-side). Deterministic wait, not a fixed sleep.
-        cy.waitUntil(() => nodeExists(evilPath).then((exists) => exists === false), {
+        cy.waitUntil(() => nodeExists(evilPath).then(exists => exists === false), {
             timeout: 30000,
             interval: 1000,
-            errorMsg: 'spoofed file was not removed by ForgeMediaMimeListener',
-        })
+            errorMsg: 'spoofed file was not removed by ForgeMediaMimeListener'
+        });
 
         // The legitimate raster must survive untouched.
-        nodeExists(legitPath).should('equal', true)
-    })
-})
+        nodeExists(legitPath).should('equal', true);
+    });
+});
