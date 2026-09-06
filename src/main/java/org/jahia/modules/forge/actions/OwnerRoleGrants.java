@@ -55,7 +55,7 @@ import java.util.Set;
  *
  * <p><strong>Why the grants are deferred.</strong> Both upload paths grant the owner role on
  * nodes that are still transient in the caller's session. A system session cannot see those,
- * so callers {@link #record(JCRNodeWrapper)} each node as it is created and
+ * so callers {@link #recordOwner(JCRNodeWrapper)} each node as it is created and
  * {@link #flush()} once the caller's session has been saved.
  *
  * <p><strong>Invariants enforced on every elevated write</strong> — an elevated write is only
@@ -92,7 +92,7 @@ final class OwnerRoleGrants {
      * @param scopeRoot     the repository node the action was invoked on — the only subtree in
      *                      which this instance may ever grant the owner role
      */
-    OwnerRoleGrants(JCRSessionWrapper callerSession, JCRNodeWrapper scopeRoot) throws RepositoryException {
+    OwnerRoleGrants(JCRSessionWrapper callerSession, JCRNodeWrapper scopeRoot) {
         this.callerSession = callerSession;
         this.scopeRootPath = scopeRoot.getPath();
         this.username = callerSession.getUser().getUsername();
@@ -108,7 +108,7 @@ final class OwnerRoleGrants {
      * than the node, because the node may still be transient and will be re-resolved in the
      * system session at {@link #flush()} time. Guest uploads record nothing.
      */
-    void record(JCRNodeWrapper node) throws RepositoryException {
+    void recordOwner(JCRNodeWrapper node) throws RepositoryException {
         if (Constants.GUEST_USERNAME.equals(username)) {
             return;
         }
@@ -134,7 +134,7 @@ final class OwnerRoleGrants {
         pendingIdentifiers.clear();
         final String workspace = callerSession.getWorkspace().getName();
 
-        JCRTemplate.getInstance().doExecuteWithSystemSession(null, workspace, systemSession -> {
+        JCRTemplate.getInstance().doExecuteWithSystemSessionAsUser(null, workspace, null, systemSession -> {
             boolean dirty = false;
             for (String identifier : identifiers) {
                 dirty |= grantOwner(systemSession, identifier);
@@ -164,9 +164,11 @@ final class OwnerRoleGrants {
         if (!isWithinScope(node.getPath())) {
             // Refused, not repaired: a target outside the gated subtree means the caller passed
             // something the jahiaForgeUploadModule check never covered.
-            logger.error("Owner grant refused: {} is outside the upload repository {}",
-                    ActionSecurityUtils.sanitizeForLog(node.getPath()),
-                    ActionSecurityUtils.sanitizeForLog(scopeRootPath));
+            if (logger.isErrorEnabled()) {
+                logger.error("Owner grant refused: {} is outside the upload repository {}",
+                        ActionSecurityUtils.sanitizeForLog(node.getPath()),
+                        ActionSecurityUtils.sanitizeForLog(scopeRootPath));
+            }
             return false;
         }
 

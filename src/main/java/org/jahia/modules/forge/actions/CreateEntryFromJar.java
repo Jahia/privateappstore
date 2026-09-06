@@ -343,8 +343,7 @@ public class CreateEntryFromJar extends Action {
         private final OwnerRoleGrants ownerGrants;
 
         private UploadContext(DiskFileItem uploadedFile, HttpServletRequest request, RenderContext renderContext,
-                              Resource resource, JCRSessionWrapper session, Map<String, List<String>> formParams)
-                throws RepositoryException {
+                              Resource resource, JCRSessionWrapper session, Map<String, List<String>> formParams) {
             this.uploadedFile = uploadedFile;
             this.request = request;
             this.renderContext = renderContext;
@@ -386,7 +385,7 @@ public class CreateEntryFromJar extends Action {
         logger.info("Start creating Private App Store Package {}", ActionSecurityUtils.sanitizeForLog(packageName));
 
         final JCRNodeWrapper modulesPackage = upsertPackageNode(ctx.request, repository, packageRelPath, packageName, packageParameters);
-        ctx.ownerGrants.record(modulesPackage);
+        ctx.ownerGrants.recordOwner(modulesPackage);
 
         boolean hasPackageVersions = JCRTagUtils.hasChildrenOfType(modulesPackage, JNT_FORGEPACKAGEVERSION);
         logger.info("Start adding package version {} of {}",
@@ -398,7 +397,7 @@ public class CreateEntryFromJar extends Action {
         }
 
         JCRNodeWrapper packageVersion = createNode(ctx.request, versionParameters, modulesPackage, JNT_FORGEPACKAGEVERSION, modulesPackage.getName() + "-" + version, false);
-        ctx.ownerGrants.record(packageVersion);
+        ctx.ownerGrants.recordOwner(packageVersion);
         packageVersion.uploadFile(ctx.uploadedFile.getName(), ctx.uploadedFile.getInputStream(), ctx.uploadedFile.getContentType());
 
         logger.info("Package version {} of {} successfully added",
@@ -624,7 +623,7 @@ public class CreateEntryFromJar extends Action {
             throws RepositoryException, JSONException {
         final String moduleRelPath = groupId.replace(".", FileSystem.SEPARATOR) + FileSystem.SEPARATOR + moduleName;
         final JCRNodeWrapper module = upsertModuleNode(request, repository, moduleRelPath, groupId, moduleName, moduleParameters);
-        ownerGrants.record(module);
+        ownerGrants.recordOwner(module);
         return new ModulePrep(module, versionConflict(module, version, moduleName, ownerGrants.getCallerSession()));
     }
 
@@ -664,7 +663,7 @@ public class CreateEntryFromJar extends Action {
         final JCRNodeWrapper moduleVersion = createNode(request, versionParameters, module,
                 JNT_FORGEMODULEVERSION, module.getName() + "-" + version, false);
         moduleVersion.setProperty(REFERENCES, dependencies != null ? dependencies.split(",") : EMPTY_REFERENCES);
-        ownerGrants.record(moduleVersion);
+        ownerGrants.recordOwner(moduleVersion);
         return moduleVersion;
     }
 

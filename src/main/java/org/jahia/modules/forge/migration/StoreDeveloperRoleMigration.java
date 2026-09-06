@@ -59,6 +59,11 @@ import java.util.List;
  * becomes-empty case — so it is reused rather than reimplemented. It does not save; this class
  * does.
  *
+ * <p>{@code RBACUtils} is deprecated with no replacement exported by the platform, so Sonar
+ * flags this use (java:S1874). It is kept deliberately: reimplementing a weak-reference ACL edit
+ * by hand to satisfy a style rule would put more risk into a security fix than the deprecation
+ * carries. Revisit when Jahia ships a supported role-permission API.
+ *
  * <p>The permission's own path is never hard-coded. It is read back from the references the role
  * actually holds, so the migration does not depend on where Jahia nests JCR privileges under
  * {@code /permissions}.
@@ -106,7 +111,7 @@ public class StoreDeveloperRoleMigration {
     private void migrateQuietly(String workspace) {
         try {
             final int removed = JCRTemplate.getInstance()
-                    .doExecuteWithSystemSession(null, workspace, this::revokeStalePermission);
+                    .doExecuteWithSystemSessionAsUser(null, workspace, null, this::revokeStalePermission);
             if (removed > 0) {
                 logger.info("SEC-366: removed {} from role {} in workspace {} ({} reference(s))",
                         STALE_PERMISSION, ROLE_NAME, workspace, removed);
