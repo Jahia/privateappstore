@@ -101,7 +101,6 @@ public class CreateEntryFromJar extends Action {
     private static final String AUTHOR_URL = "authorURL";
     private static final String ERROR = "error";
     private static final String PACKAGES = "packages";
-    private static final String OWNER = "owner";
     private static final String MODULES_LIST = "modulesList";
     private static final String RESOURCES_JAHIA_STORE = "resources.jahia-store";
     private static final String GROUP_ID = "groupId";
@@ -300,12 +299,12 @@ public class CreateEntryFromJar extends Action {
         logger.info("Start creating Private App Store Module {}", ActionSecurityUtils.sanitizeForLog(moduleName));
         logger.info("Start adding module version {} of {}",
                 ActionSecurityUtils.sanitizeForLog(version), ActionSecurityUtils.sanitizeForLog(title));
-        final ModulePrep prep = prepareModuleVersion(ctx.request, repository, groupId, moduleName, moduleParameters, version, ctx.session);
+        final ModulePrep prep = prepareModuleVersion(ctx.request, repository, groupId, moduleName, moduleParameters, version, ctx.ownerGrants);
         if (prep.conflict != null) {
             return prep.conflict;
         }
         final JCRNodeWrapper module = prep.module;
-        final JCRNodeWrapper moduleVersion = createModuleVersion(ctx.request, module, versionParameters, version, dependencies, ctx.session);
+        final JCRNodeWrapper moduleVersion = createModuleVersion(ctx.request, module, versionParameters, version, dependencies, ctx.ownerGrants);
 
         logger.info("Module version {} of {} successfully added",
                 ActionSecurityUtils.sanitizeForLog(version), ActionSecurityUtils.sanitizeForLog(title));
@@ -313,6 +312,9 @@ public class CreateEntryFromJar extends Action {
                 ActionSecurityUtils.sanitizeForLog(moduleName), module.getParent().getPath());
 
         ctx.session.save();
+        // Nodes are durable from here, so the deferred owner grants can be applied by a system
+        // session (SEC-366 - the uploader's own role no longer carries live ACL authority).
+        ctx.ownerGrants.flush();
         if (!deployJar) {
             moduleVersion.uploadFile(ctx.uploadedFile.getName(), ctx.uploadedFile.getInputStream(), ctx.uploadedFile.getContentType());
             ctx.session.save();
@@ -332,15 +334,24 @@ public class CreateEntryFromJar extends Action {
         private final Resource resource;
         private final JCRSessionWrapper session;
         private final Map<String, List<String>> formParams;
+        /**
+         * Collects the owner-role grants this upload owes, so they can be applied with elevated
+         * rights once the caller's session is saved (SEC-366). Scoped to the repository node the
+         * action was invoked on — the node the Action framework already gated with
+         * {@code jahiaForgeUploadModule}.
+         */
+        private final OwnerRoleGrants ownerGrants;
 
         private UploadContext(DiskFileItem uploadedFile, HttpServletRequest request, RenderContext renderContext,
-                              Resource resource, JCRSessionWrapper session, Map<String, List<String>> formParams) {
+                              Resource resource, JCRSessionWrapper session, Map<String, List<String>> formParams)
+                throws RepositoryException {
             this.uploadedFile = uploadedFile;
             this.request = request;
             this.renderContext = renderContext;
             this.resource = resource;
             this.session = session;
             this.formParams = formParams;
+            this.ownerGrants = new OwnerRoleGrants(session, resource.getNode());
         }
     }
 
@@ -375,7 +386,7 @@ public class CreateEntryFromJar extends Action {
         logger.info("Start creating Private App Store Package {}", ActionSecurityUtils.sanitizeForLog(packageName));
 
         final JCRNodeWrapper modulesPackage = upsertPackageNode(ctx.request, repository, packageRelPath, packageName, packageParameters);
-        grantOwnerRole(ctx.session, modulesPackage);
+        ctx.ownerGrants.record(modulesPackage);
 
         boolean hasPackageVersions = JCRTagUtils.hasChildrenOfType(modulesPackage, JNT_FORGEPACKAGEVERSION);
         logger.info("Start adding package version {} of {}",
@@ -387,7 +398,7 @@ public class CreateEntryFromJar extends Action {
         }
 
         JCRNodeWrapper packageVersion = createNode(ctx.request, versionParameters, modulesPackage, JNT_FORGEPACKAGEVERSION, modulesPackage.getName() + "-" + version, false);
-        grantOwnerRole(ctx.session, packageVersion);
+        ctx.ownerGrants.record(packageVersion);
         packageVersion.uploadFile(ctx.uploadedFile.getName(), ctx.uploadedFile.getInputStream(), ctx.uploadedFile.getContentType());
 
         logger.info("Package version {} of {} successfully added",
@@ -399,6 +410,8 @@ public class CreateEntryFromJar extends Action {
                 ActionSecurityUtils.sanitizeForLog(packageName), modulesPackage.getParent().getPath());
 
         ctx.session.save();
+        // See createForgeModule: grants are applied only once the nodes exist for another session.
+        ctx.ownerGrants.flush();
         return buildUploadResult(ctx.request, ctx.renderContext, modulesPackage, ctx.formParams);
     }
 
@@ -527,12 +540,6 @@ public class CreateEntryFromJar extends Action {
         }
     }
 
-    private static void grantOwnerRole(JCRSessionWrapper session, JCRNodeWrapper node) throws RepositoryException {
-        if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
-            node.grantRoles("u:" + session.getUser().getUsername(), new HashSet<>(Arrays.asList(OWNER)));
-        }
-    }
-
     private static void partitionParams(Map<String, List<String>> source,
                                         List<String> moduleKeys, List<String> versionKeys,
                                         Map<String, List<String>> moduleTarget,
@@ -613,12 +620,12 @@ public class CreateEntryFromJar extends Action {
      */
     private ModulePrep prepareModuleVersion(HttpServletRequest request, JCRNodeWrapper repository, String groupId,
                                             String moduleName, Map<String, List<String>> moduleParameters,
-                                            String version, JCRSessionWrapper session)
+                                            String version, OwnerRoleGrants ownerGrants)
             throws RepositoryException, JSONException {
         final String moduleRelPath = groupId.replace(".", FileSystem.SEPARATOR) + FileSystem.SEPARATOR + moduleName;
         final JCRNodeWrapper module = upsertModuleNode(request, repository, moduleRelPath, groupId, moduleName, moduleParameters);
-        grantOwnerRole(session, module);
-        return new ModulePrep(module, versionConflict(module, version, moduleName, session));
+        ownerGrants.record(module);
+        return new ModulePrep(module, versionConflict(module, version, moduleName, ownerGrants.getCallerSession()));
     }
 
     /** The "version already exists" error result, or null when {@code version} may be added. */
@@ -653,11 +660,11 @@ public class CreateEntryFromJar extends Action {
     /** Create the version node under a module, set its dependency references, and grant the owner role. */
     private JCRNodeWrapper createModuleVersion(HttpServletRequest request, JCRNodeWrapper module,
                                                Map<String, List<String>> versionParameters, String version,
-                                               String dependencies, JCRSessionWrapper session) throws RepositoryException {
+                                               String dependencies, OwnerRoleGrants ownerGrants) throws RepositoryException {
         final JCRNodeWrapper moduleVersion = createNode(request, versionParameters, module,
                 JNT_FORGEMODULEVERSION, module.getName() + "-" + version, false);
         moduleVersion.setProperty(REFERENCES, dependencies != null ? dependencies.split(",") : EMPTY_REFERENCES);
-        grantOwnerRole(session, moduleVersion);
+        ownerGrants.record(moduleVersion);
         return moduleVersion;
     }
 
