@@ -1,0 +1,23 @@
+# Jahia core's generic node-level role grant, with the workspace left as a variable.
+#
+# This is the exact operation GHSA-f882-3xwv-3439 was exploited with: the same call, the same
+# actor and the same node, differing only in the workspace, was denied in EDIT and accepted in
+# LIVE because store-developer shipped jcr:modifyAccessControl_live at site scope. The workspace
+# is a variable precisely so the two arms can be one query with one word changed.
+mutation GrantNodeRoles(
+    $workspace: Workspace!
+    $pathOrId: String!
+    $principalType: JCRPrincipalType!
+    $principalName: String!
+    $roles: [String]!
+) {
+    jcr(workspace: $workspace) {
+        mutateNode(pathOrId: $pathOrId) {
+            grantRoles(
+                principalType: $principalType
+                principalName: $principalName
+                roles: $roles
+            )
+        }
+    }
+}
