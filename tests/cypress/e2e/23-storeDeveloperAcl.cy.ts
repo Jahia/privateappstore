@@ -1,5 +1,13 @@
 import {DocumentNode} from 'graphql';
-import {createSite, deleteSite, createUser, deleteUser, grantRoles, revokeRoles, publishAndWaitJobEnding} from '@jahia/cypress';
+import {
+    createSite,
+    deleteSite,
+    createUser,
+    deleteUser,
+    grantRoles,
+    revokeRoles,
+    publishAndWaitJobEnding
+} from '@jahia/cypress';
 
 /**
  * Regression coverage for GHSA-f882-3xwv-3439 / SEC-366.
@@ -26,34 +34,37 @@ import {createSite, deleteSite, createUser, deleteUser, grantRoles, revokeRoles,
  * header (`cy.apolloClient`), not the browser session.
  */
 
-const grantNodeRoles: DocumentNode =
-    require('graphql-tag/loader!../fixtures/graphql/mutation/grantNodeRoles.graphql');
+const grantNodeRoles: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/mutation/grantNodeRoles.graphql');
 
-const nodeHasPermission: DocumentNode =
-    require('graphql-tag/loader!../fixtures/graphql/query/nodeHasPermission.graphql');
+const nodeHasPermission: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/query/nodeHasPermission.graphql');
 
 describe('A store developer cannot rewrite the site ACL in LIVE (GHSA-f882-3xwv-3439)', () => {
     const siteKey = 'devAclSite';
     const sitePath = `/sites/${siteKey}`;
     const DEV = 'devuser';
     const DEV_PWD = 'Devuser#1234';
-    // The permission gating whether an uploaded module is published to the store. Self-promotion
-    // to store-administrator is what used to confer it.
+    // The permission gating whether an uploaded module is published to the store.
     const MODERATE = 'jahiaForgeModerateModule';
+    // The role the advisory names as the escalation prize, and the only role that confers
+    // MODERATE. Jahia's own site-administrator does NOT carry this module's permissions, so
+    // probing MODERATE after granting site-administrator reads false whether the grant landed or
+    // not - which would make the positive-control arm prove nothing.
+    const ESCALATION_ROLE = 'store-administrator';
 
     const devCreds = {username: DEV, password: DEV_PWD};
 
     /** Run the ACL rewrite as `devuser`, in the given workspace. */
-    const attemptSelfPromotionAs = (workspace: 'LIVE' | 'EDIT', creds?: {username: string; password: string}) => {
+    const attemptSelfPromotionAs = (workspace: 'LIVE' | 'EDIT', creds?: { username: string; password: string }) => {
         const variables = {
             workspace,
             pathOrId: sitePath,
             principalType: 'USER',
             principalName: DEV,
-            roles: ['site-administrator']
+            roleNames: [ESCALATION_ROLE]
         };
         if (creds) {
-            return cy.apolloClient(creds, {log: true, setCurrentApolloClient: false})
+            return cy
+                .apolloClient(creds, {log: true, setCurrentApolloClient: false})
                 .apollo({mutation: grantNodeRoles, variables});
         }
 
@@ -67,7 +78,8 @@ describe('A store developer cannot rewrite the site ACL in LIVE (GHSA-f882-3xwv-
      * GraphQL error, and what actually matters is whether the developer's rights moved.
      */
     const devHasModeratePermission = (workspace: 'LIVE' | 'EDIT') =>
-        cy.apolloClient(devCreds, {log: true, setCurrentApolloClient: false})
+        cy
+            .apolloClient(devCreds, {log: true, setCurrentApolloClient: false})
             .apollo({
                 query: nodeHasPermission,
                 variables: {workspace, path: sitePath, permission: MODERATE},
@@ -83,9 +95,14 @@ describe('A store developer cannot rewrite the site ACL in LIVE (GHSA-f882-3xwv-
             // Ignore — first run.
         }
 
-        createSite(siteKey, {languages: 'en', templateSet: 'jahia-store-template', serverName: 'devacl.local', locale: 'en'});
+        createSite(siteKey, {
+            languages: 'en',
+            templateSet: 'jahia-store-template',
+            serverName: 'devacl.local',
+            locale: 'en'
+        });
         createUser(DEV, DEV_PWD);
-        // devuser holds exactly one role, granted at the site — the same starting state as the
+        // Devuser holds exactly one role, granted at the site — the same starting state as the
         // advisory's proof. store-developer carries j:privilegedAccess, which is what lets an
         // ordinary uploader reach /modules/graphql at all.
         grantRoles(sitePath, ['store-developer'], DEV, 'USER');
@@ -133,11 +150,11 @@ describe('A store developer cannot rewrite the site ACL in LIVE (GHSA-f882-3xwv-
         // reach, so cleaning one up is unreliable. Granting through publication also demonstrates
         // the review step the vulnerability bypassed.
         cy.login();
-        grantRoles(sitePath, ['site-administrator'], DEV, 'USER');
+        grantRoles(sitePath, [ESCALATION_ROLE], DEV, 'USER');
         publishAndWaitJobEnding(sitePath, ['en']);
         devHasModeratePermission('LIVE').should('eq', true);
 
-        revokeRoles(sitePath, ['site-administrator'], DEV, 'USER');
+        revokeRoles(sitePath, [ESCALATION_ROLE], DEV, 'USER');
         publishAndWaitJobEnding(sitePath, ['en']);
         devHasModeratePermission('LIVE').should('eq', false);
     });

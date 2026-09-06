@@ -22,11 +22,9 @@ import {createSite, deleteSite, createUser, deleteUser, grantRoles, publishAndWa
  * owner grant was applied. The ACE under `j:acl` is the only unambiguous evidence that the
  * elevated grant landed.
  */
-const getChildNames: DocumentNode =
-    require('graphql-tag/loader!../fixtures/graphql/query/getChildNames.graphql');
+const getAclEntries: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/query/getAclEntries.graphql');
 
-const getNodeProperty: DocumentNode =
-    require('graphql-tag/loader!../fixtures/graphql/query/getNodeProperties.graphql');
+const getNodePropertyInWorkspace: DocumentNode = require('graphql-tag/loader!../fixtures/graphql/query/getNodePropertyInWorkspace.graphql');
 
 describe('A store developer can still upload, and owns what they upload (SEC-366 / APPS-14)', () => {
     const siteKey = 'uploadOwnerSite';
@@ -40,20 +38,43 @@ describe('A store developer can still upload, and owns what they upload (SEC-366
     const DEV = 'storedev';
     const DEV_PWD = 'Storedev#1234';
 
-    const aclEntryNames = (path: string) =>
-        cy.apollo({
-            query: getChildNames,
-            variables: {workspace: 'LIVE', path: `${path}/j:acl`},
-            fetchPolicy: 'no-cache'
-        }).then(res => {
-            const node = (res as {data?: {jcr?: {nodeByPath?: {children?: {nodes?: {name: string}[]}}}}})
-                .data?.jcr?.nodeByPath;
-            return (node?.children?.nodes ?? []).map(child => child.name);
-        });
+    /** The roles each ACE on `path` grants, keyed by ACE node name, read in LIVE as root. */
+    const aclRolesByEntry = (path: string) =>
+        cy
+            .apollo({
+                query: getAclEntries,
+                variables: {workspace: 'LIVE', path: `${path}/j:acl`},
+                fetchPolicy: 'no-cache'
+            })
+            .then(res => {
+                const nodes =
+                    (
+                        res as {
+                            data?: {
+                                jcr?: {
+                                    nodeByPath?: {
+                                        children?: {
+                                            nodes?: { name: string; properties?: { name: string; values?: string[] }[] }[]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ).data?.jcr?.nodeByPath?.children?.nodes ?? [];
+                const out: Record<string, string[]> = {};
+                for (const n of nodes) {
+                    out[n.name] = n.properties?.find(pr => pr.name === 'j:roles')?.values ?? [];
+                }
 
-    /** True when some ACE names both the uploader and the owner role, whatever the naming scheme. */
-    const ownsNode = (names: string[]) =>
-        names.some(name => name.includes(DEV) && name.includes('owner'));
+                return out;
+            });
+
+    /**
+     * True when some ACE both names the uploader and grants the owner role. Matching the
+     * principal loosely (Jahia writes "GRANT_u_storedev") but the role exactly.
+     */
+    const ownsNode = (entries: Record<string, string[]>) =>
+        Object.entries(entries).some(([name, roles]) => name.includes(DEV) && roles.includes('owner'));
 
     before(() => {
         cy.login();
@@ -63,7 +84,12 @@ describe('A store developer can still upload, and owns what they upload (SEC-366
             // Ignore — first run.
         }
 
-        createSite(siteKey, {languages: 'en', templateSet: 'jahia-store-template', serverName: 'uploadowner.local', locale: 'en'});
+        createSite(siteKey, {
+            languages: 'en',
+            templateSet: 'jahia-store-template',
+            serverName: 'uploadowner.local',
+            locale: 'en'
+        });
         createUser(DEV, DEV_PWD);
         grantRoles(sitePath, ['store-developer'], DEV, 'USER');
         // The developer uploads from the live store front-end, so the site (and the grant that
@@ -102,21 +128,23 @@ describe('A store developer can still upload, and owns what they upload (SEC-366
         //    AccessDeniedException would have surfaced - after the content was written, leaving a
         //    half-committed upload.
         cy.login();
+        // Read back in LIVE: the store front-end renders live, so the action created these nodes
+        // in the live workspace and nothing published them into EDIT.
         cy.apollo({
-            query: getNodeProperty,
-            variables: {path: modulePath, name: 'jcr:primaryType', language: null},
+            query: getNodePropertyInWorkspace,
+            variables: {workspace: 'LIVE', path: modulePath, name: 'jcr:primaryType', language: null},
             fetchPolicy: 'no-cache'
-        }).its('data.jcr.nodeByPath.properties[0].value').should('equal', 'jnt:forgeModule');
+        })
+            .its('data.jcr.nodeByPath.properties[0].value')
+            .should('equal', 'jnt:forgeModule');
 
         // 2. The elevated grant landed on BOTH nodes the upload creates. Checking only the module
         //    node would miss a flush that stopped after the first identifier.
-        aclEntryNames(modulePath).then(names => {
-            expect(ownsNode(names), `owner ACE for ${DEV} on the module node, got ${JSON.stringify(names)}`)
-                .to.equal(true);
+        aclRolesByEntry(modulePath).then(entries => {
+            expect(ownsNode(entries), `owner ACE for ${DEV} on the module node, got ${JSON.stringify(entries)}`).to.equal(true);
         });
-        aclEntryNames(versionPath).then(names => {
-            expect(ownsNode(names), `owner ACE for ${DEV} on the version node, got ${JSON.stringify(names)}`)
-                .to.equal(true);
+        aclRolesByEntry(versionPath).then(entries => {
+            expect(ownsNode(entries), `owner ACE for ${DEV} on the version node, got ${JSON.stringify(entries)}`).to.equal(true);
         });
     });
 });
