@@ -40,6 +40,7 @@ import org.jahia.modules.forge.settings.ForgeSettings;
 import org.jahia.modules.forge.settings.ForgeSettingsService;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
+import org.jahia.services.content.JCRTemplate;
 import org.jahia.services.content.decorator.JCRSiteNode;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
@@ -300,12 +301,12 @@ public class CreateEntryFromJar extends Action {
         logger.info("Start creating Private App Store Module {}", ActionSecurityUtils.sanitizeForLog(moduleName));
         logger.info("Start adding module version {} of {}",
                 ActionSecurityUtils.sanitizeForLog(version), ActionSecurityUtils.sanitizeForLog(title));
-        final ModulePrep prep = prepareModuleVersion(ctx.request, repository, groupId, moduleName, moduleParameters, version, ctx.session);
+        final ModulePrep prep = prepareModuleVersion(ctx, repository, groupId, moduleName, moduleParameters, version);
         if (prep.conflict != null) {
             return prep.conflict;
         }
         final JCRNodeWrapper module = prep.module;
-        final JCRNodeWrapper moduleVersion = createModuleVersion(ctx.request, module, versionParameters, version, dependencies, ctx.session);
+        final JCRNodeWrapper moduleVersion = createModuleVersion(ctx, module, versionParameters, version, dependencies);
 
         logger.info("Module version {} of {} successfully added",
                 ActionSecurityUtils.sanitizeForLog(version), ActionSecurityUtils.sanitizeForLog(title));
@@ -317,21 +318,25 @@ public class CreateEntryFromJar extends Action {
             moduleVersion.uploadFile(ctx.uploadedFile.getName(), ctx.uploadedFile.getInputStream(), ctx.uploadedFile.getContentType());
             ctx.session.save();
         }
+        grantOwnerRoles(ctx);
         return buildUploadResult(ctx.request, ctx.renderContext, module, ctx.formParams);
     }
 
     /**
-     * Immutable bundle of the request-scoped arguments shared by both upload paths, so the shared
+     * Bundle of the request-scoped arguments shared by both upload paths, so the shared
      * {@link #createForgeModule} core stays within a sane parameter count. The module coordinates
      * (name / groupId / version) are read back from the populated {@code moduleParams} map.
      */
     private static final class UploadContext {
+        // The arguments are immutable; ownedPaths accumulates as the upload creates nodes.
         private final DiskFileItem uploadedFile;
         private final HttpServletRequest request;
         private final RenderContext renderContext;
         private final Resource resource;
         private final JCRSessionWrapper session;
         private final Map<String, List<String>> formParams;
+        /** Paths of the nodes created by this upload that the caller must own. */
+        private final List<String> ownedPaths = new ArrayList<>();
 
         private UploadContext(DiskFileItem uploadedFile, HttpServletRequest request, RenderContext renderContext,
                               Resource resource, JCRSessionWrapper session, Map<String, List<String>> formParams) {
@@ -375,7 +380,7 @@ public class CreateEntryFromJar extends Action {
         logger.info("Start creating Private App Store Package {}", ActionSecurityUtils.sanitizeForLog(packageName));
 
         final JCRNodeWrapper modulesPackage = upsertPackageNode(ctx.request, repository, packageRelPath, packageName, packageParameters);
-        grantOwnerRole(ctx.session, modulesPackage);
+        recordOwnedNode(ctx, modulesPackage);
 
         boolean hasPackageVersions = JCRTagUtils.hasChildrenOfType(modulesPackage, JNT_FORGEPACKAGEVERSION);
         logger.info("Start adding package version {} of {}",
@@ -387,7 +392,7 @@ public class CreateEntryFromJar extends Action {
         }
 
         JCRNodeWrapper packageVersion = createNode(ctx.request, versionParameters, modulesPackage, JNT_FORGEPACKAGEVERSION, modulesPackage.getName() + "-" + version, false);
-        grantOwnerRole(ctx.session, packageVersion);
+        recordOwnedNode(ctx, packageVersion);
         packageVersion.uploadFile(ctx.uploadedFile.getName(), ctx.uploadedFile.getInputStream(), ctx.uploadedFile.getContentType());
 
         logger.info("Package version {} of {} successfully added",
@@ -399,6 +404,7 @@ public class CreateEntryFromJar extends Action {
                 ActionSecurityUtils.sanitizeForLog(packageName), modulesPackage.getParent().getPath());
 
         ctx.session.save();
+        grantOwnerRoles(ctx);
         return buildUploadResult(ctx.request, ctx.renderContext, modulesPackage, ctx.formParams);
     }
 
@@ -527,10 +533,37 @@ public class CreateEntryFromJar extends Action {
         }
     }
 
-    private static void grantOwnerRole(JCRSessionWrapper session, JCRNodeWrapper node) throws RepositoryException {
-        if (!session.getUser().getUsername().equals(Constants.GUEST_USERNAME)) {
-            node.grantRoles("u:" + session.getUser().getUsername(), new HashSet<>(Arrays.asList(OWNER)));
+    /**
+     * Record a node the caller must own, when this upload is what created it. An upload that adds a
+     * version to a module somebody else already owns reaches that module through
+     * {@link #upsertModuleNode}, which returns the stored node. Recording it would hand the caller the
+     * owner role on another developer's module. {@link #grantOwnerRoles} writes the ACE afterwards, so
+     * the node is only remembered here, and {@code isNew} still answers for the caller's own session.
+     */
+    private static void recordOwnedNode(UploadContext ctx, JCRNodeWrapper node) throws RepositoryException {
+        if (node.isNew()) {
+            ctx.ownedPaths.add(node.getPath());
         }
+    }
+
+    /**
+     * Grant the caller the owner role on every node {@link #recordOwnedNode} collected. The ACE is
+     * written by the module through a system session instead of by the caller, so uploading a module
+     * needs {@code jahiaForgeUploadModule} and write access and nothing more. A guest owns nothing.
+     * Call this after {@code ctx.session.save()}: a separate session cannot see unsaved nodes.
+     */
+    private static void grantOwnerRoles(UploadContext ctx) throws RepositoryException {
+        final String username = ctx.session.getUser().getUsername();
+        if (Constants.GUEST_USERNAME.equals(username) || ctx.ownedPaths.isEmpty()) {
+            return;
+        }
+        JCRTemplate.getInstance().doExecuteWithSystemSessionAsUser(null, ctx.session.getWorkspace().getName(), null, systemSession -> {
+            for (String path : ctx.ownedPaths) {
+                systemSession.getNode(path).grantRoles("u:" + username, new HashSet<>(Collections.singletonList(OWNER)));
+            }
+            systemSession.save();
+            return null;
+        });
     }
 
     private static void partitionParams(Map<String, List<String>> source,
@@ -608,17 +641,17 @@ public class CreateEntryFromJar extends Action {
     }
 
     /**
-     * Upsert the module node (creating its groupId folders as needed), grant the caller the owner
-     * role, and check whether {@code version} may be added. Shared by both upload paths.
+     * Upsert the module node (creating its groupId folders as needed), record the caller as its
+     * owner, and check whether {@code version} may be added. Shared by both upload paths.
      */
-    private ModulePrep prepareModuleVersion(HttpServletRequest request, JCRNodeWrapper repository, String groupId,
+    private ModulePrep prepareModuleVersion(UploadContext ctx, JCRNodeWrapper repository, String groupId,
                                             String moduleName, Map<String, List<String>> moduleParameters,
-                                            String version, JCRSessionWrapper session)
+                                            String version)
             throws RepositoryException, JSONException {
         final String moduleRelPath = groupId.replace(".", FileSystem.SEPARATOR) + FileSystem.SEPARATOR + moduleName;
-        final JCRNodeWrapper module = upsertModuleNode(request, repository, moduleRelPath, groupId, moduleName, moduleParameters);
-        grantOwnerRole(session, module);
-        return new ModulePrep(module, versionConflict(module, version, moduleName, session));
+        final JCRNodeWrapper module = upsertModuleNode(ctx.request, repository, moduleRelPath, groupId, moduleName, moduleParameters);
+        recordOwnedNode(ctx, module);
+        return new ModulePrep(module, versionConflict(module, version, moduleName, ctx.session));
     }
 
     /** The "version already exists" error result, or null when {@code version} may be added. */
@@ -650,14 +683,14 @@ public class CreateEntryFromJar extends Action {
         return title;
     }
 
-    /** Create the version node under a module, set its dependency references, and grant the owner role. */
-    private JCRNodeWrapper createModuleVersion(HttpServletRequest request, JCRNodeWrapper module,
+    /** Create the version node under a module, set its dependency references, and record its owner. */
+    private JCRNodeWrapper createModuleVersion(UploadContext ctx, JCRNodeWrapper module,
                                                Map<String, List<String>> versionParameters, String version,
-                                               String dependencies, JCRSessionWrapper session) throws RepositoryException {
-        final JCRNodeWrapper moduleVersion = createNode(request, versionParameters, module,
+                                               String dependencies) throws RepositoryException {
+        final JCRNodeWrapper moduleVersion = createNode(ctx.request, versionParameters, module,
                 JNT_FORGEMODULEVERSION, module.getName() + "-" + version, false);
         moduleVersion.setProperty(REFERENCES, dependencies != null ? dependencies.split(",") : EMPTY_REFERENCES);
-        grantOwnerRole(session, moduleVersion);
+        recordOwnedNode(ctx, moduleVersion);
         return moduleVersion;
     }
 

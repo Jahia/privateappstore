@@ -1,0 +1,18 @@
+query GetAclEntries($workspace: Workspace!, $path: String!) {
+    jcr(workspace: $workspace) {
+        nodeByPath(path: $path) {
+            acl {
+                aclEntries {
+                    principal {
+                        name
+                    }
+                    role {
+                        name
+                    }
+                    aclEntryType
+                    inherited
+                }
+            }
+        }
+    }
+}
