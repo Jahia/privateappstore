@@ -59,8 +59,9 @@ import java.util.List;
  * becomes-empty case — so it is reused rather than reimplemented. It does not save; this class
  * does.
  *
- * <p>{@code RBACUtils} is deprecated with no replacement exported by the platform, so Sonar
- * flags this use (java:S1874). It is kept deliberately: reimplementing a weak-reference ACL edit
+ * <p>{@code RBACUtils} is deprecated as a whole class — not {@code forRemoval} — and the
+ * platform exports no replacement, so {@code java:S1874} is suppressed at the single call site
+ * rather than worked around. It is kept deliberately: reimplementing a weak-reference ACL edit
  * by hand to satisfy a style rule would put more risk into a security fix than the deprecation
  * carries. Revisit when Jahia ships a supported role-permission API.
  *
@@ -124,6 +125,8 @@ public class StoreDeveloperRoleMigration {
     }
 
     /** @return how many stale permission references were revoked (0 when already clean). */
+    // java:S1874 - RBACUtils is deprecated with no exported replacement; see the class javadoc.
+    @SuppressWarnings("java:S1874")
     private Integer revokeStalePermission(JCRSessionWrapper session) throws RepositoryException {
         final String rolePath = ROLES_PATH + FileSystem.SEPARATOR + ROLE_NAME;
         if (!session.nodeExists(rolePath)) {
