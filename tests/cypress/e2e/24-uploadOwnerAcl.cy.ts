@@ -37,6 +37,11 @@ describe('A store developer can still upload, and owns what they upload (SEC-366
 
     const DEV = 'storedev';
     const DEV_PWD = 'Storedev#1234';
+    // A SECOND developer, holding the same one role. The upload it makes reuses DEV's module node,
+    // which is the case the elevated grant has to refuse.
+    const DEV2 = 'storedev2';
+    const DEV2_PWD = 'Storedev2#1234';
+    const versionPath110 = `${modulePath}/cy-js-module-1.1.0`;
 
     /** The roles each ACE on `path` grants, keyed by ACE node name, read in LIVE as root. */
     const aclRolesByEntry = (path: string) =>
@@ -73,8 +78,8 @@ describe('A store developer can still upload, and owns what they upload (SEC-366
      * True when some ACE both names the uploader and grants the owner role. Matching the
      * principal loosely (Jahia writes "GRANT_u_storedev") but the role exactly.
      */
-    const ownsNode = (entries: Record<string, string[]>) =>
-        Object.entries(entries).some(([name, roles]) => name.includes(DEV) && roles.includes('owner'));
+    const ownsNode = (entries: Record<string, string[]>, user: string) =>
+        Object.entries(entries).some(([name, roles]) => name.includes(user) && roles.includes('owner'));
 
     before(() => {
         cy.login();
@@ -92,6 +97,8 @@ describe('A store developer can still upload, and owns what they upload (SEC-366
         });
         createUser(DEV, DEV_PWD);
         grantRoles(sitePath, ['store-developer'], DEV, 'USER');
+        createUser(DEV2, DEV2_PWD);
+        grantRoles(sitePath, ['store-developer'], DEV2, 'USER');
         // The developer uploads from the live store front-end, so the site (and the grant that
         // lets them see it) has to be published.
         publishAndWaitJobEnding(sitePath, ['en']);
@@ -101,6 +108,7 @@ describe('A store developer can still upload, and owns what they upload (SEC-366
         cy.login();
         deleteSite(siteKey);
         deleteUser(DEV);
+        deleteUser(DEV2);
     });
 
     it('completes the upload and records the uploader as owner', function () {
@@ -141,10 +149,45 @@ describe('A store developer can still upload, and owns what they upload (SEC-366
         // 2. The elevated grant landed on BOTH nodes the upload creates. Checking only the module
         //    node would miss a flush that stopped after the first identifier.
         aclRolesByEntry(modulePath).then(entries => {
-            expect(ownsNode(entries), `owner ACE for ${DEV} on the module node, got ${JSON.stringify(entries)}`).to.equal(true);
+            expect(ownsNode(entries, DEV), `owner ACE for ${DEV} on the module node, got ${JSON.stringify(entries)}`).to.equal(true);
         });
         aclRolesByEntry(versionPath).then(entries => {
-            expect(ownsNode(entries), `owner ACE for ${DEV} on the version node, got ${JSON.stringify(entries)}`).to.equal(true);
+            expect(ownsNode(entries, DEV), `owner ACE for ${DEV} on the version node, got ${JSON.stringify(entries)}`).to.equal(true);
+        });
+    });
+
+    it('gives a second developer their own version, and not the module somebody else owns', function () {
+        // Runs after the upload above, which is what creates the module this one adds a version to.
+        cy.request({
+            url: '/modules/jahia-store-template/dist/client/components/forge/ModuleEditor.client.tsx.js',
+            failOnStatusCode: false
+        }).then(res => {
+            if (res.status !== 200) {
+                this.skip();
+            }
+        });
+
+        cy.login(DEV2, DEV2_PWD);
+        cy.visit(`/cms/render/live/en/sites/${siteKey}/home/my-modules.html`);
+        cy.get('[data-upload-ready="true"]', {timeout: 20000}).should('exist');
+
+        cy.intercept('POST', /createEntryFromJar\.do/).as('upload2');
+        // 1.1.0 of the SAME module: upsertModuleNode returns DEV's stored node rather than creating one.
+        cy.get('input[type="file"][name="file"]').selectFile('assets/cy-js-module-1.1.0.tgz', {force: true});
+        cy.get('[data-upload-ready] button[type="submit"]').click();
+        cy.wait('@upload2', {timeout: 60000});
+
+        cy.login();
+        // The version node is new, so the second developer owns it.
+        aclRolesByEntry(versionPath110).then(entries => {
+            expect(ownsNode(entries, DEV2), `owner ACE for ${DEV2} on its own version node, got ${JSON.stringify(entries)}`).to.equal(true);
+        });
+
+        // The module node is not, so the second developer must NOT own it, and the first still must.
+        // A system session writes these entries, so nothing else refuses this one.
+        aclRolesByEntry(modulePath).then(entries => {
+            expect(ownsNode(entries, DEV2), `no owner ACE for ${DEV2} on ${DEV}'s module node, got ${JSON.stringify(entries)}`).to.equal(false);
+            expect(ownsNode(entries, DEV), `owner ACE for ${DEV} still on its own module node, got ${JSON.stringify(entries)}`).to.equal(true);
         });
     });
 });
