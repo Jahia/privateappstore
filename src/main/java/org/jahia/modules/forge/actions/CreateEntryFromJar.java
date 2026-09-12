@@ -117,6 +117,11 @@ public class CreateEntryFromJar extends Action {
     private static final String SCREENSHOTS = "screenshots";
     private static final String VIDEO = "video";
     private static final String CHANGE_LOG = "changeLog";
+    /**
+     * Immutable release date of a version node. Deliberately NOT in any *_PARAM_KEYS list: it is
+     * written from the server clock only, so an upload cannot forge its own release date.
+     */
+    private static final String UPLOAD_DATE = "uploadDate";
     private static final String FILE_DSA_SIGNATURE = "fileDsaSignature";
     private static final String REFERENCES = "references";
     private static final String SUCCESS_REDIRECT_URL = "successRedirectUrl";
@@ -397,6 +402,7 @@ public class CreateEntryFromJar extends Action {
         }
 
         JCRNodeWrapper packageVersion = createNode(ctx.request, versionParameters, modulesPackage, JNT_FORGEPACKAGEVERSION, modulesPackage.getName() + "-" + version, false);
+        stampUploadDate(packageVersion);
         ctx.ownerGrants.recordOwner(packageVersion);
         packageVersion.uploadFile(ctx.uploadedFile.getName(), ctx.uploadedFile.getInputStream(), ctx.uploadedFile.getContentType());
 
@@ -663,8 +669,26 @@ public class CreateEntryFromJar extends Action {
         final JCRNodeWrapper moduleVersion = createNode(request, versionParameters, module,
                 JNT_FORGEMODULEVERSION, module.getName() + "-" + version, false);
         moduleVersion.setProperty(REFERENCES, dependencies != null ? dependencies.split(",") : EMPTY_REFERENCES);
+        stampUploadDate(moduleVersion);
         ownerGrants.recordOwner(moduleVersion);
         return moduleVersion;
+    }
+
+    /**
+     * Stamp the release date of a freshly created version node - the date the storefront shows as
+     * "Released", for the version and for its module.
+     *
+     * Written ONCE, at creation, and never rewritten: the storefront used to read jcr:lastModified,
+     * so editing a changelog or toggling "published" moved a release date. Guarded by hasProperty
+     * rather than set unconditionally, so no later code path can overwrite a historical date; a
+     * re-upload of an existing version number is refused earlier by hasValidVersionNumber anyway.
+     * Versions created outside this action (jContent, GraphQL, provisioning) have no uploadDate -
+     * the storefront falls back to jcr:lastModified for those, exactly as before.
+     */
+    private void stampUploadDate(JCRNodeWrapper versionNode) throws RepositoryException {
+        if (!versionNode.hasProperty(UPLOAD_DATE)) {
+            versionNode.setProperty(UPLOAD_DATE, Calendar.getInstance());
+        }
     }
 
     /** Build the success result (module URLs + safe redirect) shared by both upload paths. */
