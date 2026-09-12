@@ -97,9 +97,7 @@ describe('Storefront read views (JS module)', () => {
         // GroupId is intrinsic to a JAR module; the version download URL is GENERATED
         // from it (+ name/version/site), not stored on the version node.
         setNodeProperty(`${repo}/analytics`, 'groupId', 'org.cypress.test', 'en');
-        // The IMMUTABLE release date jahia-store stamps at upload time (uploadDate). Seeded well
-        // in the past so the assertions can tell it apart from jcr:lastModified, which every
-        // property write below moves to "now".
+        // Seeded in the past so the assertions can tell it apart from jcr:lastModified.
         addNode(`${repo}/analytics`, 'v100', 'jnt:forgeModuleVersion', [
             {name: 'versionNumber', value: '1.0.0'},
             {name: 'published', value: 'true'},
@@ -342,8 +340,7 @@ describe('Storefront read views (JS module)', () => {
     });
 
     it('keeps the release date fixed when the module and its version are edited', () => {
-        // The regression this whole feature exists for: the date used to be jcr:lastModified, so
-        // editing a changelog or a description silently re-dated a release. Touch both nodes...
+        // Touch both nodes; neither date may move.
         setNodeProperty(`${repo}/analytics/v100`, 'changeLog', '<ul><li>Edited changelog</li></ul>', 'en');
         setNodeProperty(`${repo}/analytics`, 'description', '<p>Edited description.</p>', 'en');
 
@@ -363,8 +360,7 @@ describe('Storefront read views (JS module)', () => {
     });
 
     it('omits the release date while every version is still a draft', () => {
-        // The draft module has no published version at all, so the rail shows no date rather than
-        // falling back to the module node's own last-modified date.
+        // No published version: the rail shows no date rather than the module's own.
         cy.visit(`/cms/render/default/en${repo}/draft.html`);
         cy.get('[data-detail-info]', {timeout: 20000}).should('be.visible');
         cy.get('[data-detail-info]').contains('dt', /released/i).should('not.exist');

@@ -1,45 +1,21 @@
 /*
  * backfill-upload-date.groovy
  * ---------------------------------------------------------------------------
- * Seed `uploadDate` on module/package VERSION nodes that predate the property.
+ * Seed `uploadDate` on module/package VERSION nodes that predate the property, from their
+ * current jcr:lastModified - the best record of the original release that exists. Not
+ * jcr:created: that is the migration run date for content copied from the legacy store.
  *
- * WHY
- *   The storefront shows a version's release date, and a module's "Released" date, from
- *   `uploadDate` — stamped once by createEntryFromJar when the version node is created and never
- *   rewritten, so editing a changelog or toggling "published" no longer moves a release date.
- *   Versions uploaded BEFORE that change have no uploadDate; the storefront falls back to
- *   jcr:lastModified for them, which is exactly the drifting value we are moving away from.
- *   This script freezes each version's current jcr:lastModified into uploadDate — the best record
- *   of the original release that exists — after which the date is stable.
+ * SAVES WITH EVENT LISTENERS DISABLED - do not "simplify" this away. LastModifiedListener would
+ * otherwise re-stamp jcr:lastModified on every version it touches, which resets the pubDate of,
+ * and re-sorts, the module-list RSS feed (jnt_contentFolder/rss/...moduleList.jsp still dates and
+ * orders by jcr:lastModified). Jackrabbit still indexes what is persisted.
  *
- *   jcr:created is NOT used: it is the migration run date for content copied from the legacy
- *   store (jcr:created is protected, so the content migration could not preserve it).
+ * RUN ONCE PER WORKSPACE ('live', then 'default'). Versions uploaded from the live storefront are
+ * created directly in LIVE and never published from EDIT, so a 'default'-only pass misses them.
  *
- * WHY LISTENERS ARE DISABLED (do not "simplify" this away)
- *   Jahia's LastModifiedListener re-stamps jcr:lastModified to "now" on every save. A plain save
- *   here would therefore rewrite jcr:lastModified on EVERY version node — which would reset the
- *   `pubDate` of, and re-sort, the module-list RSS feed (jnt_contentFolder/rss/…moduleList.jsp
- *   still sorts and dates by jcr:lastModified). Saving with Jahia's app-level listeners disabled
- *   leaves those values untouched; Jackrabbit still indexes what is persisted.
- *
- * WORKSPACES
- *   Version nodes uploaded from the LIVE storefront are created directly in LIVE and never
- *   published from EDIT, so a 'default'-only pass would miss them. Run the script ONCE PER
- *   WORKSPACE: WORKSPACE='live', then WORKSPACE='default'. Nodes absent from a workspace are
- *   simply not visited there.
- *
- * Idempotent: a version that already has uploadDate is left untouched. Re-runnable.
- *
- * HOW TO RUN
- *   Jahia Tools > Groovy Console (https://<host>/modules/tools/groovyConsole.jsp), or via the
- *   provisioning API `executeScript`. Edit the CONFIG block, run with DRY_RUN = true first to
- *   preview, then set DRY_RUN = false to apply.
- *
- * AFTER RUNNING (verification)
- *   Spot-check a handful of versions: uploadDate must equal the jcr:lastModified they had before
- *   the run, and their jcr:lastModified must be UNCHANGED. If jcr:lastModified moved to "now",
- *   the listener suppression did not take effect — restore from backup and investigate before
- *   re-running.
+ * Idempotent. Run from Jahia Tools > Groovy Console or the provisioning API `executeScript`, with
+ * DRY_RUN = true first. Afterwards spot-check that uploadDate matches the old jcr:lastModified and
+ * that jcr:lastModified itself has NOT moved; if it has, the listener suppression did not take.
  * ---------------------------------------------------------------------------
  */
 

@@ -117,10 +117,7 @@ public class CreateEntryFromJar extends Action {
     private static final String SCREENSHOTS = "screenshots";
     private static final String VIDEO = "video";
     private static final String CHANGE_LOG = "changeLog";
-    /**
-     * Immutable release date of a version node. Deliberately NOT in any *_PARAM_KEYS list: it is
-     * written from the server clock only, so an upload cannot forge its own release date.
-     */
+    /** Never add to *_PARAM_KEYS: server clock only, so an upload cannot forge its release date. */
     private static final String UPLOAD_DATE = "uploadDate";
     private static final String FILE_DSA_SIGNATURE = "fileDsaSignature";
     private static final String REFERENCES = "references";
@@ -674,17 +671,7 @@ public class CreateEntryFromJar extends Action {
         return moduleVersion;
     }
 
-    /**
-     * Stamp the release date of a freshly created version node - the date the storefront shows as
-     * "Released", for the version and for its module.
-     *
-     * Written ONCE, at creation, and never rewritten: the storefront used to read jcr:lastModified,
-     * so editing a changelog or toggling "published" moved a release date. Guarded by hasProperty
-     * rather than set unconditionally, so no later code path can overwrite a historical date; a
-     * re-upload of an existing version number is refused earlier by hasValidVersionNumber anyway.
-     * Versions created outside this action (jContent, GraphQL, provisioning) have no uploadDate -
-     * the storefront falls back to jcr:lastModified for those, exactly as before.
-     */
+    /** Written once, at creation: the guard stops any later path re-dating a release. */
     private void stampUploadDate(JCRNodeWrapper versionNode) throws RepositoryException {
         if (!versionNode.hasProperty(UPLOAD_DATE)) {
             versionNode.setProperty(UPLOAD_DATE, Calendar.getInstance());

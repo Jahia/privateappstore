@@ -282,11 +282,8 @@ JCRTemplate.getInstance().doExecuteWithSystemSession(null, WORKSPACE, { JCRSessi
             // Preserve the version's historical "updated" date (the date the storefront shows /
             // sorts "Latest releases" by) before any other change re-stamps it.
             preserveLastModified(tv, sv)
-            // Seed the immutable release date. The legacy store has no uploadDate, and the
-            // storefront's fallback (jcr:lastModified) drifts the moment anyone edits this
-            // version's changelog in the target store — so freeze the historical date we just
-            // preserved into uploadDate, which nothing rewrites. A source that already HAS an
-            // uploadDate carried it over with the node copy, so this only fills the gaps.
+            // Freeze the preserved date into uploadDate: the jcr:lastModified fallback
+            // drifts as soon as anyone edits this version in the target store.
             if (!tv.hasProperty('uploadDate') && tv.hasProperty('jcr:lastModified')) {
                 tv.setProperty('uploadDate', tv.getProperty('jcr:lastModified').getDate())
                 stats.uploadDatesSeeded++
