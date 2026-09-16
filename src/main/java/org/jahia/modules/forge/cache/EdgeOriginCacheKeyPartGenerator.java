@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.filter.cache.CacheKeyPartGenerator;
+import org.jahia.services.render.filter.cache.ClientCachePolicy;
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -94,5 +95,26 @@ public class EdgeOriginCacheKeyPartGenerator implements CacheKeyPartGenerator {
     @Override
     public String replacePlaceholders(RenderContext renderContext, String keyPart) {
         return keyPart;
+    }
+
+    /**
+     * Must be implemented, not inherited. {@code ClientCachePolicy Contributor}'s default
+     * method returns {@link ClientCachePolicy#PRIVATE} and logs a warning naming the
+     * offending class. Because policies from every contributor are combined with
+     * {@code ClientCachePolicy.strongest(...)}, and because part generators are global,
+     * inheriting that default would force PRIVATE client caching on every fragment on the
+     * platform — a broad performance regression contributed by a module that only wanted
+     * an extra cache-key component.
+     *
+     * <p>{@link ClientCachePolicy#DEFAULT} is the correct answer here: knowing which
+     * network a request came from does not make the response unsafe to cache client-side.
+     * The browser cache is per-user, and the CDN only ever sees public traffic because VPN
+     * traffic reaches the origin directly — so a shared cache can never hold a VPN variant
+     * and hand it to a public visitor.
+     */
+    @Override
+    public ClientCachePolicy getClientCachePolicy(Resource resource, RenderContext renderContext,
+            Properties properties, String key) {
+        return ClientCachePolicy.DEFAULT;
     }
 }
