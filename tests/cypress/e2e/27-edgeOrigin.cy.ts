@@ -3,7 +3,9 @@ import {createSite, deleteSite, publishAndWaitJobEnding} from '@jahia/cypress';
 /**
  * SUPPORT-687 — regression coverage for the edge lockdown of store.jahia.com.
  *
- * Proves two things that an HAProxy-only test cannot:
+ * Covers this module's own behaviour: the cache key component, the header-driven
+ * rendering and the authentication valve. Reverse-proxy configuration is out of scope
+ * here and is validated with the infrastructure that owns it.
  *
  *  1. jahia-store-template omits the header sign-in trigger when the request carries
  *     X-Jahia-Edge: public, and renders it otherwise.
@@ -82,25 +84,39 @@ describe('SUPPORT-687 — edge origin drives the sign-in trigger, per cache entr
     });
 
     /**
-     * Only meaningful with the edge in front of Jahia. CI and local dev run without it,
-     * so probe first and skip rather than fail — the three arms above already cover the
-     * module's own behaviour, which is what this suite owns.
+     * PublicEdgeGuestValve: a request marked as coming from the public CDN must be
+     * anonymous even when it carries a fully authenticated session.
+     *
+     * The probe is an endpoint that REQUIRES authentication, not a "who am I" query -
+     * GraphQL's currentUser is refused by the security profile regardless of who asks,
+     * so it cannot tell the two apart. /jahia/administration/ answers 200 to an
+     * authenticated request and 401 to a guest, which is exactly the distinction under
+     * test. Measured on 8.2.3.2: auth=200, auth+public=401, anonymous=401.
      */
-    it('lets HAProxy overwrite a client-supplied X-Jahia-Edge', function () {
-        const proxied = `http://haproxy:8080${homeLive}`;
-        cy.request({url: proxied, failOnStatusCode: false, timeout: 5000})
-            .then(res => {
-                if (res.status >= 500) {
-                    this.skip();
-                }
-            })
-            .then(() => {
-                // Straight at Jahia the forged value is believed; nothing sanitises it there.
-                fetchHome('public').its('body').should('not.include', SIGN_IN_MARKER);
-                // Through HAProxy's VPN listener the same forged header is deleted and
-                // re-set to "vpn", so the trigger comes back. This is what stops a visitor
-                // poisoning the cache entry that operators then read.
-                fetchHome('public', proxied).its('body').should('include', SIGN_IN_MARKER);
-            });
+    const ADMIN_PROBE = '/jahia/administration/';
+    const probeAs = (edge?: string) =>
+        cy.request({
+            url: ADMIN_PROBE,
+            headers: edge ? {'X-Jahia-Edge': edge} : {},
+            failOnStatusCode: false
+        });
+
+    it('treats an authenticated session as guest when the request came from the public edge', () => {
+        cy.login();
+        // Control: the same session, unmarked, still reaches the back office.
+        probeAs().its('status').should('eq', 200);
+        // Marked public, the valve terminates the auth pipeline before the session valve
+        // runs, so the request is guest and the back office refuses it.
+        probeAs('public').its('status').should('eq', 401);
+        // An explicit vpn marking behaves like no marking at all.
+        probeAs('vpn').its('status').should('eq', 200);
+    });
+
+    it('leaves the session intact, so the same browser is still authenticated afterwards', () => {
+        cy.login();
+        // Stripping the cookie at the edge, or removing the session user in a filter,
+        // would have logged the operator out everywhere. The valve mutates nothing.
+        probeAs('public').its('status').should('eq', 401);
+        probeAs().its('status').should('eq', 200);
     });
 });

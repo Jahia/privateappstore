@@ -82,14 +82,17 @@ public class EdgeOriginCacheKeyPartGenerator implements CacheKeyPartGenerator {
      * instead of re-deriving it and drifting from it.
      */
     public static boolean isPublicEdge(RenderContext renderContext) {
-        if (renderContext == null) {
-            return false;
-        }
-        HttpServletRequest request = renderContext.getRequest();
-        if (request == null) {
-            return false;
-        }
-        return PUBLIC_EDGE.equalsIgnoreCase(request.getHeader(EDGE_HEADER));
+        return renderContext != null && isPublicEdge(renderContext.getRequest());
+    }
+
+    /**
+     * Same question from a raw request, for callers outside the rendering pipeline -
+     * notably {@code PublicEdgeGuestValve}, which runs during authentication and has no
+     * RenderContext. Kept as the single implementation so the valve and the cache key can
+     * never disagree about what "public" means.
+     */
+    public static boolean isPublicEdge(HttpServletRequest request) {
+        return request != null && PUBLIC_EDGE.equalsIgnoreCase(request.getHeader(EDGE_HEADER));
     }
 
     @Override
