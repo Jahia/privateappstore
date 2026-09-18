@@ -43,6 +43,6 @@ export default defineConfig({
     env: {
         SUPER_USER_PASSWORD: process.env.SUPER_USER_PASSWORD || 'root1234',
         PRIVATEAPPSTORE_VERSION: process.env.PRIVATEAPPSTORE_VERSION || '5.1.2-SNAPSHOT',
-        STORE_TEMPLATE_VERSION: process.env.STORE_TEMPLATE_VERSION || '5.0.5-SNAPSHOT'
+        STORE_TEMPLATE_VERSION: process.env.STORE_TEMPLATE_VERSION || '5.0.6-SNAPSHOT'
     }
 });
