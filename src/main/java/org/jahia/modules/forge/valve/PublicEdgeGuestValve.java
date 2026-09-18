@@ -82,6 +82,14 @@ public final class PublicEdgeGuestValve extends BaseAuthValve {
         HttpServletRequest request = authContext.getRequest();
 
         if (EdgeOriginCacheKeyPartGenerator.isPublicEdge(request)) {
+            // This request must be anonymous, but the SESSION must not change: the same
+            // session is the operator's, and they are expected to still be signed in the
+            // moment they are back on the trusted network. Say explicitly that nothing
+            // from this request's (non-)authentication may be written back, so a guest
+            // resolution cannot be persisted over the stored user and turn a per-request
+            // decision into a permanent logout.
+            authContext.setShouldStoreAuthInSession(false);
+
             // Terminate the pipeline. No valve authenticates, so the request is guest.
             // Deliberately no VALVE_RESULT is set: this is not a failed login, it is a
             // request that may not be authenticated at all, and marking it BAD_PASSWORD
