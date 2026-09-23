@@ -93,9 +93,14 @@ final class OwnerRoleGrants {
      *                      which this instance may ever grant the owner role
      */
     OwnerRoleGrants(JCRSessionWrapper callerSession, JCRNodeWrapper scopeRoot) {
+        this(callerSession, scopeRoot.getPath(), callerSession.getUser().getUsername());
+    }
+
+    // package-private for unit testing: lets a test build an instance without a live session
+    OwnerRoleGrants(JCRSessionWrapper callerSession, String scopeRootPath, String username) {
         this.callerSession = callerSession;
-        this.scopeRootPath = scopeRoot.getPath();
-        this.username = callerSession.getUser().getUsername();
+        this.scopeRootPath = scopeRootPath;
+        this.username = username;
     }
 
     /** The caller's session, so callers that only needed it to reach this collector can share one argument. */
@@ -113,6 +118,12 @@ final class OwnerRoleGrants {
             return;
         }
         pendingIdentifiers.add(node.getIdentifier());
+    }
+
+    /** The identifiers {@link #flush()} would grant on, in recording order. */
+    // package-private for unit testing
+    Set<String> getPendingIdentifiers() {
+        return Collections.unmodifiableSet(pendingIdentifiers);
     }
 
     /**

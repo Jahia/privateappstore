@@ -1,10 +1,14 @@
 package org.jahia.modules.forge.actions;
 
 import org.jahia.api.Constants;
+import org.jahia.services.content.JCRNodeWrapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+
+import javax.jcr.RepositoryException;
+import java.lang.reflect.Proxy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -91,5 +95,58 @@ class OwnerRoleGrantsTest {
     void shouldRecord_guest_isFalse() {
         assertThat(OwnerRoleGrants.shouldRecord(Constants.GUEST_USERNAME, true)).isFalse();
         assertThat(OwnerRoleGrants.shouldRecord(Constants.GUEST_USERNAME, false)).isFalse();
+    }
+
+    // ── recordOwner wires the predicate to the node's own isNew() ──────────────
+    // The truth table above states the predicate. These state that recordOwner asks it with the
+    // node's real isNew(), so dropping or hard-coding that argument turns them red.
+
+    @Test
+    @DisplayName("recordOwner queues a node the upload created")
+    void recordOwner_newNode_isQueued() throws RepositoryException {
+        final OwnerRoleGrants grants = new OwnerRoleGrants(null, REPO, UPLOADER);
+
+        grants.recordOwner(node("new-module", true));
+
+        assertThat(grants.getPendingIdentifiers()).containsExactly("new-module");
+    }
+
+    @Test
+    @DisplayName("recordOwner skips a node that was already there, and keeps the new one")
+    void recordOwner_reusedNode_isSkipped() throws RepositoryException {
+        final OwnerRoleGrants grants = new OwnerRoleGrants(null, REPO, UPLOADER);
+
+        // The second developer's upload: DEV's stored module, then the version created under it.
+        grants.recordOwner(node("someone-elses-module", false));
+        grants.recordOwner(node("my-new-version", true));
+
+        assertThat(grants.getPendingIdentifiers()).containsExactly("my-new-version");
+    }
+
+    @Test
+    @DisplayName("recordOwner queues nothing for a guest")
+    void recordOwner_guest_queuesNothing() throws RepositoryException {
+        final OwnerRoleGrants grants = new OwnerRoleGrants(null, REPO, Constants.GUEST_USERNAME);
+
+        grants.recordOwner(node("new-module", true));
+
+        assertThat(grants.getPendingIdentifiers()).isEmpty();
+    }
+
+    /** A node answering only isNew() and getIdentifier(), which is all recordOwner may touch. */
+    private static JCRNodeWrapper node(String identifier, boolean isNew) {
+        return (JCRNodeWrapper) Proxy.newProxyInstance(
+                OwnerRoleGrantsTest.class.getClassLoader(),
+                new Class<?>[]{JCRNodeWrapper.class},
+                (proxy, method, args) -> {
+                    switch (method.getName()) {
+                        case "isNew":
+                            return isNew;
+                        case "getIdentifier":
+                            return identifier;
+                        default:
+                            throw new UnsupportedOperationException(method.getName());
+                    }
+                });
     }
 }
