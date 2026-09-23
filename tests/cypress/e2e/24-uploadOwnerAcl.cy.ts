@@ -75,11 +75,12 @@ describe('A store developer can still upload, and owns what they upload (SEC-366
             });
 
     /**
-     * True when some ACE both names the uploader and grants the owner role. Matching the
-     * principal loosely (Jahia writes "GRANT_u_storedev") but the role exactly.
+     * True when the uploader's own GRANT ACE carries the owner role. The ACE name is matched
+     * exactly (Jahia writes "GRANT_u_<username>"): DEV is a prefix of DEV2, so a substring match
+     * would let DEV2's entry pass for DEV's.
      */
     const ownsNode = (entries: Record<string, string[]>, user: string) =>
-        Object.entries(entries).some(([name, roles]) => name.includes(user) && roles.includes('owner'));
+        (entries[`GRANT_u_${user}`] ?? []).includes('owner');
 
     before(() => {
         cy.login();
