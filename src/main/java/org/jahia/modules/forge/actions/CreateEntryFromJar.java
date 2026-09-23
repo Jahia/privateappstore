@@ -117,6 +117,8 @@ public class CreateEntryFromJar extends Action {
     private static final String SCREENSHOTS = "screenshots";
     private static final String VIDEO = "video";
     private static final String CHANGE_LOG = "changeLog";
+    /** Never add to *_PARAM_KEYS: server clock only, so an upload cannot forge its release date. */
+    private static final String UPLOAD_DATE = "uploadDate";
     private static final String FILE_DSA_SIGNATURE = "fileDsaSignature";
     private static final String REFERENCES = "references";
     private static final String SUCCESS_REDIRECT_URL = "successRedirectUrl";
@@ -397,6 +399,7 @@ public class CreateEntryFromJar extends Action {
         }
 
         JCRNodeWrapper packageVersion = createNode(ctx.request, versionParameters, modulesPackage, JNT_FORGEPACKAGEVERSION, modulesPackage.getName() + "-" + version, false);
+        stampUploadDate(packageVersion);
         ctx.ownerGrants.recordOwner(packageVersion);
         packageVersion.uploadFile(ctx.uploadedFile.getName(), ctx.uploadedFile.getInputStream(), ctx.uploadedFile.getContentType());
 
@@ -663,8 +666,16 @@ public class CreateEntryFromJar extends Action {
         final JCRNodeWrapper moduleVersion = createNode(request, versionParameters, module,
                 JNT_FORGEMODULEVERSION, module.getName() + "-" + version, false);
         moduleVersion.setProperty(REFERENCES, dependencies != null ? dependencies.split(",") : EMPTY_REFERENCES);
+        stampUploadDate(moduleVersion);
         ownerGrants.recordOwner(moduleVersion);
         return moduleVersion;
+    }
+
+    /** Written once, at creation: the guard stops any later path re-dating a release. */
+    private void stampUploadDate(JCRNodeWrapper versionNode) throws RepositoryException {
+        if (!versionNode.hasProperty(UPLOAD_DATE)) {
+            versionNode.setProperty(UPLOAD_DATE, Calendar.getInstance());
+        }
     }
 
     /** Build the success result (module URLs + safe redirect) shared by both upload paths. */
