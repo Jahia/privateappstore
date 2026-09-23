@@ -8,17 +8,6 @@ on:
     types: [opened, reopened, synchronize]
 
 jobs:
-  update-signature:
-    name: Update module signature
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: jahia/jahia-modules-action/update-signature@v2
-        with:
-          nexus_username: ${{ secrets.NEXUS_USERNAME }}
-          nexus_password: ${{ secrets.NEXUS_PASSWORD }}
-          nexus_enterprise_releases_url: ${{ secrets.NEXUS_ENTERPRISE_RELEASES_URL }}
-
   static-analysis:
     name: Static Analysis (linting, vulns)
     runs-on: ubuntu-latest
@@ -33,7 +22,6 @@ jobs:
 
   build:
     name: Build Module
-    needs: update-signature
     runs-on: ubuntu-latest
     env:
       NEXUS_INTERNAL_URL: https://devtools.jahia.com/nexus/content/groups/internal/
