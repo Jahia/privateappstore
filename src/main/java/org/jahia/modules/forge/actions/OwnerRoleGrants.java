@@ -93,9 +93,14 @@ final class OwnerRoleGrants {
      *                      which this instance may ever grant the owner role
      */
     OwnerRoleGrants(JCRSessionWrapper callerSession, JCRNodeWrapper scopeRoot) {
+        this(callerSession, scopeRoot.getPath(), callerSession.getUser().getUsername());
+    }
+
+    // package-private for unit testing: lets a test build an instance without a live session
+    OwnerRoleGrants(JCRSessionWrapper callerSession, String scopeRootPath, String username) {
         this.callerSession = callerSession;
-        this.scopeRootPath = scopeRoot.getPath();
-        this.username = callerSession.getUser().getUsername();
+        this.scopeRootPath = scopeRootPath;
+        this.username = username;
     }
 
     /** The caller's session, so callers that only needed it to reach this collector can share one argument. */
@@ -106,13 +111,45 @@ final class OwnerRoleGrants {
     /**
      * Remember that {@code node} should be owned by the uploader. Records the identifier rather
      * than the node, because the node may still be transient and will be re-resolved in the
-     * system session at {@link #flush()} time. Guest uploads record nothing.
+     * system session at {@link #flush()} time.
      */
     void recordOwner(JCRNodeWrapper node) throws RepositoryException {
-        if (Constants.GUEST_USERNAME.equals(username)) {
+        if (!shouldRecord(username, node.isNew())) {
             return;
         }
         pendingIdentifiers.add(node.getIdentifier());
+    }
+
+    /** The identifiers {@link #flush()} would grant on, in recording order. */
+    // package-private for unit testing
+    Set<String> getPendingIdentifiers() {
+        return Collections.unmodifiableSet(pendingIdentifiers);
+    }
+
+    /**
+     * True when this upload should own the node it just handled. Two facts decide it, and the
+     * second is what bounds the elevated write.
+     *
+     * <p>A guest owns nothing, so a guest upload records no node at all.
+     *
+     * <p>An upload owns only what it CREATED. {@code CreateEntryFromJar} reaches its module node
+     * through {@code upsertModuleNode}, and its package node through {@code upsertPackageNode},
+     * and both return the STORED node when one of that name already exists. {@code Action.createNode}
+     * reuses an existing node of the requested name in the same way. So the node handed here is not
+     * always a new one, and a reused node belongs to whoever uploaded it first. Recording it would
+     * put a second uploader's owner entry on that node, written by a system session that answers to
+     * no ACL. The subtree check in {@link #isWithin} does not cover this, because another
+     * developer's module sits under the same upload repository.
+     *
+     * <p>{@code isNew} is the discriminator, and it is read on the caller's own session before that
+     * session is saved, which is where it still answers correctly.
+     *
+     * @param username  the caller's username
+     * @param nodeIsNew whether the caller's session created the node in this request
+     */
+    // package-private for unit testing
+    static boolean shouldRecord(String username, boolean nodeIsNew) {
+        return !Constants.GUEST_USERNAME.equals(username) && nodeIsNew;
     }
 
     /**
